@@ -1,0 +1,5 @@
+#!/usr/bin/sh
+[ -z $1 ] && echo "error: mkmod <filename>" && exit
+touch include/$1.hpp
+touch src/$1.cpp
+code include/$1.hpp src/$1.cpp
