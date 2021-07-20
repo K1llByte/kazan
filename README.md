@@ -2,8 +2,10 @@
 
 An experimental computer graphics engine for learning purposes.
 
+<!-- 
 **Drawing a triangle**
 <meter id="progress" min="0" max="17" optimum="17" value="6"/>
+-->
 
 
 ## Requirements
