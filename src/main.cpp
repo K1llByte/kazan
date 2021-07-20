@@ -329,7 +329,7 @@ int main()
 {
     kzn::Window window(800, 800, "GLFW Window");
 
-    HelloTriangleApplication app;
+    Device app;
 
     try
     {
