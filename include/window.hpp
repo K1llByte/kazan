@@ -12,10 +12,10 @@ namespace kzn
 class Window
 {
     private:
-    int width;
-    int height;
-    std::string name;
-    GLFWwindow* window;
+    int m_width;
+    int m_height;
+    std::string m_name;
+    GLFWwindow* m_window;
     
     void create();
 
@@ -28,6 +28,7 @@ class Window
     Window& operator=(const Window&) = delete;
 
     bool should_close();
+    void create_window_surface(VkInstance instance, VkSurfaceKHR* surface);
 };
 
 }
