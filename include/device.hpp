@@ -25,6 +25,13 @@ struct QueueFamilyIndices
     }
 };
 
+struct SwapChainSupportDetails
+{
+    VkSurfaceCapabilitiesKHR capabilities;
+    std::vector<VkSurfaceFormatKHR> formats;
+    std::vector<VkPresentModeKHR> present_modes;
+};
+
 
 class Device
 {
@@ -39,8 +46,10 @@ private:
     VkSurfaceKHR m_surface;
 
     const bool enable_validation_layers = false;
-    const std::vector<const char *> validation_layers = {
-        "VK_LAYER_KHRONOS_validation"};
+    const std::vector<const char*> m_validation_layers = {
+        "VK_LAYER_KHRONOS_validation" };
+    const std::vector<const char*> m_device_extensions = {
+        VK_KHR_SWAPCHAIN_EXTENSION_NAME };
 
 public:
     Device(kzn::Window& window);
@@ -54,6 +63,13 @@ public:
 
     void run() {}
 
+    SwapChainSupportDetails get_swap_chain_support();
+    
+    VkSurfaceKHR surface() { return m_surface; }
+    VkDevice device() { return m_device; }
+
+    QueueFamilyIndices get_physical_queue_families();
+    
 private:
 
     void create_instance();
@@ -68,11 +84,15 @@ private:
 
     bool is_device_suitable(VkPhysicalDevice device);
 
+    bool has_device_extensions_support(VkPhysicalDevice device);
+
     QueueFamilyIndices find_queue_families(VkPhysicalDevice device);
 
     void create_logical_device();
 
     void create_surface();
+
+    SwapChainSupportDetails query_swap_chain_support(VkPhysicalDevice device);
 };
 
 }
