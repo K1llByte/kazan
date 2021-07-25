@@ -1,9 +1,0 @@
-bin/
-
-build/
-
-.vscode/
-
-*.o
-
-vulkan.md

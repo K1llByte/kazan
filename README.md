@@ -36,13 +36,18 @@ sudo pacman -S vulkan-validation-layers spirv-tools
 ### GLFW
 
 Library for window creation and managment
+
 ```sh
+sudo pacman -S glfw
+```
+
+<!-- ```sh
 # for x11
 sudo pacman -S glfw-x11
 
 # or for wayland
 sudo pacman -S glfw-wayland
-``` 
+```  -->
 
 ### GLM
 
