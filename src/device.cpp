@@ -160,7 +160,8 @@ namespace kzn
         // VkPhysicalDeviceFeatures device_features;
         // vkGetPhysicalDeviceFeatures(device, &device_features);
 
-        return device_properties.deviceType == VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU
+        if(device_properties.deviceType != VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU)
+            return false;
 #else
         QueueFamilyIndices indices = find_queue_families(device);
 

@@ -9,10 +9,16 @@ namespace kzn
         : m_device{device_ref}, m_window_extent{window_extent}
     {
         create_swap_chain();
+        create_image_views();
     }
 
     SwapChain::~SwapChain()
     {
+        for (auto& image_view : m_swap_chain_image_views)
+        {
+            vkDestroyImageView(m_device.device(), image_view, nullptr);
+        }
+
         vkDestroySwapchainKHR(m_device.device(), m_swap_chain, nullptr);
     }
 
@@ -68,8 +74,12 @@ namespace kzn
         if (vkCreateSwapchainKHR(m_device.device(), &create_info, nullptr, &m_swap_chain) != VK_SUCCESS)
             throw std::runtime_error("failed to create swap chain!");
 
-        swap_chain_image_format = surface_format.format;
-        swap_chain_extent = extent;
+        vkGetSwapchainImagesKHR(m_device.device(), swap_chain, &image_count, nullptr);
+        m_swap_chain_images.resize(image_count);
+        vkGetSwapchainImagesKHR(m_device.device(), swap_chain, &image_count, m_swap_chain_images.data());
+
+        m_swap_chain_image_format = surface_format.format;
+        m_swap_chain_extent = extent;
     }
 
     VkSurfaceFormatKHR SwapChain::choose_swap_surface_format(const std::vector<VkSurfaceFormatKHR> &available_formats)
@@ -83,7 +93,7 @@ namespace kzn
 
     VkPresentModeKHR SwapChain::choose_swap_present_mode(const std::vector<VkPresentModeKHR> &available_present_modes)
     {
-        for (const auto &present_mode : available_present_modes)
+        for (const auto& present_mode : available_present_modes)
             if (present_mode == VK_PRESENT_MODE_MAILBOX_KHR)
                 return present_mode;
 
@@ -103,6 +113,34 @@ namespace kzn
                 std::clamp(m_window_extent.height, capabilities.minImageExtent.height, capabilities.maxImageExtent.height)};
 
             return actual_extent;
+        }
+    }
+
+    void SwapChain::create_image_views()
+    {
+        m_swap_chain_image_views.resize(m_swap_chain_images.size());
+        for (size_t i = 0; i < swapChainImages.size(); i++)
+        {
+            VkImageViewCreateInfo create_info{};
+            create_info.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
+            create_info.image = m_swap_chain_images[i];
+            
+            create_info.viewType = VK_IMAGE_VIEW_TYPE_2D;
+            create_info.format = m_swap_chain_image_format;
+
+            create_info.components.r = VK_COMPONENT_SWIZZLE_IDENTITY;
+            create_info.components.g = VK_COMPONENT_SWIZZLE_IDENTITY;
+            create_info.components.b = VK_COMPONENT_SWIZZLE_IDENTITY;
+            create_info.components.a = VK_COMPONENT_SWIZZLE_IDENTITY;
+
+            create_info.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+            create_info.subresourceRange.baseMipLevel = 0;
+            create_info.subresourceRange.levelCount = 1;
+            create_info.subresourceRange.baseArrayLayer = 0;
+            create_info.subresourceRange.layerCount = 1;
+
+            if (vkCreateImageView(m_device.device(), &create_info, nullptr, &m_swap_chain_image_views[i]) != VK_SUCCESS)
+                throw std::runtime_error("failed to create image views!");
         }
     }
 }
