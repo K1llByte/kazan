@@ -2,15 +2,79 @@
 
 #include <iostream>
 #include <algorithm>
-//#include <iterator>
 
 namespace kzn
 {
+
+    static VKAPI_ATTR VkBool32 VKAPI_CALL debug_callback(
+        VkDebugUtilsMessageSeverityFlagBitsEXT /* message_severity */,
+        VkDebugUtilsMessageTypeFlagsEXT /* message_type */,
+        const VkDebugUtilsMessengerCallbackDataEXT* p_callback_data,
+        void* /* p_user_data */)
+    {
+        std::cout << "DEBUG > " << p_callback_data->pMessage << std::endl;
+        return VK_FALSE;
+    }
+
+    VkResult CreateDebugUtilsMessenger(
+        VkInstance instance,
+        const VkDebugUtilsMessengerCreateInfoEXT* p_create_info,
+        const VkAllocationCallbacks* p_allocator,
+        VkDebugUtilsMessengerEXT* p_debug_messenger)
+    {
+        auto func = (PFN_vkCreateDebugUtilsMessengerEXT) vkGetInstanceProcAddr(
+            instance,
+            "vkCreateDebugUtilsMessengerEXT");
+
+        return (func != nullptr)
+            ? func(instance, p_create_info, p_allocator, p_debug_messenger)
+            : VK_ERROR_EXTENSION_NOT_PRESENT;
+    }
+
+    void DestroyDebugUtilsMessenger(
+            VkInstance instance,
+            VkDebugUtilsMessengerEXT debug_messenger,
+            const VkAllocationCallbacks* p_allocator)
+    {
+        auto func = (PFN_vkDestroyDebugUtilsMessengerEXT) vkGetInstanceProcAddr(
+            instance,
+            "vkDestroyDebugUtilsMessengerEXT");
+
+        if(func != nullptr)
+            func(instance, debug_messenger, p_allocator);
+    }
+
+    void populate_debug_messenger_create_info(
+        VkDebugUtilsMessengerCreateInfoEXT &create_info)
+    {
+        create_info = {};
+        create_info.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT;
+        create_info.messageSeverity = VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT |
+                                     VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT;
+        create_info.messageType = VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT |
+                                 VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT |
+                                 VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT;
+        create_info.pfnUserCallback = debug_callback;
+        create_info.pUserData = nullptr;
+    }
+
+    void Device::setup_debug_messenger()
+    {
+        if (!enable_validation_layers)
+            return;
+        VkDebugUtilsMessengerCreateInfoEXT create_info;
+        create_info = {};
+        populate_debug_messenger_create_info(create_info);
+        
+        if (CreateDebugUtilsMessenger(m_instance, &create_info, nullptr, &m_debug_messenger) != VK_SUCCESS)
+            throw std::runtime_error("failed to set up debug messenger!");
+    }
 
     Device::Device(Window &window)
         : m_window{window}
     {
         create_instance();
+        setup_debug_messenger();
         create_surface();
         pick_physical_device();
         create_logical_device();
@@ -22,6 +86,9 @@ namespace kzn
         // Physical device is automaticly destroyed
         // on instance destruction
         vkDestroyDevice(m_device, nullptr);
+        if (enable_validation_layers)
+            DestroyDebugUtilsMessenger(m_instance, m_debug_messenger, nullptr);
+
         vkDestroyInstance(m_instance, nullptr);
     }
 
@@ -40,37 +107,42 @@ namespace kzn
         if (enable_validation_layers && !has_validation_layers_support())
             throw std::runtime_error("validation layers requested, but not available!");
 
-        VkApplicationInfo appInfo{};
-        appInfo.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
-        // appInfo.pNext = nullptr;
-        appInfo.pApplicationName = "Hello Triangle";
-        appInfo.applicationVersion = VK_MAKE_VERSION(1, 0, 0);
-        appInfo.pEngineName = "Kazan";
-        appInfo.engineVersion = VK_MAKE_VERSION(1, 0, 0);
-        appInfo.apiVersion = VK_API_VERSION_1_0;
+        VkApplicationInfo app_info{};
+        app_info.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
+        // app_info.pNext = nullptr;
+        app_info.pApplicationName = "Hello Triangle";
+        app_info.applicationVersion = VK_MAKE_VERSION(1, 0, 0);
+        app_info.pEngineName = "Kazan";
+        app_info.engineVersion = VK_MAKE_VERSION(1, 0, 0);
+        app_info.apiVersion = VK_API_VERSION_1_0;
 
-        VkInstanceCreateInfo createInfo{};
-        createInfo.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
-        createInfo.pApplicationInfo = &appInfo;
+        VkInstanceCreateInfo create_info{};
+        create_info.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
+        create_info.pApplicationInfo = &app_info;
 
         auto exts = get_required_extensions();
-        createInfo.enabledExtensionCount = exts.size();
-        createInfo.ppEnabledExtensionNames = exts.data();
+        create_info.enabledExtensionCount = exts.size();
+        create_info.ppEnabledExtensionNames = exts.data();
 
-        if (vkCreateInstance(&createInfo, nullptr, &m_instance) != VK_SUCCESS)
-            throw std::runtime_error("failed to create m_instance!");
-
-        has_required_extensions();
-
+        VkDebugUtilsMessengerCreateInfoEXT debug_create_info;
         if (enable_validation_layers)
         {
-            createInfo.enabledLayerCount = m_validation_layers.size();
-            createInfo.ppEnabledLayerNames = m_validation_layers.data();
+            create_info.enabledLayerCount = m_validation_layers.size();
+            create_info.ppEnabledLayerNames = m_validation_layers.data();
+
+            populate_debug_messenger_create_info(debug_create_info);
+            create_info.pNext = (VkDebugUtilsMessengerCreateInfoEXT*) &debug_create_info;
         }
         else
         {
-            createInfo.enabledLayerCount = 0;
+            create_info.enabledLayerCount = 0;
+            create_info.pNext = nullptr;
         }
+
+        if (vkCreateInstance(&create_info, nullptr, &m_instance) != VK_SUCCESS)
+            throw std::runtime_error("failed to create m_instance!");
+
+        has_required_extensions();
     }
 
     std::vector<const char *> Device::get_required_extensions()
@@ -82,8 +154,8 @@ namespace kzn
 
         std::vector<const char *> extensions(glfw_extensions, glfw_extensions + glfw_extension_count);
 
-        // if (enable_validation_layers)
-        //     extensions.push_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
+        if (enable_validation_layers)
+            extensions.push_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
 
         return extensions;
     }

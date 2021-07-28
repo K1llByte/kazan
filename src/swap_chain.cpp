@@ -74,9 +74,9 @@ namespace kzn
         if (vkCreateSwapchainKHR(m_device.device(), &create_info, nullptr, &m_swap_chain) != VK_SUCCESS)
             throw std::runtime_error("failed to create swap chain!");
 
-        vkGetSwapchainImagesKHR(m_device.device(), swap_chain, &image_count, nullptr);
+        vkGetSwapchainImagesKHR(m_device.device(), m_swap_chain, &image_count, nullptr);
         m_swap_chain_images.resize(image_count);
-        vkGetSwapchainImagesKHR(m_device.device(), swap_chain, &image_count, m_swap_chain_images.data());
+        vkGetSwapchainImagesKHR(m_device.device(), m_swap_chain, &image_count, m_swap_chain_images.data());
 
         m_swap_chain_image_format = surface_format.format;
         m_swap_chain_extent = extent;
@@ -119,7 +119,7 @@ namespace kzn
     void SwapChain::create_image_views()
     {
         m_swap_chain_image_views.resize(m_swap_chain_images.size());
-        for (size_t i = 0; i < swapChainImages.size(); i++)
+        for (size_t i = 0; i < m_swap_chain_images.size(); i++)
         {
             VkImageViewCreateInfo create_info{};
             create_info.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;

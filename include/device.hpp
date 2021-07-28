@@ -39,6 +39,7 @@ private:
     kzn::Window& m_window;
 
     VkInstance m_instance;
+    VkDebugUtilsMessengerEXT m_debug_messenger;
     VkPhysicalDevice m_physical_device = VK_NULL_HANDLE;
     VkDevice m_device;
     VkQueue m_graphics_queue;
@@ -79,6 +80,8 @@ private:
     bool has_required_extensions();
 
     bool has_validation_layers_support();
+
+    void setup_debug_messenger();
 
     void pick_physical_device();
 
