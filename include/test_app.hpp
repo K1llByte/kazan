@@ -3,6 +3,7 @@
 
 #include "window.hpp"
 #include "pipeline.hpp"
+#include "device.hpp"
 
 namespace kzn
 {
@@ -11,6 +12,7 @@ class TestApp
 {
     private:
     Window window;
+    Device device;
     Pipeline pipeline;
 
     public:

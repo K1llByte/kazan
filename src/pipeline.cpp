@@ -29,7 +29,10 @@ std::vector<char> Pipeline::read_file(const std::string& file_path)
     return buffer;
 }
 
-void Pipeline::create_pipeline(const std::string& vert_path, const std::string& frag_path)
+void Pipeline::create_pipeline(
+    const std::string& vert_path,
+    const std::string& frag_path,
+    const PipelineConfigInfo& config)
 {
     std::vector<char> vert_bin = read_file(vert_path);
     std::vector<char> frag_bin = read_file(frag_path);
@@ -38,9 +41,33 @@ void Pipeline::create_pipeline(const std::string& vert_path, const std::string& 
     std::cout << frag_bin.size() << '\n';
 }
 
-Pipeline::Pipeline(const std::string& vert_path, const std::string& frag_path)
+void Pipeline::create_shader_module(const std::vector<char>& code, VkShaderModule* shader_module)
 {
-    create_pipeline(vert_path, frag_path);
+    VkShaderModuleCreateInfo create_info;
+    create_info.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
+    create_info.codeSize = code.size();
+    create_info.pCode = reinterpret_cast<const uint32_t*>(code.data());
+
+    if(vkCreateShaderModule(m_device.device(), &create_info, nullptr, shader_module) != VK_SUCCESS)
+        throw std::runtime_error("failde to create shader module");
 }
+
+Pipeline::Pipeline(
+    Device device,
+    const std::string& vert_path,
+    const std::string& frag_path,
+    const PipelineConfigInfo& config)
+    : m_device{device}
+{
+    create_pipeline(vert_path, frag_path, config);
+}
+
+PipelineConfigInfo Pipeline::default_config(uint32_t width, uint32_t height)
+{
+    PipelineConfigInfo config;
+
+    return config;
+}
+
 
 }
