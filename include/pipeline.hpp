@@ -9,18 +9,28 @@
 namespace kzn
 {
 
-struct PipelineConfigInfo
-{
-
+struct PipelineConfigInfo {
+    VkViewport viewport;
+    VkRect2D scissor;
+    VkPipelineViewportStateCreateInfo viewport_info;
+    VkPipelineInputAssemblyStateCreateInfo input_assembly_info;
+    VkPipelineRasterizationStateCreateInfo rasterization_info;
+    VkPipelineMultisampleStateCreateInfo multisample_info;
+    VkPipelineColorBlendAttachmentState color_blend_attachment;
+    VkPipelineColorBlendStateCreateInfo color_blend_info;
+    VkPipelineDepthStencilStateCreateInfo depth_stencil_info;
+    VkPipelineLayout pipeline_layout = nullptr;
+    VkRenderPass render_pass = nullptr;
+    uint32_t subpass = 0;
 };
 
 class Pipeline
 {
 private:
     Device& m_device;
-    VkPipeline graphics_pipeline;
-    VkShaderModule vert_shader_module;
-    VkShaderModule frag_shader_module;
+    VkPipeline m_graphics_pipeline;
+    VkShaderModule m_vert_shader_module;
+    VkShaderModule m_frag_shader_module;
 
 private:
     static std::vector<char> read_file(const std::string& file_path);
@@ -32,11 +42,11 @@ private:
 
 public:
     Pipeline(
-        Device device,
+        Device& device,
         const std::string& vert_path,
         const std::string& frag_path,
         const PipelineConfigInfo& config);
-    ~Pipeline() {}
+    ~Pipeline();
 
     Pipeline(const Pipeline&) = delete;
     void operator=(const Pipeline&) = delete;

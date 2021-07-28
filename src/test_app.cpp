@@ -7,7 +7,7 @@ namespace kzn
 TestApp::TestApp()
     : window(WIDTH, HEIGHT, "GLFW Window"),
       device{window},
-      pipeline(device, "shaders/shader.vert.spv", "shaders/shader.frag.spv", Pipeline::default_config()) {}
+      pipeline(device, "shaders/shader.vert.spv", "shaders/shader.frag.spv", Pipeline::default_config(WIDTH, HEIGHT)) {}
 
 void TestApp::run()
 {
