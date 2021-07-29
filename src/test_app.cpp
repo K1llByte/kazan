@@ -32,7 +32,7 @@ void TestApp::create_pipeline_layout()
 
 void TestApp::create_pipeline()
 {
-    auto pipeline_config = Pipeline::default_config(swap_chain);
+    auto pipeline_config = Pipeline::default_config(swap_chain.width(), swap_chain.height());
 }
 
 void TestApp::create_command_buffers()
