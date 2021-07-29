@@ -77,6 +77,7 @@ void Pipeline::create_pipeline(
     pipeline_info.pInputAssemblyState = &config.input_assembly_info;
     pipeline_info.pViewportState = &config.viewport_info;
     pipeline_info.pRasterizationState = &config.rasterization_info;
+    pipeline_info.pMultisampleState = &config.multisample_info  ;
     pipeline_info.pColorBlendState = &config.color_blend_info;
     pipeline_info.pDepthStencilState = &config.depth_stencil_info;
     pipeline_info.pDepthStencilState = nullptr;
