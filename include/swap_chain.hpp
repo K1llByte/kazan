@@ -24,6 +24,9 @@ public:
 
     SwapChain(const SwapChain&) = delete;
     void operator=(const SwapChain&) = delete;
+
+    uint32_t width() { return ; }
+    uint32_t height() { return ; }
     
 private:
 
