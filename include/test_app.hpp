@@ -4,7 +4,8 @@
 #include "window.hpp"
 #include "pipeline.hpp"
 #include "device.hpp"
-#include "swap_chain.hpp"
+// #include "swap_chain.hpp"
+#include "kzn_swap_chain.hpp"
 #include <memory>
 
 namespace kzn

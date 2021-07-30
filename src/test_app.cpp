@@ -7,8 +7,17 @@ namespace kzn
 TestApp::TestApp()
     : window(WIDTH, HEIGHT, "GLFW Window"),
       device{window},
-      pipeline(device, "shaders/shader.vert.spv", "shaders/shader.frag.spv", Pipeline::default_config(WIDTH, HEIGHT)),
-      swap_chain(device, window.get_extent()) {}
+      swap_chain(device, window.get_extent())
+{
+    create_pipeline_layout();
+    create_pipeline();
+    create_command_buffers();
+}
+
+TestApp::~TestApp()
+{
+    vkDestroyPipelineLayout(device.device(), pipeline_layout, nullptr);
+}
 
 void TestApp::run()
 {
@@ -33,6 +42,15 @@ void TestApp::create_pipeline_layout()
 void TestApp::create_pipeline()
 {
     auto pipeline_config = Pipeline::default_config(swap_chain.width(), swap_chain.height());
+    pipeline_config.render_pass = swap_chain.getRenderPass();
+    pipeline_config.pipeline_layout = pipeline_layout;
+    pipeline = std::make_unique<Pipeline>(
+        device,
+        "shaders/shader.vert.spv",
+        "shaders/shader.frag.spv",
+        Pipeline::default_config(WIDTH, HEIGHT)
+        );
+
 }
 
 void TestApp::create_command_buffers()
