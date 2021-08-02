@@ -32,7 +32,7 @@ SwapChain::~SwapChain() {
     swapChain = nullptr;
   }
 
-  for (int i = 0; i < depthImages.size(); i++) {
+  for (size_t i = 0; i < depthImages.size(); i++) {
     vkDestroyImageView(device.device(), depthImageViews[i], nullptr);
     vkDestroyImage(device.device(), depthImages[i], nullptr);
     vkFreeMemory(device.device(), depthImageMemorys[i], nullptr);
@@ -95,7 +95,7 @@ VkResult SwapChain::submitCommandBuffers(
   submitInfo.pSignalSemaphores = signalSemaphores;
 
   vkResetFences(device.device(), 1, &inFlightFences[currentFrame]);
-  if (vkQueueSubmit(device.graphicsQueue(), 1, &submitInfo, inFlightFences[currentFrame]) !=
+  if (vkQueueSubmit(device.graphics_queue(), 1, &submitInfo, inFlightFences[currentFrame]) !=
       VK_SUCCESS) {
     throw std::runtime_error("failed to submit draw command buffer!");
   }
@@ -123,7 +123,7 @@ void SwapChain::createSwapChain() {
   SwapChainSupportDetails swapChainSupport = device.get_swap_chain_support();
 
   VkSurfaceFormatKHR surfaceFormat = chooseSwapSurfaceFormat(swapChainSupport.formats);
-  VkPresentModeKHR presentMode = chooseSwapPresentMode(swapChainSupport.presentModes);
+  VkPresentModeKHR presentMode = chooseSwapPresentMode(swapChainSupport.present_modes);
   VkExtent2D extent = chooseSwapExtent(swapChainSupport.capabilities);
 
   uint32_t imageCount = swapChainSupport.capabilities.minImageCount + 1;
@@ -143,10 +143,10 @@ void SwapChain::createSwapChain() {
   createInfo.imageArrayLayers = 1;
   createInfo.imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
 
-  QueueFamilyIndices indices = device.find_physical_queue_families();
-  uint32_t queueFamilyIndices[] = {indices.graphicsFamily, indices.presentFamily};
+  QueueFamilyIndices indices = device.get_physical_queue_families();
+  uint32_t queueFamilyIndices[] = {indices.graphics_family.value(), indices.present_family.value()};
 
-  if (indices.graphicsFamily != indices.presentFamily) {
+  if (indices.graphics_family != indices.present_family) {
     createInfo.imageSharingMode = VK_SHARING_MODE_CONCURRENT;
     createInfo.queueFamilyIndexCount = 2;
     createInfo.pQueueFamilyIndices = queueFamilyIndices;
@@ -295,7 +295,7 @@ void SwapChain::createDepthResources() {
   depthImageMemorys.resize(imageCount());
   depthImageViews.resize(imageCount());
 
-  for (int i = 0; i < depthImages.size(); i++) {
+  for (size_t i = 0; i < depthImages.size(); i++) {
     VkImageCreateInfo imageInfo{};
     imageInfo.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
     imageInfo.imageType = VK_IMAGE_TYPE_2D;

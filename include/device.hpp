@@ -65,12 +65,24 @@ public:
     void run() {}
 
     SwapChainSupportDetails get_swap_chain_support();
+    uint32_t find_memory_type(uint32_t type_filter, VkMemoryPropertyFlags properties);
+    VkFormat find_supported_format(
+      const std::vector<VkFormat> &candidates, VkImageTiling tiling, VkFormatFeatureFlags features);
     
     VkSurfaceKHR surface() { return m_surface; }
     VkDevice device() { return m_device; }
+    VkQueue graphics_queue() { return m_graphics_queue; }
+    VkQueue present_queue() { return m_present_queue; }
+
 
     QueueFamilyIndices get_physical_queue_families();
-    
+
+    void create_image_with_info(
+        const VkImageCreateInfo &image_info,
+        VkMemoryPropertyFlags properties,
+        VkImage &image,
+        VkDeviceMemory &image_memory);
+
 private:
 
     void create_instance();

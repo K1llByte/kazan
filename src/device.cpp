@@ -386,4 +386,67 @@ namespace kzn
 
         return details;
     }
+
+    void Device::create_image_with_info(
+        const VkImageCreateInfo &image_info,
+        VkMemoryPropertyFlags properties,
+        VkImage &image,
+        VkDeviceMemory &image_memory)
+    {
+        if (vkCreateImage(m_device, &image_info, nullptr, &image) != VK_SUCCESS) {
+            throw std::runtime_error("failed to create image!");
+        }
+
+        VkMemoryRequirements memRequirements;
+        vkGetImageMemoryRequirements(m_device, image, &memRequirements);
+
+        VkMemoryAllocateInfo allocInfo{};
+        allocInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
+        allocInfo.allocationSize = memRequirements.size;
+        allocInfo.memoryTypeIndex = find_memory_type(memRequirements.memoryTypeBits, properties);
+
+        if (vkAllocateMemory(m_device, &allocInfo, nullptr, &image_memory) != VK_SUCCESS)
+            throw std::runtime_error("failed to allocate image memory!");
+
+        if (vkBindImageMemory(m_device, image, image_memory, 0) != VK_SUCCESS)
+            throw std::runtime_error("failed to bind image memory!");
+        
+    }
+
+    uint32_t Device::find_memory_type(uint32_t typeFilter, VkMemoryPropertyFlags properties)
+    {
+        VkPhysicalDeviceMemoryProperties memProperties;
+        vkGetPhysicalDeviceMemoryProperties(m_physical_device, &memProperties);
+        for (uint32_t i = 0; i < memProperties.memoryTypeCount; i++)
+        {
+            if ((typeFilter & (1 << i)) &&
+                  (memProperties.memoryTypes[i].propertyFlags & properties) == properties)
+            {
+                return i;
+            }
+        }
+
+        throw std::runtime_error("failed to find suitable memory type!");
+    }
+
+    VkFormat Device::find_supported_format(
+    const std::vector<VkFormat> &candidates, VkImageTiling tiling, VkFormatFeatureFlags features)
+    {
+        for (VkFormat format : candidates)
+        {
+            VkFormatProperties props;
+            vkGetPhysicalDeviceFormatProperties(m_physical_device, format, &props);
+
+            if (tiling == VK_IMAGE_TILING_LINEAR && (props.linearTilingFeatures & features) == features)
+            {
+                return format;
+            }
+            else if (
+                tiling == VK_IMAGE_TILING_OPTIMAL && (props.optimalTilingFeatures & features) == features)
+            {
+                return format;
+            }
+      }
+      throw std::runtime_error("failed to find supported format!");
+    }
 }
