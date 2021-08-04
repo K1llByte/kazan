@@ -21,6 +21,7 @@ private:
     SwapChain swap_chain;
     std::unique_ptr<Pipeline> pipeline;
     VkPipelineLayout pipeline_layout;
+    VkCommandPool command_pool;
     std::vector<VkCommandBuffer> command_buffers;
 
 public:

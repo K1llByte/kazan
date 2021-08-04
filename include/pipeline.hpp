@@ -9,7 +9,8 @@
 namespace kzn
 {
 
-struct PipelineConfigInfo {
+struct PipelineConfigInfo
+{
     VkViewport viewport;
     VkRect2D scissor;
     VkPipelineInputAssemblyStateCreateInfo input_assembly_info;
@@ -51,6 +52,11 @@ public:
     void operator=(const Pipeline&) = delete;
 
     static PipelineConfigInfo default_config(uint32_t width, uint32_t height);
+
+    VkPipeline get_graphics_pipeline()
+    {
+        return m_graphics_pipeline;
+    }
 };
 
 }

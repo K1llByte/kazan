@@ -142,8 +142,8 @@ PipelineConfigInfo Pipeline::default_config(uint32_t width, uint32_t height)
     config.viewport.minDepth = 0.0f;
     config.viewport.maxDepth = 1.0f;
 
-    config.scissor.offset = {0, 0};
-    config.scissor.extent = {width, height};
+    config.scissor.offset = { 0, 0 };
+    config.scissor.extent = { width, height };
 
     config.rasterization_info.sType = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO;
     config.rasterization_info.depthClampEnable = VK_FALSE;
@@ -199,6 +199,5 @@ PipelineConfigInfo Pipeline::default_config(uint32_t width, uint32_t height)
     
     return config;
 }
-
 
 }
