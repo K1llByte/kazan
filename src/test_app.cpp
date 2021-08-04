@@ -50,7 +50,8 @@ void TestApp::create_pipeline()
         device,
         "shaders/shader.vert.spv",
         "shaders/shader.frag.spv",
-        Pipeline::default_config(WIDTH, HEIGHT)
+        pipeline_config
+        //Pipeline::default_config(WIDTH, HEIGHT)
         );
 
 }
@@ -79,6 +80,10 @@ void TestApp::create_command_buffers()
     alloc_info.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
     alloc_info.commandBufferCount = static_cast<uint32_t>(command_buffers.size());
 
+    if (vkAllocateCommandBuffers(device.device(), &alloc_info, command_buffers.data()) != VK_SUCCESS)
+        throw std::runtime_error("failed to allocate command buffers!");
+
+
     for (size_t i = 0 ; i < command_buffers.size() ; ++i)
     {
         VkCommandBufferBeginInfo begin_info{};
@@ -89,6 +94,8 @@ void TestApp::create_command_buffers()
         if (vkBeginCommandBuffer(command_buffers[i], &begin_info) != VK_SUCCESS)
             throw std::runtime_error("failed to begin recording command buffer!");
 
+        // ======== Starting a render pass ======== //
+
         VkRenderPassBeginInfo render_pass_info{};
         render_pass_info.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
         render_pass_info.renderPass = swap_chain.getRenderPass();
@@ -97,30 +104,39 @@ void TestApp::create_command_buffers()
         render_pass_info.renderArea.offset = {0, 0};
         render_pass_info.renderArea.extent = swap_chain.getSwapChainExtent();
 
-        VkClearValue clear_color = {{{0.0f, 0.0f, 0.0f, 1.0f}}};
-        render_pass_info.clearValueCount = 1;
-        render_pass_info.pClearValues = &clear_color;
+        std::array<VkClearValue, 2> clear_values{};
+        clear_values[0].color = {0.0f, 0.0f, 0.0f, 1.0f};
+        clear_values[1].depthStencil = {1.0f, 0};
+        //VkClearValue clear_color = {{{0.0f, 0.0f, 0.0f, 1.0f}}};
+        render_pass_info.clearValueCount = 2;
+        render_pass_info.pClearValues = clear_values.data();
 
         // ======== Command Buffers - register drawing commands ======== //
+        
         vkCmdBeginRenderPass(command_buffers[i], &render_pass_info, VK_SUBPASS_CONTENTS_INLINE);
         vkCmdBindPipeline(command_buffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline->get_graphics_pipeline());
+        vkCmdDraw(command_buffers[i], 3, 1, 0, 0);
         vkCmdEndRenderPass(command_buffers[i]);
 
         if (vkEndCommandBuffer(command_buffers[i]) != VK_SUCCESS)
             throw std::runtime_error("failed to record command buffer!");
-
     }
-
-    // ======== Starting a render pass ======== //
-
-
-
 }
 
 void TestApp::draw_frame()
 {
+    // Acquire an image from the swap chain //
+    uint32_t img_idx;
+    VkResult res = swap_chain.acquireNextImage(&img_idx);
+    if(res != VK_SUCCESS && res != VK_SUBOPTIMAL_KHR)
+        throw std::runtime_error("failed to aquire swap chain image!");
 
+    // Execute the command buffer //
+    // Return the image to the swap chain for presentation //
+    res = swap_chain.submitCommandBuffers(&command_buffers[img_idx], &img_idx);
+
+    if(res != VK_SUCCESS)
+        throw std::runtime_error("failed to present swapchain image!");
 }
-
 
 }

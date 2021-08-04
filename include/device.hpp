@@ -62,7 +62,7 @@ public:
     Device(Device &&) = delete;
     Device &operator=(Device &&) = delete;
 
-    void run() {}
+    // void run();
 
     SwapChainSupportDetails get_swap_chain_support();
     uint32_t find_memory_type(uint32_t type_filter, VkMemoryPropertyFlags properties);

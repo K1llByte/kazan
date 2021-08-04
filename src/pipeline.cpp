@@ -38,8 +38,8 @@ void Pipeline::create_pipeline(
     std::vector<char> vert_bin = read_file(vert_path);
     std::vector<char> frag_bin = read_file(frag_path);
 
-    // std::cout << vert_bin.size() << '\n';
-    // std::cout << frag_bin.size() << '\n';
+    std::cout << vert_bin.size() << '\n';
+    std::cout << frag_bin.size() << '\n';
 
     create_shader_module(vert_bin, &m_vert_shader_module);
     create_shader_module(frag_bin, &m_frag_shader_module);

@@ -1,23 +1,12 @@
-// #include "test_app.hpp"
-
-// int main()
-// {
-//     kzn::TestApp app{};
-//     app.run();
-//     return 0;
-// }
-
-/////////////////////////////////////////////////////
-
-
-#include "device.hpp"
+#include "test_app.hpp"
 
 #include <iostream>
 
 int main()
 {
-    kzn::Window window(800, 800, "Test Window");
-    kzn::Device app(window);
+    // kzn::Window window(800, 800, "Test Window");
+    // kzn::Device app(window);
+    kzn::TestApp app;
 
     try
     {
