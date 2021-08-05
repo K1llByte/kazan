@@ -1,4 +1,5 @@
-#include "test_app.hpp"
+// #include "test_app.hpp"
+#include "renderer.hpp"
 
 #include <iostream>
 
@@ -6,7 +7,9 @@ int main()
 {
     // kzn::Window window(800, 800, "Test Window");
     // kzn::Device app(window);
-    kzn::TestApp app;
+    // kzn::TestApp app;
+
+    kzn::Renderer app;
 
     try
     {
