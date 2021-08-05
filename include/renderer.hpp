@@ -25,6 +25,7 @@ private:
         "VK_LAYER_KHRONOS_validation"
     };
     const bool ENABLE_VALIDATION_LAYERS = true;
+    VkDebugUtilsMessengerEXT m_debug_messenger;
 
 public:
 
@@ -46,6 +47,23 @@ private:
 
     bool check_validation_layer_support();
 
+    std::vector<const char*> get_required_extensions();
+
+    void setup_debug_messenger();
+
+    VkResult CreateDebugUtilsMessenger(
+        VkInstance                                instance,
+        const VkDebugUtilsMessengerCreateInfoEXT* p_create_info,
+        const VkAllocationCallbacks*              p_allocator,
+        VkDebugUtilsMessengerEXT*                 p_debug_messenger);
+
+    void DestroyDebugUtilsMessenger(
+        VkInstance                   instance,
+        VkDebugUtilsMessengerEXT     debug_messenger,
+        const VkAllocationCallbacks* p_allocator);
+
+    void populate_debug_messenger_create_info(
+        VkDebugUtilsMessengerCreateInfoEXT& create_info);
 };
 
 }
