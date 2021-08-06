@@ -36,7 +36,7 @@ struct SwapChainSupportDetails
 class Device
 {
 private:
-    kzn::Window& m_window;
+    Window& m_window;
 
     VkInstance m_instance;
     VkDebugUtilsMessengerEXT m_debug_messenger;

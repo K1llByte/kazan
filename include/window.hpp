@@ -30,7 +30,7 @@ public:
     bool should_close();
     VkExtent2D get_extent()
     {
-        return { 
+        return {
             static_cast<uint32_t>(m_width),
             static_cast<uint32_t>(m_height)
         };

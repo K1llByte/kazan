@@ -6,9 +6,28 @@
 
 #include <cstdint>
 #include <vector>
+#include <optional>
 
 namespace kzn
 {
+
+struct QueueFamilyIndices
+{
+    std::optional<uint32_t> graphics_family;
+    std::optional<uint32_t> present_family;
+
+    bool is_complete()
+    {
+        return graphics_family.has_value() && present_family.has_value();
+    }
+};
+
+struct SwapChainSupportDetails
+{
+    VkSurfaceCapabilitiesKHR capabilities;
+    std::vector<VkSurfaceFormatKHR> formats;
+    std::vector<VkPresentModeKHR> present_modes;
+};
 
 class Renderer
 {
@@ -18,6 +37,7 @@ private:
     GLFWwindow* m_window;
     const uint32_t WIDTH = 800;
     const uint32_t HEIGHT = 600;
+    VkSurfaceKHR m_surface;
 
     // Vulkan instance
     VkInstance m_instance;
@@ -26,6 +46,17 @@ private:
     };
     const bool ENABLE_VALIDATION_LAYERS = true;
     VkDebugUtilsMessengerEXT m_debug_messenger;
+
+    // Device
+    VkPhysicalDevice m_physical_device = VK_NULL_HANDLE;
+    VkDevice m_device;
+    VkQueue m_graphics_queue;
+    VkQueue m_present_queue;
+    const std::vector<const char*> device_extensions = {
+        VK_KHR_SWAPCHAIN_EXTENSION_NAME
+    };
+
+    // SwapChain
 
 public:
 
@@ -43,6 +74,7 @@ private:
 
     // ======= Create functions ======= //
 
+    // Vulkan instance stuff
     void create_instance();
 
     bool check_validation_layer_support();
@@ -64,6 +96,21 @@ private:
 
     void populate_debug_messenger_create_info(
         VkDebugUtilsMessengerCreateInfoEXT& create_info);
+
+    // Device stuff
+    void pick_physical_device();
+
+    bool is_device_suitable(VkPhysicalDevice physical_device);
+
+    QueueFamilyIndices find_queue_families(VkPhysicalDevice physical_device);
+
+    void create_logical_device();
+
+    void create_surface();
+
+    bool check_device_extension_support(VkPhysicalDevice physical_device);
+
+    SwapChainSupportDetails query_swap_chain_support(VkPhysicalDevice physical_device);
 };
 
 }
