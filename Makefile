@@ -5,7 +5,7 @@ FLAGS = $(WARNIGNS) -std=c++17 -O2 $(INCLUDE) # -fsanitize=address
 LIB_FLAGS = -lglfw -lvulkan -ldl -lpthread -lX11 -lXxf86vm -lXrandr -lXi
 SRC_EXT = cpp
 
-GLSLC = glslc
+GLSLC = glslangValidator # glslc
 VERT_EXT = vert
 FRAG_EXT = frag
 
@@ -44,11 +44,19 @@ FRAGS_SPV = $(patsubst $(SHADER_DIR)/%,$(SHADER_DIR)/%,$(FRAGS:.$(FRAG_EXT)=.$(F
 
 shaders: $(VERTS_SPV) $(FRAGS_SPV)
 
+# # GLSLC
+# $(SHADER_DIR)/%.$(VERT_EXT).spv: $(SHADER_DIR)/%.$(VERT_EXT)
+# 	$(GLSLC) $< -o $@
+
+# $(SHADER_DIR)/%.$(FRAG_EXT).spv: $(SHADER_DIR)/%.$(FRAG_EXT)
+# 	$(GLSLC) $< -o $@
+
+# GLSLang
 $(SHADER_DIR)/%.$(VERT_EXT).spv: $(SHADER_DIR)/%.$(VERT_EXT)
-	$(GLSLC) $< -o $@
+	$(GLSLC) -V $< -o $@
 
 $(SHADER_DIR)/%.$(FRAG_EXT).spv: $(SHADER_DIR)/%.$(FRAG_EXT)
-	$(GLSLC) $< -o $@
+	$(GLSLC) -V $< -o $@
 
 #############################################################
 

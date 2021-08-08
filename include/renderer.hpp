@@ -45,7 +45,7 @@ private:
     const std::vector<const char*> validation_layers = {
         "VK_LAYER_KHRONOS_validation"
     };
-    const bool ENABLE_VALIDATION_LAYERS = true;
+    const bool ENABLE_VALIDATION_LAYERS = false;
     VkDebugUtilsMessengerEXT m_debug_messenger;
 
     // Device
