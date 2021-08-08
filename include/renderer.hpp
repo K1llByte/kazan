@@ -57,10 +57,23 @@ private:
     };
 
     // SwapChain
+    VkSwapchainKHR m_swap_chain;
+    std::vector<VkImage> m_swap_chain_images;
+    std::vector<VkImageView> m_swap_chain_image_views;
+    VkFormat m_swap_chain_image_format;
+    VkExtent2D m_swap_chain_extent;
+
+    // Graphics pipeline
+    VkRenderPass m_render_pass;
+    VkPipelineLayout m_pipeline_layout;
+    VkPipeline m_graphics_pipeline;
 
 public:
 
     void run();
+
+    // Graphics pipeline stuff
+    static std::vector<char> read_file(const std::string& filename);
     
 private:
 
@@ -120,6 +133,15 @@ private:
     VkExtent2D choose_swap_extent(const VkSurfaceCapabilitiesKHR& capabilities);
 
     void create_swap_chain();
+
+    void create_image_views();
+
+    // Graphics pipeline stuff
+    void create_graphics_pipeline();
+
+    VkShaderModule create_shader_module(const std::vector<char>& code);
+
+    void create_render_pass();
 };
 
 }
