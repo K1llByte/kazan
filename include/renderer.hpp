@@ -7,6 +7,7 @@
 #include <cstdint>
 #include <vector>
 #include <optional>
+#include <string>
 
 namespace kzn
 {
@@ -62,11 +63,16 @@ private:
     std::vector<VkImageView> m_swap_chain_image_views;
     VkFormat m_swap_chain_image_format;
     VkExtent2D m_swap_chain_extent;
+    std::vector<VkFramebuffer> m_swap_chain_framebuffers;
 
     // Graphics pipeline
     VkRenderPass m_render_pass;
     VkPipelineLayout m_pipeline_layout;
     VkPipeline m_graphics_pipeline;
+
+    // Command buffers
+    VkCommandPool m_command_pool;
+    std::vector<VkCommandBuffer> m_command_buffers;
 
 public:
 
@@ -136,12 +142,19 @@ private:
 
     void create_image_views();
 
+    void create_framebuffers();
+
     // Graphics pipeline stuff
     void create_graphics_pipeline();
 
     VkShaderModule create_shader_module(const std::vector<char>& code);
 
     void create_render_pass();
+
+    // Command buffer stuff
+    void create_command_pool();
+
+    void create_command_buffers();
 };
 
 }
