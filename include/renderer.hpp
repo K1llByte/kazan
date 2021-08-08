@@ -74,6 +74,10 @@ private:
     VkCommandPool m_command_pool;
     std::vector<VkCommandBuffer> m_command_buffers;
 
+    // Unnamed
+    VkSemaphore m_image_available_semaphore;
+    VkSemaphore m_render_finished_semaphore;
+
 public:
 
     void run();
@@ -88,6 +92,8 @@ private:
     void init_vulkan();
 
     void main_loop();
+
+    void draw_frame();
 
     void cleanup();
 
@@ -155,6 +161,9 @@ private:
     void create_command_pool();
 
     void create_command_buffers();
+
+    // Unnamed stuff
+    void create_semaphores();
 };
 
 }
