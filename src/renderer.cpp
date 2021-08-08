@@ -59,8 +59,10 @@ void Renderer::init_vulkan()
 {
     create_instance();
     setup_debug_messenger();
+    create_surface();
     pick_physical_device();
     create_logical_device();
+    create_swap_chain();
 }
 
 void Renderer::main_loop()
@@ -481,6 +483,22 @@ VkExtent2D Renderer::choose_swap_extent(const VkSurfaceCapabilitiesKHR& capabili
         actual_extent.height = std::clamp(actual_extent.height, capabilities.minImageExtent.height, capabilities.maxImageExtent.height);
 
         return actual_extent;
+    }
+}
+
+void Renderer::create_swap_chain()
+{
+    SwapChainSupportDetails swap_chain_support = query_swap_chain_support(m_physical_device);
+
+    VkSurfaceFormatKHR surface_format = choose_swap_surface_format(swap_chain_support.formats);
+    VkPresentModeKHR present_mode = choose_swap_present_mode(swap_chain_support.present_modes);
+    VkExtent2D extent = choose_swap_extent(swap_chain_support.capabilities);
+
+    uint32_t image_count = swap_chain_support.capabilities.minImageCount + 1;
+
+    if(swap_chain_support.capabilities.maxImageCount > 0 && image_count > swap_chain_support.capabilities.maxImageCount)
+    {
+        image_count = swap_chain_support.capabilities.maxImageCount;
     }
 }
 
