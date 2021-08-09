@@ -1,4 +1,4 @@
-#include "renderer.hpp"
+#include "full_renderer.hpp"
 
 #include <fstream>
 #include <stdexcept>
@@ -8,7 +8,7 @@
 #include <set>
 #include <algorithm>
 
-namespace kzn
+namespace tmp
 {
 
 VkResult Renderer::CreateDebugUtilsMessenger(
@@ -853,7 +853,8 @@ void Renderer::create_graphics_pipeline()
     rasterizer.sType = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO;
     rasterizer.depthClampEnable = VK_FALSE;
     rasterizer.rasterizerDiscardEnable = VK_FALSE;
-    rasterizer.polygonMode = VK_POLYGON_MODE_LINE;
+    rasterizer.polygonMode = VK_POLYGON_MODE_FILL;
+    rasterizer.lineWidth = 1.0f;
     // Alternatively:
     // VK_POLYGON_MODE_FILL
     // VK_POLYGON_MODE_LINE

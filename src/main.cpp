@@ -1,5 +1,4 @@
-// #include "test_app.hpp"
-#include "renderer.hpp"
+#include "full_renderer.hpp"
 
 #include <iostream>
 
@@ -9,7 +8,7 @@ int main()
     // kzn::Device app(window);
     // kzn::TestApp app;
 
-    kzn::Renderer app;
+    tmp::Renderer app;
 
     try
     {
