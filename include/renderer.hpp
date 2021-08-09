@@ -45,7 +45,7 @@ private:
     const std::vector<const char*> validation_layers = {
         "VK_LAYER_KHRONOS_validation"
     };
-    const bool ENABLE_VALIDATION_LAYERS = false;
+    const bool ENABLE_VALIDATION_LAYERS = true;
     VkDebugUtilsMessengerEXT m_debug_messenger;
 
     // Device
@@ -75,8 +75,13 @@ private:
     std::vector<VkCommandBuffer> m_command_buffers;
 
     // Unnamed
-    VkSemaphore m_image_available_semaphore;
-    VkSemaphore m_render_finished_semaphore;
+    const size_t MAX_FRAMES_IN_FLIGHT = 2;
+    std::vector<VkSemaphore> m_image_available_semaphores;
+    std::vector<VkSemaphore> m_render_finished_semaphores;
+    std::vector<VkFence> m_in_flight_fences;
+    std::vector<VkFence> m_images_in_flight;
+    size_t current_frame = 0;
+    bool m_framebuffer_resized = false;
 
 public:
 
@@ -98,6 +103,9 @@ private:
     void cleanup();
 
     // ======= Create functions ======= //
+
+    // Window stuff
+    static void framebuffer_resize_callback(GLFWwindow* window, int width, int height);
 
     // Vulkan instance stuff
     void create_instance();
@@ -146,9 +154,13 @@ private:
 
     void create_swap_chain();
 
+    void cleanup_swap_chain();
+
     void create_image_views();
 
     void create_framebuffers();
+
+    void recreate_swap_chain();
 
     // Graphics pipeline stuff
     void create_graphics_pipeline();
@@ -163,7 +175,7 @@ private:
     void create_command_buffers();
 
     // Unnamed stuff
-    void create_semaphores();
+    void create_sync_objects();
 };
 
 }
