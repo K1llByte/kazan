@@ -146,11 +146,9 @@ void Renderer::draw_frame()
     present_info.waitSemaphoreCount = 1;
     present_info.pWaitSemaphores = signal_semaphores;
 
-    // TODO: Remove this array and pass m_swap_chain's
-    // address directly
-    VkSwapchainKHR swap_chains[] = { m_swap_chain };
+    // VkSwapchainKHR swap_chains[] = { m_swap_chain };
     present_info.swapchainCount = 1;
-    present_info.pSwapchains = swap_chains; // &m_swap_chain;
+    present_info.pSwapchains = &m_swap_chain; // swap_chains;
     present_info.pImageIndices = &image_index;
     present_info.pResults = nullptr; // Optional
 
@@ -779,8 +777,7 @@ std::vector<char> Renderer::read_file(const std::string& filename)
     if (!file.is_open())
         throw std::runtime_error("failed to open file!");
     
-    // TODO: change type of cast
-    size_t file_size = (size_t) file.tellg();
+    size_t file_size = static_cast<size_t>(file.tellg()); // (size_t) 
     std::vector<char> buffer(file_size);
 
     file.seekg(0);
@@ -833,9 +830,8 @@ void Renderer::create_graphics_pipeline()
     VkViewport viewport{};
     viewport.x = 0.0f;
     viewport.y = 0.0f;
-    // TODO: change type of cast
-    viewport.width = (float) m_swap_chain_extent.width;
-    viewport.height = (float) m_swap_chain_extent.height;
+    viewport.width = static_cast<float>(m_swap_chain_extent.width);
+    viewport.height = static_cast<float>(m_swap_chain_extent.height);
     viewport.minDepth = 0.0f;
     viewport.maxDepth = 1.0f;
 
@@ -1048,8 +1044,7 @@ void Renderer::create_command_buffers()
     alloc_info.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
     alloc_info.commandPool = m_command_pool;
     alloc_info.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
-    // TODO: change type of cast
-    alloc_info.commandBufferCount = (uint32_t) m_command_buffers.size();
+    alloc_info.commandBufferCount = static_cast<uint32_t>(m_command_buffers.size());
 
     if (vkAllocateCommandBuffers(m_device, &alloc_info, m_command_buffers.data()) != VK_SUCCESS) {
         throw std::runtime_error("failed to allocate command buffers!");
