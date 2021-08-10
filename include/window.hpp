@@ -29,7 +29,7 @@ public:
 
 private:
 
-    void init_window();
+    // void init_window();
 };
 
 } // kzn

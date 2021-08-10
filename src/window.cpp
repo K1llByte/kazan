@@ -14,7 +14,7 @@ Window::Window(const std::string& name, int width, int height)
     // glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
     
     // Initialize window
-    m_window = glfwCreateWindow(WIDTH, HEIGHT, "Kazan Vulkan", nullptr, nullptr);
+    m_window = glfwCreateWindow(width, height, name.c_str(), nullptr, nullptr);
 
     // glfwSetWindowUserPointer(m_window, this);
     
