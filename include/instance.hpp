@@ -14,18 +14,40 @@
 #endif
 // }
 
+#include <vector>
 
 namespace kzn
 {
 
-class InstanceBuilder
+struct Instance
 {
-
+    VkInstance m_instance;
 };
 
-class Instance
+class InstanceBuilder
 {
+private:
 
+    VkApplicationInfo m_app_info{};
+    VkInstanceCreateInfo m_create_info{};
+    std::vector<const char*> m_extensions{};
+
+    std::vector<const char*> m_validation_layers = {};
+    // VkDebugUtilsMessengerEXT m_debug_messenger;
+
+public:
+
+    InstanceBuilder();
+
+    ~InstanceBuilder() = default;
+
+    // Setters
+    InstanceBuilder& enable_extensions(const std::vector<const char*>& extensions);
+
+    InstanceBuilder& enable_validation_layers();
+
+    // Build
+    Instance build();
 };
 
 } // kzn

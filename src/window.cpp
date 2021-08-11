@@ -31,4 +31,13 @@ Window::~Window()
     glfwDestroyWindow(m_window);
 }
 
+std::vector<const char*> Window::required_extensions()
+{
+    uint32_t glfw_extension_count = 0;
+    const char** glfw_extensions;
+    glfw_extensions = glfwGetRequiredInstanceExtensions(&glfw_extension_count);
+
+    return std::vector<const char*>(glfw_extensions, glfw_extensions + glfw_extension_count);
+}
+
 }

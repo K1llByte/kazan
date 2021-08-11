@@ -287,7 +287,7 @@ bool Renderer::check_validation_layer_support()
     // Check for each wanted validation layers
     // that they exist in the available layers
     // vector
-    for (const char* layerName : validation_layers)
+    for(const char* layerName : validation_layers)
     {
         bool layer_found = false;
 

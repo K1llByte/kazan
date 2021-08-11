@@ -5,6 +5,7 @@
 #include <GLFW/glfw3.h>
 
 #include <string>
+#include <vector>
 
 namespace kzn
 {
@@ -27,9 +28,10 @@ public:
 
     ~Window();
 
+    std::vector<const char*> required_extensions();
+
 private:
 
-    // void init_window();
 };
 
 } // kzn

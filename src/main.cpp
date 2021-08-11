@@ -1,6 +1,7 @@
 // #include "full_renderer.hpp"
 
 #include "window.hpp"
+#include "instance.hpp"
 
 #include <iostream>
 
@@ -32,7 +33,13 @@ int main()
 
     //////////////////////////////////////////////////
 
-    // kzn::Window window("Kazan Vulkan", 800, 800);
+    kzn::Window window("Kazan Vulkan", 800, 800);
+    auto instance = kzn::InstanceBuilder()
+        .enable_extensions(window.required_extensions())
+        .enable_validation_layers()
+        .build();
+
+
 
     //////////////////////////////////////////////////
 
@@ -46,7 +53,7 @@ int main()
     // {
     //     std::cerr << e.what() << std::endl;
     //     return EXIT_FAILURE;
-    }
+    // }
 
     //////////////////////////////////////////////////
 
