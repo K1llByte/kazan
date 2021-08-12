@@ -1,20 +1,32 @@
 #ifndef DEVICE
 #define DEVICE
 
+#include "instance.hpp"
+
 namespace kzn
 {
+
+class PhysicalDevice
+{
+
+};
+
+class PhysicalDeviceSelector
+{
+private:
+
+public:
+    PhysicalDeviceSelector(const Instance&);
+};
 
 class Device
 {
 
 };
 
-class DeviceSelector
+class DeviceBuild
 {
-private:
-
-public:
-    DeviceSelector(const Instance&);
+    
 };
 
 } // namespace kzn
