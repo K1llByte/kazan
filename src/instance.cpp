@@ -17,10 +17,20 @@ VkResult CreateDebugUtilsMessenger(
     // TODO:
     // static_cast<PFN_vkCreateDebugUtilsMessengerEXT>()
     auto func = (PFN_vkCreateDebugUtilsMessengerEXT) vkGetInstanceProcAddr(instance, "vkCreateDebugUtilsMessengerEXT");
-    
-    return (func != nullptr)
-        ? func(instance, p_create_info, p_allocator, p_debug_messenger)
-        : VK_ERROR_EXTENSION_NOT_PRESENT;
+
+    if(func != nullptr)
+    {
+        std::cout << "+ Debug messeger created successfully\n";
+        return func(instance, p_create_info, p_allocator, p_debug_messenger);
+    }
+    else
+    {
+        return VK_ERROR_EXTENSION_NOT_PRESENT;
+    }
+
+    // return (func != nullptr)
+    //     ? func(instance, p_create_info, p_allocator, p_debug_messenger)
+    //     : VK_ERROR_EXTENSION_NOT_PRESENT;
 }
 
 void DestroyDebugUtilsMessenger(
@@ -30,9 +40,13 @@ void DestroyDebugUtilsMessenger(
 {
     // TODO:
     // static_cast<PFN_vkCreateDebugUtilsMessengerEXT>()
+
     auto func = (PFN_vkDestroyDebugUtilsMessengerEXT) vkGetInstanceProcAddr(instance, "vkDestroyDebugUtilsMessengerEXT");
     if(func != nullptr)
+    {
+        std::cout << "- Debug messeger destroyed successfully\n";
         func(instance, debug_messenger, p_allocator);
+    }
     
 }
 
@@ -56,12 +70,13 @@ Instance::Instance(VkInstance instance, bool enable_debug_messeger, VkDebugUtils
 
 Instance::~Instance()
 {
-    std::cout << "~Instance\n";
+    // Destroy debug messeger
     if (m_enable_debug_messeger)
     {
         DestroyDebugUtilsMessenger(m_instance, m_debug_messenger, nullptr);
-        std::cout << "~Instance::DestroyDebugUtilsMessenger\n";
     }
+
+    std::cout << "- Instance destroyed successfully\n";
 
     // Destroy vulkan instance
     vkDestroyInstance(m_instance, nullptr);
@@ -105,6 +120,7 @@ InstanceBuilder& InstanceBuilder::set_debug_messeger()
         m_extensions.push_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
 
         m_enable_debug_messeger = true;
+
         //VkDebugUtilsMessengerCreateInfoEXT m_debug_create_info{};
         m_debug_create_info.sType =           VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT;
         m_debug_create_info.messageSeverity = VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT
@@ -151,13 +167,13 @@ bool check_validation_layers_support(const std::vector<const char*>& validation_
     // Check for each wanted validation layers
     // that they exist in the available layers
     // vector
-    for (const char* layerName : validation_layers)
+    for (const char* layer_name : validation_layers)
     {
         bool layer_found = false;
 
-        for (const auto& layerProperties : available_layers)
+        for (const auto& layer_properties : available_layers)
         {
-            if (strcmp(layerName, layerProperties.layerName) == 0)
+            if (strcmp(layer_name, layer_properties.layerName) == 0)
             {
                 layer_found = true;
                 break;
@@ -201,6 +217,7 @@ Instance InstanceBuilder::build()
     VkInstance vkinstance;
 
     // Create instance
+    std::cout << "+ Instance created successfully\n";
     if(vkCreateInstance(&m_create_info, nullptr, &vkinstance) != VK_SUCCESS)
     {
         throw std::runtime_error("failed to create instance!");
