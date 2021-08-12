@@ -8,6 +8,65 @@
 namespace kzn
 {
 
+VkResult CreateDebugUtilsMessenger(
+    VkInstance                                instance,
+    const VkDebugUtilsMessengerCreateInfoEXT* p_create_info,
+    const VkAllocationCallbacks*              p_allocator,
+    VkDebugUtilsMessengerEXT*                 p_debug_messenger)
+{
+    // TODO:
+    // static_cast<PFN_vkCreateDebugUtilsMessengerEXT>()
+    auto func = (PFN_vkCreateDebugUtilsMessengerEXT) vkGetInstanceProcAddr(instance, "vkCreateDebugUtilsMessengerEXT");
+    
+    return (func != nullptr)
+        ? func(instance, p_create_info, p_allocator, p_debug_messenger)
+        : VK_ERROR_EXTENSION_NOT_PRESENT;
+}
+
+void DestroyDebugUtilsMessenger(
+    VkInstance                   instance,
+    VkDebugUtilsMessengerEXT     debug_messenger,
+    const VkAllocationCallbacks* p_allocator)
+{
+    // TODO:
+    // static_cast<PFN_vkCreateDebugUtilsMessengerEXT>()
+    auto func = (PFN_vkDestroyDebugUtilsMessengerEXT) vkGetInstanceProcAddr(instance, "vkDestroyDebugUtilsMessengerEXT");
+    if(func != nullptr)
+        func(instance, debug_messenger, p_allocator);
+    
+}
+
+static VKAPI_ATTR VkBool32 VKAPI_CALL debug_callback(
+    VkDebugUtilsMessageSeverityFlagBitsEXT      /* message_severity */,
+    VkDebugUtilsMessageTypeFlagsEXT             /* message_type */,
+    const VkDebugUtilsMessengerCallbackDataEXT* p_callback_data,
+    void*                                       /* p_user_data */)
+{
+    std::cerr << "[VALIDATION] > " << p_callback_data->pMessage << std::endl;
+    return VK_FALSE;
+}
+
+Instance::Instance(VkInstance instance, bool enable_debug_messeger, VkDebugUtilsMessengerEXT debug_messenger)
+    : m_instance{instance}, 
+    m_enable_debug_messeger{enable_debug_messeger},
+    m_debug_messenger{debug_messenger}
+{
+
+}
+
+Instance::~Instance()
+{
+    std::cout << "~Instance\n";
+    if (m_enable_debug_messeger)
+    {
+        DestroyDebugUtilsMessenger(m_instance, m_debug_messenger, nullptr);
+        std::cout << "~Instance::DestroyDebugUtilsMessenger\n";
+    }
+
+    // Destroy vulkan instance
+    vkDestroyInstance(m_instance, nullptr);
+}
+
 InstanceBuilder::InstanceBuilder()
 {
     m_app_info.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
@@ -37,6 +96,31 @@ InstanceBuilder::InstanceBuilder()
     // {
     //     extensions.push_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
     // }
+}
+
+InstanceBuilder& InstanceBuilder::set_debug_messeger()
+{
+    if(m_enable_validation_layers)
+    {
+        m_extensions.push_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
+
+        m_enable_debug_messeger = true;
+        //VkDebugUtilsMessengerCreateInfoEXT m_debug_create_info{};
+        m_debug_create_info.sType =           VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT;
+        m_debug_create_info.messageSeverity = VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT
+                                    | VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT
+                                    // | VK_DEBUG_UTILS_MESSAGE_SEVERITY_INFO_BIT_EXT
+                                    // | VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT
+                                    ;
+        m_debug_create_info.messageType =     VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT
+                                    | VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT
+                                    | VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT
+                                    ;
+        m_debug_create_info.pfnUserCallback = debug_callback;
+        m_debug_create_info.pUserData = nullptr; // Optional
+    }
+
+    return *this;
 }
 
 InstanceBuilder& InstanceBuilder::enable_extensions(const std::vector<const char*>& extensions)
@@ -89,6 +173,7 @@ bool check_validation_layers_support(const std::vector<const char*>& validation_
 
 InstanceBuilder& InstanceBuilder::enable_validation_layers()
 {
+    m_enable_validation_layers = true;
     m_validation_layers.push_back("VK_LAYER_KHRONOS_validation");
 
     if(!check_validation_layers_support(m_validation_layers))
@@ -99,7 +184,6 @@ InstanceBuilder& InstanceBuilder::enable_validation_layers()
     m_create_info.enabledLayerCount = static_cast<uint32_t>(m_validation_layers.size());
     m_create_info.ppEnabledLayerNames = m_validation_layers.data();
 
-    // m_extensions.push_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
     return *this;
 }
 
@@ -109,20 +193,30 @@ Instance InstanceBuilder::build()
     m_create_info.ppEnabledExtensionNames = m_extensions.data();
 
     ///////////////// LOGS /////////////////
-    std::cout << "[INFO] > Enabled Extensions:\n";
-    for (const auto& ext : m_extensions)
-        std::cout << " - " << ext << '\n';
+    // std::cout << "[INFO] > Enabled Extensions:\n";
+    // for (const auto& ext : m_extensions)
+    //     std::cout << " - " << ext << '\n';
     ////////////////////////////////////////
 
-    Instance instance;
+    VkInstance vkinstance;
 
     // Create instance
-    if(vkCreateInstance(&m_create_info, nullptr, &instance.m_instance) != VK_SUCCESS)
+    if(vkCreateInstance(&m_create_info, nullptr, &vkinstance) != VK_SUCCESS)
     {
         throw std::runtime_error("failed to create instance!");
     }
 
-    return instance;
+    // Setup debug callback
+    if(m_enable_debug_messeger)
+    {
+        VkResult res = CreateDebugUtilsMessenger(vkinstance, &m_debug_create_info, nullptr, &m_debug_messenger);
+        if(res != VK_SUCCESS)
+        {
+            throw std::runtime_error("failed to set up debug messenger!");
+        }
+    }
+
+    return Instance(vkinstance, m_enable_debug_messeger);;
 }
 
 } // namespace kzn

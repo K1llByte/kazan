@@ -17,6 +17,7 @@ VkResult Renderer::CreateDebugUtilsMessenger(
     const VkAllocationCallbacks*              p_allocator,
     VkDebugUtilsMessengerEXT*                 p_debug_messenger)
 {
+    // TODO:
     // static_cast<PFN_vkCreateDebugUtilsMessengerEXT>()
     auto func = (PFN_vkCreateDebugUtilsMessengerEXT) vkGetInstanceProcAddr(instance, "vkCreateDebugUtilsMessengerEXT");
     
@@ -30,6 +31,7 @@ void Renderer::DestroyDebugUtilsMessenger(
     VkDebugUtilsMessengerEXT     debug_messenger,
     const VkAllocationCallbacks* p_allocator)
 {
+    // TODO:
     // static_cast<PFN_vkCreateDebugUtilsMessengerEXT>()
     auto func = (PFN_vkDestroyDebugUtilsMessengerEXT) vkGetInstanceProcAddr(instance, "vkDestroyDebugUtilsMessengerEXT");
     if (func != nullptr)

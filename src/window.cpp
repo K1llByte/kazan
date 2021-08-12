@@ -1,5 +1,6 @@
 #include "window.hpp"
 
+
 namespace kzn
 {
 
@@ -29,6 +30,9 @@ Window::~Window()
 
     // Destroy window
     glfwDestroyWindow(m_window);
+
+    // Destroy glfw
+    glfwTerminate();
 }
 
 std::vector<const char*> Window::required_extensions()

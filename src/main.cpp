@@ -37,6 +37,7 @@ int main()
     auto instance = kzn::InstanceBuilder()
         .enable_extensions(window.required_extensions())
         .enable_validation_layers()
+        .set_debug_messeger()
         .build();
 
 
