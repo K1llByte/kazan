@@ -150,7 +150,7 @@ QueueFamilyIndices PhysicalDeviceSelector::find_queue_families(VkPhysicalDevice 
 
 PhysicalDevice PhysicalDeviceSelector::select()
 {
-    VkPhysicalDevice physical_device;
+    VkPhysicalDevice physical_device = VK_NULL_HANDLE;
     for (const auto& device : m_available_devices)
     {
         if (is_device_suitable(device))
@@ -160,19 +160,43 @@ PhysicalDevice PhysicalDeviceSelector::select()
         }
     }
 
-    if (physical_device == VK_NULL_HANDLE)
+    if(physical_device == VK_NULL_HANDLE)
     {
         throw std::runtime_error("failed to find a suitable GPU!");
     }
+    else
+    {
+        std::cout << "+ Physical device selected successfully\n";
 
-    std::cout << "+ Physical device selected successfully\n";
+        VkPhysicalDeviceProperties device_properties;
+        vkGetPhysicalDeviceProperties(physical_device, &device_properties);
+        std::cout << "[INFO] > Using " << device_properties.deviceName << "\n";
 
-    VkPhysicalDeviceProperties device_properties;
-    vkGetPhysicalDeviceProperties(physical_device, &device_properties);
-    std::cout << "[INFO] > Using " << device_properties.deviceName << "\n";
+        return PhysicalDevice(physical_device, std::move(m_indices), std::move(m_device_extensions));
+    }
+}
 
-    // return PhysicalDevice(std::move(*this), physical_device); // , m_indices
-    return PhysicalDevice(physical_device, std::move(m_indices), std::move(m_device_extensions));
+
+Device::Device()
+    : m_physical_device{VK_NULL_HANDLE},
+    m_indices{},
+    m_graphics_queue{VK_NULL_HANDLE},
+    m_present_queue{VK_NULL_HANDLE},
+    m_device{VK_NULL_HANDLE} {}
+
+
+Device::Device(DeviceBuilder&& device_builder)
+    : m_physical_device{device_builder.m_physical_device.m_physical_device},
+    m_indices{std::move(device_builder.m_physical_device.m_indices)},
+    m_graphics_queue{device_builder.m_graphics_queue},
+    m_present_queue{device_builder.m_present_queue},
+    m_device{device_builder.m_device}
+{}
+
+Device::~Device()
+{
+    // Destroy logical device instance
+    vkDestroyDevice(m_device, nullptr);
 }
 
 
@@ -181,6 +205,7 @@ DeviceBuilder::DeviceBuilder(PhysicalDevice& physical_device)
 
 Device DeviceBuilder::build()
 {
+    m_validation_layers.push_back("VK_LAYER_KHRONOS_validation");
     // QueueFamilyIndices indices = find_queue_families(m_physical_device);
 
     std::vector<VkDeviceQueueCreateInfo> queue_create_infos;
@@ -210,24 +235,28 @@ Device DeviceBuilder::build()
 
     create_info.pEnabledFeatures = &device_features;
 
-    create_info.enabledExtensionCount = static_cast<uint32_t>(m_device_extensions.size());
-    create_info.ppEnabledExtensionNames = m_device_extensions.data();
+    create_info.enabledExtensionCount = static_cast<uint32_t>(m_physical_device.m_device_extensions.size());
+    create_info.ppEnabledExtensionNames = m_physical_device.m_device_extensions.data();
 
     if(true)
     {
-        create_info.enabledLayerCount = static_cast<uint32_t>(validation_layers.size());
-        create_info.ppEnabledLayerNames = validation_layers.data();
+        create_info.enabledLayerCount = static_cast<uint32_t>(m_validation_layers.size());
+        create_info.ppEnabledLayerNames = m_validation_layers.data();
     }
     else
     {
         create_info.enabledLayerCount = 0;
     }
 
-    if (vkCreateDevice(m_physical_device, &create_info, nullptr, &m_device) != VK_SUCCESS)
+    if (vkCreateDevice(m_physical_device.m_physical_device, &create_info, nullptr, &m_device) != VK_SUCCESS)
+    {
         throw std::runtime_error("failed to create logical device!");
+    }
 
     vkGetDeviceQueue(m_device, m_physical_device.m_indices.graphics_family.value(), 0, &m_graphics_queue);
     vkGetDeviceQueue(m_device, m_physical_device.m_indices.present_family.value(), 0, &m_present_queue);
+
+    return Device(std::move(*this));
 }
 
 } // namespace kzn

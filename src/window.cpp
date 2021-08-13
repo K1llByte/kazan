@@ -53,7 +53,7 @@ VkSurfaceKHR Window::create_surface(Instance& instance)
     {
         throw std::runtime_error("failed to create window surface!");
     }
-    std::cout << "- Surface created successfully\n";
+    std::cout << "+ Surface created successfully\n";
 
     return m_surface;
 }

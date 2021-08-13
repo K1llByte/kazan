@@ -29,6 +29,8 @@ public:
 
 public:
 
+    Instance();
+
     Instance(VkInstance instance, bool enable_debug_messeger = false, VkDebugUtilsMessengerEXT debug_messenger = nullptr);
 
     Instance(const Instance&) = delete;
@@ -44,7 +46,7 @@ private:
     VkApplicationInfo m_app_info{};
     VkInstanceCreateInfo m_create_info{};
     std::vector<const char*> m_extensions{};
-    std::vector<const char*> m_validation_layers = {};
+    std::vector<const char*> m_validation_layers{};
     VkDebugUtilsMessengerCreateInfoEXT m_debug_create_info{};
     VkDebugUtilsMessengerEXT m_debug_messenger;
     bool m_enable_validation_layers = false;

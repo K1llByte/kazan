@@ -60,6 +60,13 @@ static VKAPI_ATTR VkBool32 VKAPI_CALL debug_callback(
     return VK_FALSE;
 }
 
+
+Instance::Instance()
+    : m_instance{VK_NULL_HANDLE},
+    m_enable_debug_messeger{false},
+    m_debug_messenger{VK_NULL_HANDLE} {}
+
+
 Instance::Instance(VkInstance instance, bool enable_debug_messeger, VkDebugUtilsMessengerEXT debug_messenger)
     : m_instance{instance}, 
     m_enable_debug_messeger{enable_debug_messeger},

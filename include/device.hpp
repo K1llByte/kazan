@@ -5,6 +5,10 @@
 
 #include <optional>
 
+// FIXME:
+// - 'device_builder.m_physical_device.m_physical_device' this
+// is happening in the code, meaning that this file isn't pretty 
+
 namespace kzn
 {
 
@@ -27,7 +31,9 @@ struct SwapChainSupportDetails
     std::vector<VkPresentModeKHR> present_modes;
 };
 
+
 class PhysicalDeviceSelector;
+
 
 class PhysicalDevice
 {
@@ -40,8 +46,8 @@ public:
 public:
 
     PhysicalDevice(
-        VkPhysicalDevice physical_device,
-        QueueFamilyIndices&& indices,
+        VkPhysicalDevice           physical_device,
+        QueueFamilyIndices&&       indices,
         std::vector<const char*>&& device_extensions);
 
     ~PhysicalDevice();
@@ -83,11 +89,28 @@ private:
 };
 
 
+class DeviceBuilder;
+
+
 class Device
 {
-    public:
-
 public:
+
+    VkPhysicalDevice m_physical_device;
+    QueueFamilyIndices m_indices;
+    // std::vector<const char*> m_device_extensions;
+    VkQueue m_graphics_queue;
+    VkQueue m_present_queue;
+    VkDevice m_device;
+    
+public:
+
+    Device();
+
+    Device(DeviceBuilder&& device_builder);
+
+    ~Device();
+
     Device(const Device&) = delete;
     void operator=(const Device&) = delete;
 };
@@ -97,12 +120,11 @@ class DeviceBuilder
 {
 public:
 
-    // VkPhysicalDevice m_physical_device;
-    // QueueFamilyIndices m_indices;
     PhysicalDevice& m_physical_device;
     VkQueue m_graphics_queue;
     VkQueue m_present_queue;
     VkDevice m_device;
+    std::vector<const char*> m_validation_layers;
 
 public:
 
