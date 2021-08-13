@@ -27,6 +27,7 @@ struct SwapChainSupportDetails
     std::vector<VkPresentModeKHR> present_modes;
 };
 
+class PhysicalDeviceSelector;
 
 class PhysicalDevice
 {
@@ -34,11 +35,14 @@ public:
 
     VkPhysicalDevice m_physical_device;
     QueueFamilyIndices m_indices;
-
+    std::vector<const char*> m_device_extensions;
 
 public:
 
-    PhysicalDevice(VkPhysicalDevice physical_device, const QueueFamilyIndices& indices);
+    PhysicalDevice(
+        VkPhysicalDevice physical_device,
+        QueueFamilyIndices&& indices,
+        std::vector<const char*>&& device_extensions);
 
     ~PhysicalDevice();
 
@@ -81,6 +85,8 @@ private:
 
 class Device
 {
+    public:
+
 public:
     Device(const Device&) = delete;
     void operator=(const Device&) = delete;
@@ -91,12 +97,16 @@ class DeviceBuilder
 {
 public:
 
-    VkPhysicalDevice m_physical_device;
-    QueueFamilyIndices m_indices;
-    
+    // VkPhysicalDevice m_physical_device;
+    // QueueFamilyIndices m_indices;
+    PhysicalDevice& m_physical_device;
+    VkQueue m_graphics_queue;
+    VkQueue m_present_queue;
+    VkDevice m_device;
+
 public:
 
-    DeviceBuilder(PhysicalDevice physical_device);
+    DeviceBuilder(PhysicalDevice& physical_device);
 
     Device build();
 };

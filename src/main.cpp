@@ -34,20 +34,28 @@ int main()
 
     //////////////////////////////////////////////////
 
-    auto window = kzn::Window("Kazan Vulkan", 800, 800);
+    // auto window = kzn::Window("Kazan Vulkan", 800, 800);
 
-    auto instance = kzn::InstanceBuilder()
-        .enable_extensions(window.required_extensions())
-        .enable_validation_layers()
-        .set_debug_messeger()
-        .build();
+    // auto instance = kzn::InstanceBuilder()
+    //     .enable_extensions(window.required_extensions())
+    //     .enable_validation_layers()
+    //     .set_debug_messeger()
+    //     .build();
 
-    auto surface = window.create_surface(instance);
+    // auto surface = window.create_surface(instance);
     
-    auto device = kzn::PhysicalDeviceSelector(instance, surface)
-        .select();
+    // auto device = kzn::PhysicalDeviceSelector(instance, surface)
+    //     .select();
 
-    window.destroy_surface(instance);
+    // window.destroy_surface(instance);
+
+    //////////////////////////////////////////////////
+
+    // auto physical_device = kzn::PhysicalDeviceSelector(instance, surface)
+    //     .select();
+
+    // auto device = kzn::DeviceBuilder(std::move(physical_device))
+    //     .build();
 
     //////////////////////////////////////////////////
 

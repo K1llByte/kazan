@@ -7,9 +7,13 @@
 namespace kzn
 {
 
-PhysicalDevice::PhysicalDevice(VkPhysicalDevice physical_device, const QueueFamilyIndices& indices)
+PhysicalDevice::PhysicalDevice(
+        VkPhysicalDevice physical_device,
+        QueueFamilyIndices&& indices,
+        std::vector<const char*>&& device_extensions)
     : m_physical_device{physical_device},
-    m_indices{indices} {}
+    m_indices{std::move(indices)},
+    m_device_extensions{std::move(device_extensions)} {}
 
 
 PhysicalDevice::~PhysicalDevice()
@@ -62,6 +66,9 @@ bool PhysicalDeviceSelector::is_device_suitable(VkPhysicalDevice physical_device
 
 bool PhysicalDeviceSelector::check_device_extension_support(VkPhysicalDevice physical_device)
 {
+    // 'vkEnumerateDeviceExtensionProperties' will fetch all supported device extensions
+    // and this function iterates over all 'device_extensions' that are wanted to be loaded,
+    // and check if they're in the 'available_extensions' vector fetched from the vulkan call
     uint32_t extension_count;
     vkEnumerateDeviceExtensionProperties(physical_device, nullptr, &extension_count, nullptr);
 
@@ -164,13 +171,13 @@ PhysicalDevice PhysicalDeviceSelector::select()
     vkGetPhysicalDeviceProperties(physical_device, &device_properties);
     std::cout << "[INFO] > Using " << device_properties.deviceName << "\n";
 
-    return PhysicalDevice(physical_device, m_indices);
+    // return PhysicalDevice(std::move(*this), physical_device); // , m_indices
+    return PhysicalDevice(physical_device, std::move(m_indices), std::move(m_device_extensions));
 }
 
 
-DeviceBuilder::DeviceBuilder(PhysicalDevice physical_device)
-    : m_physical_device{physical_device.m_physical_device},
-    m_indices{physical_device.m_indices} {}
+DeviceBuilder::DeviceBuilder(PhysicalDevice& physical_device)
+    : m_physical_device{physical_device} {}
 
 Device DeviceBuilder::build()
 {
@@ -178,12 +185,12 @@ Device DeviceBuilder::build()
 
     std::vector<VkDeviceQueueCreateInfo> queue_create_infos;
     std::set<uint32_t> unique_queue_families = {
-        indices.graphics_family.value(),
-        indices.present_family.value()
+        m_physical_device.m_indices.graphics_family.value(),
+        m_physical_device.m_indices.present_family.value()
     };
     
     float queue_priority = 1.0f;
-    for (uint32_t queue_family : unique_queue_families)
+    for(uint32_t queue_family : unique_queue_families)
     {
         VkDeviceQueueCreateInfo queue_create_info{};
         queue_create_info.sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
@@ -199,14 +206,14 @@ Device DeviceBuilder::build()
     create_info.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
 
     create_info.pQueueCreateInfos = queue_create_infos.data();
-    create_info.queueCreateInfoCount = static_cast<uint32_t>(queue_create_infos.size());;
+    create_info.queueCreateInfoCount = static_cast<uint32_t>(queue_create_infos.size());
 
     create_info.pEnabledFeatures = &device_features;
 
-    create_info.enabledExtensionCount = static_cast<uint32_t>(device_extensions.size());
-    create_info.ppEnabledExtensionNames = device_extensions.data();
+    create_info.enabledExtensionCount = static_cast<uint32_t>(m_device_extensions.size());
+    create_info.ppEnabledExtensionNames = m_device_extensions.data();
 
-    if(ENABLE_VALIDATION_LAYERS)
+    if(true)
     {
         create_info.enabledLayerCount = static_cast<uint32_t>(validation_layers.size());
         create_info.ppEnabledLayerNames = validation_layers.data();
@@ -219,8 +226,8 @@ Device DeviceBuilder::build()
     if (vkCreateDevice(m_physical_device, &create_info, nullptr, &m_device) != VK_SUCCESS)
         throw std::runtime_error("failed to create logical device!");
 
-    vkGetDeviceQueue(m_device, indices.graphics_family.value(), 0, &m_graphics_queue);
-    vkGetDeviceQueue(m_device, indices.present_family.value(), 0, &m_present_queue);
+    vkGetDeviceQueue(m_device, m_physical_device.m_indices.graphics_family.value(), 0, &m_graphics_queue);
+    vkGetDeviceQueue(m_device, m_physical_device.m_indices.present_family.value(), 0, &m_present_queue);
 }
 
 } // namespace kzn

@@ -72,4 +72,7 @@ clean:
 run: all
 	$(TARGET)
 
+main:
+	$(CC) src/main.cpp -o $(TARGET) $(LIB_FLAGS)
+
 #############################################################
