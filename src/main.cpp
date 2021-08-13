@@ -2,6 +2,7 @@
 
 #include "window.hpp"
 #include "instance.hpp"
+#include "device.hpp"
 
 #include <iostream>
 
@@ -33,14 +34,20 @@ int main()
 
     //////////////////////////////////////////////////
 
-    kzn::Window window("Kazan Vulkan", 800, 800);
+    auto window = kzn::Window("Kazan Vulkan", 800, 800);
+
     auto instance = kzn::InstanceBuilder()
         .enable_extensions(window.required_extensions())
         .enable_validation_layers()
         .set_debug_messeger()
         .build();
 
+    auto surface = window.create_surface(instance);
+    
+    auto device = kzn::PhysicalDeviceSelector(instance, surface)
+        .select();
 
+    window.destroy_surface(instance);
 
     //////////////////////////////////////////////////
 

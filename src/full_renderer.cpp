@@ -506,7 +506,7 @@ void Renderer::create_logical_device()
 
 void Renderer::create_surface()
 {
-    if (glfwCreateWindowSurface(m_instance, m_window, nullptr, &m_surface) != VK_SUCCESS)
+    if(glfwCreateWindowSurface(m_instance, m_window, nullptr, &m_surface) != VK_SUCCESS)
         throw std::runtime_error("failed to create window surface!");
 
 }

@@ -1,5 +1,7 @@
 #include "window.hpp"
 
+#include <stdexcept>
+#include <iostream>
 
 namespace kzn
 {
@@ -21,13 +23,12 @@ Window::Window(const std::string& name, int width, int height)
     
     // On framebuffer resize callback
     // glfwSetFramebufferSizeCallback(m_window, framebuffer_resize_callback);
+
+    
 }
 
 Window::~Window()
 {
-    // // Destroy window surface
-    // vkDestroySurfaceKHR(m_instance, m_surface, nullptr);
-
     // Destroy window
     glfwDestroyWindow(m_window);
 
@@ -42,6 +43,26 @@ std::vector<const char*> Window::required_extensions()
     glfw_extensions = glfwGetRequiredInstanceExtensions(&glfw_extension_count);
 
     return std::vector<const char*>(glfw_extensions, glfw_extensions + glfw_extension_count);
+}
+
+
+VkSurfaceKHR Window::create_surface(Instance& instance)
+{
+    // Create surface
+    if(glfwCreateWindowSurface(instance.m_instance, m_window, nullptr, &m_surface) != VK_SUCCESS)
+    {
+        throw std::runtime_error("failed to create window surface!");
+    }
+    std::cout << "- Surface created successfully\n";
+
+    return m_surface;
+}
+
+void Window::destroy_surface(Instance& instance)
+{
+    // Destroy window surface
+    vkDestroySurfaceKHR(instance.m_instance, m_surface, nullptr);
+    std::cout << "- Surface destroyed successfully\n";
 }
 
 }
