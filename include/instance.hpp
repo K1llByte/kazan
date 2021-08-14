@@ -29,12 +29,14 @@ public:
 
 public:
 
-    Instance();
+    // Instance();
 
     Instance(VkInstance instance, bool enable_debug_messeger = false, VkDebugUtilsMessengerEXT debug_messenger = nullptr);
 
-    Instance(const Instance&) = delete;
-    void operator=(const Instance&) = delete;
+    Instance(Instance&& instance) = default;
+
+    // Instance(const Instance&) = delete;
+    // void operator=(const Instance&) = delete;
 
     ~Instance();
 };

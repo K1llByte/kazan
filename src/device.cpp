@@ -177,12 +177,12 @@ PhysicalDevice PhysicalDeviceSelector::select()
 }
 
 
-Device::Device()
-    : m_physical_device{VK_NULL_HANDLE},
-    m_indices{},
-    m_graphics_queue{VK_NULL_HANDLE},
-    m_present_queue{VK_NULL_HANDLE},
-    m_device{VK_NULL_HANDLE} {}
+// Device::Device()
+//     : m_physical_device{VK_NULL_HANDLE},
+//     m_indices{},
+//     m_graphics_queue{VK_NULL_HANDLE},
+//     m_present_queue{VK_NULL_HANDLE},
+//     m_device{VK_NULL_HANDLE} {}
 
 
 Device::Device(DeviceBuilder&& device_builder)

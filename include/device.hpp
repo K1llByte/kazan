@@ -105,14 +105,16 @@ public:
     
 public:
 
-    Device();
+    // Device();
 
     Device(DeviceBuilder&& device_builder);
 
+    Device(Device&& device) = default;
+
     ~Device();
 
-    Device(const Device&) = delete;
-    void operator=(const Device&) = delete;
+    // Device(const Device&) = delete;
+    // void operator=(const Device&) = delete;
 };
 
 
