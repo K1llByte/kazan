@@ -56,8 +56,8 @@ bool PhysicalDeviceSelector::is_device_suitable(VkPhysicalDevice physical_device
     bool swap_chain_adequate = false;
     if (extensions_supported)
     {
-        SwapChainSupportDetails swap_chain_support = query_swap_chain_support(physical_device);
-        swap_chain_adequate = !swap_chain_support.formats.empty() && !swap_chain_support.present_modes.empty();
+        m_swap_chain_support = query_swap_chain_support(physical_device);
+        swap_chain_adequate = !m_swap_chain_support.formats.empty() && !m_swap_chain_support.present_modes.empty();
     }
 
     return m_indices.is_complete() && swap_chain_adequate;
