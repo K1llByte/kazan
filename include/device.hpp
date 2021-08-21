@@ -68,7 +68,7 @@ public:
         VK_KHR_SWAPCHAIN_EXTENSION_NAME
     };
     QueueFamilyIndices m_indices;
-    SwapChainSupportDetails m_swap_chain_support
+    SwapChainSupportDetails m_swap_chain_support;
     
 public:
 

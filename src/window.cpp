@@ -10,11 +10,12 @@ Window::Window(const std::string& name, int width, int height)
 {
     // Initialize glfw
     glfwInit();
+
     // Turn off OpenGl context initialization
     glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
     
     // Turn off resizable window
-    // glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
+    glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
     
     // Initialize window
     m_window = glfwCreateWindow(width, height, name.c_str(), nullptr, nullptr);

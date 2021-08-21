@@ -1,8 +1,10 @@
 // #include "full_renderer.hpp"
 
-#include "window.hpp"
-#include "instance.hpp"
-#include "device.hpp"
+// #include "window.hpp"
+// #include "instance.hpp"
+// #include "device.hpp"
+
+#include "engine.hpp"
 
 #include <iostream>
 
@@ -34,25 +36,25 @@ int main()
 
     //////////////////////////////////////////////////
 
-    auto window = kzn::Window("Kazan Vulkan", 800, 800);
+    // auto window = kzn::Window("Kazan Vulkan", 800, 800);
 
-    auto instance = kzn::InstanceBuilder()
-        .enable_extensions(window.required_extensions())
-        .enable_validation_layers()
-        .set_debug_messeger()
-        .build();
+    // auto instance = kzn::InstanceBuilder()
+    //     .enable_extensions(window.required_extensions())
+    //     .enable_validation_layers()
+    //     .set_debug_messeger()
+    //     .build();
 
-    auto surface = window.create_surface(instance);
+    // auto surface = window.create_surface(instance);
     
-    auto physical_device = kzn::PhysicalDeviceSelector(instance, surface)
-        .select();
+    // auto physical_device = kzn::PhysicalDeviceSelector(instance, surface)
+    //     .select();
 
-    auto device = kzn::DeviceBuilder(physical_device)
-        .build();
+    // auto device = kzn::DeviceBuilder(physical_device)
+    //     .build();
 
-    // ...
+    // // ...
 
-    window.destroy_surface(instance);
+    // window.destroy_surface(instance);
 
     //////////////////////////////////////////////////
 
@@ -67,6 +69,16 @@ int main()
     //     std::cerr << e.what() << std::endl;
     //     return EXIT_FAILURE;
     // }
+
+    //////////////////////////////////////////////////
+
+    kzn::Engine engine;
+
+    engine.init();
+
+	engine.run();
+
+	engine.cleanup();
 
     //////////////////////////////////////////////////
 

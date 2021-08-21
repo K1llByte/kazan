@@ -28,7 +28,7 @@ public:
 
     SwapChainBuilder(Device& device);
 
-    SwapChain build()
+    SwapChain build();
 };
 
 }
