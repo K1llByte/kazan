@@ -1,5 +1,39 @@
-#!/usr/bin/sh
+#!/bin/bash
+
+# * This is a helper script to create a
+# * cpp module (cpp & hpp) just to spare
+# * some time.
+
+# First argument is mandatory
 [ -z $1 ] && echo "error: mkmod <filename>" && exit
-touch include/$1.hpp
-touch src/$1.cpp
+
+# Check if doesn't exists already
+[ -f src/$1.cpp ] && echo "error: file already exists" && exit
+
+# Create include file
+echo "\
+#ifndef ${1^^}_H
+#define ${1^^}_H
+
+namespace kzn
+{
+
+
+
+}
+
+#endif // ${1^^}_H" > include/$1.hpp
+
+# Create source file
+echo "\
+#include \"$1.hpp\"
+
+namespace kzn
+{
+
+
+
+}" > src/$1.cpp
+
+# Open in editor
 code include/$1.hpp src/$1.cpp
