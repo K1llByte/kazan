@@ -148,11 +148,11 @@ void Engine::init_vulkan()
 
 void Engine::init_swapchain()
 {
-    vkb::SwapchainBuilder swapchainBuilder{_physical_device,_device,_surface };
+    vkb::SwapchainBuilder vkb_swapchain_builder{ _physical_device, _device, _surface };
 
-    vkb::Swapchain vkb_swapchain = swapchainBuilder
+    vkb::Swapchain vkb_swapchain = vkb_swapchain_builder
         .use_default_format_selection()
-        //use vsync present mode
+        // Use vsync present mode
         .set_desired_present_mode(VK_PRESENT_MODE_FIFO_KHR)
         .set_desired_extent(_window_extent.width, _window_extent.height)
         .build()
