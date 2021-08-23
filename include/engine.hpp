@@ -25,10 +25,16 @@ public:
     VkDevice                 _device; // Vulkan device for commands
     VkSurfaceKHR             _surface; // Vulkan window surface
 
-    VkSwapchainKHR _swapchain;
-    VkFormat _swapchain_image_format;
-    std::vector<VkImage> _swapchain_images;
+    VkSwapchainKHR           _swapchain;
+    VkFormat                 _swapchain_image_format;
+    std::vector<VkImage>     _swapchain_images;
     std::vector<VkImageView> _swapchain_image_views;
+
+    VkQueue  _graphics_queue;
+    uint32_t _graphics_queue_family;
+
+    VkCommandPool   _command_pool;
+    VkCommandBuffer _main_command_buffer;
 
 public:
 
@@ -49,6 +55,8 @@ private:
     void init_vulkan();
 
     void init_swapchain();
+
+    void init_commands();
 };
 
 }

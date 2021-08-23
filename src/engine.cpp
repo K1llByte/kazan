@@ -3,7 +3,7 @@
 // #define GLFW_INCLUDE_VULKAN
 // #include <GLFW/glfw3.h>
 
-#include "types.hpp"
+// #include "types.hpp"
 #include "initializers.hpp"
 
 #include "VkBootstrap.h"
@@ -46,6 +46,9 @@ void Engine::init()
     // Create the swapchain
     init_swapchain();
 
+    // Create commands stuff
+    init_commands();
+
     _is_initialized = true;
 }
 
@@ -54,6 +57,9 @@ void Engine::cleanup()
 {
     if(_is_initialized)
     {
+        // Destroy command pool
+        vkDestroyCommandPool(_device, _command_pool, nullptr);
+        
         // Destroy Swapchain
         vkDestroySwapchainKHR(_device, _swapchain, nullptr);
 
@@ -143,6 +149,12 @@ void Engine::init_vulkan()
     // Get the VkDevice handle used in the rest of a Vulkan application
     _device = vkb_device.device;
     _physical_device = vkb_physical_device.physical_device;
+
+    // Use vkbootstrap to get a Graphics queue & Queue family index
+    _graphics_queue = vkb_device.get_queue(vkb::QueueType::graphics).value();
+    _graphics_queue_family = vkb_device.get_queue_index(vkb::QueueType::graphics).value();
+
+
 }
 
 
@@ -164,6 +176,21 @@ void Engine::init_swapchain()
     _swapchain_image_views = vkb_swapchain.get_image_views().value();
 
     _swapchain_image_format = vkb_swapchain.image_format;
+}
+
+
+void Engine::init_commands()
+{
+    // Create a command pool for commands submitted to the graphics queue.
+	// We also want the pool to allow for reseting of individual command buffers
+    VkCommandPoolCreateInfo command_pool_info = kzn::command_pool_create_info(_graphics_queue_family, VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT);
+
+    VK_CHECK(vkCreateCommandPool(_device, &command_pool_info, nullptr, &_commandPool));
+
+    // Allocate the default command buffer that we will use for rendering
+    VkCommandBufferAllocateInfo cmd_alloc_info = command_buffer_allocate_info(_command_pool, 1);
+
+    VK_CHECK(vkAllocateCommandBuffers(_device, &cmd_alloc_info, &_main_command_buffer));
 }
 
 }
