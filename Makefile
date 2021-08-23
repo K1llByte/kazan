@@ -62,6 +62,7 @@ $(SHADER_DIR)/%.$(FRAG_EXT).spv: $(SHADER_DIR)/%.$(FRAG_EXT)
 
 renderer_directories:
 	@mkdir -p $(BUILD_DIR)
+	@mkdir -p $(BUILD_DIR)/lib
 	@mkdir -p bin
 
 clean:
