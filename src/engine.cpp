@@ -69,8 +69,18 @@ void Engine::cleanup()
         // Destroy Swapchain
         vkDestroySwapchainKHR(_device, _swapchain, nullptr);
 
+        //destroy the main renderpass
+        vkDestroyRenderPass(_device, _render_pass, nullptr);
+
+        //destroy swapchain resources
+        for(int i = 0; i < _framebuffers.size(); ++i)
+        {
+            vkDestroyFramebuffer(_device, _framebuffers[i], nullptr);
+            vkDestroyImageView(_device, _swapchain_image_views[i], nullptr);
+        }
+
         // Destroy swapchain resources
-        for (int i = 0; i < _swapchain_image_views.size(); i++)
+        for (int i = 0; i < _swapchain_image_views.size(); ++i)
         {
             // Images are implicitly destroyed by the swapchain
             vkDestroyImageView(_device, _swapchain_image_views[i], nullptr);
@@ -99,7 +109,26 @@ void Engine::cleanup()
 
 void Engine::draw()
 {
+    // Wait until the GPU has finished rendering the last frame. Timeout of 1 second
+    VK_CHECK(vkWaitForFences(_device, 1, &_render_fence, true, 1000000000));
+    VK_CHECK(vkResetFences(_device, 1, &_render_fence));
 
+    // Request image from the swapchain, one second timeout
+    uint32_t swapchain_image_index;
+    VK_CHECK(vkAcquireNextImageKHR(_device, _swapchain, 1000000000, _present_semaphore, nullptr, &swapchain_image_index));
+
+    // Now that we are sure that the commands finished executing, we can safely reset the command buffer to begin recording again.
+    VK_CHECK(vkResetCommandBuffer(_main_command_buffer, 0));
+
+	// Begin the command buffer recording. We will use this command buffer exactly once, so we want to let Vulkan know that
+	VkCommandBufferBeginInfo cmd_begin_info{};
+	cmd_begin_info.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+	cmd_begin_info.pNext = nullptr;
+
+	cmd_begin_info.pInheritanceInfo = nullptr;
+	cmd_begin_info.flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;
+
+	VK_CHECK(vkBeginCommandBuffer(cmd, &cmd_begin_info));
 }
 
 
@@ -249,9 +278,54 @@ void Engine::init_default_renderpass()
 }
 
 
-void init_framebuffers()
+void Engine::init_framebuffers()
 {
-    
+    // Create the framebuffers for the swapchain images. This will connect the render-pass to the images for rendering
+    VkFramebufferCreateInfo fb_info = {};
+    fb_info.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
+    fb_info.pNext = nullptr;
+
+    fb_info.renderPass = _render_pass;
+    fb_info.attachmentCount = 1;
+    fb_info.width = _window_extent.width;
+    fb_info.height = _window_extent.height;
+    fb_info.layers = 1;
+
+    // Grab how many images we have in the swapchain
+    const uint32_t swapchain_imagecount = _swapchain_images.size();
+    // TODO: change copy to resize
+    // _framebuffers.resize(swapchain_imagecount);
+    _framebuffers = std::vector<VkFramebuffer>(swapchain_imagecount);
+
+    // Create framebuffers for each of the swapchain image views
+    for (int i = 0; i < swapchain_imagecount; i++)
+    {
+        fb_info.pAttachments = &_swapchain_image_views[i];
+        VK_CHECK(vkCreateFramebuffer(_device, &fb_info, nullptr, &_framebuffers[i]));
+    }
+}
+
+
+void Engine::init_sync_structures()
+{
+    // Create synchronization structures
+    VkFenceCreateInfo fence_create_info = {};
+    fence_create_info.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
+    fence_create_info.pNext = nullptr;
+
+    // We want to create the fence with the Create Signaled flag, so we can wait on it before using it on a GPU command (for the first frame)
+    fence_create_info.flags = VK_FENCE_CREATE_SIGNALED_BIT;
+
+    VK_CHECK(vkCreateFence(_device, &fence_create_info, nullptr, &_render_fence));
+
+    // For the semaphores we don't need any flags
+    VkSemaphoreCreateInfo semaphoreCreateInfo = {};
+    semaphoreCreateInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
+    semaphoreCreateInfo.pNext = nullptr;
+    semaphoreCreateInfo.flags = 0;
+
+    VK_CHECK(vkCreateSemaphore(_device, &semaphoreCreateInfo, nullptr, &_present_semaphore));
+    VK_CHECK(vkCreateSemaphore(_device, &semaphoreCreateInfo, nullptr, &_render_semaphore));
 }
 
 }
