@@ -49,6 +49,12 @@ void Engine::init()
     // Create commands stuff
     init_commands();
 
+    // Create Renderpass
+    init_default_renderpass();
+
+    // Create framebuffers
+    init_framebuffers();
+
     _is_initialized = true;
 }
 
@@ -182,7 +188,7 @@ void Engine::init_swapchain()
 void Engine::init_commands()
 {
     // Create a command pool for commands submitted to the graphics queue.
-	// We also want the pool to allow for reseting of individual command buffers
+    // We also want the pool to allow for reseting of individual command buffers
     VkCommandPoolCreateInfo command_pool_info = kzn::command_pool_create_info(_graphics_queue_family, VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT);
 
     VK_CHECK(vkCreateCommandPool(_device, &command_pool_info, nullptr, &_commandPool));
@@ -191,6 +197,61 @@ void Engine::init_commands()
     VkCommandBufferAllocateInfo cmd_alloc_info = command_buffer_allocate_info(_command_pool, 1);
 
     VK_CHECK(vkAllocateCommandBuffers(_device, &cmd_alloc_info, &_main_command_buffer));
+}
+
+
+void Engine::init_default_renderpass()
+{
+    // The renderpass will use this color attachment.
+    VkAttachmentDescription color_attachment{};
+    // The attachment will have the format needed by the swapchain
+    color_attachment.format = _swapchain_image_format;
+    // 1 sample, we won't be doing MSAA
+    color_attachment.samples = VK_SAMPLE_COUNT_1_BIT;
+    // We Clear when this attachment is loaded
+    color_attachment.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
+    // We keep the attachment stored when the renderpass ends
+    color_attachment.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
+    // We don't care about stencil
+    color_attachment.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
+    color_attachment.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
+
+    // We don't know or care about the starting layout of the attachment
+    color_attachment.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+
+    // After the renderpass ends, the image has to be on a layout ready for display
+    color_attachment.finalLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
+
+    VkAttachmentReference color_attachment_ref{};
+    // Attachment number will index into the pAttachments array in the parent renderpass itself
+    color_attachment_ref.attachment = 0;
+    color_attachment_ref.layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+
+    //we are going to create 1 subpass, which is the minimum you can do
+    VkSubpassDescription subpass = {};
+    subpass.pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS;
+    subpass.colorAttachmentCount = 1;
+    subpass.pColorAttachments = &color_attachment_ref;
+
+
+    VkRenderPassCreateInfo render_pass_info = {};
+    render_pass_info.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
+
+    // Connect the color attachment to the info
+    render_pass_info.attachmentCount = 1;
+    render_pass_info.pAttachments = &color_attachment;
+    // Connect the subpass to the info
+    render_pass_info.subpassCount = 1;
+    render_pass_info.pSubpasses = &subpass;
+
+
+    VK_CHECK(vkCreateRenderPass(_device, &render_pass_info, nullptr, &_render_pass));
+}
+
+
+void init_framebuffers()
+{
+    
 }
 
 }

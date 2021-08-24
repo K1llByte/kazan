@@ -36,6 +36,9 @@ public:
     VkCommandPool   _command_pool;
     VkCommandBuffer _main_command_buffer;
 
+    VkRenderPass _render_pass;
+    std::vector<VkFramebuffer> _framebuffers;
+
 public:
 
     // Initializes necessary objects
@@ -57,6 +60,10 @@ private:
     void init_swapchain();
 
     void init_commands();
+
+    void init_default_renderpass();
+
+	void init_framebuffers();
 };
 
 }
