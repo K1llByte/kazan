@@ -43,6 +43,8 @@ public:
     VkSemaphore _render_semaphore;
 	VkFence _render_fence;
 
+    uint32_t _frame_number = 0;
+
 public:
 
     // Initializes necessary objects
@@ -57,6 +59,9 @@ public:
     // Run main loop
     void run();
 
+    //loads a shader module from a spir-v file. Returns false if it errors
+    bool load_shader_module(const char* file_path, VkShaderModule* out_shader_module);
+
 private:
 
     void init_vulkan();
@@ -70,6 +75,8 @@ private:
 	void init_framebuffers();
 
     void init_sync_structures();
+
+    void init_pipelines();
 };
 
 }

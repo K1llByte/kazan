@@ -8,7 +8,10 @@
 
 #include "VkBootstrap.h"
 
+#include <cmath>
+
 #include <iostream>
+#include <fstream>
 
 #define VK_CHECK(x)                                            \
     do                                                         \
@@ -54,6 +57,12 @@ void Engine::init()
 
     // Create framebuffers
     init_framebuffers();
+
+    // Create sync structures
+    init_sync_structures();
+
+    // Create pipeline
+    init_pipelines();
 
     _is_initialized = true;
 }
@@ -120,15 +129,90 @@ void Engine::draw()
     // Now that we are sure that the commands finished executing, we can safely reset the command buffer to begin recording again.
     VK_CHECK(vkResetCommandBuffer(_main_command_buffer, 0));
 
-	// Begin the command buffer recording. We will use this command buffer exactly once, so we want to let Vulkan know that
-	VkCommandBufferBeginInfo cmd_begin_info{};
-	cmd_begin_info.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
-	cmd_begin_info.pNext = nullptr;
+    // Begin the command buffer recording. We will use this command buffer exactly once, so we want to let Vulkan know that
+    VkCommandBufferBeginInfo cmd_begin_info{};
+    cmd_begin_info.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+    cmd_begin_info.pNext = nullptr;
 
-	cmd_begin_info.pInheritanceInfo = nullptr;
-	cmd_begin_info.flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;
+    cmd_begin_info.pInheritanceInfo = nullptr;
+    cmd_begin_info.flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT;
 
-	VK_CHECK(vkBeginCommandBuffer(cmd, &cmd_begin_info));
+    VK_CHECK(vkBeginCommandBuffer(_main_command_buffer, &cmd_begin_info));
+
+
+    // Make a clear-color from frame number. This will flash with a 120*pi frame period.
+    VkClearValue clear_value;
+    float flash = abs(sin(_frame_number / 120.f));
+    clear_value.color = { { 0.0f, 0.0f, flash, 1.0f } };
+
+    //start the main renderpass.
+    //We will use the clear color from above, and the framebuffer of the index the swapchain gave us
+    VkRenderPassBeginInfo rp_info{};
+    rp_info.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
+    rp_info.pNext = nullptr;
+
+    rp_info.renderPass = _render_pass;
+    rp_info.renderArea.offset.x = 0;
+    rp_info.renderArea.offset.y = 0;
+    rp_info.renderArea.extent = _window_extent;
+    rp_info.framebuffer = _framebuffers[swapchain_image_index];
+
+    //connect clear values
+    rp_info.clearValueCount = 1;
+    rp_info.pClearValues = &clear_value;
+
+    vkCmdBeginRenderPass(_main_command_buffer, &rp_info, VK_SUBPASS_CONTENTS_INLINE);
+
+    // Finalize the render pass
+    vkCmdEndRenderPass(_main_command_buffer);
+    // Finalize the command buffer (we can no longer add commands, but it can now be executed)
+    VK_CHECK(vkEndCommandBuffer(_main_command_buffer));
+
+
+    // Prepare the submission to the queue.
+    // We want to wait on the _presentSemaphore, as that semaphore is signaled when the swapchain is ready
+    // We will signal the _renderSemaphore, to signal that rendering has finished
+
+    VkSubmitInfo submit = {};
+    submit.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+    submit.pNext = nullptr;
+
+    VkPipelineStageFlags wait_stage = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
+
+    submit.pWaitDstStageMask = &wait_stage;
+
+    submit.waitSemaphoreCount = 1;
+    submit.pWaitSemaphores = &_present_semaphore;
+
+    submit.signalSemaphoreCount = 1;
+    submit.pSignalSemaphores = &_render_semaphore;
+
+    submit.commandBufferCount = 1;
+    submit.pCommandBuffers = &_main_command_buffer;
+
+    //submit command buffer to the queue and execute it.
+    // _renderFence will now block until the graphic commands finish execution
+    VK_CHECK(vkQueueSubmit(_graphics_queue, 1, &submit, _render_fence));
+
+    // This will put the image we just rendered into the visible window.
+    // We want to wait on the _renderSemaphore for that,
+    // as it's necessary that drawing commands have finished before the image is displayed to the user
+    VkPresentInfoKHR present_info = {};
+    present_info.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
+    present_info.pNext = nullptr;
+
+    present_info.pSwapchains = &_swapchain;
+    present_info.swapchainCount = 1;
+
+    present_info.pWaitSemaphores = &_render_semaphore;
+    present_info.waitSemaphoreCount = 1;
+
+    present_info.pImageIndices = &swapchain_image_index;
+
+    VK_CHECK(vkQueuePresentKHR(_graphics_queue, &present_info));
+
+    // increase the number of frames drawn
+    ++_frame_number;
 }
 
 
@@ -140,6 +224,51 @@ void Engine::run()
         glfwPollEvents();
         draw();
     }
+}
+
+
+bool Engine::load_shader_module(const char* file_path, VkShaderModule* out_shader_module)
+{
+    // Open the file. With cursor at the end
+    std::ifstream file(file_path, std::ios::ate | std::ios::binary);
+
+    if (!file.is_open())
+        return false;
+    
+    //find what the size of the file is by looking up the location of the cursor
+    //because the cursor is at the end, it gives the size directly in bytes
+    size_t file_size = (size_t) file.tellg();
+    
+    // SPIRV expects the buffer to be on uint32, so make sure to reserve an int vector big enough for the entire file
+    std::vector<uint32_t> buffer(file_size / sizeof(uint32_t));
+    
+    // Put file cursor at beginning
+    file.seekg(0);
+    
+    // Load the entire file into the buffer
+    file.read((char*)buffer.data(), file_size);
+    
+    file.close();
+
+    //create a new shader module, using the buffer we loaded
+    VkShaderModuleCreateInfo create_info = {};
+    create_info.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
+    create_info.pNext = nullptr;
+
+    // code_size has to be in bytes, so multiply the ints in the buffer by size of int to know the real size of the buffer
+    create_info.codeSize = buffer.size() * sizeof(uint32_t);
+    create_info.pCode = buffer.data();
+
+    // Check that the creation goes well.
+    VkShaderModule shader_module;
+    if(vkCreateShaderModule(_device, &create_info, nullptr, &shader_module) != VK_SUCCESS)
+    {
+        return false;
+    }
+
+    *out_shader_module = shader_module;
+
+    return true;
 }
 
 
@@ -326,6 +455,30 @@ void Engine::init_sync_structures()
 
     VK_CHECK(vkCreateSemaphore(_device, &semaphoreCreateInfo, nullptr, &_present_semaphore));
     VK_CHECK(vkCreateSemaphore(_device, &semaphoreCreateInfo, nullptr, &_render_semaphore));
+}
+
+
+void Engine::init_pipelines()
+{
+    VkShaderModule frag_shader;
+    if(!load_shader_module("../../shaders/triangle.frag.spv", &frag_shader))
+    {
+        std::cout << "Error when building the triangle fragment shader module" << std::endl;
+    }
+    else
+    {
+        std::cout << "Triangle fragment shader successfully loaded" << std::endl;
+    }
+
+    VkShaderModule vertex_shader;
+    if(!load_shader_module("../../shaders/triangle.vert.spv", &vertex_shader))
+    {
+        std::cout << "Error when building the triangle vertex shader module" << std::endl;
+    }
+    else
+    {
+        std::cout << "Triangle vertex shader successfully loaded" << std::endl;
+    }
 }
 
 }
