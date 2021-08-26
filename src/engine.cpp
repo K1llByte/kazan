@@ -461,7 +461,7 @@ void Engine::init_sync_structures()
 void Engine::init_pipelines()
 {
     VkShaderModule frag_shader;
-    if(!load_shader_module("../../shaders/triangle.frag.spv", &frag_shader))
+    if(!load_shader_module("shaders/shader.vert.spv", &frag_shader))
     {
         std::cout << "Error when building the triangle fragment shader module" << std::endl;
     }
@@ -471,13 +471,72 @@ void Engine::init_pipelines()
     }
 
     VkShaderModule vertex_shader;
-    if(!load_shader_module("../../shaders/triangle.vert.spv", &vertex_shader))
+    if(!load_shader_module("shaders/shader.vert.spv", &vertex_shader))
     {
         std::cout << "Error when building the triangle vertex shader module" << std::endl;
     }
     else
     {
         std::cout << "Triangle vertex shader successfully loaded" << std::endl;
+    }
+}
+
+
+VkPipeline PipelineBuilder::build(VkDevice device, VkRenderPass pass)
+{
+    // Make viewport state from our stored viewport and scissor.
+    // at the moment we won't support multiple viewports or scissors
+    VkPipelineViewportStateCreateInfo viewport_state = {};
+    viewport_state.sType = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO;
+    viewport_state.pNext = nullptr;
+
+    viewport_state.viewportCount = 1;
+    viewport_state.pViewports = &_viewport;
+    viewport_state.scissorCount = 1;
+    viewport_state.pScissors = &_scissor;
+
+    // Setup dummy color blending. We aren't using transparent objects yet
+    // the blending is just "no blend", but we do write to the color attachment
+    VkPipelineColorBlendStateCreateInfo color_blending{};
+    color_blending.sType = VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO;
+    color_blending.pNext = nullptr;
+
+    color_blending.logicOpEnable = VK_FALSE;
+    color_blending.logicOp = VK_LOGIC_OP_COPY;
+    color_blending.attachmentCount = 1;
+    color_blending.pAttachments = &_color_blend_attachment;
+
+
+    // Build the actual pipeline
+    // we now use all of the info structs we have been writing into into this one to create the pipeline
+    VkGraphicsPipelineCreateInfo pipeline_info{};
+    pipeline_info.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
+    pipeline_info.pNext = nullptr;
+
+    pipeline_info.stageCount = _shaderStages.size();
+    pipeline_info.pStages = _shaderStages.data();
+    pipeline_info.pVertexInputState = &_vertexInputInfo;
+    pipeline_info.pInputAssemblyState = &_inputAssembly;
+    pipeline_info.pViewportState = &viewportState;
+    pipeline_info.pRasterizationState = &_rasterizer;
+    pipeline_info.pMultisampleState = &_multisampling;
+    pipeline_info.pColorBlendState = &colorBlending;
+    pipeline_info.layout = _pipelineLayout;
+    pipeline_info.renderPass = pass;
+    pipeline_info.subpass = 0;
+    pipeline_info.basePipelineHandle = VK_NULL_HANDLE;
+
+    // It's easy to error out on create graphics pipeline, so we handle it a bit better than the common VK_CHECK case
+    VkPipeline new_pipeline;
+    if(vkCreateGraphicsPipelines(
+        device, VK_NULL_HANDLE, 1, &pipeline_info, nullptr, &new_pipeline) != VK_SUCCESS)
+    {
+        std::cout << "failed to create pipeline\n";
+        return VK_NULL_HANDLE; // failed to create graphics pipeline
+    }
+    else
+    {
+        return new_pipeline;
     }
 }
 

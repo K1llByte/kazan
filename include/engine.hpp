@@ -8,6 +8,22 @@
 namespace kzn
 {
 
+struct PipelineBuilder
+{
+    std::vector<VkPipelineShaderStageCreateInfo> _shader_stages;
+    VkPipelineVertexInputStateCreateInfo _vertex_input_info;
+    VkPipelineInputAssemblyStateCreateInfo _input_assembly;
+    VkViewport _viewport;
+    VkRect2D _scissor;
+    VkPipelineRasterizationStateCreateInfo _rasterizer;
+    VkPipelineColorBlendAttachmentState _color_blend_attachment;
+    VkPipelineMultisampleStateCreateInfo _multisampling;
+    VkPipelineLayout _pipeline_layout;
+
+    VkPipeline build(VkDevice device, VkRenderPass pass);
+};
+
+
 class Engine
 {
 public:
@@ -41,7 +57,7 @@ public:
 
     VkSemaphore _present_semaphore;
     VkSemaphore _render_semaphore;
-	VkFence _render_fence;
+    VkFence _render_fence;
 
     uint32_t _frame_number = 0;
 
@@ -72,7 +88,7 @@ private:
 
     void init_default_renderpass();
 
-	void init_framebuffers();
+    void init_framebuffers();
 
     void init_sync_structures();
 

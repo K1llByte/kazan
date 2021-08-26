@@ -10,6 +10,16 @@ VkCommandPoolCreateInfo command_pool_create_info(uint32_t queue_family_index, Vk
 
 VkCommandBufferAllocateInfo command_buffer_allocate_info(VkCommandPool pool, uint32_t count = 1, VkCommandBufferLevel level = VK_COMMAND_BUFFER_LEVEL_PRIMARY);
 
+
+VkPipelineShaderStageCreateInfo pipeline_shader_stage_create_info(VkShaderStageFlagBits stage, VkShaderModule shader_module);
+
+VkPipelineVertexInputStateCreateInfo vertex_input_state_create_info();
+
+VkPipelineRasterizationStateCreateInfo rasterization_state_create_info(VkPolygonMode polygon_mode);
+
+VkPipelineMultisampleStateCreateInfo multisampling_state_create_info();
+
+VkPipelineColorBlendAttachmentState color_blend_attachment_state();
 }
 
 #endif // INITIALIZERS_H
