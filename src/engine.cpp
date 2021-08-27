@@ -22,7 +22,7 @@
             std::cout << "Vulkan Error: " << err << std::endl; \
             std::abort();                                      \
         }                                                      \
-    } while (0)
+    } while(0)
 
 namespace kzn
 {
@@ -162,6 +162,11 @@ void Engine::draw()
     rp_info.pClearValues = &clear_value;
 
     vkCmdBeginRenderPass(_main_command_buffer, &rp_info, VK_SUBPASS_CONTENTS_INLINE);
+
+    //once we start adding rendering commands, they will go here
+
+    vkCmdBindPipeline(_main_command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, _triangle_pipeline);
+    vkCmdDraw(_main_command_buffer, 3, 1, 0, 0);
 
     // Finalize the render pass
     vkCmdEndRenderPass(_main_command_buffer);
@@ -349,7 +354,7 @@ void Engine::init_commands()
     // We also want the pool to allow for reseting of individual command buffers
     VkCommandPoolCreateInfo command_pool_info = kzn::command_pool_create_info(_graphics_queue_family, VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT);
 
-    VK_CHECK(vkCreateCommandPool(_device, &command_pool_info, nullptr, &_commandPool));
+    VK_CHECK(vkCreateCommandPool(_device, &command_pool_info, nullptr, &_command_pool));
 
     // Allocate the default command buffer that we will use for rendering
     VkCommandBufferAllocateInfo cmd_alloc_info = command_buffer_allocate_info(_command_pool, 1);
@@ -461,7 +466,7 @@ void Engine::init_sync_structures()
 void Engine::init_pipelines()
 {
     VkShaderModule frag_shader;
-    if(!load_shader_module("shaders/shader.vert.spv", &frag_shader))
+    if(!load_shader_module("shaders/shader.frag.spv", &frag_shader))
     {
         std::cout << "Error when building the triangle fragment shader module" << std::endl;
     }
@@ -479,6 +484,57 @@ void Engine::init_pipelines()
     {
         std::cout << "Triangle vertex shader successfully loaded" << std::endl;
     }
+
+
+    // Build the pipeline layout that controls the inputs/outputs of the shader
+    // we are not using descriptor sets or other systems yet, so no need to use anything other than empty default
+    VkPipelineLayoutCreateInfo pipeline_layout_info = kzn::pipeline_layout_create_info();
+
+    VK_CHECK(vkCreatePipelineLayout(_device, &pipeline_layout_info, nullptr, &_triangle_pipeline_layout));
+
+
+    // Build the stage-create-info for both vertex and fragment stages. This lets the pipeline know the shader modules per stage
+    PipelineBuilder pipeline_builder;
+
+    pipeline_builder._shader_stages.push_back(
+        kzn::pipeline_shader_stage_create_info(VK_SHADER_STAGE_VERTEX_BIT, vertex_shader));
+
+    pipeline_builder._shader_stages.push_back(
+        kzn::pipeline_shader_stage_create_info(VK_SHADER_STAGE_FRAGMENT_BIT, frag_shader));
+
+
+    // Vertex input controls how to read vertices from vertex buffers. We aren't using it yet
+    pipeline_builder._vertex_input_info = kzn::vertex_input_state_create_info();
+
+    // Input assembly is the configuration for drawing triangle lists, strips, or individual points.
+    // we are just going to draw triangle list
+    pipeline_builder._input_assembly = kzn::input_assembly_create_info(VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST);
+
+    // Build viewport and scissor from the swapchain extents
+    pipeline_builder._viewport.x = 0.0f;
+    pipeline_builder._viewport.y = 0.0f;
+    pipeline_builder._viewport.width = (float) _window_extent.width;
+    pipeline_builder._viewport.height = (float) _window_extent.height;
+    pipeline_builder._viewport.minDepth = 0.0f;
+    pipeline_builder._viewport.maxDepth = 1.0f;
+
+    pipeline_builder._scissor.offset = { 0, 0 };
+    pipeline_builder._scissor.extent = _window_extent;
+
+    // Configure the rasterizer to draw filled triangles
+    pipeline_builder._rasterizer = kzn::rasterization_state_create_info(VK_POLYGON_MODE_FILL);
+
+    // We don't use multisampling, so just run the default one
+    pipeline_builder._multisampling = kzn::multisampling_state_create_info();
+
+    // A single blend attachment with no blending and writing to RGBA
+    pipeline_builder._color_blend_attachment = kzn::color_blend_attachment_state();
+
+    // Use the triangle layout we created
+    pipeline_builder._pipeline_layout = _triangle_pipeline_layout;
+
+    // Finally build the pipeline
+    _triangle_pipeline = pipeline_builder.build(_device, _render_pass);
 }
 
 
@@ -513,15 +569,15 @@ VkPipeline PipelineBuilder::build(VkDevice device, VkRenderPass pass)
     pipeline_info.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
     pipeline_info.pNext = nullptr;
 
-    pipeline_info.stageCount = _shaderStages.size();
-    pipeline_info.pStages = _shaderStages.data();
-    pipeline_info.pVertexInputState = &_vertexInputInfo;
-    pipeline_info.pInputAssemblyState = &_inputAssembly;
-    pipeline_info.pViewportState = &viewportState;
+    pipeline_info.stageCount = _shader_stages.size();
+    pipeline_info.pStages = _shader_stages.data();
+    pipeline_info.pVertexInputState = &_vertex_input_info;
+    pipeline_info.pInputAssemblyState = &_input_assembly;
+    pipeline_info.pViewportState = &viewport_state;
     pipeline_info.pRasterizationState = &_rasterizer;
     pipeline_info.pMultisampleState = &_multisampling;
-    pipeline_info.pColorBlendState = &colorBlending;
-    pipeline_info.layout = _pipelineLayout;
+    pipeline_info.pColorBlendState = &color_blending;
+    pipeline_info.layout = _pipeline_layout;
     pipeline_info.renderPass = pass;
     pipeline_info.subpass = 0;
     pipeline_info.basePipelineHandle = VK_NULL_HANDLE;

@@ -59,7 +59,8 @@ public:
     VkSemaphore _render_semaphore;
     VkFence _render_fence;
 
-    uint32_t _frame_number = 0;
+    VkPipelineLayout _triangle_pipeline_layout;
+    VkPipeline _triangle_pipeline;
 
 public:
 

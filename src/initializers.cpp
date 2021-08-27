@@ -3,7 +3,7 @@
 namespace kzn
 {
 
-VkCommandPoolCreateInfo kzn::command_pool_create_info(uint32_t queue_family_index, VkCommandPoolCreateFlags flags /*= 0*/)
+VkCommandPoolCreateInfo command_pool_create_info(uint32_t queue_family_index, VkCommandPoolCreateFlags flags /*= 0*/)
 {
     VkCommandPoolCreateInfo info = {};
     info.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
@@ -14,7 +14,7 @@ VkCommandPoolCreateInfo kzn::command_pool_create_info(uint32_t queue_family_inde
     return info;
 }
 
-VkCommandBufferAllocateInfo kzn::command_buffer_allocate_info(VkCommandPool pool, uint32_t count, VkCommandBufferLevel level)
+VkCommandBufferAllocateInfo command_buffer_allocate_info(VkCommandPool pool, uint32_t count, VkCommandBufferLevel level)
 {
     VkCommandBufferAllocateInfo info = {};
     info.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
@@ -27,7 +27,7 @@ VkCommandBufferAllocateInfo kzn::command_buffer_allocate_info(VkCommandPool pool
 }
 
 
-VkPipelineShaderStageCreateInfo kzn::pipeline_shader_stage_create_info(VkShaderStageFlagBits stage, VkShaderModule shaderModule)
+VkPipelineShaderStageCreateInfo pipeline_shader_stage_create_info(VkShaderStageFlagBits stage, VkShaderModule shader_module)
 {
     VkPipelineShaderStageCreateInfo info{};
     info.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
@@ -36,14 +36,14 @@ VkPipelineShaderStageCreateInfo kzn::pipeline_shader_stage_create_info(VkShaderS
     // Shader stage
     info.stage = stage;
     // Module containing the code for this shader stage
-    info.module = shaderModule;
+    info.module = shader_module;
     // The entry point of the shader
     info.pName = "main";
     return info;
 }
 
 
-VkPipelineVertexInputStateCreateInfo kzn::vertex_input_state_create_info()
+VkPipelineVertexInputStateCreateInfo vertex_input_state_create_info()
 {
     VkPipelineVertexInputStateCreateInfo info{};
     info.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
@@ -56,7 +56,7 @@ VkPipelineVertexInputStateCreateInfo kzn::vertex_input_state_create_info()
 }
 
 
-VkPipelineInputAssemblyStateCreateInfo vkinit::input_assembly_create_info(VkPrimitiveTopology topology)
+VkPipelineInputAssemblyStateCreateInfo input_assembly_create_info(VkPrimitiveTopology topology)
 {
     VkPipelineInputAssemblyStateCreateInfo info{};
     info.sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
@@ -69,7 +69,7 @@ VkPipelineInputAssemblyStateCreateInfo vkinit::input_assembly_create_info(VkPrim
 }
 
 
-VkPipelineRasterizationStateCreateInfo kzn::rasterization_state_create_info(VkPolygonMode polygon_mode)
+VkPipelineRasterizationStateCreateInfo rasterization_state_create_info(VkPolygonMode polygon_mode)
 {
     VkPipelineRasterizationStateCreateInfo info = {};
     info.sType = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO;
@@ -94,7 +94,7 @@ VkPipelineRasterizationStateCreateInfo kzn::rasterization_state_create_info(VkPo
 }
 
 
-VkPipelineMultisampleStateCreateInfo kzn::multisampling_state_create_info()
+VkPipelineMultisampleStateCreateInfo multisampling_state_create_info()
 {
     VkPipelineMultisampleStateCreateInfo info{};
     info.sType = VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO;
@@ -111,7 +111,7 @@ VkPipelineMultisampleStateCreateInfo kzn::multisampling_state_create_info()
 }
 
 
-VkPipelineColorBlendAttachmentState kzn::color_blend_attachment_state()
+VkPipelineColorBlendAttachmentState color_blend_attachment_state()
 {
     VkPipelineColorBlendAttachmentState color_blend_attachment{};
     color_blend_attachment.colorWriteMask = VK_COLOR_COMPONENT_R_BIT
@@ -123,18 +123,19 @@ VkPipelineColorBlendAttachmentState kzn::color_blend_attachment_state()
 }
 
 
-VkPipelineLayoutCreateInfo kzn::pipeline_layout_create_info() {
-		VkPipelineLayoutCreateInfo info{};
-		info.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
-		info.pNext = nullptr;
+VkPipelineLayoutCreateInfo pipeline_layout_create_info()
+{
+    VkPipelineLayoutCreateInfo info{};
+    info.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
+    info.pNext = nullptr;
 
-		//empty defaults
-		info.flags = 0;
-		info.setLayoutCount = 0;
-		info.pSetLayouts = nullptr;
-		info.pushConstantRangeCount = 0;
-		info.pPushConstantRanges = nullptr;
-		return info;
-	}
+    // Empty defaults
+    info.flags = 0;
+    info.setLayoutCount = 0;
+    info.pSetLayouts = nullptr;
+    info.pushConstantRangeCount = 0;
+    info.pPushConstantRanges = nullptr;
+    return info;
+}
 
 }
