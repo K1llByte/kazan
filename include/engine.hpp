@@ -11,14 +11,14 @@ namespace kzn
 struct PipelineBuilder
 {
     std::vector<VkPipelineShaderStageCreateInfo> _shader_stages;
-    VkPipelineVertexInputStateCreateInfo _vertex_input_info;
-    VkPipelineInputAssemblyStateCreateInfo _input_assembly;
-    VkViewport _viewport;
-    VkRect2D _scissor;
-    VkPipelineRasterizationStateCreateInfo _rasterizer;
-    VkPipelineColorBlendAttachmentState _color_blend_attachment;
-    VkPipelineMultisampleStateCreateInfo _multisampling;
-    VkPipelineLayout _pipeline_layout;
+    VkPipelineVertexInputStateCreateInfo         _vertex_input_info;
+    VkPipelineInputAssemblyStateCreateInfo       _input_assembly;
+    VkViewport                                   _viewport;
+    VkRect2D                                     _scissor;
+    VkPipelineRasterizationStateCreateInfo       _rasterizer;
+    VkPipelineColorBlendAttachmentState          _color_blend_attachment;
+    VkPipelineMultisampleStateCreateInfo         _multisampling;
+    VkPipelineLayout                             _pipeline_layout;
 
     VkPipeline build(VkDevice device, VkRenderPass pass);
 };
@@ -52,15 +52,15 @@ public:
     VkCommandPool   _command_pool;
     VkCommandBuffer _main_command_buffer;
 
-    VkRenderPass _render_pass;
+    VkRenderPass               _render_pass;
     std::vector<VkFramebuffer> _framebuffers;
 
     VkSemaphore _present_semaphore;
     VkSemaphore _render_semaphore;
-    VkFence _render_fence;
+    VkFence     _render_fence;
 
     VkPipelineLayout _triangle_pipeline_layout;
-    VkPipeline _triangle_pipeline;
+    VkPipeline       _triangle_pipeline;
 
 public:
 

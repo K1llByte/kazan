@@ -145,8 +145,8 @@ void Engine::draw()
     float flash = abs(sin(_frame_number / 120.f));
     clear_value.color = { { 0.0f, 0.0f, flash, 1.0f } };
 
-    //start the main renderpass.
-    //We will use the clear color from above, and the framebuffer of the index the swapchain gave us
+    // Start the main renderpass.
+    // We will use the clear color from above, and the framebuffer of the index the swapchain gave us
     VkRenderPassBeginInfo rp_info{};
     rp_info.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
     rp_info.pNext = nullptr;
