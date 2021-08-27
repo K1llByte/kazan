@@ -8,10 +8,11 @@
 
 #include "VkBootstrap.h"
 
-#include <cmath>
 
 #include <iostream>
 #include <fstream>
+
+#include <cmath>
 
 #define VK_CHECK(x)                                            \
     do                                                         \
@@ -142,7 +143,13 @@ void Engine::draw()
 
     // Make a clear-color from frame number. This will flash with a 120*pi frame period.
     VkClearValue clear_value;
-    float flash = abs(sin(_frame_number / 120.f));
+    float flash = std::abs(sin(_frame_number / 1.f));
+    // std::cout << _frame_number << ", " << flash << '\n';
+    // std::cout << "_frame_number / 120.f: " << (_frame_number / 120.f) << "\n";
+    // std::cout << "sin(_frame_number / 120.f): " << (sin(_frame_number / 120.f)) << "\n";
+    // std::cout << "res: " <<  abs<double>(sin(_frame_number / 120.f)) << "\n";
+    // std::cout << "abs(float(-1.0)): " << abs(float(-0.5)) << "\n" ;
+    
     clear_value.color = { { 0.0f, 0.0f, flash, 1.0f } };
 
     // Start the main renderpass.
@@ -157,7 +164,7 @@ void Engine::draw()
     rp_info.renderArea.extent = _window_extent;
     rp_info.framebuffer = _framebuffers[swapchain_image_index];
 
-    //connect clear values
+    // Connect clear values
     rp_info.clearValueCount = 1;
     rp_info.pClearValues = &clear_value;
 
