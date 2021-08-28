@@ -8,11 +8,12 @@
 
 #include "VkBootstrap.h"
 
-
 #include <iostream>
 #include <fstream>
 
 #include <cmath>
+#include <cstring>
+
 
 #define VK_CHECK(x)                                            \
     do                                                         \
@@ -65,6 +66,8 @@ void Engine::init()
     // Create pipeline
     init_pipelines();
 
+    load_meshes();
+
     _is_initialized = true;
 }
 
@@ -73,34 +76,40 @@ void Engine::cleanup()
 {
     if(_is_initialized)
     {
-        // Destroy command pool
-        vkDestroyCommandPool(_device, _command_pool, nullptr);
+        // // Destroy command pool
+        // vkDestroyCommandPool(_device, _command_pool, nullptr);
         
-        // Destroy Swapchain
-        vkDestroySwapchainKHR(_device, _swapchain, nullptr);
+        // // Destroy Swapchain
+        // vkDestroySwapchainKHR(_device, _swapchain, nullptr);
 
-        //destroy the main renderpass
-        vkDestroyRenderPass(_device, _render_pass, nullptr);
+        // //destroy the main renderpass
+        // vkDestroyRenderPass(_device, _render_pass, nullptr);
 
-        //destroy swapchain resources
-        for(int i = 0; i < _framebuffers.size(); ++i)
-        {
-            vkDestroyFramebuffer(_device, _framebuffers[i], nullptr);
-            vkDestroyImageView(_device, _swapchain_image_views[i], nullptr);
-        }
+        // //destroy swapchain resources
+        // for(int i = 0; i < _framebuffers.size(); ++i)
+        // {
+        //     vkDestroyFramebuffer(_device, _framebuffers[i], nullptr);
+        //     vkDestroyImageView(_device, _swapchain_image_views[i], nullptr);
+        // }
 
-        // Destroy swapchain resources
-        for (int i = 0; i < _swapchain_image_views.size(); ++i)
-        {
-            // Images are implicitly destroyed by the swapchain
-            vkDestroyImageView(_device, _swapchain_image_views[i], nullptr);
-        }
+        // // Destroy swapchain resources
+        // for (int i = 0; i < _swapchain_image_views.size(); ++i)
+        // {
+        //     // Images are implicitly destroyed by the swapchain
+        //     vkDestroyImageView(_device, _swapchain_image_views[i], nullptr);
+        // }
 
-        // Destroy device
-        vkDestroyDevice(_device, nullptr);
+        // Make sure the GPU has stopped doing its things
+        // TODO(kb): change timeout to max uint value
+        vkWaitForFences(_device, 1, &_render_fence, true, 1000000000);
+
+        _main_deletion_queue.flush();
 
         // Destroy surface
         vkDestroySurfaceKHR(_instance, _surface, nullptr);
+
+        // Destroy device
+        vkDestroyDevice(_device, nullptr);
 
         // Destroy Debug messenger
         vkb::destroy_debug_utils_messenger(_instance, _debug_messenger);
@@ -143,12 +152,7 @@ void Engine::draw()
 
     // Make a clear-color from frame number. This will flash with a 120*pi frame period.
     VkClearValue clear_value;
-    float flash = std::abs(sin(_frame_number / 1.f));
-    // std::cout << _frame_number << ", " << flash << '\n';
-    // std::cout << "_frame_number / 120.f: " << (_frame_number / 120.f) << "\n";
-    // std::cout << "sin(_frame_number / 120.f): " << (sin(_frame_number / 120.f)) << "\n";
-    // std::cout << "res: " <<  abs<double>(sin(_frame_number / 120.f)) << "\n";
-    // std::cout << "abs(float(-1.0)): " << abs(float(-0.5)) << "\n" ;
+    float flash = std::abs(std::sin(_frame_number / 30.f));
     
     clear_value.color = { { 0.0f, 0.0f, flash, 1.0f } };
 
@@ -170,9 +174,12 @@ void Engine::draw()
 
     vkCmdBeginRenderPass(_main_command_buffer, &rp_info, VK_SUBPASS_CONTENTS_INLINE);
 
-    //once we start adding rendering commands, they will go here
+    // Once we start adding rendering commands, they will go here
 
     vkCmdBindPipeline(_main_command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, _triangle_pipeline);
+    // Bind the mesh vertex buffer with offset 0
+	VkDeviceSize offset = 0;
+	vkCmdBindVertexBuffers(_main_command_buffer, 0, 1, &_triangle_mesh._vertex_buffer._buffer, &offset);
     vkCmdDraw(_main_command_buffer, 3, 1, 0, 0);
 
     // Finalize the render pass
@@ -330,7 +337,13 @@ void Engine::init_vulkan()
     _graphics_queue = vkb_device.get_queue(vkb::QueueType::graphics).value();
     _graphics_queue_family = vkb_device.get_queue_index(vkb::QueueType::graphics).value();
 
-
+    
+    // Initialize the memory allocator
+    VmaAllocatorCreateInfo allocator_info{};
+    allocator_info.physicalDevice = _physical_device;
+    allocator_info.device = _device;
+    allocator_info.instance = _instance;
+    vmaCreateAllocator(&allocator_info, &_allocator);
 }
 
 
@@ -352,6 +365,10 @@ void Engine::init_swapchain()
     _swapchain_image_views = vkb_swapchain.get_image_views().value();
 
     _swapchain_image_format = vkb_swapchain.image_format;
+
+    _main_deletion_queue.push_function([=]() {
+        vkDestroySwapchainKHR(_device, _swapchain, nullptr);
+    });
 }
 
 
@@ -367,6 +384,10 @@ void Engine::init_commands()
     VkCommandBufferAllocateInfo cmd_alloc_info = command_buffer_allocate_info(_command_pool, 1);
 
     VK_CHECK(vkAllocateCommandBuffers(_device, &cmd_alloc_info, &_main_command_buffer));
+
+    _main_deletion_queue.push_function([=]() {
+        vkDestroyCommandPool(_device, _command_pool, nullptr);
+    });
 }
 
 
@@ -416,6 +437,10 @@ void Engine::init_default_renderpass()
 
 
     VK_CHECK(vkCreateRenderPass(_device, &render_pass_info, nullptr, &_render_pass));
+
+    _main_deletion_queue.push_function([=]() {
+        vkDestroyRenderPass(_device, _render_pass, nullptr);
+    });
 }
 
 
@@ -443,6 +468,11 @@ void Engine::init_framebuffers()
     {
         fb_info.pAttachments = &_swapchain_image_views[i];
         VK_CHECK(vkCreateFramebuffer(_device, &fb_info, nullptr, &_framebuffers[i]));
+        
+        _main_deletion_queue.push_function([=]() {
+            vkDestroyFramebuffer(_device, _framebuffers[i], nullptr);
+            vkDestroyImageView(_device, _swapchain_image_views[i], nullptr);
+        });
     }
 }
 
@@ -459,6 +489,11 @@ void Engine::init_sync_structures()
 
     VK_CHECK(vkCreateFence(_device, &fence_create_info, nullptr, &_render_fence));
 
+    // Enqueue the destruction of the fence
+    _main_deletion_queue.push_function([=]() {
+        vkDestroyFence(_device, _render_fence, nullptr);
+    });
+
     // For the semaphores we don't need any flags
     VkSemaphoreCreateInfo semaphoreCreateInfo = {};
     semaphoreCreateInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
@@ -467,13 +502,18 @@ void Engine::init_sync_structures()
 
     VK_CHECK(vkCreateSemaphore(_device, &semaphoreCreateInfo, nullptr, &_present_semaphore));
     VK_CHECK(vkCreateSemaphore(_device, &semaphoreCreateInfo, nullptr, &_render_semaphore));
+
+    _main_deletion_queue.push_function([=]() {
+        vkDestroySemaphore(_device, _present_semaphore, nullptr);
+        vkDestroySemaphore(_device, _render_semaphore, nullptr);
+    });
 }
 
 
 void Engine::init_pipelines()
 {
     VkShaderModule frag_shader;
-    if(!load_shader_module("shaders/shader.frag.spv", &frag_shader))
+    if(!load_shader_module("shaders/mesh.frag.spv", &frag_shader))
     {
         std::cout << "Error when building the triangle fragment shader module" << std::endl;
     }
@@ -483,7 +523,7 @@ void Engine::init_pipelines()
     }
 
     VkShaderModule vertex_shader;
-    if(!load_shader_module("shaders/shader.vert.spv", &vertex_shader))
+    if(!load_shader_module("shaders/mesh.vert.spv", &vertex_shader))
     {
         std::cout << "Error when building the triangle vertex shader module" << std::endl;
     }
@@ -508,6 +548,18 @@ void Engine::init_pipelines()
 
     pipeline_builder._shader_stages.push_back(
         kzn::pipeline_shader_stage_create_info(VK_SHADER_STAGE_FRAGMENT_BIT, frag_shader));
+
+    VertexInputDescription vertex_description = Vertex::get_vertex_description();
+
+	//connect the pipeline builder vertex input info to the one we get from Vertex
+	pipeline_builder._vertex_input_info.pVertexAttributeDescriptions = vertex_description.attributes.data();
+	pipeline_builder._vertex_input_info.vertexAttributeDescriptionCount = vertex_description.attributes.size();
+
+	pipeline_builder._vertex_input_info.pVertexBindingDescriptions = vertex_description.bindings.data();
+	pipeline_builder._vertex_input_info.vertexBindingDescriptionCount = vertex_description.bindings.size();
+
+	//clear the shader stages for the builder
+	pipeline_builder._shader_stages.clear();
 
 
     // Vertex input controls how to read vertices from vertex buffers. We aren't using it yet
@@ -542,6 +594,18 @@ void Engine::init_pipelines()
 
     // Finally build the pipeline
     _triangle_pipeline = pipeline_builder.build(_device, _render_pass);
+
+
+    vkDestroyShaderModule(_device, vertex_shader, nullptr);
+    vkDestroyShaderModule(_device, frag_shader, nullptr);
+
+     _main_deletion_queue.push_function([=]() {
+        // Destroy the pipelines we have created
+        vkDestroyPipeline(_device, _triangle_pipeline, nullptr);
+
+        // Destroy the pipeline layout that they use
+        vkDestroyPipelineLayout(_device, _triangle_pipeline_layout, nullptr);
+    });
 }
 
 
@@ -601,6 +665,64 @@ VkPipeline PipelineBuilder::build(VkDevice device, VkRenderPass pass)
     {
         return new_pipeline;
     }
+}
+
+
+void Engine::load_meshes()
+{
+    // Make the array 3 vertices long
+    _triangle_mesh._vertices.resize(3);
+
+    // Vertex positions
+    _triangle_mesh._vertices[0].position = { 1.f, 1.f, 0.0f };
+    _triangle_mesh._vertices[1].position = {-1.f, 1.f, 0.0f };
+    _triangle_mesh._vertices[2].position = { 0.f,-1.f, 0.0f };
+
+    // Vertex colors, all green
+    _triangle_mesh._vertices[0].color = { 0.f, 1.f, 0.0f }; //pure green
+    _triangle_mesh._vertices[1].color = { 0.f, 1.f, 0.0f }; //pure green
+    _triangle_mesh._vertices[2].color = { 0.f, 1.f, 0.0f }; //pure green
+
+    // We don't care about the vertex normals
+
+    upload_mesh(_triangle_mesh);
+}
+
+
+void Engine::upload_mesh(Mesh& mesh)
+{
+    // Allocate vertex buffer
+    VkBufferCreateInfo buffer_info = {};
+    buffer_info.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
+    // This is the total size, in bytes, of the buffer we are allocating
+    buffer_info.size = mesh._vertices.size() * sizeof(Vertex);
+    // This buffer is going to be used as a Vertex Buffer
+    buffer_info.usage = VK_BUFFER_USAGE_VERTEX_BUFFER_BIT;
+
+
+    // Let the VMA library know that this data should be writeable by CPU, but also readable by GPU
+    VmaAllocationCreateInfo vma_alloc_info{};
+    vma_alloc_info.usage = VMA_MEMORY_USAGE_CPU_TO_GPU;
+
+    // Allocate the buffer
+    VK_CHECK(vmaCreateBuffer(_allocator, &buffer_info, &vma_alloc_info,
+        &mesh._vertex_buffer._buffer,
+        &mesh._vertex_buffer._allocation,
+        nullptr));
+
+    // Add the destruction of triangle mesh buffer to the deletion queue
+    _main_deletion_queue.push_function([=]() {
+        vmaDestroyBuffer(_allocator, mesh._vertex_buffer._buffer, mesh._vertex_buffer._allocation);
+    });
+
+
+    // Copy vertex data
+    void* data;
+	vmaMapMemory(_allocator, mesh._vertex_buffer._allocation, &data);
+
+	std::memcpy(data, mesh._vertices.data(), mesh._vertices.size() * sizeof(Vertex));
+
+	vmaUnmapMemory(_allocator, mesh._vertex_buffer._allocation);
 }
 
 }

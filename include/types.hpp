@@ -3,9 +3,18 @@
 
 #include <vulkan/vulkan.h>
 
+// #define VMA_USE_STL_CONTAINERS 1
+#define VMA_IMPLEMENTATION
+#include "vk_mem_alloc.h"
+
+struct AllocatedBuffer
+{
+    VkBuffer      _buffer;
+    VmaAllocation _allocation;
+};
+
 namespace kzn
 {
-
 
 
 }

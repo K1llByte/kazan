@@ -2,8 +2,11 @@
 #define ENGINE_H
 
 #include "types.hpp"
+#include "mesh.hpp"
 
 #include <vector>
+#include <functional>
+#include <deque>
 
 namespace kzn
 {
@@ -21,6 +24,28 @@ struct PipelineBuilder
     VkPipelineLayout                             _pipeline_layout;
 
     VkPipeline build(VkDevice device, VkRenderPass pass);
+};
+
+
+struct DeletionQueue
+{
+    std::deque<std::function<void()>> deletors;
+
+    void push_function(std::function<void()>&& function)
+    {
+        deletors.push_back(function);
+    }
+
+    void flush()
+    {
+        // Reverse iterate the deletion queue to execute all the functions
+        for (auto it = deletors.rbegin(); it != deletors.rend(); ++it)
+        {
+            (*it)();
+        }
+
+        deletors.clear();
+    }
 };
 
 
@@ -62,6 +87,13 @@ public:
     VkPipelineLayout _triangle_pipeline_layout;
     VkPipeline       _triangle_pipeline;
 
+    DeletionQueue _main_deletion_queue;
+
+    VmaAllocator _allocator; //vma lib allocator
+
+    VkPipeline _mesh_pipeline;
+	Mesh _triangle_mesh;
+
 public:
 
     // Initializes necessary objects
@@ -94,6 +126,11 @@ private:
     void init_sync_structures();
 
     void init_pipelines();
+
+    void load_meshes();
+
+    void upload_mesh(Mesh& mesh);
+
 };
 
 }
