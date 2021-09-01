@@ -13,6 +13,7 @@
 
 #include <cmath>
 #include <cstring>
+#include <cstdint>
 
 
 #define VK_CHECK(x)                                            \
