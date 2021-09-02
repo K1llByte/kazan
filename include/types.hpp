@@ -11,7 +11,7 @@
 struct AllocatedBuffer
 {
     VkBuffer      _buffer;
-    VmaAllocation _allocation;
+    // VmaAllocation _allocation;
 };
 
 namespace kzn

@@ -339,12 +339,12 @@ void Engine::init_vulkan()
     _graphics_queue_family = vkb_device.get_queue_index(vkb::QueueType::graphics).value();
 
     
-    // Initialize the memory allocator
-    VmaAllocatorCreateInfo allocator_info{};
-    allocator_info.physicalDevice = _physical_device;
-    allocator_info.device = _device;
-    allocator_info.instance = _instance;
-    vmaCreateAllocator(&allocator_info, &_allocator);
+    // // Initialize the memory allocator
+    // VmaAllocatorCreateInfo allocator_info{};
+    // allocator_info.physicalDevice = _physical_device;
+    // allocator_info.device = _device;
+    // allocator_info.instance = _instance;
+    // vmaCreateAllocator(&allocator_info, &_allocator);
 }
 
 
@@ -702,28 +702,31 @@ void Engine::upload_mesh(Mesh& mesh)
 
 
     // Let the VMA library know that this data should be writeable by CPU, but also readable by GPU
-    VmaAllocationCreateInfo vma_alloc_info{};
-    vma_alloc_info.usage = VMA_MEMORY_USAGE_CPU_TO_GPU;
+    // VmaAllocationCreateInfo vma_alloc_info{};
+    // vma_alloc_info.usage = VMA_MEMORY_USAGE_CPU_TO_GPU;
 
-    // Allocate the buffer
-    VK_CHECK(vmaCreateBuffer(_allocator, &buffer_info, &vma_alloc_info,
-        &mesh._vertex_buffer._buffer,
-        &mesh._vertex_buffer._allocation,
-        nullptr));
+    // // Allocate the buffer
+    // VK_CHECK(vmaCreateBuffer(
+    //     _allocator,
+    //     &buffer_info,
+    //     &vma_alloc_info,
+    //     &mesh._vertex_buffer._buffer,
+    //     &mesh._vertex_buffer._allocation,
+    //     nullptr));
 
-    // Add the destruction of triangle mesh buffer to the deletion queue
-    _main_deletion_queue.push_function([=]() {
-        vmaDestroyBuffer(_allocator, mesh._vertex_buffer._buffer, mesh._vertex_buffer._allocation);
-    });
+    // // Add the destruction of triangle mesh buffer to the deletion queue
+    // _main_deletion_queue.push_function([=]() {
+    //     vmaDestroyBuffer(_allocator, mesh._vertex_buffer._buffer, mesh._vertex_buffer._allocation);
+    // });
 
 
     // Copy vertex data
-    void* data;
-	vmaMapMemory(_allocator, mesh._vertex_buffer._allocation, &data);
+    // void* data;
+	// vmaMapMemory(_allocator, mesh._vertex_buffer._allocation, &data);
 
-	std::memcpy(data, mesh._vertices.data(), mesh._vertices.size() * sizeof(Vertex));
+	// std::memcpy(data, mesh._vertices.data(), mesh._vertices.size() * sizeof(Vertex));
 
-	vmaUnmapMemory(_allocator, mesh._vertex_buffer._allocation);
+	// vmaUnmapMemory(_allocator, mesh._vertex_buffer._allocation);
 }
 
 }
