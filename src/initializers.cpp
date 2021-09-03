@@ -84,6 +84,7 @@ VkPipelineRasterizationStateCreateInfo rasterization_state_create_info(VkPolygon
     // No backface cull
     info.cullMode = VK_CULL_MODE_NONE;
     info.frontFace = VK_FRONT_FACE_CLOCKWISE;
+    // info.frontFace = VK_FRONT_FACE_COUNTER_CLOCKWISE;
     // No depth bias
     info.depthBiasEnable = VK_FALSE;
     info.depthBiasConstantFactor = 0.0f;
