@@ -72,13 +72,13 @@ int main()
 
     //////////////////////////////////////////////////
 
-    kzn::Engine engine;
+    kzn::Engine app;
 
-    engine.init();
+    app.init();
 
-	engine.run();
+	app.run();
 
-	engine.cleanup();
+	app.cleanup();
 
     //////////////////////////////////////////////////
 

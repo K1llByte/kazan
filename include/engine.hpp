@@ -89,7 +89,7 @@ public:
 
     DeletionQueue _main_deletion_queue;
 
-    // VmaAllocator _allocator; //vma lib allocator
+    VmaAllocator _allocator; //vma lib allocator
 
     VkPipeline _mesh_pipeline;
 	Mesh _triangle_mesh;

@@ -1,7 +1,6 @@
 #ifndef TYPES_H
 #define TYPES_H
 
-#define VMA_IMPLEMENTATION
 #include "vk_mem_alloc.h"
 
 #include <vulkan/vulkan.h>
@@ -11,7 +10,7 @@
 struct AllocatedBuffer
 {
     VkBuffer      _buffer;
-    // VmaAllocation _allocation;
+    VmaAllocation _allocation;
 };
 
 namespace kzn
