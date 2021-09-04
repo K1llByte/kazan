@@ -730,6 +730,7 @@ void Engine::load_meshes()
 
     // We don't care about the vertex normals
 
+    _triangle_mesh.load_from_obj("models/monkey.obj");
     upload_mesh(_triangle_mesh);
 }
 

@@ -31,6 +31,8 @@ struct Mesh
 {
     std::vector<Vertex> _vertices;
     AllocatedBuffer     _vertex_buffer;
+
+    bool load_from_obj(const char* filename);
 };
 
 }
