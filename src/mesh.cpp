@@ -1,6 +1,8 @@
 #include "mesh.hpp"
 
+#define TINYOBJLOADER_IMPLEMENTATION
 #include "tiny_obj_loader.h"
+
 #include <iostream>
 
 namespace kzn
@@ -118,7 +120,7 @@ bool Mesh::load_from_obj(const char* filename)
             index_offset += fv;
         }
     }
-    
+
     return true;
 }
 

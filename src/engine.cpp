@@ -710,23 +710,23 @@ VkPipeline PipelineBuilder::build(VkDevice device, VkRenderPass pass)
 void Engine::load_meshes()
 {
     // Make the array 3 vertices long
-    _triangle_mesh._vertices.resize(6);
+    // _triangle_mesh._vertices.resize(6);
 
-    // Vertex positions
-    _triangle_mesh._vertices[0].position = {  0.5f,  0.5f, 0.0f };
-    _triangle_mesh._vertices[1].position = { -0.5f,  0.5f, 0.0f };
-    _triangle_mesh._vertices[2].position = { -0.5f, -0.5f, 0.0f };
-    _triangle_mesh._vertices[3].position = { -0.5f, -0.5f, 0.0f };
-    _triangle_mesh._vertices[4].position = {  0.5f, -0.5f, 0.0f };
-    _triangle_mesh._vertices[5].position = {  0.5f,  0.5f, 0.0f };
+    // // Vertex positions
+    // _triangle_mesh._vertices[0].position = {  0.5f,  0.5f, 0.0f };
+    // _triangle_mesh._vertices[1].position = { -0.5f,  0.5f, 0.0f };
+    // _triangle_mesh._vertices[2].position = { -0.5f, -0.5f, 0.0f };
+    // _triangle_mesh._vertices[3].position = { -0.5f, -0.5f, 0.0f };
+    // _triangle_mesh._vertices[4].position = {  0.5f, -0.5f, 0.0f };
+    // _triangle_mesh._vertices[5].position = {  0.5f,  0.5f, 0.0f };
 
-    // Vertex colors, all green
-    _triangle_mesh._vertices[0].color = { 0.f, 1.f, 0.0f }; //pure green
-    _triangle_mesh._vertices[1].color = { 1.f, 1.f, 0.0f }; //pure green
-    _triangle_mesh._vertices[2].color = { 0.f, 1.f, 0.0f }; //pure green
-    _triangle_mesh._vertices[3].color = { 0.f, 1.f, 0.0f }; //pure green
-    _triangle_mesh._vertices[4].color = { 1.f, 1.f, 0.0f }; //pure green
-    _triangle_mesh._vertices[5].color = { 0.f, 1.f, 0.0f }; //pure green
+    // // Vertex colors, all green
+    // _triangle_mesh._vertices[0].color = { 0.f, 1.f, 0.0f }; //pure green
+    // _triangle_mesh._vertices[1].color = { 1.f, 1.f, 0.0f }; //pure green
+    // _triangle_mesh._vertices[2].color = { 0.f, 1.f, 0.0f }; //pure green
+    // _triangle_mesh._vertices[3].color = { 0.f, 1.f, 0.0f }; //pure green
+    // _triangle_mesh._vertices[4].color = { 1.f, 1.f, 0.0f }; //pure green
+    // _triangle_mesh._vertices[5].color = { 0.f, 1.f, 0.0f }; //pure green
 
     // We don't care about the vertex normals
 
