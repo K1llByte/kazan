@@ -8,6 +8,8 @@
 #include <functional>
 #include <deque>
 
+#include <glm/glm.hpp>
+
 namespace kzn
 {
 
@@ -24,6 +26,13 @@ struct PipelineBuilder
     VkPipelineLayout                             _pipeline_layout;
 
     VkPipeline build(VkDevice device, VkRenderPass pass);
+};
+
+
+struct MeshPushConstants
+{
+    glm::vec4 data;
+    glm::mat4 pvm;
 };
 
 
@@ -89,10 +98,11 @@ public:
 
     DeletionQueue _main_deletion_queue;
 
-    VmaAllocator _allocator; //vma lib allocator
+    VmaAllocator _allocator; // VMA lib allocator
 
     VkPipeline _mesh_pipeline;
-	Mesh _triangle_mesh;
+    Mesh _triangle_mesh;
+
 
 public:
 

@@ -10,9 +10,10 @@
 
 #include "VkBootstrap.h"
 
+#include <glm/gtx/transform.hpp>
+
 #include <iostream>
 #include <fstream>
-
 #include <cmath>
 #include <cstring>
 #include <cstdint>
@@ -180,9 +181,31 @@ void Engine::draw()
     // Once we start adding rendering commands, they will go here
 
     vkCmdBindPipeline(_main_command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, _triangle_pipeline);
+
     // Bind the mesh vertex buffer with offset 0
 	VkDeviceSize offset = 0;
 	vkCmdBindVertexBuffers(_main_command_buffer, 0, 1, &_triangle_mesh._vertex_buffer._buffer, &offset);
+
+    // Make a model view matrix for rendering the object
+    // Camera position
+    glm::vec3 cam_pos = { 0.f,0.f,-2.f };
+
+    glm::mat4 view = glm::translate(glm::mat4(1.f), cam_pos);
+    //camera projection
+    glm::mat4 projection = glm::perspective(glm::radians(70.f), 1700.f / 900.f, 0.1f, 200.0f);
+    projection[1][1] *= -1;
+    //model rotation
+    glm::mat4 model = glm::rotate(glm::mat4{ 1.0f }, glm::radians(_frame_number * 0.4f), glm::vec3(0, 1, 0));
+
+    //calculate final mesh matrix
+    glm::mat4 mesh_matrix = projection * view * model;
+
+    MeshPushConstants constants;
+    constants.pvm = mesh_matrix;
+
+    //upload the matrix to the GPU via push constants
+    vkCmdPushConstants(_main_command_buffer, _triangle_pipeline_layout, VK_SHADER_STAGE_VERTEX_BIT, 0, sizeof(MeshPushConstants), &constants);
+
     vkCmdDraw(_main_command_buffer, _triangle_mesh._vertices.size(), 1, 0, 0);
 
     // Finalize the render pass
@@ -545,6 +568,18 @@ void Engine::init_pipelines()
     // we are not using descriptor sets or other systems yet, so no need to use anything other than empty default
     VkPipelineLayoutCreateInfo pipeline_layout_info = kzn::pipeline_layout_create_info();
 
+    // Setup push constants
+	VkPushConstantRange push_constant{};
+	// This push constant range starts at the beginning
+	push_constant.offset = 0;
+	// This push constant range takes up the size of a MeshPushConstants struct
+	push_constant.size = sizeof(MeshPushConstants);
+	// This push constant range is accessible only in the vertex shader
+	push_constant.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
+
+	pipeline_layout_info.pPushConstantRanges = &push_constant;
+	pipeline_layout_info.pushConstantRangeCount = 1;
+
     VK_CHECK(vkCreatePipelineLayout(_device, &pipeline_layout_info, nullptr, &_triangle_pipeline_layout));
 
 
@@ -603,7 +638,7 @@ void Engine::init_pipelines()
     vkDestroyShaderModule(_device, vertex_shader, nullptr);
     vkDestroyShaderModule(_device, frag_shader, nullptr);
 
-     _main_deletion_queue.push_function([=]() {
+    _main_deletion_queue.push_function([=]() {
         // Destroy the pipelines we have created
         vkDestroyPipeline(_device, _triangle_pipeline, nullptr);
 
