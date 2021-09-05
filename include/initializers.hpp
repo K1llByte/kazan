@@ -30,6 +30,8 @@ VkImageCreateInfo image_create_info(VkFormat format, VkImageUsageFlags usage_fla
 
 VkImageViewCreateInfo imageview_create_info(VkFormat format, VkImage image, VkImageAspectFlags aspect_flags);
 
+VkPipelineDepthStencilStateCreateInfo depth_stencil_create_info(bool b_depth_test, bool b_depth_write, VkCompareOp compare_op);
+
 }
 
 #endif // INITIALIZERS_H

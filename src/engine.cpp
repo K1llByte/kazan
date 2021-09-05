@@ -157,8 +157,11 @@ void Engine::draw()
     // Make a clear-color from frame number. This will flash with a 120*pi frame period.
     VkClearValue clear_value;
     float flash = std::abs(std::sin(_frame_number / 30.f));
-    
     clear_value.color = { { 0.0f, 0.0f, flash, 1.0f } };
+
+    // Clear depth at 1
+    VkClearValue depth_clear;
+    depth_clear.depthStencil.depth = 1.f;
 
     // Start the main renderpass.
     // We will use the clear color from above, and the framebuffer of the index the swapchain gave us
@@ -173,8 +176,9 @@ void Engine::draw()
     rp_info.framebuffer = _framebuffers[swapchain_image_index];
 
     // Connect clear values
-    rp_info.clearValueCount = 1;
-    rp_info.pClearValues = &clear_value;
+    rp_info.clearValueCount = 2;
+    VkClearValue clear_values[] = { clear_value, depth_clear };
+    rp_info.pClearValues = &clear_values[0];
 
     vkCmdBeginRenderPass(_main_command_buffer, &rp_info, VK_SUBPASS_CONTENTS_INLINE);
 
@@ -188,7 +192,7 @@ void Engine::draw()
 
     // Make a model view matrix for rendering the object
     // Camera position
-    glm::vec3 cam_pos = { 0.f,0.f,-2.f };
+    glm::vec3 cam_pos = { 0.f,0.f,-3.5f };
 
     glm::mat4 view = glm::translate(glm::mat4(1.f), cam_pos);
     //camera projection
@@ -430,7 +434,7 @@ void Engine::init_swapchain()
     VK_CHECK(vkCreateImageView(_device, &dview_info, nullptr, &_depth_image_view));
 
     // Add to deletion queues
-    _mainDeletionQueue.push_function([=]() {
+    _main_deletion_queue.push_function([=]() {
         vkDestroyImageView(_device, _depth_image_view, nullptr);
         vmaDestroyImage(_allocator, _depth_image._image, _depth_image._allocation);
     });
@@ -693,6 +697,9 @@ void Engine::init_pipelines()
     // Use the triangle layout we created
     pipeline_builder._pipeline_layout = _triangle_pipeline_layout;
 
+    // Default depthtesting
+    pipeline_builder._depth_stencil = kzn::depth_stencil_create_info(true, true, VK_COMPARE_OP_LESS_OR_EQUAL);
+
     // Finally build the pipeline
     _triangle_pipeline = pipeline_builder.build(_device, _render_pass);
 
@@ -740,6 +747,7 @@ VkPipeline PipelineBuilder::build(VkDevice device, VkRenderPass pass)
     VkGraphicsPipelineCreateInfo pipeline_info{};
     pipeline_info.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
     pipeline_info.pNext = nullptr;
+    pipeline_info.pDepthStencilState = &_depth_stencil;
 
     pipeline_info.stageCount = _shader_stages.size();
     pipeline_info.pStages = _shader_stages.data();

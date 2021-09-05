@@ -180,4 +180,22 @@ VkImageViewCreateInfo imageview_create_info(VkFormat format, VkImage image, VkIm
     return info;
 }
 
+
+VkPipelineDepthStencilStateCreateInfo depth_stencil_create_info(bool b_depth_test, bool b_depth_write, VkCompareOp compare_op)
+{
+    VkPipelineDepthStencilStateCreateInfo info{};
+    info.sType = VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO;
+    info.pNext = nullptr;
+
+    info.depthTestEnable = b_depth_test ? VK_TRUE : VK_FALSE;
+    info.depthWriteEnable = b_depth_write ? VK_TRUE : VK_FALSE;
+    info.depthCompareOp = b_depth_test ? compare_op : VK_COMPARE_OP_ALWAYS;
+    info.depthBoundsTestEnable = VK_FALSE;
+    info.minDepthBounds = 0.0f; // Optional
+    info.maxDepthBounds = 1.0f; // Optional
+    info.stencilTestEnable = VK_FALSE;
+
+    return info;
+}
+
 }

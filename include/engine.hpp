@@ -24,6 +24,7 @@ struct PipelineBuilder
     VkPipelineColorBlendAttachmentState          _color_blend_attachment;
     VkPipelineMultisampleStateCreateInfo         _multisampling;
     VkPipelineLayout                             _pipeline_layout;
+    VkPipelineDepthStencilStateCreateInfo        _depth_stencil;
 
     VkPipeline build(VkDevice device, VkRenderPass pass);
 };
