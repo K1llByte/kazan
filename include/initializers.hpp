@@ -25,6 +25,11 @@ VkPipelineColorBlendAttachmentState color_blend_attachment_state();
 
 VkPipelineLayoutCreateInfo pipeline_layout_create_info();
 
+
+VkImageCreateInfo image_create_info(VkFormat format, VkImageUsageFlags usage_flags, VkExtent3D extent);
+
+VkImageViewCreateInfo imageview_create_info(VkFormat format, VkImage image, VkImageAspectFlags aspect_flags);
+
 }
 
 #endif // INITIALIZERS_H

@@ -183,8 +183,8 @@ void Engine::draw()
     vkCmdBindPipeline(_main_command_buffer, VK_PIPELINE_BIND_POINT_GRAPHICS, _triangle_pipeline);
 
     // Bind the mesh vertex buffer with offset 0
-	VkDeviceSize offset = 0;
-	vkCmdBindVertexBuffers(_main_command_buffer, 0, 1, &_triangle_mesh._vertex_buffer._buffer, &offset);
+    VkDeviceSize offset = 0;
+    vkCmdBindVertexBuffers(_main_command_buffer, 0, 1, &_triangle_mesh._vertex_buffer._buffer, &offset);
 
     // Make a model view matrix for rendering the object
     // Camera position
@@ -400,6 +400,40 @@ void Engine::init_swapchain()
     _main_deletion_queue.push_function([=]() {
         vkDestroySwapchainKHR(_device, _swapchain, nullptr);
     });
+
+    // ========= Depth buffer/image allocation ========= //
+
+    // Depth image size will match the window
+    VkExtent3D depth_image_extent = {
+        _window_extent.width,
+        _window_extent.height,
+        1
+    };
+
+    // Hardcoding the depth format to 32 bit float
+    _depth_format = VK_FORMAT_D32_SFLOAT;
+
+    // The depth image will be an image with the format we selected and Depth Attachment usage flag
+    VkImageCreateInfo dimg_info = kzn::image_create_info(_depth_format, VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT, depth_image_extent);
+
+    // For the depth image, we want to allocate it from GPU local memory
+    VmaAllocationCreateInfo dimg_allocinfo = {};
+    dimg_allocinfo.usage = VMA_MEMORY_USAGE_GPU_ONLY;
+    dimg_allocinfo.requiredFlags = VkMemoryPropertyFlags(VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT); // ?
+
+    // Allocate and create the image
+    vmaCreateImage(_allocator, &dimg_info, &dimg_allocinfo, &_depth_image._image, &_depth_image._allocation, nullptr);
+
+    // Build an image-view for the depth image to use for rendering
+    VkImageViewCreateInfo dview_info = kzn::imageview_create_info(_depth_format, _depth_image._image, VK_IMAGE_ASPECT_DEPTH_BIT);
+
+    VK_CHECK(vkCreateImageView(_device, &dview_info, nullptr, &_depth_image_view));
+
+    // Add to deletion queues
+    _mainDeletionQueue.push_function([=]() {
+        vkDestroyImageView(_device, _depth_image_view, nullptr);
+        vmaDestroyImage(_allocator, _depth_image._image, _depth_image._allocation);
+    });
 }
 
 
@@ -424,6 +458,8 @@ void Engine::init_commands()
 
 void Engine::init_default_renderpass()
 {
+    // ======== Render Target Attachment ======== //
+
     // The renderpass will use this color attachment.
     VkAttachmentDescription color_attachment{};
     // The attachment will have the format needed by the swapchain
@@ -449,19 +485,42 @@ void Engine::init_default_renderpass()
     color_attachment_ref.attachment = 0;
     color_attachment_ref.layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
 
-    //we are going to create 1 subpass, which is the minimum you can do
-    VkSubpassDescription subpass = {};
+    // ======== Depth Buffer Attachment ======== //
+
+    VkAttachmentDescription depth_attachment{};
+    // Depth attachment
+    depth_attachment.flags = 0;
+    depth_attachment.format = _depth_format;
+    depth_attachment.samples = VK_SAMPLE_COUNT_1_BIT;
+    depth_attachment.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
+    depth_attachment.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
+    depth_attachment.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
+    depth_attachment.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
+    depth_attachment.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+    depth_attachment.finalLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
+
+    VkAttachmentReference depth_attachment_ref{};
+    depth_attachment_ref.attachment = 1;
+    depth_attachment_ref.layout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
+
+
+    // We are going to create 1 subpass, which is the minimum you can do
+    VkSubpassDescription subpass{};
     subpass.pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS;
     subpass.colorAttachmentCount = 1;
     subpass.pColorAttachments = &color_attachment_ref;
+    // hook the depth attachment into the subpass
+    subpass.pDepthStencilAttachment = &depth_attachment_ref;
 
 
-    VkRenderPassCreateInfo render_pass_info = {};
+    VkAttachmentDescription attachments[2] = { color_attachment, depth_attachment };
+
+    VkRenderPassCreateInfo render_pass_info{};
     render_pass_info.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
 
-    // Connect the color attachment to the info
-    render_pass_info.attachmentCount = 1;
-    render_pass_info.pAttachments = &color_attachment;
+    render_pass_info.attachmentCount = 2;
+    render_pass_info.pAttachments = &attachments[0]; // TODO(kb): change to just attachments
+    // Connect the color attachment & depth buffer to the info
     // Connect the subpass to the info
     render_pass_info.subpassCount = 1;
     render_pass_info.pSubpasses = &subpass;
@@ -478,7 +537,7 @@ void Engine::init_default_renderpass()
 void Engine::init_framebuffers()
 {
     // Create the framebuffers for the swapchain images. This will connect the render-pass to the images for rendering
-    VkFramebufferCreateInfo fb_info = {};
+    VkFramebufferCreateInfo fb_info{};
     fb_info.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
     fb_info.pNext = nullptr;
 
@@ -495,9 +554,12 @@ void Engine::init_framebuffers()
     _framebuffers = std::vector<VkFramebuffer>(swapchain_imagecount);
 
     // Create framebuffers for each of the swapchain image views
-    for (int i = 0; i < swapchain_imagecount; i++)
+    for (int i = 0; i < swapchain_imagecount; ++i)
     {
-        fb_info.pAttachments = &_swapchain_image_views[i];
+        VkImageView attachments[2] = { _swapchain_image_views[i], _depth_image_view };
+
+        fb_info.attachmentCount = 2;
+        fb_info.pAttachments = attachments;
         VK_CHECK(vkCreateFramebuffer(_device, &fb_info, nullptr, &_framebuffers[i]));
         
         _main_deletion_queue.push_function([=]() {
@@ -569,16 +631,16 @@ void Engine::init_pipelines()
     VkPipelineLayoutCreateInfo pipeline_layout_info = kzn::pipeline_layout_create_info();
 
     // Setup push constants
-	VkPushConstantRange push_constant{};
-	// This push constant range starts at the beginning
-	push_constant.offset = 0;
-	// This push constant range takes up the size of a MeshPushConstants struct
-	push_constant.size = sizeof(MeshPushConstants);
-	// This push constant range is accessible only in the vertex shader
-	push_constant.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
+    VkPushConstantRange push_constant{};
+    // This push constant range starts at the beginning
+    push_constant.offset = 0;
+    // This push constant range takes up the size of a MeshPushConstants struct
+    push_constant.size = sizeof(MeshPushConstants);
+    // This push constant range is accessible only in the vertex shader
+    push_constant.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
 
-	pipeline_layout_info.pPushConstantRanges = &push_constant;
-	pipeline_layout_info.pushConstantRangeCount = 1;
+    pipeline_layout_info.pPushConstantRanges = &push_constant;
+    pipeline_layout_info.pushConstantRangeCount = 1;
 
     VK_CHECK(vkCreatePipelineLayout(_device, &pipeline_layout_info, nullptr, &_triangle_pipeline_layout));
 
@@ -597,12 +659,12 @@ void Engine::init_pipelines()
     // Vertex input controls how to read vertices from vertex buffers. We aren't using it yet
     pipeline_builder._vertex_input_info = kzn::vertex_input_state_create_info();
 
-	//connect the pipeline builder vertex input info to the one we get from Vertex
-	pipeline_builder._vertex_input_info.pVertexAttributeDescriptions = vertex_description.attributes.data();
-	pipeline_builder._vertex_input_info.vertexAttributeDescriptionCount = vertex_description.attributes.size();
+    //connect the pipeline builder vertex input info to the one we get from Vertex
+    pipeline_builder._vertex_input_info.pVertexAttributeDescriptions = vertex_description.attributes.data();
+    pipeline_builder._vertex_input_info.vertexAttributeDescriptionCount = vertex_description.attributes.size();
 
-	pipeline_builder._vertex_input_info.pVertexBindingDescriptions = vertex_description.bindings.data();
-	pipeline_builder._vertex_input_info.vertexBindingDescriptionCount = vertex_description.bindings.size();
+    pipeline_builder._vertex_input_info.pVertexBindingDescriptions = vertex_description.bindings.data();
+    pipeline_builder._vertex_input_info.vertexBindingDescriptionCount = vertex_description.bindings.size();
 
     // Input assembly is the configuration for drawing triangle lists, strips, or individual points.
     // we are just going to draw triangle list
@@ -767,11 +829,11 @@ void Engine::upload_mesh(Mesh& mesh)
 
     // Copy vertex data
     void* data;
-	vmaMapMemory(_allocator, mesh._vertex_buffer._allocation, &data);
+    vmaMapMemory(_allocator, mesh._vertex_buffer._allocation, &data);
 
-	std::memcpy(data, mesh._vertices.data(), mesh._vertices.size() * sizeof(Vertex));
+    std::memcpy(data, mesh._vertices.data(), mesh._vertices.size() * sizeof(Vertex));
 
-	vmaUnmapMemory(_allocator, mesh._vertex_buffer._allocation);
+    vmaUnmapMemory(_allocator, mesh._vertex_buffer._allocation);
 }
 
 }

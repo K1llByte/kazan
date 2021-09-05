@@ -103,6 +103,9 @@ public:
     VkPipeline _mesh_pipeline;
     Mesh _triangle_mesh;
 
+    VkImageView    _depth_image_view;
+    AllocatedImage _depth_image;
+    VkFormat       _depth_format;
 
 public:
 
