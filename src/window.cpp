@@ -25,7 +25,7 @@ Window::Window(const std::string& name, int width, int height)
     // On framebuffer resize callback
     // glfwSetFramebufferSizeCallback(m_window, framebuffer_resize_callback);
 
-    
+    std::cout << "+ Created window\n";
 }
 
 Window::~Window()
@@ -35,6 +35,8 @@ Window::~Window()
 
     // Destroy glfw
     glfwTerminate();
+
+    std::cout << "- Destroyed window\n";
 }
 
 std::vector<const char*> Window::required_extensions()
@@ -50,7 +52,7 @@ std::vector<const char*> Window::required_extensions()
 VkSurfaceKHR Window::create_surface(Instance& instance)
 {
     // Create surface
-    if(glfwCreateWindowSurface(instance.m_instance, m_window, nullptr, &m_surface) != VK_SUCCESS)
+    if(glfwCreateWindowSurface(instance.instance(), m_window, nullptr, &m_surface) != VK_SUCCESS)
     {
         throw std::runtime_error("failed to create window surface!");
     }
@@ -62,7 +64,7 @@ VkSurfaceKHR Window::create_surface(Instance& instance)
 void Window::destroy_surface(Instance& instance)
 {
     // Destroy window surface
-    vkDestroySurfaceKHR(instance.m_instance, m_surface, nullptr);
+    vkDestroySurfaceKHR(instance.instance(), m_surface, nullptr);
     std::cout << "- Surface destroyed successfully\n";
 }
 

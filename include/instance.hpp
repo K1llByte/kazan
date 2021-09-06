@@ -1,20 +1,12 @@
 #ifndef INSTANCE
 #define INSTANCE
 
-/**
- * The vulkan headers already define
- * preprocessor conditional compilation
- * rules for c++ compatability
- */
-
-// extern "C"
-// {
 #ifndef GLFW_INCLUDE_VULKAN
 #   include <vulkan/vulkan.h>
 #endif
-// }
 
 #include <vector>
+#include <memory>
 
 namespace kzn
 {
@@ -23,52 +15,39 @@ class Instance
 {
 public:
 
-    VkInstance m_instance;
-    bool m_enable_debug_messeger;
-    VkDebugUtilsMessengerEXT m_debug_messenger;
+    struct TemporaryData
+    {
+        VkApplicationInfo                  _app_info;
+        VkInstanceCreateInfo               _create_info;
+        VkDebugUtilsMessengerCreateInfoEXT _debug_create_info;
+    };
 
 public:
 
-    // Instance();
+    VkInstance     _instance;
+    TemporaryData* _tmp_data = nullptr;
+    // Optional data
+    std::vector<const char*> _extensions{};
+    std::vector<const char*> _validation_layers{};
+    VkDebugUtilsMessengerEXT _debug_messenger;
+    bool                     _enable_validation_layers = false;
+    bool                     _enable_debug_messeger = false;
 
-    Instance(VkInstance instance, bool enable_debug_messeger = false, VkDebugUtilsMessengerEXT debug_messenger = nullptr);
+public:
 
-    Instance(Instance&& instance) = default;
-
-    // Instance(const Instance&) = delete;
-    // void operator=(const Instance&) = delete;
-
+    Instance();
     ~Instance();
-};
 
-class InstanceBuilder
-{
-private:
+    Instance& set_debug_messeger();
+    Instance& enable_extensions(const std::vector<const char*>& extensions);
+    Instance& enable_validation_layers();
 
-    VkApplicationInfo m_app_info{};
-    VkInstanceCreateInfo m_create_info{};
-    std::vector<const char*> m_extensions{};
-    std::vector<const char*> m_validation_layers{};
-    VkDebugUtilsMessengerCreateInfoEXT m_debug_create_info{};
-    VkDebugUtilsMessengerEXT m_debug_messenger;
-    bool m_enable_validation_layers = false;
-    bool m_enable_debug_messeger = false;
+    void init();
+    void cleanup();
 
-public:
-
-    InstanceBuilder();
-
-    ~InstanceBuilder() = default;
-
-    // Setters
-    InstanceBuilder& set_debug_messeger();
-
-    InstanceBuilder& enable_extensions(const std::vector<const char*>& extensions);
-
-    InstanceBuilder& enable_validation_layers();
-
-    // Build
-    Instance build();
+    // Getters
+    VkInstance instance() const;
+    bool initialized() const;
 };
 
 } // namespace kzn

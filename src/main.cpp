@@ -1,10 +1,6 @@
-// #include "full_renderer.hpp"
-
-// #include "window.hpp"
-// #include "instance.hpp"
+#include "window.hpp"
+#include "instance.hpp"
 // #include "device.hpp"
-
-#include "engine.hpp"
 
 #include <iostream>
 
@@ -72,15 +68,46 @@ int main()
 
     //////////////////////////////////////////////////
 
-    kzn::Engine app;
+    // kzn::Engine app;
 
-    app.init();
+    // app.init();
 
-	app.run();
+	// app.run();
 
-	app.cleanup();
+	// app.cleanup();
 
     //////////////////////////////////////////////////
 
+    // kzn::Window window();
+
+    // kzn::Instance instance()
+    //     .enable_extensions(window.required_extensions())
+    //     .enable_validation_layers()
+    //     .set_debug_messeger()
+    //     .init()
+
+    // kzn::Device device(window);
+    // device.init();
+
+    kzn::Window window("Hello Kazan", 800, 600);
+
+    
+    // kzn::Instance intance = kzn::InstanceBuilder()
+    //     .enable_extensions(window.required_extensions())
+    //     .enable_validation_layers()
+    //     .set_debug_messeger()
+    //     .build();
+
+    kzn::Instance instance{};
+
+    instance
+        .enable_extensions(window.required_extensions())
+        .enable_validation_layers()
+        .set_debug_messeger()
+        .init();
+
+    // std::cout << "size T: " << sizeof(kzn::Instance::TemporaryData) << '\n';
+    // std::cout << "size T*: " << sizeof(kzn::Instance::TemporaryData*) << '\n';
+    
     return EXIT_SUCCESS;
 }
