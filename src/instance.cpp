@@ -92,38 +92,52 @@ Instance::~Instance()
 
 Instance& Instance::set_debug_messeger()
 {
-    if(_enable_validation_layers)
+    if(!initialized())
     {
-        _extensions.push_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
+        if(_enable_validation_layers)
+        {
+            _extensions.push_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
 
-        _enable_debug_messeger = true;
+            _enable_debug_messeger = true;
 
-        //VkDebugUtilsMessengerCreateInfoEXT _tmp_data->_debug_create_info{};
-        _tmp_data->_debug_create_info.sType =           VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT;
-        _tmp_data->_debug_create_info.messageSeverity = VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT
-                                    | VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT
-                                    // | VK_DEBUG_UTILS_MESSAGE_SEVERITY_INFO_BIT_EXT
-                                    // | VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT
-                                    ;
-        _tmp_data->_debug_create_info.messageType =     VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT
-                                    | VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT
-                                    | VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT
-                                    ;
-        _tmp_data->_debug_create_info.pfnUserCallback = debug_callback;
-        _tmp_data->_debug_create_info.pUserData = nullptr; // Optional
+            //VkDebugUtilsMessengerCreateInfoEXT _tmp_data->_debug_create_info{};
+            _tmp_data->_debug_create_info.sType =           VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT;
+            _tmp_data->_debug_create_info.messageSeverity = VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT
+                                        | VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT
+                                        // | VK_DEBUG_UTILS_MESSAGE_SEVERITY_INFO_BIT_EXT
+                                        // | VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT
+                                        ;
+            _tmp_data->_debug_create_info.messageType =     VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT
+                                        | VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT
+                                        | VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT
+                                        ;
+            _tmp_data->_debug_create_info.pfnUserCallback = debug_callback;
+            _tmp_data->_debug_create_info.pUserData = nullptr; // Optional
+        }
+
+        return *this;
     }
-
-    return *this;
+    else
+    {
+        throw std::runtime_error("Cannot use method with initialized instance");
+    }
 }
 
 Instance& Instance::enable_extensions(const std::vector<const char*>& extensions)
 {
-    _extensions.insert(
-        _extensions.end(),
-        extensions.begin(),
-        extensions.end()
-        );
-    return *this;
+    if(!initialized())
+    {
+        _extensions.insert(
+            _extensions.end(),
+            extensions.begin(),
+            extensions.end()
+            );
+        return *this;
+    }
+    else
+    {
+        throw std::runtime_error("Cannot use method with initialized instance");
+    }
 }
 
 // InstanceBuilder& InstanceBuilder::enable_extension(const char* extension)
@@ -166,63 +180,85 @@ bool check_validation_layers_support(const std::vector<const char*>& validation_
 
 Instance& Instance::enable_validation_layers()
 {
-    _enable_validation_layers = true;
-    _validation_layers.push_back("VK_LAYER_KHRONOS_validation");
-
-    if(!check_validation_layers_support(_validation_layers))
+    if(!initialized())
     {
-        throw std::runtime_error("validation layers requested, but not available!");
+        _enable_validation_layers = true;
+        _validation_layers.push_back("VK_LAYER_KHRONOS_validation");
+
+        if(!check_validation_layers_support(_validation_layers))
+        {
+            throw std::runtime_error("validation layers requested, but not available!");
+        }
+
+        _tmp_data->_create_info.enabledLayerCount = static_cast<uint32_t>(_validation_layers.size());
+        _tmp_data->_create_info.ppEnabledLayerNames = _validation_layers.data();
+
+        return *this;
     }
-
-    _tmp_data->_create_info.enabledLayerCount = static_cast<uint32_t>(_validation_layers.size());
-    _tmp_data->_create_info.ppEnabledLayerNames = _validation_layers.data();
-
-    return *this;
+    else
+    {
+        throw std::runtime_error("Cannot use method with initialized instance");
+    }
 }
 
 void Instance::init()
 {
-    _tmp_data->_create_info.enabledExtensionCount = static_cast<uint32_t>(_extensions.size());
-    _tmp_data->_create_info.ppEnabledExtensionNames = _extensions.data();
-
-    ///////////////// LOGS /////////////////
-    // std::cout << "[INFO] > Enabled Extensions:\n";
-    // for (const auto& ext : _extensions)
-    //     std::cout << " - " << ext << '\n';
-    ////////////////////////////////////////
-
-    // Create instance
-    std::cout << "+ Instance created successfully\n";
-    if(vkCreateInstance(&_tmp_data->_create_info, nullptr, &_instance) != VK_SUCCESS)
+    if(!initialized())
     {
-        throw std::runtime_error("failed to create instance!");
-    }
+        _tmp_data->_create_info.enabledExtensionCount = static_cast<uint32_t>(_extensions.size());
+        _tmp_data->_create_info.ppEnabledExtensionNames = _extensions.data();
 
-    // Setup debug callback
-    if(_enable_debug_messeger)
-    {
-        VkResult res = CreateDebugUtilsMessenger(_instance, &_tmp_data->_debug_create_info, nullptr, &_debug_messenger);
-        if(res != VK_SUCCESS)
+        ///////////////// LOGS /////////////////
+        // std::cout << "[INFO] > Enabled Extensions:\n";
+        // for (const auto& ext : _extensions)
+        //     std::cout << " - " << ext << '\n';
+        ////////////////////////////////////////
+
+        // Create instance
+        std::cout << "+ Instance created successfully\n";
+        if(vkCreateInstance(&_tmp_data->_create_info, nullptr, &_instance) != VK_SUCCESS)
         {
-            throw std::runtime_error("failed to set up debug messenger!");
+            throw std::runtime_error("failed to create instance!");
         }
-    }
 
-    delete _tmp_data;
+        // Setup debug callback
+        if(_enable_debug_messeger)
+        {
+            VkResult res = CreateDebugUtilsMessenger(_instance, &_tmp_data->_debug_create_info, nullptr, &_debug_messenger);
+            if(res != VK_SUCCESS)
+            {
+                throw std::runtime_error("failed to set up debug messenger!");
+            }
+        }
+
+        delete _tmp_data;
+        _tmp_data = nullptr;
+    }
+    else
+    {
+        throw std::runtime_error("Cannot reinitialize an initialized instance");
+    }
 }
 
 
 void Instance::cleanup()
 {
-    // Destroy debug messeger
-    if(_enable_debug_messeger)
+    if(initialized())
     {
-        DestroyDebugUtilsMessenger(_instance, _debug_messenger, nullptr);
-    }
+        // Destroy debug messeger
+        if(_enable_debug_messeger)
+        {
+            DestroyDebugUtilsMessenger(_instance, _debug_messenger, nullptr);
+        }
 
-    // Destroy vulkan instance
-    vkDestroyInstance(_instance, nullptr);
-    std::cout << "- Destroyed vulkan instance\n";
+        // Destroy vulkan instance
+        vkDestroyInstance(_instance, nullptr);
+        std::cout << "- Destroyed vulkan instance\n";
+    }
+    else
+    {
+        throw std::runtime_error("Cannot cleanup unitialized instance");
+    }
 }
 
 
@@ -234,7 +270,7 @@ VkInstance Instance::instance() const
 
 bool Instance::initialized() const
 {
-    return _tmp_data != nullptr;
+    return _tmp_data == nullptr;
 }
 
 } // namespace kzn

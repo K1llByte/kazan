@@ -1,6 +1,6 @@
 #include "window.hpp"
 #include "instance.hpp"
-// #include "device.hpp"
+#include "device.hpp"
 
 #include <iostream>
 
@@ -91,13 +91,6 @@ int main()
 
     kzn::Window window("Hello Kazan", 800, 600);
 
-    
-    // kzn::Instance intance = kzn::InstanceBuilder()
-    //     .enable_extensions(window.required_extensions())
-    //     .enable_validation_layers()
-    //     .set_debug_messeger()
-    //     .build();
-
     kzn::Instance instance{};
 
     instance
@@ -106,8 +99,16 @@ int main()
         .set_debug_messeger()
         .init();
 
-    // std::cout << "size T: " << sizeof(kzn::Instance::TemporaryData) << '\n';
-    // std::cout << "size T*: " << sizeof(kzn::Instance::TemporaryData*) << '\n';
-    
+    auto surface = window.create_surface(instance);
+
+
+    auto physical_device = kzn::PhysicalDeviceSelector(instance, surface)
+        .select();
+
+    kzn::Device device(physical_device);
+    device.init();
+
+    window.destroy_surface(instance);
+
     return EXIT_SUCCESS;
 }
