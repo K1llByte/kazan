@@ -86,7 +86,10 @@ Instance::Instance()
 
 Instance::~Instance()
 {
-    cleanup();
+    if(initialized())
+    {
+        cleanup();
+    }
 }
 
 

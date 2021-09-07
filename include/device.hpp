@@ -42,13 +42,15 @@ public:
     VkPhysicalDevice _physical_device;
     QueueFamilyIndices _indices;
     std::vector<const char*> _device_extensions;
+    SwapChainSupportDetails _swap_chain_support;
 
 public:
 
     PhysicalDevice(
         VkPhysicalDevice           physical_device,
         QueueFamilyIndices&&       indices,
-        std::vector<const char*>&& device_extensions);
+        std::vector<const char*>&& device_extensions,
+        SwapChainSupportDetails swap_chain_support);
 
     ~PhysicalDevice();
 
@@ -68,7 +70,7 @@ public:
         VK_KHR_SWAPCHAIN_EXTENSION_NAME
     };
     QueueFamilyIndices _indices;
-    SwapChainSupportDetails m_swap_chain_support;
+    SwapChainSupportDetails _swap_chain_support;
     
 public:
 
@@ -90,9 +92,6 @@ private:
 };
 
 
-class DeviceBuilder;
-
-
 class Device
 {
 public:
@@ -102,19 +101,23 @@ public:
     std::vector<const char*> _device_extensions;
     VkQueue                  _graphics_queue;
     VkQueue                  _present_queue;
-    VkDevice                 _device;
+    VkDevice                 _device = VK_NULL_HANDLE;
     std::vector<const char*> _validation_layers;
     
 public:
 
+    Device() = default;
     Device(const PhysicalDevice& physical_device);
-
     ~Device();
 
     void init();
     void cleanup();
 
     bool initialized() const;
+
+    void wait_idle();
+
+
 
     // Device(const Device&) = delete;
     // void operator=(const Device&) = delete;

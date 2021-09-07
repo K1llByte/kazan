@@ -6,7 +6,8 @@
 namespace kzn
 {
 
-Window::Window(const std::string& name, int width, int height)
+Window::Window(const std::string& name, int win_width, int win_height)
+    : width{win_width}, height{win_height}
 {
     // Initialize glfw
     glfwInit();
@@ -18,26 +19,28 @@ Window::Window(const std::string& name, int width, int height)
     glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
     
     // Initialize window
-    m_window = glfwCreateWindow(width, height, name.c_str(), nullptr, nullptr);
+    _window = glfwCreateWindow(width, height, name.c_str(), nullptr, nullptr);
 
-    // glfwSetWindowUserPointer(m_window, this);
+    glfwSetWindowUserPointer(_window, this);
     
     // On framebuffer resize callback
-    // glfwSetFramebufferSizeCallback(m_window, framebuffer_resize_callback);
+    glfwSetFramebufferSizeCallback(_window, framebuffer_resize_callback);
 
     std::cout << "+ Created window\n";
 }
 
+
 Window::~Window()
 {
     // Destroy window
-    glfwDestroyWindow(m_window);
+    glfwDestroyWindow(_window);
 
     // Destroy glfw
     glfwTerminate();
 
     std::cout << "- Destroyed window\n";
 }
+
 
 std::vector<const char*> Window::required_extensions()
 {
@@ -52,20 +55,45 @@ std::vector<const char*> Window::required_extensions()
 VkSurfaceKHR Window::create_surface(Instance& instance)
 {
     // Create surface
-    if(glfwCreateWindowSurface(instance.instance(), m_window, nullptr, &m_surface) != VK_SUCCESS)
+    if(glfwCreateWindowSurface(instance.instance(), _window, nullptr, &_surface) != VK_SUCCESS)
     {
         throw std::runtime_error("failed to create window surface!");
     }
     std::cout << "+ Surface created successfully\n";
 
-    return m_surface;
+    return _surface;
 }
+
 
 void Window::destroy_surface(Instance& instance)
 {
     // Destroy window surface
-    vkDestroySurfaceKHR(instance.instance(), m_surface, nullptr);
+    vkDestroySurfaceKHR(instance.instance(), _surface, nullptr);
     std::cout << "- Surface destroyed successfully\n";
+}
+
+
+bool Window::should_close()
+{
+    return glfwWindowShouldClose(_window);
+}
+
+
+VkExtent2D Window::get_extent()
+{
+    return VkExtent2D{
+        static_cast<uint32_t>(width),
+        static_cast<uint32_t>(height)
+    };
+}
+
+
+void Window::framebuffer_resize_callback(GLFWwindow* window, int width, int height)
+{
+    auto _window = reinterpret_cast<kzn::Window*>(glfwGetWindowUserPointer(window));
+    // _window->framebuffer_resized = true;
+    _window->width = width;
+    _window->height = height;
 }
 
 }

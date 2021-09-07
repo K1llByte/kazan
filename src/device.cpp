@@ -10,10 +10,12 @@ namespace kzn
 PhysicalDevice::PhysicalDevice(
         VkPhysicalDevice physical_device,
         QueueFamilyIndices&& indices,
-        std::vector<const char*>&& device_extensions)
+        std::vector<const char*>&& device_extensions,
+        SwapChainSupportDetails swap_chain_support)
     : _physical_device{physical_device},
     _indices{std::move(indices)},
-    _device_extensions{std::move(device_extensions)} {}
+    _device_extensions{std::move(device_extensions)},
+    _swap_chain_support{std::move(swap_chain_support)} {}
 
 
 PhysicalDevice::~PhysicalDevice()
@@ -56,8 +58,8 @@ bool PhysicalDeviceSelector::is_device_suitable(VkPhysicalDevice physical_device
     bool swap_chain_adequate = false;
     if (extensions_supported)
     {
-        m_swap_chain_support = query_swap_chain_support(physical_device);
-        swap_chain_adequate = !m_swap_chain_support.formats.empty() && !m_swap_chain_support.present_modes.empty();
+        _swap_chain_support = query_swap_chain_support(physical_device);
+        swap_chain_adequate = !_swap_chain_support.formats.empty() && !_swap_chain_support.present_modes.empty();
     }
 
     return _indices.is_complete() && swap_chain_adequate;
@@ -172,7 +174,12 @@ PhysicalDevice PhysicalDeviceSelector::select()
         vkGetPhysicalDeviceProperties(physical_device, &device_properties);
         std::cout << "[INFO] > Using " << device_properties.deviceName << "\n";
 
-        return PhysicalDevice(physical_device, std::move(_indices), std::move(_device_extensions));
+        return PhysicalDevice(
+            physical_device,
+            std::move(_indices),
+            std::move(_device_extensions),
+            std::move(_swap_chain_support)
+            );
     }
 }
 
@@ -188,7 +195,10 @@ Device::Device(const PhysicalDevice& physical_device)
 
 Device::~Device()
 {
-    cleanup();
+    if(initialized())
+    {
+        cleanup();
+    }
 }
 
 
@@ -263,6 +273,12 @@ void Device::cleanup()
 bool Device::initialized() const
 {
     return _device != VK_NULL_HANDLE;
+}
+
+
+void Device::wait_idle()
+{
+    vkDeviceWaitIdle(_device);
 }
 
 } // namespace kzn

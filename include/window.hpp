@@ -14,12 +14,15 @@ namespace kzn
 
 class Window
 {
+public:
+
+    int width = 800;
+    int height = 600;
+
 private:
 
-    GLFWwindow* m_window;
-    const uint32_t WIDTH = 800;
-    const uint32_t HEIGHT = 600;
-    VkSurfaceKHR m_surface = VK_NULL_HANDLE;
+    GLFWwindow*    _window;
+    VkSurfaceKHR   _surface = VK_NULL_HANDLE;
 
 public:
 
@@ -33,10 +36,14 @@ public:
     std::vector<const char*> required_extensions();
 
     VkSurfaceKHR create_surface(Instance& instance);
-
     void destroy_surface(Instance& instance);
 
-private:
+    static void framebuffer_resize_callback(GLFWwindow *window, int width, int height);
+
+    bool should_close();
+    VkExtent2D get_extent();
+
+// private:
 
 };
 
