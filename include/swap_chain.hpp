@@ -42,7 +42,7 @@ private:
 
 public:
 
-    SwapChain(Device& device, VkExtent2D win_extent, VkSwapchainKHR old_swap_chain = VK_NULL_HANDLE);
+    SwapChain(Device& device, VkExtent2D win_extent, VkSurfaceKHR surface, VkSwapchainKHR old_swap_chain = VK_NULL_HANDLE);
     // SwapChain(const SwapChain&) = default;
     ~SwapChain();
 
