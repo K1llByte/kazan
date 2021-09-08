@@ -33,7 +33,11 @@ private:
 
 public:
 
-    Pipeline();
+    Pipeline(
+        Device& device,
+        const std::string& vert_shader_path,
+        const std::string& frag_shader_path,
+        const PipelineConfigInfo& config_info);
     ~Pipeline();
 
 private:
