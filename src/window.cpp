@@ -73,13 +73,22 @@ void Window::destroy_surface(Instance& instance)
 }
 
 
+void Window::framebuffer_resize_callback(GLFWwindow* window, int width, int height)
+{
+    auto _window = reinterpret_cast<kzn::Window*>(glfwGetWindowUserPointer(window));
+    // _window->framebuffer_resized = true;
+    _window->width = width;
+    _window->height = height;
+}
+
+
 bool Window::should_close()
 {
     return glfwWindowShouldClose(_window);
 }
 
 
-VkExtent2D Window::get_extent()
+VkExtent2D Window::get_extent() const
 {
     return VkExtent2D{
         static_cast<uint32_t>(width),
@@ -88,12 +97,9 @@ VkExtent2D Window::get_extent()
 }
 
 
-void Window::framebuffer_resize_callback(GLFWwindow* window, int width, int height)
+VkSurfaceKHR Window::surface() const
 {
-    auto _window = reinterpret_cast<kzn::Window*>(glfwGetWindowUserPointer(window));
-    // _window->framebuffer_resized = true;
-    _window->width = width;
-    _window->height = height;
+    return _surface;
 }
 
 }

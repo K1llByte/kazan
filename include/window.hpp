@@ -41,7 +41,8 @@ public:
     static void framebuffer_resize_callback(GLFWwindow *window, int width, int height);
 
     bool should_close();
-    VkExtent2D get_extent();
+    VkExtent2D get_extent() const;
+    VkSurfaceKHR surface() const;
 
 // private:
 

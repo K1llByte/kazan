@@ -98,6 +98,7 @@ public:
 
     VkPhysicalDevice         _physical_device;
     QueueFamilyIndices       _indices;
+    SwapChainSupportDetails  _swap_chain_support;
     std::vector<const char*> _device_extensions;
     VkQueue                  _graphics_queue;
     VkQueue                  _present_queue;
@@ -117,10 +118,20 @@ public:
 
     void wait_idle();
 
+    VkDevice device() const;
 
+    // Functionality methods
 
-    // Device(const Device&) = delete;
-    // void operator=(const Device&) = delete;
+    uint32_t find_memory_type(
+        uint32_t type_filter,
+        VkMemoryPropertyFlags properties);
+
+    void create_image_with_info(
+        const VkImageCreateInfo &imageInfo,
+        VkMemoryPropertyFlags properties,
+        VkImage &image,
+        VkDeviceMemory &imageMemory);
+
 };
 
 } // namespace kzn

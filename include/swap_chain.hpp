@@ -21,24 +21,24 @@ private:
     VkSwapchainKHR _swap_chain = VK_NULL_HANDLE;
     VkSwapchainKHR _old_swap_chain = VK_NULL_HANDLE;
 
-    VkFormat   swap_chain_image_format;
-    // VkFormat   swap_chain_depth_format;
-    VkExtent2D swap_chain_extent;
+    VkFormat   _image_format;
+    VkFormat   _depth_format;
+    VkExtent2D _swap_chain_extent;
 
-    // std::vector<VkFramebuffer> swap_chain_framebuffers;
-    // VkRenderPass               render_pass;
+    // std::vector<VkFramebuffer> _swap_chain_framebuffers;
+    VkRenderPass               _render_pass;
 
-    // std::vector<VkImage>        depth_images;
-    // std::vector<VkDeviceMemory> depth_image_memorys;
-    // std::vector<VkImageView>    depth_image_views;
-    std::vector<VkImage>        swap_chain_images;
-    std::vector<VkImageView>    swap_chain_image_views;
+    std::vector<VkImage>        _depth_images;
+    std::vector<VkDeviceMemory> _depth_image_memorys;
+    std::vector<VkImageView>    _depth_image_views;
+    std::vector<VkImage>        _color_images;
+    std::vector<VkImageView>    _color_image_views;
 
-    // std::vector<VkSemaphore> image_available_semaphores;
-    // std::vector<VkSemaphore> render_finished_semaphores;
-    // std::vector<VkFence>     in_flight_fences;
-    // std::vector<VkFence>     images_in_flight;
-    // size_t                   current_frame = 0;
+    // std::vector<VkSemaphore> _image_available_semaphores;
+    // std::vector<VkSemaphore> _render_finished_semaphores;
+    // std::vector<VkFence>     _in_flight_fences;
+    // std::vector<VkFence>     _images_in_flight;
+    // size_t                   _current_frame = 0;
 
 public:
 
@@ -53,9 +53,14 @@ public:
 
     VkSwapchainKHR swap_chain();
 
+    // VkFormat find_depth_format();
+
 private:
 
     void create_swap_chain();
+    void create_image_views();
+    void create_render_pass();
+    void create_depth_resources();
 
     // SwapChain support choosers
     VkSurfaceFormatKHR choose_surface_format(

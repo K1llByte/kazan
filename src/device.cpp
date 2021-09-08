@@ -187,6 +187,7 @@ PhysicalDevice PhysicalDeviceSelector::select()
 Device::Device(const PhysicalDevice& physical_device)
     : _physical_device{physical_device._physical_device},
     _indices{physical_device._indices},
+    _swap_chain_support{physical_device._swap_chain_support},
     _device_extensions{physical_device._device_extensions}
 {
 
@@ -279,6 +280,63 @@ bool Device::initialized() const
 void Device::wait_idle()
 {
     vkDeviceWaitIdle(_device);
+}
+
+
+VkDevice Device::device() const
+{
+    return _device;
+}
+
+
+uint32_t Device::find_memory_type(
+    uint32_t type_filter,
+    VkMemoryPropertyFlags properties)
+{
+    // TODO: Understand this later
+    VkPhysicalDeviceMemoryProperties mem_properties;
+    vkGetPhysicalDeviceMemoryProperties(_physical_device, &mem_properties);
+    for (uint32_t i = 0; i < mem_properties.memoryTypeCount; ++i)
+    {
+        if ((type_filter & (1 << i)) &&
+            (mem_properties.memoryTypes[i].propertyFlags & properties) == properties)
+        {
+            return i;
+        }
+    }
+
+  throw std::runtime_error("failed to find suitable memory type!");
+}
+
+
+void Device::create_image_with_info(
+    const VkImageCreateInfo &image_info,
+    VkMemoryPropertyFlags properties,
+    VkImage &image,
+    VkDeviceMemory &image_memory)
+{
+    if(vkCreateImage(_device, &image_info, nullptr, &image) != VK_SUCCESS)
+    {
+        throw std::runtime_error("failed to create image!");
+    }
+
+    VkMemoryRequirements mem_requirements;
+    vkGetImageMemoryRequirements(_device, image, &mem_requirements);
+
+    VkMemoryAllocateInfo alloc_info{};
+    alloc_info.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
+    alloc_info.allocationSize = mem_requirements.size;
+    alloc_info.memoryTypeIndex = find_memory_type(mem_requirements.memoryTypeBits, properties);
+
+    if(vkAllocateMemory(_device, &alloc_info, nullptr, &image_memory) != VK_SUCCESS)
+    {
+        throw std::runtime_error("failed to allocate image memory!");
+    }
+
+    if(vkBindImageMemory(_device, image, image_memory, 0) != VK_SUCCESS)
+    {
+        throw std::runtime_error("failed to bind image memory!");
+    }
 }
 
 } // namespace kzn

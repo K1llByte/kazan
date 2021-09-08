@@ -29,13 +29,13 @@ void Renderer::recreate_swap_chain()
 
     if(_swap_chain == nullptr)
     {
-        _swap_chain = new SwapChain(_device, extent);
+        _swap_chain = new SwapChain(_device, extent, _window.surface());
         _swap_chain->init();
     }
     else
     {
         SwapChain* old_swap_chain = _swap_chain;
-        _swap_chain = new SwapChain(_device, extent, old_swap_chain->swap_chain());
+        _swap_chain = new SwapChain(_device, extent, _window.surface(), old_swap_chain->swap_chain());
 
         delete old_swap_chain;
 
