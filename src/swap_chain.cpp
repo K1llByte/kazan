@@ -93,9 +93,27 @@ bool SwapChain::initialized() const
 }
 
 
-VkSwapchainKHR SwapChain::swap_chain()
+VkSwapchainKHR SwapChain::swap_chain() const
 {
     return _swap_chain;
+}
+
+
+VkRenderPass SwapChain::render_pass() const
+{
+    return _render_pass;
+}
+
+
+VkFramebuffer SwapChain::framebuffer(uint32_t image_index) const
+{
+    return _swap_chain_framebuffers[image_index];
+}
+
+
+VkExtent2D SwapChain::swap_chain_extent() const
+{
+    return _swap_chain_extent;
 }
 
 
@@ -279,6 +297,7 @@ void SwapChain::create_image_views()
 void SwapChain::create_render_pass()
 {
     // Depth attachment
+    // TODO: Change '_depth_format' to accept stencil data
     _depth_format = VK_FORMAT_D32_SFLOAT;
     VkAttachmentDescription depth_attachment{};
     depth_attachment.format = _depth_format; //findDepthFormat();

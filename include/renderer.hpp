@@ -20,6 +20,10 @@ public:
     SwapChain*                   _swap_chain = nullptr;
     std::vector<VkCommandBuffer> _command_buffers;
 
+    uint32_t _current_image_index;
+    int      _current_frame_index = 0;
+    bool     _frame_started = false;
+
 public:
 
     Renderer(Window& window, Device& device);
@@ -30,6 +34,10 @@ public:
     void recreate_swap_chain();
     void create_command_buffers();
 
+    VkCommandBuffer begin_frame();
+    void end_frame();
+    void begin_render_pass(VkCommandBuffer command_buffer);
+    void end_render_pass(VkCommandBuffer command_buffer);
 };
 
 }

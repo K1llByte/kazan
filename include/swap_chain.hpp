@@ -50,7 +50,10 @@ public:
     void cleanup();
     bool initialized() const;
 
-    VkSwapchainKHR swap_chain();
+    VkSwapchainKHR swap_chain() const;
+    VkRenderPass render_pass() const;
+    VkFramebuffer framebuffer(uint32_t image_index) const;
+    VkExtent2D swap_chain_extent() const;
 
     // VkFormat find_depth_format();
 

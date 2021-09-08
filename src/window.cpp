@@ -77,7 +77,7 @@ void Window::destroy_surface(Instance& instance)
 void Window::framebuffer_resize_callback(GLFWwindow* window, int width, int height)
 {
     auto _window = reinterpret_cast<kzn::Window*>(glfwGetWindowUserPointer(window));
-    // _window->framebuffer_resized = true;
+    _window->_framebuffer_resized = true;
     _window->width = width;
     _window->height = height;
 }
@@ -86,6 +86,18 @@ void Window::framebuffer_resize_callback(GLFWwindow* window, int width, int heig
 bool Window::should_close()
 {
     return glfwWindowShouldClose(_window);
+}
+
+
+bool Window::was_resized() const
+{
+    return _framebuffer_resized;
+}
+
+
+void Window::reset_resized_flag()
+{
+    _framebuffer_resized = false;
 }
 
 

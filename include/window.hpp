@@ -23,6 +23,7 @@ private:
 
     GLFWwindow*    _window;
     VkSurfaceKHR   _surface = VK_NULL_HANDLE;
+    bool _framebuffer_resized = false;
 
 public:
 
@@ -41,6 +42,8 @@ public:
     static void framebuffer_resize_callback(GLFWwindow *window, int width, int height);
 
     bool should_close();
+    bool was_resized() const;
+    void reset_resized_flag();
     VkExtent2D get_extent() const;
     VkSurfaceKHR surface() const;
 
