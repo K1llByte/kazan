@@ -69,6 +69,7 @@ void Window::destroy_surface(Instance& instance)
 {
     // Destroy window surface
     vkDestroySurfaceKHR(instance.instance(), _surface, nullptr);
+    _surface = VK_NULL_HANDLE;
     std::cout << "- Surface destroyed successfully\n";
 }
 

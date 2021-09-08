@@ -7,8 +7,7 @@ namespace kzn
 
 TestApp::TestApp()
     : _window("Hello Kazan", WIDTH, HEIGHT),
-    _instance(),
-    _renderer()
+    _instance()
 {
     _instance.enable_extensions(_window.required_extensions())
         .enable_validation_layers()
@@ -28,7 +27,7 @@ TestApp::TestApp()
     _device = Device(physical_device);
     _device.init();
 
-    _renderer = Renderer(_window, _device);
+    _renderer = std::make_unique<Renderer>(_window, _device);
 }
 
 
