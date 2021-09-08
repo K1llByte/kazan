@@ -184,7 +184,7 @@ void Renderer::begin_render_pass(VkCommandBuffer command_buffer)
 }
 
 
-void Renderer::end_render_pass(VkCommandBuffer /* command_buffer */)
+void Renderer::end_render_pass(VkCommandBuffer command_buffer)
 {
     if(!_frame_started)
     {
@@ -196,7 +196,7 @@ void Renderer::end_render_pass(VkCommandBuffer /* command_buffer */)
         throw std::runtime_error("Can't end render pass on command buffer from a different frame");
     }
 
-    vkCmdEndRenderPass(commandBuffer);
+    vkCmdEndRenderPass(command_buffer);
 }
 
 }
