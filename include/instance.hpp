@@ -44,10 +44,10 @@ public:
 
     void init();
     void cleanup();
+    bool initialized() const;
 
     // Getters
     VkInstance instance() const;
-    bool initialized() const;
 };
 
 } // namespace kzn

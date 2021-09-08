@@ -3,7 +3,7 @@
 
 #include "window.hpp"
 #include "device.hpp"
-// #include "renderer.hpp"
+#include "renderer.hpp"
 
 namespace kzn
 {
@@ -20,7 +20,7 @@ private:
     Window   _window;
     Instance _instance;
     Device   _device;
-    // Renderer _renderer;
+    Renderer _renderer;
 
 public:
 

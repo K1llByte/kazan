@@ -283,6 +283,18 @@ void Device::wait_idle()
 }
 
 
+VkQueue Device::graphics_queue() const
+{
+    return _graphics_queue;
+}
+
+
+VkQueue Device::present_queue() const
+{
+    return _present_queue;
+}
+
+
 VkDevice Device::device() const
 {
     return _device;

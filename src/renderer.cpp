@@ -3,10 +3,16 @@
 namespace kzn
 {
 
+Renderer::Renderer()
+{
+
+}
+
+
 Renderer::Renderer(Window& window, Device& device)
     : _window{window}, _device{device}
 {
-    
+    recreate_swap_chain();
 }
 
 

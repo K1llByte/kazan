@@ -22,8 +22,13 @@ public:
 
 public:
 
+    Renderer();
     Renderer(Window& window, Device& device);
+    Renderer(const Renderer&) = default;
     ~Renderer();
+
+    void operator=(const Renderer&) = default;
+
 
     void recreate_swap_chain();
 

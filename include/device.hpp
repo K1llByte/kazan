@@ -113,11 +113,12 @@ public:
 
     void init();
     void cleanup();
-
     bool initialized() const;
 
     void wait_idle();
 
+    VkQueue graphics_queue() const;
+    VkQueue present_queue() const;
     VkDevice device() const;
 
     // Functionality methods

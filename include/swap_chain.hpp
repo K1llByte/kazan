@@ -10,7 +10,7 @@ class SwapChain
 {
 public:
 
-    // static constexpr int MAX_FRAMES_IN_FLIGHT = 2;
+    static constexpr int MAX_FRAMES_IN_FLIGHT = 2;
 
 private:
 
@@ -34,11 +34,11 @@ private:
     std::vector<VkImage>        _color_images;
     std::vector<VkImageView>    _color_image_views;
 
-    // std::vector<VkSemaphore> _image_available_semaphores;
-    // std::vector<VkSemaphore> _render_finished_semaphores;
-    // std::vector<VkFence>     _in_flight_fences;
-    // std::vector<VkFence>     _images_in_flight;
-    // size_t                   _current_frame = 0;
+    std::vector<VkSemaphore> _image_available_semaphores;
+    std::vector<VkSemaphore> _render_finished_semaphores;
+    std::vector<VkFence>     _in_flight_fences;
+    std::vector<VkFence>     _images_in_flight;
+    size_t                   _current_frame = 0;
 
 public:
 
@@ -48,12 +48,16 @@ public:
 
     void init();
     void cleanup();
-
     bool initialized() const;
 
     VkSwapchainKHR swap_chain();
 
     // VkFormat find_depth_format();
+
+    VkResult acquire_next_image(uint32_t* image_index);
+    VkResult submit_command_buffers(const VkCommandBuffer* buffers, uint32_t* image_index);
+
+    bool compare_formats(const SwapChain &swap_chain) const;
 
 private:
 
@@ -62,6 +66,7 @@ private:
     void create_render_pass();
     void create_depth_resources();
     void create_framebuffers();
+    void create_sync_objects();
 
     // SwapChain support choosers
     VkSurfaceFormatKHR choose_surface_format(
