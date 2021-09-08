@@ -25,7 +25,7 @@ private:
     VkFormat   _depth_format;
     VkExtent2D _swap_chain_extent;
 
-    // std::vector<VkFramebuffer> _swap_chain_framebuffers;
+    std::vector<VkFramebuffer> _swap_chain_framebuffers;
     VkRenderPass               _render_pass;
 
     std::vector<VkImage>        _depth_images;
@@ -61,6 +61,7 @@ private:
     void create_image_views();
     void create_render_pass();
     void create_depth_resources();
+    void create_framebuffers();
 
     // SwapChain support choosers
     VkSurfaceFormatKHR choose_surface_format(

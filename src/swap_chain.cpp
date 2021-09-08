@@ -34,7 +34,7 @@ void SwapChain::init()
     create_image_views();
     create_render_pass();
     create_depth_resources();
-    // create_framebuffers();
+    create_framebuffers();
     // create_sync_objects();
 }
 
@@ -221,7 +221,7 @@ void SwapChain::create_render_pass()
 
 void SwapChain::create_depth_resources()
 {
-    size_t image_count = _color_images.size();
+    const size_t image_count = _color_images.size();
     _depth_images.resize(image_count);
     _depth_image_memorys.resize(image_count);
     _depth_image_views.resize(image_count);
@@ -265,6 +265,39 @@ void SwapChain::create_depth_resources()
         if(vkCreateImageView(_device.device(), &view_info, nullptr, &_depth_image_views[i]) != VK_SUCCESS)
         {
             throw std::runtime_error("failed to create texture image view!");
+        }
+    }
+}
+
+
+void SwapChain::create_framebuffers()
+{
+    size_t image_count = _color_images.size();
+    _swap_chain_framebuffers.resize(image_count);
+
+    for(size_t i = 0; i < image_count; ++i)
+    {
+        std::array<VkImageView, 2> attachments = {
+            _color_image_views[i],
+            _depth_image_views[i]
+            };
+
+        VkFramebufferCreateInfo framebuffer_info{};
+        framebuffer_info.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
+        framebuffer_info.renderPass = _render_pass;
+        framebuffer_info.attachmentCount = static_cast<uint32_t>(attachments.size());
+        framebuffer_info.pAttachments = attachments.data();
+        framebuffer_info.width = _swap_chain_extent.width;
+        framebuffer_info.height = _swap_chain_extent.height;
+        framebuffer_info.layers = 1;
+
+        if(vkCreateFramebuffer(
+            _device.device(),
+            &framebuffer_info,
+            nullptr,
+            &_swap_chain_framebuffers[i]) != VK_SUCCESS)
+        {
+            throw std::runtime_error("failed to create framebuffer!");
         }
     }
 }
