@@ -104,6 +104,7 @@ public:
     VkQueue                  _present_queue;
     VkDevice                 _device = VK_NULL_HANDLE;
     std::vector<const char*> _validation_layers;
+    VkCommandPool            _command_pool;
     
 public:
 
@@ -120,6 +121,7 @@ public:
     VkQueue graphics_queue() const;
     VkQueue present_queue() const;
     VkDevice device() const;
+    VkCommandPool command_pool() const;
 
     // Functionality methods
 

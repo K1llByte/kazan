@@ -28,6 +28,7 @@ public:
     // void operator=(const Renderer&) = default;
 
     void recreate_swap_chain();
+    void create_command_buffers();
 
 };
 

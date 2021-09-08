@@ -33,6 +33,7 @@ TestApp::TestApp()
 
 TestApp::~TestApp()
 {
+    _renderer.reset();
     _window.destroy_surface(_instance);
 }
 

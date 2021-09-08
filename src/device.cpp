@@ -15,7 +15,10 @@ PhysicalDevice::PhysicalDevice(
     : _physical_device{physical_device},
     _indices{std::move(indices)},
     _device_extensions{std::move(device_extensions)},
-    _swap_chain_support{std::move(swap_chain_support)} {}
+    _swap_chain_support{std::move(swap_chain_support)}
+{
+    
+}
 
 
 PhysicalDevice::~PhysicalDevice()
@@ -190,7 +193,7 @@ Device::Device(const PhysicalDevice& physical_device)
     _swap_chain_support{physical_device._swap_chain_support},
     _device_extensions{physical_device._device_extensions}
 {
-
+    
 }
 
 
@@ -254,6 +257,18 @@ void Device::init()
 
     vkGetDeviceQueue(_device, _indices.graphics_family.value(), 0, &_graphics_queue);
     vkGetDeviceQueue(_device, _indices.present_family.value(), 0, &_present_queue);
+
+    // Create command buffer
+    VkCommandPoolCreateInfo pool_info{};
+    pool_info.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
+    pool_info.queueFamilyIndex = _indices.graphics_family.value();
+    pool_info.flags = VK_COMMAND_POOL_CREATE_TRANSIENT_BIT
+                    | VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT;
+
+    if(vkCreateCommandPool(_device, &pool_info, nullptr, &_command_pool) != VK_SUCCESS)
+    {
+        throw std::runtime_error("failed to create command pool!");
+    }
 }
 
 
@@ -261,6 +276,9 @@ void Device::cleanup()
 {
     if(initialized())
     {
+        // Destroy command pool
+        vkDestroyCommandPool(_device, _command_pool, nullptr);
+        
         // Destroy logical device instance
         vkDestroyDevice(_device, nullptr);
     }
@@ -298,6 +316,12 @@ VkQueue Device::present_queue() const
 VkDevice Device::device() const
 {
     return _device;
+}
+
+
+VkCommandPool Device::command_pool() const
+{
+    return _command_pool;
 }
 
 
