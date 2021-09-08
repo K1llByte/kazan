@@ -129,6 +129,13 @@ public:
         uint32_t type_filter,
         VkMemoryPropertyFlags properties);
 
+    void create_buffer(
+        VkDeviceSize size,
+        VkBufferUsageFlags usage,
+        VkMemoryPropertyFlags properties,
+        VkBuffer& buffer,
+        VkDeviceMemory& buffer_memory);
+
     void create_image_with_info(
         const VkImageCreateInfo &imageInfo,
         VkMemoryPropertyFlags properties,

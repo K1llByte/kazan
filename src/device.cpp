@@ -122,6 +122,41 @@ SwapChainSupportDetails PhysicalDeviceSelector::query_swap_chain_support(VkPhysi
 }
 
 
+void Device::create_buffer(
+    VkDeviceSize          size,
+    VkBufferUsageFlags    usage,
+    VkMemoryPropertyFlags properties,
+    VkBuffer&             buffer,
+    VkDeviceMemory&       buffer_memory)
+{
+    VkBufferCreateInfo buffer_info{};
+    buffer_info.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
+    buffer_info.size = size;
+    buffer_info.usage = usage;
+    buffer_info.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
+
+    if(vkCreateBuffer(_device, &buffer_info, nullptr, &buffer) != VK_SUCCESS)
+    {
+        throw std::runtime_error("failed to create vertex buffer!");
+    }
+
+    VkMemoryRequirements mem_requirements;
+    vkGetBufferMemoryRequirements(_device, buffer, &mem_requirements);
+
+    VkMemoryAllocateInfo alloc_info{};
+    alloc_info.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
+    alloc_info.allocationSize = mem_requirements.size;
+    alloc_info.memoryTypeIndex = find_memory_type(mem_requirements.memoryTypeBits, properties);
+
+    if (vkAllocateMemory(_device, &alloc_info, nullptr, &buffer_memory) != VK_SUCCESS)
+    {
+        throw std::runtime_error("failed to allocate vertex buffer memory!");
+    }
+
+    vkBindBufferMemory(_device, buffer, buffer_memory, 0);
+}
+
+
 QueueFamilyIndices PhysicalDeviceSelector::find_queue_families(VkPhysicalDevice physical_device)
 {
     // QueueFamilyIndices indices;

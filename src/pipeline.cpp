@@ -1,5 +1,7 @@
 #include "pipeline.hpp"
 
+#include "model.hpp"
+
 #include <fstream>
 
 namespace kzn
@@ -24,7 +26,7 @@ Pipeline::~Pipeline()
 }
 
 
-VkShaderModule* Pipeline::create_shader_module(const std::string& file_path)
+VkShaderModule Pipeline::create_shader_module(const std::string& file_path)
 {
     // 1. Read code from file and store it in a vector
     std::ifstream file{file_path, std::ios::ate | std::ios::binary};
@@ -48,8 +50,8 @@ VkShaderModule* Pipeline::create_shader_module(const std::string& file_path)
     create_info.codeSize = code.size();
     create_info.pCode = reinterpret_cast<const uint32_t*>(code.data());
 
-    VkShaderModule* shader_module;
-    if(vkCreateShaderModule(_device.device(), &create_info, nullptr, shader_module) != VK_SUCCESS)
+    VkShaderModule shader_module;
+    if(vkCreateShaderModule(_device.device(), &create_info, nullptr, &shader_module) != VK_SUCCESS)
     {
         throw std::runtime_error("failed to create shader module");
     }
@@ -58,7 +60,7 @@ VkShaderModule* Pipeline::create_shader_module(const std::string& file_path)
 }
 
 
-void create_graphics_pipeline(
+void Pipeline::create_graphics_pipeline(
     const std::string& vert_path,
     const std::string& frag_path,
     const PipelineConfigInfo& config_info)
@@ -92,8 +94,9 @@ void create_graphics_pipeline(
     shader_stages[1].pNext = nullptr;
     shader_stages[1].pSpecializationInfo = nullptr;
 
-    auto binding_descriptions = LveModel::Vertex::getBindingDescriptions();
-    auto attribute_descriptions = LveModel::Vertex::getAttributeDescriptions();
+    auto descriptions = Model::Vertex::get_vertex_description();
+    auto& binding_descriptions = descriptions.bindings;
+    auto& attribute_descriptions = descriptions.attributes;
     VkPipelineVertexInputStateCreateInfo vertex_input_info{};
     vertex_input_info.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
     vertex_input_info.vertexAttributeDescriptionCount =

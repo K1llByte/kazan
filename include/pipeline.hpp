@@ -42,7 +42,7 @@ public:
 
 private:
 
-    VkShaderModule* create_shader_module(const std::string& file_path);
+    VkShaderModule create_shader_module(const std::string& file_path);
 
     void create_graphics_pipeline(
         const std::string& vert_path,
