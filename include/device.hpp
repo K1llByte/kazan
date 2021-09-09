@@ -125,6 +125,8 @@ public:
 
     // Functionality methods
 
+    SwapChainSupportDetails query_swap_chain_support(VkSurfaceKHR surface);
+
     uint32_t find_memory_type(
         uint32_t type_filter,
         VkMemoryPropertyFlags properties);

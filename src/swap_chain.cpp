@@ -19,7 +19,6 @@ SwapChain::SwapChain(Device& device, VkExtent2D win_extent, VkSurfaceKHR surface
     _surface{surface},
     _swap_chain{old_swap_chain}
 {
-    
 }
 
 
@@ -131,7 +130,7 @@ VkResult SwapChain::acquire_next_image(uint32_t* image_index)
         _device.device(),
         _swap_chain,
         std::numeric_limits<uint64_t>::max(),
-        _image_available_semaphores[_current_frame],  // must be an unsignaled semaphore
+        _image_available_semaphores[_current_frame], // must be an unsignaled semaphore
         VK_NULL_HANDLE,
         image_index);
 
@@ -201,7 +200,7 @@ bool SwapChain::compare_formats(const SwapChain &swap_chain) const
 
 void SwapChain::create_swap_chain()
 {
-    SwapChainSupportDetails swap_chain_support = _device._swap_chain_support;
+    SwapChainSupportDetails swap_chain_support = _device.query_swap_chain_support(_surface); //_device._swap_chain_support;
 
     // Choose settings for swapchain from SwapChainSupportDetails
     VkSurfaceFormatKHR surface_format = choose_surface_format(swap_chain_support.formats);
@@ -255,8 +254,11 @@ void SwapChain::create_swap_chain()
     // 'old_swap_chain' may be VK_NULL_HANDLE
     create_info.oldSwapchain = _old_swap_chain;
 
+
     // Create SwapChain instance
-    if(vkCreateSwapchainKHR(_device.device(), &create_info, nullptr, &_swap_chain) != VK_SUCCESS)
+    VkResult res = vkCreateSwapchainKHR(_device.device(), &create_info, nullptr, &_swap_chain);
+    // if(vkCreateSwapchainKHR(_device.device(), &create_info, nullptr, &_swap_chain) != VK_SUCCESS)
+    if(res != VK_SUCCESS)
     {
         throw std::runtime_error("failed to create swap chain!");
     }

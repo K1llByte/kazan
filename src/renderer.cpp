@@ -57,10 +57,13 @@ void Renderer::recreate_swap_chain()
     else
     {
         SwapChain* old_swap_chain = _swap_chain;
-        _swap_chain = new SwapChain(_device, extent, _window.surface(), old_swap_chain->swap_chain());
-
+        // TODO: delete old_swap_chain after swapchain recreation
         delete old_swap_chain;
+        _swap_chain = new SwapChain(_device, extent, _window.surface(), nullptr /* old_swap_chain->swap_chain() */);
+        _swap_chain->init();
 
+
+        // TODO: make this code work
         // if (!old_swap_chain->compare_swap_formats(*_swap_chain))
         // {
         //     throw std::runtime_error("Swap chain image(or depth) format has changed!");

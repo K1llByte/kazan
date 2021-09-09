@@ -360,6 +360,38 @@ VkCommandPool Device::command_pool() const
 }
 
 
+// TODO: make only 1 implementation of query_swap_chain_support
+SwapChainSupportDetails Device::query_swap_chain_support(VkSurfaceKHR surface)
+{
+    SwapChainSupportDetails details;
+    vkGetPhysicalDeviceSurfaceCapabilitiesKHR(_physical_device, surface, &details.capabilities);
+
+    uint32_t format_count;
+    vkGetPhysicalDeviceSurfaceFormatsKHR(_physical_device, surface, &format_count, nullptr);
+
+    if(format_count != 0)
+    {
+        details.formats.resize(format_count);
+        vkGetPhysicalDeviceSurfaceFormatsKHR(_physical_device, surface, &format_count, details.formats.data());
+    }
+
+    uint32_t present_mode_count;
+    vkGetPhysicalDeviceSurfacePresentModesKHR(_physical_device, surface, &present_mode_count, nullptr);
+
+    if (present_mode_count != 0)
+    {
+        details.present_modes.resize(present_mode_count);
+        vkGetPhysicalDeviceSurfacePresentModesKHR(
+            _physical_device,
+            surface,
+            &present_mode_count,
+            details.present_modes.data());
+    }
+
+    return details;
+}
+
+
 uint32_t Device::find_memory_type(
     uint32_t type_filter,
     VkMemoryPropertyFlags properties)
