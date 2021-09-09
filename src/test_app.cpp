@@ -67,15 +67,34 @@ void TestApp::run()
 
 void TestApp::load_game_objects()
 {
+    
+
+    // std::vector<Model::Vertex> vertices{
+    //     Model::Vertex{
+    //         .position{ 0.0f, -0.5f, 0.0f },
+    //         .normal  { 0.0f,  0.0f, 0.0f },
+    //         .color   { 1.0f,  0.0f, 0.0f },
+    //     },
+    //     Model::Vertex{
+    //         .position{ 0.5f,  0.5f, 0.0f },
+    //         .normal  { 0.0f,  0.0f, 0.0f },
+    //         .color   { 1.0f,  1.0f, 0.0f },
+    //     },
+    //     Model::Vertex{
+    //         .position{-0.5f,  0.5f, 0.0f },
+    //         .normal  { 0.0f,  0.0f, 0.0f },
+    //         .color   { 1.0f,  0.0f, 1.0f },
+    //     }
+    // };
+
     std::vector<Model::Vertex> vertices{
         {{ 0.0f, -0.5f, 0.0f}, {0.0f, 0.0f, 0.0f}, {1.0f, 0.0f, 0.0f}},
         {{ 0.5f,  0.5f, 0.0f}, {0.0f, 0.0f, 0.0f}, {0.0f, 1.0f, 0.0f}},
         {{-0.5f,  0.5f, 0.0f}, {0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 1.0f}}
-        };
-    auto model = new Model(_device, vertices);
+    };
 
     auto triangle = GameObject::create_game_object();
-    triangle.model = model;
+    triangle.model = new Model(_device, vertices);
 
     _game_objects.push_back(std::move(triangle));
 }

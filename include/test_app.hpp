@@ -22,7 +22,7 @@ private:
     Instance _instance;
     Device   _device;
     std::unique_ptr<Renderer> _renderer = nullptr;
-     std::vector<GameObject> _game_objects;
+    std::vector<GameObject>   _game_objects;
 
 public:
 

@@ -26,7 +26,7 @@ class GameObject
 public:
 
     using id_t = unsigned int;
-    Model* model{};
+    Model* model = nullptr;
 
 private:
 
@@ -35,12 +35,15 @@ private:
 
 public:
 
+    GameObject(GameObject&& old_game_object);
+    ~GameObject();
     static GameObject create_game_object();    
     id_t id() const;
 
 private:
 
     GameObject(id_t obj_id);
+    bool moved() const;
 
 };
 

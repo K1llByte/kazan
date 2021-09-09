@@ -3,6 +3,9 @@
 #include <stdexcept>
 #include <cstring>
 
+// Debug
+#include <iostream>
+
 namespace kzn
 {
 
@@ -54,12 +57,17 @@ Model::Model(Device& device, const std::vector<Vertex>& vertices)
 }
 
 
+Model::~Model()
+{
+    vkDestroyBuffer(_device.device(), _vertex_buffer, nullptr);
+    vkFreeMemory(_device.device(), _vertex_buffer_memory, nullptr);
+}
+
+
 void Model::bind(VkCommandBuffer command_buffer)
 {
-    VkBuffer buffers[] = { _vertex_buffer };
     VkDeviceSize offsets[] = { 0 };
-    // TODO: swap buffers for &_vertex_buffer
-    vkCmdBindVertexBuffers(command_buffer, 0, 1, buffers, offsets);
+    vkCmdBindVertexBuffers(command_buffer, 0, 1, &_vertex_buffer, offsets);
 }
 
 

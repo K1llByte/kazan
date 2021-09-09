@@ -8,6 +8,7 @@
 #include <limits>
 #include <set>
 #include <stdexcept>
+#include <algorithm>
 
 namespace kzn
 {
@@ -149,9 +150,9 @@ VkResult SwapChain::submit_command_buffers(const VkCommandBuffer* buffers, uint3
     VkSubmitInfo submit_info{};
     submit_info.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
 
-    // TODO: change to 'ptr + _current_frame'
-    VkSemaphore wait_semaphores[] = {_image_available_semaphores[_current_frame]};
-    // TODO: change to 'ptr + _current_frame'
+    VkSemaphore wait_semaphores[] = {
+        _image_available_semaphores[_current_frame]
+    };
     VkPipelineStageFlags wait_stages[] = {VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT};
     submit_info.waitSemaphoreCount = 1;
     submit_info.pWaitSemaphores = wait_semaphores;
@@ -160,8 +161,9 @@ VkResult SwapChain::submit_command_buffers(const VkCommandBuffer* buffers, uint3
     submit_info.commandBufferCount = 1;
     submit_info.pCommandBuffers = buffers;
 
-    // TODO: change to 'ptr + _current_frame'
-    VkSemaphore signal_semaphores[] = {_render_finished_semaphores[_current_frame]};
+    VkSemaphore signal_semaphores[] = {
+        _render_finished_semaphores[_current_frame]
+    };
     submit_info.signalSemaphoreCount = 1;
     submit_info.pSignalSemaphores = signal_semaphores;
 
@@ -177,10 +179,8 @@ VkResult SwapChain::submit_command_buffers(const VkCommandBuffer* buffers, uint3
     present_info.waitSemaphoreCount = 1;
     present_info.pWaitSemaphores = signal_semaphores;
 
-    // TODO: change to 'ptr'
-    VkSwapchainKHR swap_chains[] = { _swap_chain };
     present_info.swapchainCount = 1;
-    present_info.pSwapchains = swap_chains;
+    present_info.pSwapchains = &_swap_chain;
 
     present_info.pImageIndices = image_index;
 
@@ -369,7 +369,6 @@ void SwapChain::create_depth_resources()
     _depth_image_memorys.resize(image_count);
     _depth_image_views.resize(image_count);
 
-    // TODO: change to size_t
     for(size_t i = 0; i < _depth_images.size(); ++i)
     {
         VkImageCreateInfo image_info{};
@@ -514,15 +513,19 @@ VkExtent2D SwapChain::choose_extent(const VkSurfaceCapabilitiesKHR &capabilities
     }
     else
     {
-        // TODO: Change for std::clamp instead of max and min
         VkExtent2D actual_extent = _window_extent;
-        actual_extent.width = std::max(
+
+        actual_extent.width = std::clamp(
+            actual_extent.width,
             capabilities.minImageExtent.width,
-            std::min(capabilities.maxImageExtent.width, actual_extent.width));
-        actual_extent.height = std::max(
+            capabilities.maxImageExtent.width
+        );
+        actual_extent.height = std::clamp(
+            actual_extent.height,
             capabilities.minImageExtent.height,
-            std::min(capabilities.maxImageExtent.height, actual_extent.height));
-  
+            capabilities.maxImageExtent.height
+        );
+
         return actual_extent;
     }
 }

@@ -14,9 +14,10 @@ VkResult CreateDebugUtilsMessenger(
     const VkAllocationCallbacks*              p_allocator,
     VkDebugUtilsMessengerEXT*                 p_debug_messenger)
 {
-    // TODO:
-    // static_cast<PFN_vkCreateDebugUtilsMessengerEXT>()
-    auto func = (PFN_vkCreateDebugUtilsMessengerEXT) vkGetInstanceProcAddr(instance, "vkCreateDebugUtilsMessengerEXT");
+    // auto func = (PFN_vkCreateDebugUtilsMessengerEXT) vkGetInstanceProcAddr(instance, "vkCreateDebugUtilsMessengerEXT");
+    auto func = reinterpret_cast<PFN_vkCreateDebugUtilsMessengerEXT>(
+        vkGetInstanceProcAddr(instance, "vkCreateDebugUtilsMessengerEXT")
+    );
 
     if(func != nullptr)
     {
@@ -39,10 +40,11 @@ void DestroyDebugUtilsMessenger(
     VkDebugUtilsMessengerEXT     debug_messenger,
     const VkAllocationCallbacks* p_allocator)
 {
-    // TODO:
-    // static_cast<PFN_vkCreateDebugUtilsMessengerEXT>()
+    // auto func = (PFN_vkDestroyDebugUtilsMessengerEXT) vkGetInstanceProcAddr(instance, "vkDestroyDebugUtilsMessengerEXT");
+    auto func = reinterpret_cast<PFN_vkDestroyDebugUtilsMessengerEXT>(
+        vkGetInstanceProcAddr(instance, "vkDestroyDebugUtilsMessengerEXT")
+    );
 
-    auto func = (PFN_vkDestroyDebugUtilsMessengerEXT) vkGetInstanceProcAddr(instance, "vkDestroyDebugUtilsMessengerEXT");
     if(func != nullptr)
     {
         std::cout << "- Debug messeger destroyed successfully\n";
