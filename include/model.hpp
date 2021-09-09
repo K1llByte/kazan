@@ -43,6 +43,9 @@ public:
     Model(Device& device, const std::vector<Vertex>& vertices);
     ~Model();
 
+    void bind(VkCommandBuffer command_buffer);
+    void draw(VkCommandBuffer command_buffer);
+
 private:
 
     void create_vertex_buffers(const std::vector<Vertex>& vertices);

@@ -54,6 +54,21 @@ Model::Model(Device& device, const std::vector<Vertex>& vertices)
 }
 
 
+void Model::bind(VkCommandBuffer command_buffer)
+{
+    VkBuffer buffers[] = { _vertex_buffer };
+    VkDeviceSize offsets[] = { 0 };
+    // TODO: swap buffers for &_vertex_buffer
+    vkCmdBindVertexBuffers(command_buffer, 0, 1, buffers, offsets);
+}
+
+
+void Model::draw(VkCommandBuffer command_buffer)
+{
+    vkCmdDraw(command_buffer, _vertex_count, 1, 0, 0);
+}
+
+
 void Model::create_vertex_buffers(const std::vector<Vertex>& vertices)
 {
     _vertex_count = static_cast<uint32_t>(vertices.size());

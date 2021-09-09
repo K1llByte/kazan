@@ -4,6 +4,7 @@
 #include "window.hpp"
 #include "device.hpp"
 #include "renderer.hpp"
+#include "game_object.hpp"
 
 namespace kzn
 {
@@ -21,6 +22,7 @@ private:
     Instance _instance;
     Device   _device;
     std::unique_ptr<Renderer> _renderer = nullptr;
+     std::vector<GameObject> _game_objects;
 
 public:
 
@@ -28,6 +30,10 @@ public:
     ~TestApp();
 
     void run();
+
+private:
+
+    void load_game_objects();
 
 };
 

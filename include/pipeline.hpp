@@ -40,6 +40,10 @@ public:
         const PipelineConfigInfo& config_info);
     ~Pipeline();
 
+    void bind(VkCommandBuffer command_buffer);
+
+    static void default_pipeline_config_info(PipelineConfigInfo& config_info);
+
 private:
 
     VkShaderModule create_shader_module(const std::string& file_path);

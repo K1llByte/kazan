@@ -1,6 +1,10 @@
 #include "renderer.hpp"
 
 #include <stdexcept>
+#include <cassert>
+
+// Debug
+#include <iostream>
 
 namespace kzn
 {
@@ -24,6 +28,13 @@ Renderer::~Renderer()
 
     // Destroy swapchain
     delete _swap_chain;
+}
+
+
+VkRenderPass Renderer::render_pass() const
+{
+    assert(_swap_chain != nullptr);
+    return _swap_chain->render_pass();
 }
 
 

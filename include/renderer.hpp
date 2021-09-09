@@ -29,7 +29,7 @@ public:
     Renderer(Window& window, Device& device);
     ~Renderer();
 
-    // void operator=(const Renderer&) = default;
+    VkRenderPass render_pass() const;
 
     void recreate_swap_chain();
     void create_command_buffers();
