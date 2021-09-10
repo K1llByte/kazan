@@ -11,11 +11,10 @@ layout(push_constant) uniform constants
 {
     vec4 data;
     mat4 pvm;
-} PushConstants;
+} push;
 
 void main()
 {
-    // PushConstants.pvm *
-    gl_Position = vec4(v_position, 1.0f);
+    gl_Position = push.pvm * vec4(v_position, 1.0f);
     out_color = v_color;
 }

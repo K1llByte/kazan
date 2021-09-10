@@ -24,7 +24,8 @@ GameObject::GameObject(id_t obj_id)
 
 
 GameObject::GameObject(GameObject&& old_game_object)
-    : _id{old_game_object._id}
+    : _id{old_game_object._id},
+    transform{old_game_object.transform}
 {
     model = old_game_object.model;
     old_game_object.model = nullptr;

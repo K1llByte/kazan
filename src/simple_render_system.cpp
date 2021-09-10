@@ -38,13 +38,11 @@ void SimpleRenderSystem::render_game_objects(
 
     for(auto& obj : game_objects)
     {
-        // obj.transform2d.rotation = glm::mod(obj.transform2d.rotation + 0.01f, glm::two_pi<float>());
+        obj.transform.rotation.y = glm::mod(obj.transform.rotation.y + 0.01f, glm::two_pi<float>());
+        obj.transform.rotation.x = glm::mod(obj.transform.rotation.x + 0.005f, glm::two_pi<float>());
 
         PushConstantsData push_data{};
-        // PushConstantsData push_data{};
-        // push_data.offset = obj.transform2d.translation;
-        // push_data.color = obj.color;
-        // push_data.transform = obj.transform2d.mat2();
+        push_data.pvm = obj.transform.mat4();
 
         vkCmdPushConstants(
             command_buffer,
