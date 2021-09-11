@@ -30,6 +30,7 @@ public:
     ~Renderer();
 
     VkRenderPass render_pass() const;
+    float aspect_ratio() const;
 
     void recreate_swap_chain();
     void create_command_buffers();

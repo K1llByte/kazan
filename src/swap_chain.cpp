@@ -117,6 +117,13 @@ VkExtent2D SwapChain::swap_chain_extent() const
 }
 
 
+float SwapChain::extent_aspect_ratio() const
+{
+    return static_cast<float>(_swap_chain_extent.width) / static_cast<float>(_swap_chain_extent.height);
+    // return _window_extent.width / _window_extent.height;
+}
+
+
 VkResult SwapChain::acquire_next_image(uint32_t* image_index)
 {
     vkWaitForFences(

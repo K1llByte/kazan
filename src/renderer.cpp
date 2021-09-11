@@ -38,6 +38,12 @@ VkRenderPass Renderer::render_pass() const
 }
 
 
+float Renderer::aspect_ratio() const
+{
+    return _swap_chain->extent_aspect_ratio();
+}
+
+
 void Renderer::recreate_swap_chain()
 {
     auto extent = _window.get_extent();

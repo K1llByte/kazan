@@ -1,6 +1,7 @@
 #include "test_app.hpp"
 
 #include "simple_render_system.hpp"
+#include "camera.hpp"
 
 // Debug
 #include <iostream>
@@ -47,15 +48,21 @@ TestApp::~TestApp()
 void TestApp::run()
 {
     SimpleRenderSystem render_system{_device, _renderer->render_pass()};
+    Camera camera{};
+    camera.lookat_direction(glm::vec3(0.f), glm::vec3(0.0f, 0.f, 1.f));
 
     while(!_window.should_close())
     {
         glfwPollEvents();
 
+        float aspect = _renderer->aspect_ratio();
+        // camera.set_orthographic(-aspect, aspect, -1, 1, -1, 1);
+        camera.set_prespective(glm::radians(50.f), aspect, 0.1f, 100.0f);
+
         if(auto command_buffer = _renderer->begin_frame())
         {
             _renderer->begin_render_pass(command_buffer);
-            render_system.render_game_objects(command_buffer, _game_objects);
+            render_system.render_game_objects(command_buffer, _game_objects, camera);
             _renderer->end_render_pass(command_buffer);
             _renderer->end_frame();
         }
@@ -93,8 +100,16 @@ void TestApp::load_game_objects()
     //     {{-0.5f,  0.5f, 0.0f}, {0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 1.0f}}
     // };
 
+    std::vector<Model::Vertex> floor{
+        {{-1.f, 0.f, -1.f}, {0.0f, 0.0f, 0.0f}, {.2f, .2f, .2f}},
+        {{ 1.f, 0.f,  1.f}, {0.0f, 0.0f, 0.0f}, {.2f, .2f, .2f}},
+        {{-1.f, 0.f,  1.f}, {0.0f, 0.0f, 0.0f}, {.2f, .2f, .2f}},
+        {{-1.f, 0.f, -1.f}, {0.0f, 0.0f, 0.0f}, {.2f, .2f, .2f}},
+        {{ 1.f, 0.f, -1.f}, {0.0f, 0.0f, 0.0f}, {.2f, .2f, .2f}},
+        {{ 1.f, 0.f,  1.f}, {0.0f, 0.0f, 0.0f}, {.2f, .2f, .2f}},
+    };
+
     std::vector<Model::Vertex> vertices{
- 
       // left face (white)
       {{-.5f, -.5f, -.5f}, {0.0f, 0.0f, 0.0f}, {.9f, .9f, .9f}},
       {{-.5f,  .5f,  .5f}, {0.0f, 0.0f, 0.0f}, {.9f, .9f, .9f}},
@@ -142,12 +157,17 @@ void TestApp::load_game_objects()
       {{-.5f, -.5f, -0.5f}, {0.0f, 0.0f, 0.0f}, {.1f, .8f, .1f}},
       {{ .5f, -.5f, -0.5f}, {0.0f, 0.0f, 0.0f}, {.1f, .8f, .1f}},
       {{ .5f,  .5f, -0.5f}, {0.0f, 0.0f, 0.0f}, {.1f, .8f, .1f}},
- 
   };
+
+    auto floor_obj = GameObject::create_game_object();
+    floor_obj.model = new Model(_device, floor);
+
+    _game_objects.push_back(std::move(floor_obj));
+
 
     auto triangle = GameObject::create_game_object();
     triangle.model = new Model(_device, vertices);
-    triangle.transform.translation = { 0.f, 0.f, 0.5f};
+    triangle.transform.translation = { 0.f, 0.f, 3.5f};
     triangle.transform.scale = { 0.5f, 0.5f, 0.5f};
 
     _game_objects.push_back(std::move(triangle));

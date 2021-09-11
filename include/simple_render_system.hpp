@@ -3,6 +3,7 @@
 
 #include "pipeline.hpp"
 #include "game_object.hpp"
+#include "camera.hpp"
 
 namespace kzn
 {
@@ -20,7 +21,9 @@ public:
     SimpleRenderSystem(Device& device, VkRenderPass renderPass);
     ~SimpleRenderSystem();
 
-    void render_game_objects(VkCommandBuffer command_buffer, std::vector<GameObject>& game_objects);
+    void render_game_objects(VkCommandBuffer command_buffer,
+        std::vector<GameObject>& game_objects,
+        const Camera& camera);
 
 private:
 

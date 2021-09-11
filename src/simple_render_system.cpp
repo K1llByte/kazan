@@ -32,9 +32,12 @@ SimpleRenderSystem::~SimpleRenderSystem()
 
 void SimpleRenderSystem::render_game_objects(
     VkCommandBuffer command_buffer,
-    std::vector<GameObject>& game_objects)
+    std::vector<GameObject>& game_objects,
+    const Camera& camera)
 {
     _pipeline->bind(command_buffer);
+
+    auto projection_view = camera.projection() * camera.view();
 
     for(auto& obj : game_objects)
     {
@@ -42,7 +45,7 @@ void SimpleRenderSystem::render_game_objects(
         obj.transform.rotation.x = glm::mod(obj.transform.rotation.x + 0.005f, glm::two_pi<float>());
 
         PushConstantsData push_data{};
-        push_data.pvm = obj.transform.mat4();
+        push_data.pvm = projection_view * obj.transform.mat4();
 
         vkCmdPushConstants(
             command_buffer,

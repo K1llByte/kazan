@@ -64,9 +64,10 @@ void Pipeline::default_pipeline_config_info(PipelineConfigInfo& config_info)
     config_info.multisample_info.alphaToCoverageEnable = VK_FALSE;  // Optional
     config_info.multisample_info.alphaToOneEnable = VK_FALSE;       // Optional
 
-    config_info.color_blend_attachment.colorWriteMask =
-        VK_COLOR_COMPONENT_R_BIT | VK_COLOR_COMPONENT_G_BIT | VK_COLOR_COMPONENT_B_BIT |
-        VK_COLOR_COMPONENT_A_BIT;
+    config_info.color_blend_attachment.colorWriteMask = VK_COLOR_COMPONENT_R_BIT
+                                                      | VK_COLOR_COMPONENT_G_BIT
+                                                      | VK_COLOR_COMPONENT_B_BIT
+                                                      | VK_COLOR_COMPONENT_A_BIT;
     config_info.color_blend_attachment.blendEnable = VK_FALSE;
     config_info.color_blend_attachment.srcColorBlendFactor = VK_BLEND_FACTOR_ONE;   // Optional
     config_info.color_blend_attachment.dstColorBlendFactor = VK_BLEND_FACTOR_ZERO;  // Optional
