@@ -22,6 +22,7 @@ public:
 
     void lookat_direction(glm::vec3 position, glm::vec3 direction, glm::vec3 up = glm::vec3{0.f, -1.f, 0.f});
     void lookat_target(glm::vec3 position, glm::vec3 target, glm::vec3 up = glm::vec3{0.f, -1.f, 0.f});
+    // void set_view_yxz(glm::vec3 position, glm::vec3 rotation)
 
     const glm::mat4& projection() const;
     const glm::mat4& view() const;
