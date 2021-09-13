@@ -2,6 +2,7 @@
 #define COMMANDS_H
 
 #include <cstdint>
+#include <cstring>
 
 #include <utility>
 
@@ -19,7 +20,8 @@ enum CmdType : uint16_t
 template<CmdType T>
 struct BasicCommand
 {
-    static constexpr CmdType type() noexcept { return T; }
+    static constexpr CmdType type = T;
+    // static constexpr CmdType type() noexcept { return T; }
 };
 
 // struct Command;
@@ -39,6 +41,19 @@ struct BasicCommand
 
 ////////////////////////////////////////
 // Command data structs defenition
+
+// Procedure to add a new command:
+// 1. Create a struct with the command data
+// that extends BasicCommand<CmdType>
+// 2. Add struct to Command::CmdData union
+// 3. Build the grammar needed for that command
+// 4. Make the command handler in the controller
+
+struct CmdNone
+    : BasicCommand<CmdType::CMD_NONE>
+{
+    CmdNone() = default;
+};
 
 struct CmdSet
     : BasicCommand<CmdType::CMD_SET>
@@ -62,6 +77,7 @@ struct Command
     CmdType type;
     union CmdData
     {
+        CmdNone cmd_none;
         CmdSet cmd_set;
     } data;
 
@@ -76,12 +92,26 @@ struct Command
 };
 
 template<typename D, typename... Args>
-Command make(Args&&... args)
+constexpr Command make(Args&&... args)
 {
-    return Command{
-        .type = D::type(),
-        .data = { D(std::forward<D>(args)...) }
-    };
+    // Command cmd{ .type = D::type };
+    // // *reinterpret_cast<Command::CmdData*>(&cmd.data) = D(std::forward<D>(args)...);
+    // auto d = D(std::forward<D>(args)...);
+    // std::copy(&d, &d + 1, &cmd.data);
+    // return cmd;
+
+    Command cmd{
+        .type = D::type,
+        .data = {}
+        };
+    auto d = D(std::forward<D>(args)...);
+    std::memcpy(&cmd.data, &d, sizeof(D));
+    return cmd;
+
+    // return Command{
+    //     .type = D::type,
+    //     .data = { D(std::forward<D>(args)...) }
+    // };
 }
 
 }
