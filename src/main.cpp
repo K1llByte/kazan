@@ -24,37 +24,56 @@
 
 ///////////////////////////////////////////////
 
+// int main()
+// {
+//     namespace pegtl = tao::pegtl;
+
+//     pegtl::string_input arg1("set camera.dir", "from_main");
+
+//     kzn::Command cmd = kzn::parse(arg1);
+
+//     switch(cmd.type)
+//     {
+//         case kzn::CmdType::CMD_SET :
+//             switch(cmd.data.cmd_set.target)
+//             {
+//                 case kzn::CmdSet::Target::CAMERA_POS:
+//                     std::cout << "Set(Position)\n";
+//                     break;
+
+//                 case kzn::CmdSet::Target::CAMERA_DIR:
+//                     std::cout << "Set(Direction)\n";
+//                     break;
+//             }
+//             break;
+
+//         case kzn::CmdType::CMD_NONE:
+//             std::cout << "NO COMMAND\n";
+//             break;
+
+//         default:
+//             break;
+//     }
+
+//     return 0;
+// }
+
+
+#include "utils.hpp"
+
 int main()
 {
-    namespace pegtl = tao::pegtl;
+    using namespace kzn::utils;
 
-    // pegtl::argv_input arg1(argv, 1);
-    pegtl::string_input arg1( "set camera.dir", "from_main" );
+    Queue<int,5> q;
+    q.push(1);
+    q.push(2);
+    q.push(3);
 
-    kzn::Command cmd = kzn::parse(arg1);
-
-    switch(cmd.type)
-    {
-        case kzn::CmdType::CMD_SET :
-            switch(cmd.data.cmd_set.target)
-            {
-            case kzn::CmdSet::Target::CAMERA_POS:
-                std::cout << "Target: Position\n";
-                break;
-
-            case kzn::CmdSet::Target::CAMERA_DIR:
-                std::cout << "Target: Direction\n";
-                break;
-            }
-            break;
-
-        case kzn::CmdType::CMD_NONE:
-            std::cout << "NO COMMAND\n";
-            break;
-
-        default:
-            break;
-    }
+    std::cout << q.pop() << '\n';
+    std::cout << q.pop() << '\n';
+    std::cout << q.pop() << '\n';
+    // q.push(4);
 
     return 0;
 }
