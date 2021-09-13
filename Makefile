@@ -1,7 +1,7 @@
 CC = g++ # clang++
 INCLUDE = -I include/ -I include/lib/
 WARNIGNS = -Wall -Wextra -Wshadow -Wfatal-errors -pedantic
-FLAGS = $(WARNIGNS) -std=c++17 -O2 $(INCLUDE) # -fsanitize=address
+FLAGS = $(WARNIGNS) -std=c++2a -O2 $(INCLUDE) # -fsanitize=address
 LIB_FLAGS = -lglfw -lvulkan -ldl -lpthread -lX11 -lXxf86vm -lXrandr -lXi
 SRC_EXT = cpp
 
