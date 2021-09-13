@@ -29,6 +29,10 @@ namespace pegtl = tao::pegtl;
 
 namespace cmd_parser
 {
+    using spaces = pegtl::plus<pegtl::one<' '>>;
+    using camera_pos = pegtl::string<'c','a','m','e','r','a','.','p','o','s'>;
+    using camera_dir = pegtl::string<'c','a','m','e','r','a','.','d','i','r'>;
+
     struct set
         : pegtl::string<'s','e','t'>
     {};
@@ -37,51 +41,57 @@ namespace cmd_parser
        : pegtl::plus<pegtl::alpha>
     {};
 
-    struct camera_pos
-        : pegtl::string<'c','a','m','e','r','a','.','p','o','s'>
+    struct set_cam_pos
+        : pegtl::seq<set, spaces, camera_pos>
     {};
 
-    struct camera_pos
-        : pegtl::string<'c','a','m','e','r','a','.','p','o','s'>
+    struct set_cam_dir
+        : pegtl::seq<set, spaces, camera_dir>
     {};
-
-    struct camera_dir
-        : pegtl::string<'c','a','m','e','r','a','.','d','i','r'>
-    {};
-
-    struct set_cmd
-        : pegtl::seq<set, pegtl::sor<camera_pos, camera_dir>>
-    {}
 
     struct grammar
-       : pegtl::must<set, pegtl::plus<pegtl::one<' '>>, name, pegtl::eof>
+       : pegtl::must<pegtl::sor<set_cam_pos, set_cam_dir>, pegtl::eof>
     {};
+
+    ////////// End Of Grammar //////////
 
     template<typename Rule>
     struct action
     {};
 
     template<>
-    struct action<name>
+    struct action<set_cam_pos>
     {
         template<typename ParseInput>
         static void apply(const ParseInput& in, kzn::Command& cmd)
         {
             using Target = kzn::CmdSet::Target;
-            cmd = kzn::make<kzn::CmdSet>(Target::CAMERA_POS)
+            cmd = kzn::make<kzn::CmdSet>(Target::CAMERA_POS);
+        }
+    };
+
+    template<>
+    struct action<set_cam_dir>
+    {
+        template<typename ParseInput>
+        static void apply(const ParseInput& in, kzn::Command& cmd)
+        {
+            using Target = kzn::CmdSet::Target;
+            cmd = kzn::make<kzn::CmdSet>(Target::CAMERA_DIR);
         }
     };
 
 }  // namespace cmd_parser
 
-const kzn::Command parse(const std::string& input)
-{
-    kzn::Command cmd{kzn::CmdType::CMD_NONE};
+// kzn::Command parse(pegtl::argv_input input)
+// {
+//     using Target = kzn::CmdSet::Target;
+//     kzn::Command cmd = kzn::make<kzn::CmdSet>(Target::CAMERA_POS);
 
-    pegtl::parse<cmd_parser::grammar, cmd_parser::action>(in, cmd);
+//     pegtl::parse<cmd_parser::grammar, cmd_parser::action>(input, cmd);
 
-    return cmd;
-}
+//     return cmd;
+// }
 
 int main( int argc, char* argv[] )
 {
@@ -94,20 +104,36 @@ int main( int argc, char* argv[] )
 
     std::string name;
 
-    pegtl::argv_input in(argv, 1);
+    pegtl::argv_input arg1(argv, 1);
+
+    using Target = kzn::CmdSet::Target;
+    kzn::Command cmd = kzn::make<kzn::CmdSet>(Target::CAMERA_POS);
+
+    pegtl::parse<cmd_parser::grammar, cmd_parser::action>(arg1, cmd);
+
+    switch (cmd.type)
+    {
+        case kzn::CmdType::CMD_SET :
+            std::cout << "Target: " << cmd.data.cmd_set.target << "\n";
+            break;
+
+        default:
+            break;
+    }
+
     
-    if(pegtl::parse<cmd_parser::grammar, cmd_parser::action>(in, name))
-    {
-        std::cout << "Parser returned true\n";
+    // if(pegtl::parse<cmd_parser::grammar, cmd_parser::action>(arg1, name))
+//     {
+//         std::cout << "Parser returned true\n";
 
-        // using Target = kzn::CmdSet::Target;
-        // kzn::Command cmd = kzn::make<kzn::CmdSet>(Target::CAMERA_POS);
-    }
-    else
-    {
-        std::cout << "Parser returned false\n";
-    }
+//         // using Target = kzn::CmdSet::Target;
+//         // kzn::Command cmd = kzn::make<kzn::CmdSet>(Target::CAMERA_POS);
+//     }
+//     else
+//     {
+//         std::cout << "Parser returned false\n";
+//     }
 
-   std::cout << "Good bye, " << name << "!" << std::endl;
+//    std::cout << "Good bye, " << name << "!" << std::endl;
    return 0;
 }
