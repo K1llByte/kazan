@@ -29,12 +29,14 @@ namespace pegtl = tao::pegtl;
 ////////// Start Of Grammar //////////
 
 using spaces = pegtl::plus<pegtl::one<' '>>;
-using camera_pos = pegtl::string<'c','a','m','e','r','a','.','p','o','s'>;
-using camera_dir = pegtl::string<'c','a','m','e','r','a','.','d','i','r'>;
+using ignored = pegtl::star<pegtl::one<' '>>;
+template<typename T>
+using command = pegtl::seq<ignored, T, ignored>;
 
-struct set
-    : pegtl::string<'s','e','t'>
-{};
+using set = TAO_PEGTL_STRING("set");
+using camera_pos = TAO_PEGTL_STRING("camera.pos"); // pegtl::string<'c','a','m','e','r','a','.','p','o','s'>;
+using camera_dir = TAO_PEGTL_STRING("camera.dir"); // pegtl::string<'c','a','m','e','r','a','.','d','i','r'>;
+
 
 struct name
     : pegtl::plus<pegtl::alpha>
@@ -49,14 +51,21 @@ struct set_cam_dir
 {};
 
 struct grammar
-    : pegtl::must<
+    // : pegtl::must<
+    //     pegtl::sor<
+    //         set_cam_pos,
+    //         set_cam_dir
+    //         >, pegtl::eof>
+    : pegtl::seq<
         pegtl::sor<
-            set_cam_pos,
-            set_cam_dir
+            command<set_cam_pos>,
+            command<set_cam_dir>
             >, pegtl::eof>
 {};
 
-////////// End Of Grammar //////////
+/////////// End Of Grammar ///////////
+
+////// Start Of Grammar Actions //////
 
 template<typename Rule>
 struct action
@@ -83,6 +92,26 @@ struct action<set_cam_dir>
         cmd = make<CmdSet>(Target::CAMERA_DIR);
     }
 };
+
+/////// End Of Grammar Actions ///////
+
+template<typename ParseInput>
+constexpr Command parse(ParseInput& input)
+{
+    Command cmd = make<CmdNone>();
+
+    try
+    {
+        pegtl::parse<grammar, action>(input, cmd);
+    }
+    catch(const std::exception& e)
+    {
+        return make<CmdNone>();;
+        // std::cerr << e.what() << '\n';
+    }
+
+    return cmd;
+}
 
 }
 

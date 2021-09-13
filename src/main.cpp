@@ -24,43 +24,31 @@
 
 ///////////////////////////////////////////////
 
-int main( int argc, char* argv[] )
+int main()
 {
-    if(argc != 2)
-        return 1;
-
     namespace pegtl = tao::pegtl;
-    using namespace kzn;
 
-    pegtl::argv_input arg1(argv, 1);
+    // pegtl::argv_input arg1(argv, 1);
+    pegtl::string_input arg1( "set camera.dir", "from_main" );
 
-    Command cmd = make<CmdNone>();
-
-    try
-    {
-        pegtl::parse<grammar, action>(arg1, cmd);
-    }
-    catch(const std::exception& e)
-    {
-        // std::cerr << e.what() << '\n';
-    }
+    kzn::Command cmd = kzn::parse(arg1);
 
     switch(cmd.type)
     {
         case kzn::CmdType::CMD_SET :
             switch(cmd.data.cmd_set.target)
             {
-            case CmdSet::Target::CAMERA_POS:
+            case kzn::CmdSet::Target::CAMERA_POS:
                 std::cout << "Target: Position\n";
                 break;
 
-            case CmdSet::Target::CAMERA_DIR:
+            case kzn::CmdSet::Target::CAMERA_DIR:
                 std::cout << "Target: Direction\n";
                 break;
             }
             break;
 
-        case kzn::CmdType::CMD_NONE :
+        case kzn::CmdType::CMD_NONE:
             std::cout << "NO COMMAND\n";
             break;
 
