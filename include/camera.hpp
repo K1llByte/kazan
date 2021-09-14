@@ -15,6 +15,11 @@ private:
     glm::mat4 _projection_matrix{1.f};
     glm::mat4 _view_matrix{1.f};
 
+    glm::vec3 _position;
+    glm::vec3 _direction;
+    glm::vec3 _up;
+    glm::vec3 _right;
+
 public:
 
     void set_orthographic(float left, float right, float top, float bottom, float near, float far);
@@ -26,6 +31,11 @@ public:
 
     const glm::mat4& projection() const;
     const glm::mat4& view() const;
+    
+    const glm::vec3& position() const;
+    const glm::vec3& direction() const;
+    const glm::vec3& up() const;
+    const glm::vec3& right() const;
 
 };
 

@@ -2,6 +2,7 @@
 
 #include <stdexcept>
 #include <cassert>
+#include <chrono>
 
 // Debug
 #include <iostream>
@@ -115,6 +116,17 @@ void Renderer::create_command_buffers()
     {
         throw std::runtime_error("failed to allocate command buffers!");
     }
+}
+
+
+float Renderer::delta_time()
+{
+    static auto current_time = std::chrono::high_resolution_clock::now();
+
+    auto new_time = std::chrono::high_resolution_clock::now();
+    float dt = std::chrono::duration<float, std::chrono::seconds::period>(new_time - current_time).count();
+    current_time = new_time;
+    return dt;
 }
 
 

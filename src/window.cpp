@@ -115,4 +115,10 @@ VkSurfaceKHR Window::surface() const
     return _surface;
 }
 
+
+int Window::get_key(int key_code)
+{
+    return glfwGetKey(_window, key_code);
+}
+
 }

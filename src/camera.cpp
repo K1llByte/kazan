@@ -36,9 +36,17 @@ void Camera::set_prespective(float fov_y, float aspect, float near, float far)
 
 void Camera::lookat_direction(glm::vec3 position, glm::vec3 direction, glm::vec3 up)
 {
-    const glm::vec3 w{glm::normalize(direction)};
-    const glm::vec3 u{glm::normalize(glm::cross(w, up))};
-    const glm::vec3 v{glm::cross(w, u)};
+    _position = position;
+    _direction = glm::normalize(direction);
+    _right = glm::normalize(glm::cross(_direction, up));
+    _up = -glm::cross(_direction, _right);
+
+    const glm::vec3 w{_direction};
+    const glm::vec3 u{_right};
+    const glm::vec3 v{_up};
+    // const glm::vec3 w{glm::normalize(direction)};
+    // const glm::vec3 u{glm::normalize(glm::cross(w, up))};
+    // const glm::vec3 v{glm::cross(w, u)};
 
     _view_matrix = glm::mat4{1.f};
     _view_matrix[0][0] = u.x;
@@ -53,6 +61,12 @@ void Camera::lookat_direction(glm::vec3 position, glm::vec3 direction, glm::vec3
     _view_matrix[3][0] = -glm::dot(u, position);
     _view_matrix[3][1] = -glm::dot(v, position);
     _view_matrix[3][2] = -glm::dot(w, position);
+}
+
+
+void Camera::lookat_target(glm::vec3 position, glm::vec3 target, glm::vec3 up)
+{
+    lookat_direction(position, target - position, up);
 }
 
 
@@ -83,12 +97,6 @@ void Camera::lookat_direction(glm::vec3 position, glm::vec3 direction, glm::vec3
 // }
 
 
-void Camera::lookat_target(glm::vec3 position, glm::vec3 target, glm::vec3 up)
-{
-    lookat_direction(position, target - position, up);
-}
-
-
 const glm::mat4& Camera::projection() const
 {
     return _projection_matrix;
@@ -98,6 +106,29 @@ const glm::mat4& Camera::projection() const
 const glm::mat4& Camera::view() const
 {
     return _view_matrix;
+}
+
+
+const glm::vec3& Camera::position() const
+{
+    return _position;
+}
+
+
+const glm::vec3& Camera::direction() const
+{
+    return _direction;
+}
+
+
+const glm::vec3& Camera::up() const
+{
+    return _up;
+}
+
+const glm::vec3& Camera::right() const
+{
+    return _right;
 }
 
 }

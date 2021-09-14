@@ -26,6 +26,7 @@ public:
 
 public:
 
+    Renderer() = default;
     Renderer(Window* window, Device* device);
     ~Renderer();
 
@@ -38,6 +39,8 @@ public:
 
     void recreate_swap_chain();
     void create_command_buffers();
+
+    float delta_time();
 
     VkCommandBuffer begin_frame();
     void end_frame();

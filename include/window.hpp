@@ -47,6 +47,9 @@ public:
     VkExtent2D get_extent() const;
     VkSurfaceKHR surface() const;
 
+    // Input
+    int get_key(int key_code);
+
 // private:
 
 };

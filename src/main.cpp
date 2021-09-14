@@ -25,31 +25,31 @@ int main()
 
 ///////////////////////////////////////////////
 
-void print_cmd(const kzn::Command& cmd)
-{
-    switch(cmd.type)
-    {
-        case kzn::CmdType::CMD_SET :
-            switch(cmd.data.cmd_set.target)
-            {
-                case kzn::CmdSet::Target::CAMERA_POS:
-                    std::cout << "Set(Position)\n";
-                    break;
+// void print_cmd(const kzn::Command& cmd)
+// {
+//     switch(cmd.type)
+//     {
+//         case kzn::CmdType::CMD_SET :
+//             switch(cmd.data.cmd_set.target)
+//             {
+//                 case kzn::CmdSet::Target::CAMERA_POS:
+//                     std::cout << "Set(Position)\n";
+//                     break;
 
-                case kzn::CmdSet::Target::CAMERA_DIR:
-                    std::cout << "Set(Direction)\n";
-                    break;
-            }
-            break;
+//                 case kzn::CmdSet::Target::CAMERA_DIR:
+//                     std::cout << "Set(Direction)\n";
+//                     break;
+//             }
+//             break;
 
-        case kzn::CmdType::CMD_NONE:
-            std::cout << "None\n";
-            break;
+//         case kzn::CmdType::CMD_NONE:
+//             std::cout << "None\n";
+//             break;
 
-        default:
-            break;
-    }
-}
+//         default:
+//             break;
+//     }
+// }
 
 
 

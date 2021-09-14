@@ -2,6 +2,7 @@
 
 #include "simple_render_system.hpp"
 #include "camera.hpp"
+#include "camera_controller.hpp"
 
 #include <chrono>
 
@@ -53,16 +54,20 @@ void TestApp::run()
     SimpleRenderSystem render_system{_device, _renderer.render_pass()};
     Camera camera{};
     camera.lookat_direction(glm::vec3(0.f), glm::vec3(0.0f, 0.f, 1.f));
+    CameraController cam_controller(_window, camera);
 
-    
+    _renderer.delta_time();
 
     while(!_window.should_close())
     {
         glfwPollEvents();
 
         float aspect = _renderer.aspect_ratio();
+        float dt = _renderer.delta_time();
         // camera.set_orthographic(-aspect, aspect, -1, 1, -1, 1);
         camera.set_prespective(glm::radians(50.f), aspect, 0.1f, 100.0f);
+
+        cam_controller.update(dt);
 
         if(auto command_buffer = _renderer.begin_frame())
         {
@@ -123,19 +128,19 @@ void TestApp::load_game_objects()
  
       // right face (yellow)
       {{.5f, -.5f, -.5f}, {0.0f, 0.0f, 0.0f}, {.8f, .8f, .1f}},
-      {{.5f,  .5f,  .5f}, {0.0f, 0.0f, 0.0f}, {.8f, .8f, .1f}},
       {{.5f, -.5f,  .5f}, {0.0f, 0.0f, 0.0f}, {.8f, .8f, .1f}},
-      {{.5f, -.5f, -.5f}, {0.0f, 0.0f, 0.0f}, {.8f, .8f, .1f}},
-      {{.5f,  .5f, -.5f}, {0.0f, 0.0f, 0.0f}, {.8f, .8f, .1f}},
       {{.5f,  .5f,  .5f}, {0.0f, 0.0f, 0.0f}, {.8f, .8f, .1f}},
+      {{.5f, -.5f, -.5f}, {0.0f, 0.0f, 0.0f}, {.8f, .8f, .1f}},
+      {{.5f,  .5f,  .5f}, {0.0f, 0.0f, 0.0f}, {.8f, .8f, .1f}},
+      {{.5f,  .5f, -.5f}, {0.0f, 0.0f, 0.0f}, {.8f, .8f, .1f}},
  
       // top face (orange, remember y axis points down)
       {{-.5f, -.5f, -.5f}, {0.0f, 0.0f, 0.0f}, {.9f, .6f, .1f}},
-      {{ .5f, -.5f,  .5f}, {0.0f, 0.0f, 0.0f}, {.9f, .6f, .1f}},
       {{-.5f, -.5f,  .5f}, {0.0f, 0.0f, 0.0f}, {.9f, .6f, .1f}},
-      {{-.5f, -.5f, -.5f}, {0.0f, 0.0f, 0.0f}, {.9f, .6f, .1f}},
-      {{ .5f, -.5f, -.5f}, {0.0f, 0.0f, 0.0f}, {.9f, .6f, .1f}},
       {{ .5f, -.5f,  .5f}, {0.0f, 0.0f, 0.0f}, {.9f, .6f, .1f}},
+      {{-.5f, -.5f, -.5f}, {0.0f, 0.0f, 0.0f}, {.9f, .6f, .1f}},
+      {{ .5f, -.5f,  .5f}, {0.0f, 0.0f, 0.0f}, {.9f, .6f, .1f}},
+      {{ .5f, -.5f, -.5f}, {0.0f, 0.0f, 0.0f}, {.9f, .6f, .1f}},
  
       // bottom face (red)
       {{-.5f, .5f, -.5f}, {0.0f, 0.0f, 0.0f}, {.8f, .1f, .1f}},
@@ -147,11 +152,11 @@ void TestApp::load_game_objects()
  
       // nose face (blue)
       {{-.5f, -.5f, 0.5f}, {0.0f, 0.0f, 0.0f}, {.1f, .1f, .8f}},
-      {{ .5f,  .5f, 0.5f}, {0.0f, 0.0f, 0.0f}, {.1f, .1f, .8f}},
       {{-.5f,  .5f, 0.5f}, {0.0f, 0.0f, 0.0f}, {.1f, .1f, .8f}},
-      {{-.5f, -.5f, 0.5f}, {0.0f, 0.0f, 0.0f}, {.1f, .1f, .8f}},
-      {{ .5f, -.5f, 0.5f}, {0.0f, 0.0f, 0.0f}, {.1f, .1f, .8f}},
       {{ .5f,  .5f, 0.5f}, {0.0f, 0.0f, 0.0f}, {.1f, .1f, .8f}},
+      {{-.5f, -.5f, 0.5f}, {0.0f, 0.0f, 0.0f}, {.1f, .1f, .8f}},
+      {{ .5f,  .5f, 0.5f}, {0.0f, 0.0f, 0.0f}, {.1f, .1f, .8f}},
+      {{ .5f, -.5f, 0.5f}, {0.0f, 0.0f, 0.0f}, {.1f, .1f, .8f}},
  
       // tail face (green)
       {{-.5f, -.5f, -0.5f}, {0.0f, 0.0f, 0.0f}, {.1f, .8f, .1f}},

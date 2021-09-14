@@ -41,8 +41,8 @@ void SimpleRenderSystem::render_game_objects(
 
     for(auto& obj : game_objects)
     {
-        obj.transform.rotation.y = glm::mod(obj.transform.rotation.y + 0.01f, glm::two_pi<float>());
-        obj.transform.rotation.x = glm::mod(obj.transform.rotation.x + 0.005f, glm::two_pi<float>());
+        // obj.transform.rotation.y = glm::mod(obj.transform.rotation.y + 0.01f, glm::two_pi<float>());
+        // obj.transform.rotation.x = glm::mod(obj.transform.rotation.x + 0.005f, glm::two_pi<float>());
 
         PushConstantsData push_data{};
         push_data.pvm = projection_view * obj.transform.mat4();
