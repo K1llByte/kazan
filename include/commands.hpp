@@ -45,6 +45,7 @@ struct BasicCommand
 // Procedure to add a new command:
 // 1. Create a struct with the command data
 // that extends BasicCommand<CmdType>
+//   1.1. Add at least the default ctor
 // 2. Add struct to Command::CmdData union
 // 3. Build the grammar needed for that command
 // 4. Make the command handler in the controller
@@ -66,6 +67,7 @@ struct CmdSet
         CAMERA_UP ,
     } target;
 
+    CmdSet() = default;
     CmdSet(const Target& _target)
         : target{_target} {}
 };
@@ -80,15 +82,6 @@ struct Command
         CmdNone cmd_none;
         CmdSet cmd_set;
     } data;
-
-    // template<typename D, typename... Args>
-    // static Command make(Args&&... args)
-    // {
-    //     return Command{
-    //         .type = D::type(),
-    //         .data = { D(std::forward<D>(args)...) }
-    //     };
-    // }
 };
 
 template<typename D, typename... Args>

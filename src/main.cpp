@@ -58,22 +58,112 @@
 //     return 0;
 // }
 
-
 #include "utils.hpp"
+
+#include <thread>
+#include <memory>
+
+// extern "C"
+// {
+// #include <unistd.h>
+// };
+
+
+void print(const kzn::Command& cmd)
+{
+    switch(cmd.type)
+    {
+        case kzn::CmdType::CMD_SET :
+            switch(cmd.data.cmd_set.target)
+            {
+                case kzn::CmdSet::Target::CAMERA_POS:
+                    std::cout << "Set(Position)\n";
+                    break;
+
+                case kzn::CmdSet::Target::CAMERA_DIR:
+                    std::cout << "Set(Direction)\n";
+                    break;
+            }
+            break;
+
+        case kzn::CmdType::CMD_NONE:
+            std::cout << "None\n";
+            break;
+
+        default:
+            break;
+    }
+}
+
+class CommandInputThread
+{
+public:
+
+    using CmdQueue = kzn::utils::Queue<kzn::Command, 5>;
+    using CmdQueuePtr = std::shared_ptr<CmdQueue>;
+    CmdQueuePtr queue_p;
+
+private:
+
+    std::thread main;
+
+public:
+
+    CommandInputThread(CmdQueuePtr q)
+        : queue_p{q} {}
+
+    ~CommandInputThread()
+    {
+        join();
+    }
+
+    void start()
+    {
+        main = std::thread([](CmdQueuePtr q)
+        {
+            namespace pegtl = tao::pegtl;
+
+            std::string input;
+            while(true)
+            {
+                std::cout << "getline\n";
+                std::getline(std::cin, input);
+                // std::cin >> input;
+
+                pegtl::string_input string_input(input, "stdin");
+                kzn::Command cmd = kzn::parse(string_input);
+
+                print(cmd);
+                if(cmd.type != 0)
+                    q->push(cmd);
+            }
+        }, queue_p);
+    }
+
+    void join()
+    {
+        main.join();
+    }
+
+};
 
 int main()
 {
-    using namespace kzn::utils;
+    auto q = std::make_shared<CommandInputThread::CmdQueue>();
+    CommandInputThread t(q);
+    t.start();
 
-    Queue<int,5> q;
-    q.push(1);
-    q.push(2);
-    q.push(3);
+    bool torf = false;
+    while(1)
+    {
+        if(!q->is_empty())
+        {
+            torf = true;
+            std::cout << "is not empty\n";
+        }
+    }
 
-    std::cout << q.pop() << '\n';
-    std::cout << q.pop() << '\n';
-    std::cout << q.pop() << '\n';
-    // q.push(4);
+    t.join();
 
     return 0;
 }

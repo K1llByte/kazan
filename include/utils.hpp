@@ -15,16 +15,20 @@ namespace utils
 template<typename T, size_t N>
 class Queue
 {
+public:
+
+    bool empty = true;
+
 private:
     
     std::array<T,N> queue;
     size_t front = 0;
     size_t back = 0;
-    bool empty = true;
 
 public:
 
     Queue() = default;
+    Queue(const Queue&) = delete;
 
     constexpr void push(const T& value)
     {
@@ -55,6 +59,11 @@ public:
         }
 
         return queue[idx];
+    }
+
+    bool is_empty() const
+    {
+        return empty;
     }
 };
 
