@@ -1,5 +1,5 @@
-#ifndef CMD_PARSER_H
-#define CMD_PARSER_H
+#ifndef COMMAND_PARSER_H
+#define COMMAND_PARSER_H
 
 #include "commands.hpp"
 
@@ -115,4 +115,4 @@ constexpr Command parse(ParseInput& input)
 
 }
 
-#endif // CMD_PARSER_H
+#endif // COMMAND_PARSER_H
