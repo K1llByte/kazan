@@ -21,7 +21,8 @@ private:
     Window   _window;
     Instance _instance;
     Device   _device;
-    std::unique_ptr<Renderer> _renderer = nullptr;
+    Renderer _renderer;
+    // std::unique_ptr<Renderer> _renderer = nullptr;
     std::vector<GameObject>   _game_objects;
 
 public:

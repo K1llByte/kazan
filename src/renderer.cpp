@@ -9,30 +9,50 @@
 namespace kzn
 {
 
-Renderer::Renderer(Window& window, Device& device)
+Renderer::Renderer(Window* window, Device* device)
     : _window{window}, _device{device}
+{
+    init();
+}
+
+
+Renderer::~Renderer() {}
+
+
+void Renderer::init()
 {
     recreate_swap_chain();
     create_command_buffers();
 }
 
 
-Renderer::~Renderer()
+void Renderer::cleanup()
 {
-    // Destroy Command Buffers
-    vkFreeCommandBuffers(
-        _device.device(),
-        _device.command_pool(),
-        static_cast<uint32_t>(_command_buffers.size()),
-        _command_buffers.data());
+    if(initialized())
+    {
+        // Destroy Command Buffers
+        vkFreeCommandBuffers(
+            _device->device(),
+            _device->command_pool(),
+            static_cast<uint32_t>(_command_buffers.size()),
+            _command_buffers.data());
 
-    // Destroy swapchain
-    delete _swap_chain;
+        // Destroy swapchain
+        delete _swap_chain;
+        _swap_chain = nullptr;
+    }
+}
+
+
+bool Renderer::initialized() const
+{
+    return _swap_chain != nullptr;
 }
 
 
 VkRenderPass Renderer::render_pass() const
 {
+    assert(initialized());
     assert(_swap_chain != nullptr);
     return _swap_chain->render_pass();
 }
@@ -40,24 +60,26 @@ VkRenderPass Renderer::render_pass() const
 
 float Renderer::aspect_ratio() const
 {
+    assert(initialized());
     return _swap_chain->extent_aspect_ratio();
 }
 
 
 void Renderer::recreate_swap_chain()
 {
-    auto extent = _window.get_extent();
+    assert(_device != nullptr && _window != nullptr);
+    auto extent = _window->get_extent();
     while(extent.width == 0 || extent.height == 0)
     {
-        extent = _window.get_extent();
+        extent = _window->get_extent();
         glfwWaitEvents();
     }
 
-    _device.wait_idle();
+    _device->wait_idle();
 
     if(_swap_chain == nullptr)
     {
-        _swap_chain = new SwapChain(_device, extent, _window.surface());
+        _swap_chain = new SwapChain(*_device, extent, _window->surface());
         _swap_chain->init();
     }
     else
@@ -65,7 +87,7 @@ void Renderer::recreate_swap_chain()
         SwapChain* old_swap_chain = _swap_chain;
         // TODO: delete old_swap_chain after swapchain recreation
         delete old_swap_chain;
-        _swap_chain = new SwapChain(_device, extent, _window.surface(), nullptr /* old_swap_chain->swap_chain() */);
+        _swap_chain = new SwapChain(*_device, extent, _window->surface(), nullptr /* old_swap_chain->swap_chain() */);
         _swap_chain->init();
 
 
@@ -80,15 +102,16 @@ void Renderer::recreate_swap_chain()
 
 void Renderer::create_command_buffers()
 {
+    assert(initialized());
     _command_buffers.resize(SwapChain::MAX_FRAMES_IN_FLIGHT);
 
     VkCommandBufferAllocateInfo alloc_info{};
     alloc_info.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
     alloc_info.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
-    alloc_info.commandPool = _device.command_pool();
+    alloc_info.commandPool = _device->command_pool();
     alloc_info.commandBufferCount = static_cast<uint32_t>(_command_buffers.size());
 
-    if(vkAllocateCommandBuffers(_device.device(), &alloc_info, _command_buffers.data()) != VK_SUCCESS)
+    if(vkAllocateCommandBuffers(_device->device(), &alloc_info, _command_buffers.data()) != VK_SUCCESS)
     {
         throw std::runtime_error("failed to allocate command buffers!");
     }
@@ -97,6 +120,7 @@ void Renderer::create_command_buffers()
 
 VkCommandBuffer Renderer::begin_frame()
 {
+    assert(initialized());
     if(_frame_started)
     {
         throw std::runtime_error("Can't call beginFrame while already in progress");
@@ -132,6 +156,7 @@ VkCommandBuffer Renderer::begin_frame()
 
 void Renderer::end_frame()
 {
+    assert(initialized());
     if(!_frame_started)
     {
         throw std::runtime_error("Can't call endFrame while frame is not in progress");
@@ -146,9 +171,9 @@ void Renderer::end_frame()
     auto result = _swap_chain->submit_command_buffers(&command_buffer, &_current_image_index);
     if(result == VK_ERROR_OUT_OF_DATE_KHR
         || result == VK_SUBOPTIMAL_KHR
-        || _window.was_resized())
+        || _window->was_resized())
     {
-        _window.reset_resized_flag();
+        _window->reset_resized_flag();
         recreate_swap_chain();
     }
     else if(result != VK_SUCCESS)
@@ -163,6 +188,7 @@ void Renderer::end_frame()
 
 void Renderer::begin_render_pass(VkCommandBuffer command_buffer)
 {
+    assert(initialized());
     if(!_frame_started)
     {
         throw std::runtime_error("Can't call 'begin_render_pass' if frame is not in progress");
@@ -206,6 +232,7 @@ void Renderer::begin_render_pass(VkCommandBuffer command_buffer)
 
 void Renderer::end_render_pass(VkCommandBuffer command_buffer)
 {
+    assert(initialized());
     if(!_frame_started)
     {
         throw std::runtime_error("Can't call 'end_render_pass' if frame is not in progress");

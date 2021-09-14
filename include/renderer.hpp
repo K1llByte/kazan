@@ -15,8 +15,8 @@ class Renderer
 
 public:
 
-    Window&                      _window;
-    Device&                      _device;
+    Window*                      _window = nullptr;
+    Device*                      _device = nullptr;
     SwapChain*                   _swap_chain = nullptr;
     std::vector<VkCommandBuffer> _command_buffers;
 
@@ -26,8 +26,12 @@ public:
 
 public:
 
-    Renderer(Window& window, Device& device);
+    Renderer(Window* window, Device* device);
     ~Renderer();
+
+    void init();
+    void cleanup();
+    bool initialized() const;
 
     VkRenderPass render_pass() const;
     float aspect_ratio() const;
