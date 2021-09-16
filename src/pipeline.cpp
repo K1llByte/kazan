@@ -11,7 +11,7 @@ Pipeline::Pipeline(
         Device& device,
         const std::string& vert_shader_path,
         const std::string& frag_shader_path,
-        const PipelineConfigInfo& config_info)
+        const PipelineConfig& config_info)
     : _device{device}
 {
     create_graphics_pipeline(vert_shader_path, frag_shader_path, config_info);
@@ -32,7 +32,7 @@ void Pipeline::bind(VkCommandBuffer command_buffer)
 }
 
 
-void Pipeline::default_pipeline_config_info(PipelineConfigInfo& config_info)
+void Pipeline::default_pipeline_config_info(PipelineConfig& config_info)
 {
     config_info.input_assembly_info.sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
     config_info.input_assembly_info.topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;
@@ -143,7 +143,7 @@ VkShaderModule Pipeline::create_shader_module(const std::string& file_path)
 void Pipeline::create_graphics_pipeline(
     const std::string& vert_path,
     const std::string& frag_path,
-    const PipelineConfigInfo& config_info)
+    const PipelineConfig& config_info)
 {
     if(config_info.pipeline_layout == VK_NULL_HANDLE)
     {

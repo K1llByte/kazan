@@ -6,7 +6,7 @@
 namespace kzn
 {
 
-struct PipelineConfigInfo
+struct PipelineConfig
 {
     VkPipelineViewportStateCreateInfo      viewport_info;
     VkPipelineInputAssemblyStateCreateInfo input_assembly_info;
@@ -21,6 +21,22 @@ struct PipelineConfigInfo
     VkRenderPass                           render_pass = nullptr;
     uint32_t                               subpass = 0;
 };
+
+
+class PipelineConfigBuilder
+{
+private:
+
+    PipelineConfig _config;
+
+public:
+
+    PipelineConfigBuilder(
+        VkPipelineLayout layout = VK_NULL_HANDLE,
+        VkRenderPass render_pass = VK_NULL_HANDLE)
+
+};
+
 
 class Pipeline
 {
@@ -37,12 +53,12 @@ public:
         Device& device,
         const std::string& vert_shader_path,
         const std::string& frag_shader_path,
-        const PipelineConfigInfo& config_info);
+        const PipelineConfig& config_info);
     ~Pipeline();
 
     void bind(VkCommandBuffer command_buffer);
 
-    static void default_pipeline_config_info(PipelineConfigInfo& config_info);
+    static void default_pipeline_config_info(PipelineConfig& config_info);
 
 private:
 
@@ -51,7 +67,7 @@ private:
     void create_graphics_pipeline(
         const std::string& vert_path,
         const std::string& frag_path,
-        const PipelineConfigInfo& config_info);
+        const PipelineConfig& config_info);
 
 };
 

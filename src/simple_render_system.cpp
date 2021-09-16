@@ -87,7 +87,7 @@ void SimpleRenderSystem::create_pipeline(VkRenderPass render_pass)
         throw std::runtime_error("Cannot create pipeline before pipeline layout");
     }
   
-    PipelineConfigInfo pipeline_config{};
+    PipelineConfig pipeline_config{};
     Pipeline::default_pipeline_config_info(pipeline_config);
     pipeline_config.render_pass = render_pass;
     pipeline_config.pipeline_layout = _pipeline_layout;
