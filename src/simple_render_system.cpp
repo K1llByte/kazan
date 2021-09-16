@@ -35,8 +35,8 @@ void SimpleRenderSystem::render_game_objects(
     std::vector<GameObject>& game_objects,
     const Camera& camera)
 {
-    _pipeline->bind(command_buffer);
 
+    _pipeline->bind(command_buffer);
     auto projection_view = camera.projection() * camera.view();
 
     for(auto& obj : game_objects)
@@ -87,10 +87,15 @@ void SimpleRenderSystem::create_pipeline(VkRenderPass render_pass)
         throw std::runtime_error("Cannot create pipeline before pipeline layout");
     }
   
-    PipelineConfig pipeline_config{};
-    Pipeline::default_pipeline_config_info(pipeline_config);
-    pipeline_config.render_pass = render_pass;
-    pipeline_config.pipeline_layout = _pipeline_layout;
+    PipelineConfig pipeline_config = 
+        PipelineConfigBuilder(_pipeline_layout, render_pass)
+        .set_topology(VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST)
+        .build();
+    // PipelineConfig pipeline_config{};
+    // Pipeline::default_pipeline_config_info(pipeline_config);
+    // pipeline_config.render_pass = render_pass;
+    // pipeline_config.pipeline_layout = _pipeline_layout;
+
     // TODO: Try to change unique_ptr to
     // a stack allocated alternative
     _pipeline = std::make_unique<Pipeline>(

@@ -7,14 +7,126 @@
 namespace kzn
 {
 
+PipelineConfigBuilder::PipelineConfigBuilder(
+    VkPipelineLayout layout,
+    VkRenderPass render_pass)
+    : _config{}
+{
+    _config.input_assembly_info.sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
+    _config.input_assembly_info.topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;
+    _config.input_assembly_info.primitiveRestartEnable = VK_FALSE;
+
+    _config.viewport_info.sType = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO;
+    _config.viewport_info.viewportCount = 1;
+    _config.viewport_info.pViewports = nullptr;
+    _config.viewport_info.scissorCount = 1;
+    _config.viewport_info.pScissors = nullptr;
+
+    _config.rasterization_info.sType = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO;
+    _config.rasterization_info.depthClampEnable = VK_FALSE;
+    _config.rasterization_info.rasterizerDiscardEnable = VK_FALSE;
+    _config.rasterization_info.polygonMode = VK_POLYGON_MODE_FILL;
+    _config.rasterization_info.lineWidth = 1.0f;
+    _config.rasterization_info.cullMode = VK_CULL_MODE_BACK_BIT; //VK_CULL_MODE_NONE;
+    _config.rasterization_info.frontFace = VK_FRONT_FACE_COUNTER_CLOCKWISE; // VK_FRONT_FACE_CLOCKWISE;
+    _config.rasterization_info.depthBiasEnable = VK_FALSE;
+    _config.rasterization_info.depthBiasConstantFactor = 0.0f;  // Optional
+    _config.rasterization_info.depthBiasClamp = 0.0f;           // Optional
+    _config.rasterization_info.depthBiasSlopeFactor = 0.0f;     // Optional
+
+    _config.multisample_info.sType = VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO;
+    _config.multisample_info.sampleShadingEnable = VK_FALSE;
+    _config.multisample_info.rasterizationSamples = VK_SAMPLE_COUNT_1_BIT;
+    _config.multisample_info.minSampleShading = 1.0f;           // Optional
+    _config.multisample_info.pSampleMask = nullptr;             // Optional
+    _config.multisample_info.alphaToCoverageEnable = VK_FALSE;  // Optional
+    _config.multisample_info.alphaToOneEnable = VK_FALSE;       // Optional
+
+    _config.color_blend_attachment.colorWriteMask = VK_COLOR_COMPONENT_R_BIT
+                                                      | VK_COLOR_COMPONENT_G_BIT
+                                                      | VK_COLOR_COMPONENT_B_BIT
+                                                      | VK_COLOR_COMPONENT_A_BIT;
+    _config.color_blend_attachment.blendEnable = VK_FALSE;
+    _config.color_blend_attachment.srcColorBlendFactor = VK_BLEND_FACTOR_ONE;   // Optional
+    _config.color_blend_attachment.dstColorBlendFactor = VK_BLEND_FACTOR_ZERO;  // Optional
+    _config.color_blend_attachment.colorBlendOp = VK_BLEND_OP_ADD;              // Optional
+    _config.color_blend_attachment.srcAlphaBlendFactor = VK_BLEND_FACTOR_ONE;   // Optional
+    _config.color_blend_attachment.dstAlphaBlendFactor = VK_BLEND_FACTOR_ZERO;  // Optional
+    _config.color_blend_attachment.alphaBlendOp = VK_BLEND_OP_ADD;              // Optional
+
+    _config.color_blend_info.sType = VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO;
+    _config.color_blend_info.logicOpEnable = VK_FALSE;
+    _config.color_blend_info.logicOp = VK_LOGIC_OP_COPY;  // Optional
+    _config.color_blend_info.attachmentCount = 1;
+    _config.color_blend_info.pAttachments = &_config.color_blend_attachment;
+    _config.color_blend_info.blendConstants[0] = 0.0f;  // Optional
+    _config.color_blend_info.blendConstants[1] = 0.0f;  // Optional
+    _config.color_blend_info.blendConstants[2] = 0.0f;  // Optional
+    _config.color_blend_info.blendConstants[3] = 0.0f;  // Optional
+
+    _config.depth_stencil_info.sType = VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO;
+    _config.depth_stencil_info.depthTestEnable = VK_TRUE;
+    _config.depth_stencil_info.depthWriteEnable = VK_TRUE;
+    _config.depth_stencil_info.depthCompareOp = VK_COMPARE_OP_LESS;
+    _config.depth_stencil_info.depthBoundsTestEnable = VK_FALSE;
+    _config.depth_stencil_info.minDepthBounds = 0.0f;  // Optional
+    _config.depth_stencil_info.maxDepthBounds = 1.0f;  // Optional
+    _config.depth_stencil_info.stencilTestEnable = VK_FALSE;
+    _config.depth_stencil_info.front = {};  // Optional
+    _config.depth_stencil_info.back = {};   // Optional
+
+    _config.dynamic_state_enables = { VK_DYNAMIC_STATE_VIEWPORT, VK_DYNAMIC_STATE_SCISSOR };
+    _config.dynamic_state_info.sType = VK_STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO;
+    _config.dynamic_state_info.pDynamicStates = _config.dynamic_state_enables.data();
+    _config.dynamic_state_info.dynamicStateCount =
+        static_cast<uint32_t>(_config.dynamic_state_enables.size());
+    _config.dynamic_state_info.flags = 0;
+
+    _config.pipeline_layout = layout;
+    _config.render_pass = render_pass;
+}
+
+
+PipelineConfigBuilder& PipelineConfigBuilder::set_layout(VkPipelineLayout layout)
+{
+    _config.pipeline_layout = layout;
+    return *this;
+}
+
+
+PipelineConfigBuilder& PipelineConfigBuilder::set_render_pass(VkRenderPass render_pass)
+{
+    _config.render_pass = render_pass;
+    return *this;
+}
+
+
+PipelineConfigBuilder& PipelineConfigBuilder::set_topology(VkPrimitiveTopology topology)
+{
+    _config.input_assembly_info.topology = topology;
+    return *this;
+}
+
+
+PipelineConfig&& PipelineConfigBuilder::build()
+{
+    if(_config.render_pass == VK_NULL_HANDLE
+        || _config.pipeline_layout == VK_NULL_HANDLE)
+    {
+        throw std::runtime_error("'VkPipelineLayout' and 'VkRenderPass' must be set");
+    }
+    return std::move(_config);
+}
+
+
 Pipeline::Pipeline(
         Device& device,
         const std::string& vert_shader_path,
         const std::string& frag_shader_path,
-        const PipelineConfig& config_info)
+        const PipelineConfig& _config)
     : _device{device}
 {
-    create_graphics_pipeline(vert_shader_path, frag_shader_path, config_info);
+    create_graphics_pipeline(vert_shader_path, frag_shader_path, _config);
 }
 
 
@@ -143,16 +255,16 @@ VkShaderModule Pipeline::create_shader_module(const std::string& file_path)
 void Pipeline::create_graphics_pipeline(
     const std::string& vert_path,
     const std::string& frag_path,
-    const PipelineConfig& config_info)
+    const PipelineConfig& _config)
 {
-    if(config_info.pipeline_layout == VK_NULL_HANDLE)
+    if(_config.pipeline_layout == VK_NULL_HANDLE)
     {
-        throw std::runtime_error("Cannot create graphics pipeline: no 'pipeline_layout' provided in 'config_info'");
+        throw std::runtime_error("Cannot create graphics pipeline: no 'pipeline_layout' provided in '_config'");
     }
 
-    if(config_info.render_pass == VK_NULL_HANDLE)
+    if(_config.render_pass == VK_NULL_HANDLE)
     {
-        throw std::runtime_error("Cannot create graphics pipeline: no 'render_pass' provided in 'config_info'");
+        throw std::runtime_error("Cannot create graphics pipeline: no 'render_pass' provided in '_config'");
     }
 
     _vert_shader_module = create_shader_module(vert_path);
@@ -190,17 +302,17 @@ void Pipeline::create_graphics_pipeline(
     pipeline_info.stageCount = 2;
     pipeline_info.pStages = shader_stages;
     pipeline_info.pVertexInputState = &vertex_input_info;
-    pipeline_info.pInputAssemblyState = &config_info.input_assembly_info;
-    pipeline_info.pViewportState = &config_info.viewport_info;
-    pipeline_info.pRasterizationState = &config_info.rasterization_info;
-    pipeline_info.pMultisampleState = &config_info.multisample_info;
-    pipeline_info.pColorBlendState = &config_info.color_blend_info;
-    pipeline_info.pDepthStencilState = &config_info.depth_stencil_info;
-    pipeline_info.pDynamicState = &config_info.dynamic_state_info;
+    pipeline_info.pInputAssemblyState = &_config.input_assembly_info;
+    pipeline_info.pViewportState = &_config.viewport_info;
+    pipeline_info.pRasterizationState = &_config.rasterization_info;
+    pipeline_info.pMultisampleState = &_config.multisample_info;
+    pipeline_info.pColorBlendState = &_config.color_blend_info;
+    pipeline_info.pDepthStencilState = &_config.depth_stencil_info;
+    pipeline_info.pDynamicState = &_config.dynamic_state_info;
 
-    pipeline_info.layout = config_info.pipeline_layout;
-    pipeline_info.renderPass = config_info.render_pass;
-    pipeline_info.subpass = config_info.subpass;
+    pipeline_info.layout = _config.pipeline_layout;
+    pipeline_info.renderPass = _config.render_pass;
+    pipeline_info.subpass = _config.subpass;
 
     pipeline_info.basePipelineIndex = -1;
     pipeline_info.basePipelineHandle = VK_NULL_HANDLE;

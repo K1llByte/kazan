@@ -17,8 +17,8 @@ struct PipelineConfig
     VkPipelineDepthStencilStateCreateInfo  depth_stencil_info;
     std::vector<VkDynamicState>            dynamic_state_enables;
     VkPipelineDynamicStateCreateInfo       dynamic_state_info;
-    VkPipelineLayout                       pipeline_layout = nullptr;
-    VkRenderPass                           render_pass = nullptr;
+    VkPipelineLayout                       pipeline_layout = VK_NULL_HANDLE;
+    VkRenderPass                           render_pass = VK_NULL_HANDLE;
     uint32_t                               subpass = 0;
 };
 
@@ -33,8 +33,16 @@ public:
 
     PipelineConfigBuilder(
         VkPipelineLayout layout = VK_NULL_HANDLE,
-        VkRenderPass render_pass = VK_NULL_HANDLE)
+        VkRenderPass render_pass = VK_NULL_HANDLE);
+    ~PipelineConfigBuilder() = default;
 
+    PipelineConfigBuilder& set_layout(VkPipelineLayout layout);
+    PipelineConfigBuilder& set_render_pass(VkRenderPass render_pass);
+
+    // Input Assemply
+    PipelineConfigBuilder& set_topology(VkPrimitiveTopology topology);
+
+    PipelineConfig&& build();
 };
 
 

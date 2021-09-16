@@ -13,8 +13,8 @@ class TestApp
 {
 public:
 
-    static constexpr int WIDTH = 800;
-    static constexpr int HEIGHT = 600;
+    static constexpr int WIDTH = 1700;
+    static constexpr int HEIGHT = 900;
 
 private:
 
