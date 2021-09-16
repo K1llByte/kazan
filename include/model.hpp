@@ -38,9 +38,16 @@ private:
     VkDeviceMemory _vertex_buffer_memory;
     uint32_t       _vertex_count;
 
+    VkBuffer       _index_buffer;
+    VkDeviceMemory _index_buffer_memory;
+    uint32_t       _index_count;
+
 public:
 
-    Model(Device& device, const std::vector<Vertex>& vertices);
+    Model(
+        Device& device,
+        const std::vector<Vertex>& vertices,
+        const std::vector<uint32_t>& indices = std::vector<uint32_t>());
     ~Model();
 
     void bind(VkCommandBuffer command_buffer);
@@ -49,6 +56,12 @@ public:
 private:
 
     void create_vertex_buffers(const std::vector<Vertex>& vertices);
+    void create_index_buffers(const std::vector<uint32_t>& indices);
+
+    constexpr bool has_index_buffer()
+    {
+        return _index_count > 0;
+    }
 
 };
 
