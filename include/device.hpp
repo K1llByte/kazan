@@ -138,6 +138,15 @@ public:
         VkBuffer& buffer,
         VkDeviceMemory& buffer_memory);
 
+    void copy_buffer(
+        VkBuffer src_buffer,
+        VkBuffer dst_buffer,
+        VkDeviceSize size);
+
+    VkCommandBuffer begin_single_time_commands();
+    void end_single_time_commands(VkCommandBuffer command_buffer);
+
+
     void create_image_with_info(
         const VkImageCreateInfo &imageInfo,
         VkMemoryPropertyFlags properties,

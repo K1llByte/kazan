@@ -221,19 +221,33 @@ void Model::create_vertex_buffers(const std::vector<Vertex>& vertices)
     }
 
     // Allocate space for buffer on device
-    VkDeviceSize _buffer_size = sizeof(vertices[0]) * _vertex_count;
+    VkDeviceSize buffer_size = sizeof(vertices[0]) * _vertex_count;
+    VkBuffer staging_buffer;
+    VkDeviceMemory staging_buffer_memory;
     _device.create_buffer(
-        _buffer_size,
-        VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
+        buffer_size,
+        VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
         VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
+        staging_buffer,
+        staging_buffer_memory);
+
+    // Upload vertices data to device buffer
+    void* data;
+    vkMapMemory(_device.device(), staging_buffer_memory, 0, buffer_size, 0, &data);
+    memcpy(data, vertices.data(), static_cast<size_t>(buffer_size));
+    vkUnmapMemory(_device.device(), staging_buffer_memory);
+
+    _device.create_buffer(
+        buffer_size,
+        VK_BUFFER_USAGE_VERTEX_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT,
+        VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
         _vertex_buffer,
         _vertex_buffer_memory);
 
-    // Upload vertices data to device buffer
-    void *data;
-    vkMapMemory(_device.device(), _vertex_buffer_memory, 0, _buffer_size, 0, &data);
-    std::memcpy(data, vertices.data(), static_cast<size_t>(_buffer_size));
-    vkUnmapMemory(_device.device(), _vertex_buffer_memory);
+    _device.copy_buffer(staging_buffer, _vertex_buffer, buffer_size);
+
+    vkDestroyBuffer(_device.device(), staging_buffer, nullptr);
+    vkFreeMemory(_device.device(), staging_buffer_memory, nullptr);
 }
 
 
@@ -247,19 +261,33 @@ void Model::create_index_buffers(const std::vector<uint32_t>& indices)
     }
 
     // Allocate space for buffer on device
-    VkDeviceSize _buffer_size = sizeof(indices[0]) * _index_count;
+    VkDeviceSize buffer_size = sizeof(indices[0]) * _index_count;
+    VkBuffer staging_buffer;
+    VkDeviceMemory staging_buffer_memory;
     _device.create_buffer(
-        _buffer_size,
-        VK_BUFFER_USAGE_INDEX_BUFFER_BIT,
+        buffer_size,
+        VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
         VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
+        staging_buffer,
+        staging_buffer_memory);
+
+    // Upload indices data to device buffer
+    void *data;
+    vkMapMemory(_device.device(), staging_buffer_memory, 0, buffer_size, 0, &data);
+    std::memcpy(data, indices.data(), static_cast<size_t>(buffer_size));
+    vkUnmapMemory(_device.device(), staging_buffer_memory);
+
+    _device.create_buffer(
+        buffer_size,
+        VK_BUFFER_USAGE_INDEX_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT,
+        VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT,
         _index_buffer,
         _index_buffer_memory);
 
-    // Upload vertices data to device buffer
-    void *data;
-    vkMapMemory(_device.device(), _index_buffer_memory, 0, _buffer_size, 0, &data);
-    std::memcpy(data, indices.data(), static_cast<size_t>(_buffer_size));
-    vkUnmapMemory(_device.device(), _index_buffer_memory);
+    _device.copy_buffer(staging_buffer, _index_buffer, buffer_size);
+
+    vkDestroyBuffer(_device.device(), staging_buffer, nullptr);
+    vkFreeMemory(_device.device(), staging_buffer_memory, nullptr);
 }
 
 } // namespace kzn
