@@ -29,8 +29,17 @@ public:
         glm::vec3 position;
         glm::vec3 normal;
         glm::vec3 color;
+        glm::vec2 uv;
 
         static VertexInputDescription get_vertex_description();
+
+        bool operator==(const Vertex& other) const
+        {
+            return position == other.position &&
+                normal == other.position &&
+                color == other.color &&
+                uv == other.uv;
+        }
     };
 
 private:
@@ -52,7 +61,7 @@ public:
         const std::vector<uint32_t>& indices = std::vector<uint32_t>());
     ~Model();
 
-    static Model&& load_from_file(Device& device, const std::string& file_path);
+    static Model* load_from_file(Device& device, const std::string& file_path);
 
     void bind(VkCommandBuffer command_buffer);
     void draw(VkCommandBuffer command_buffer);
@@ -62,7 +71,7 @@ private:
     void create_vertex_buffers(const std::vector<Vertex>& vertices);
     void create_index_buffers(const std::vector<uint32_t>& indices);
 
-    constexpr bool has_index_buffer()
+    constexpr bool has_index_buffer() const
     {
         return _index_count > 0;
     }

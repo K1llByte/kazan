@@ -7,6 +7,9 @@
 
 #include <iostream>
 
+
+#include "utils.hpp"
+
 int main()
 {
     kzn::TestApp app;

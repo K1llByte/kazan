@@ -64,6 +64,7 @@ void TestApp::run()
 
         float aspect = _renderer.aspect_ratio();
         float dt = _renderer.delta_time();
+        // std::cout << "fps: " << ( 1 / dt ) << '\n';
         // camera.set_orthographic(-aspect, aspect, -1, 1, -1, 1);
         camera.set_prespective(glm::radians(50.f), aspect, 0.1f, 100.0f);
 
@@ -117,55 +118,56 @@ void TestApp::load_game_objects()
         {{ 1.f, 0.f,  1.f}, {0.0f, 0.0f, 0.0f}, {.2f, .2f, .2f}},
     };
 
-    std::vector<Model::Vertex> vertices{
-      // left face (white)
-      {{-.5f, -.5f, -.5f}, {0.0f, 0.0f, 0.0f}, {.9f, .9f, .9f}},
-      {{-.5f,  .5f,  .5f}, {0.0f, 0.0f, 0.0f}, {.9f, .9f, .9f}},
-      {{-.5f, -.5f,  .5f}, {0.0f, 0.0f, 0.0f}, {.9f, .9f, .9f}},
-      {{-.5f, -.5f, -.5f}, {0.0f, 0.0f, 0.0f}, {.9f, .9f, .9f}},
-      {{-.5f,  .5f, -.5f}, {0.0f, 0.0f, 0.0f}, {.9f, .9f, .9f}},
-      {{-.5f,  .5f,  .5f}, {0.0f, 0.0f, 0.0f}, {.9f, .9f, .9f}},
+//     std::vector<Model::Vertex> vertices{
+//       // left face (white)
+//       {{-.5f, -.5f, -.5f}, {0.0f, 0.0f, 0.0f}, {.9f, .9f, .9f}},
+//       {{-.5f,  .5f,  .5f}, {0.0f, 0.0f, 0.0f}, {.9f, .9f, .9f}},
+//       {{-.5f, -.5f,  .5f}, {0.0f, 0.0f, 0.0f}, {.9f, .9f, .9f}},
+//       {{-.5f, -.5f, -.5f}, {0.0f, 0.0f, 0.0f}, {.9f, .9f, .9f}},
+//       {{-.5f,  .5f, -.5f}, {0.0f, 0.0f, 0.0f}, {.9f, .9f, .9f}},
+//       {{-.5f,  .5f,  .5f}, {0.0f, 0.0f, 0.0f}, {.9f, .9f, .9f}},
  
-      // right face (yellow)
-      {{.5f, -.5f, -.5f}, {0.0f, 0.0f, 0.0f}, {.8f, .8f, .1f}},
-      {{.5f, -.5f,  .5f}, {0.0f, 0.0f, 0.0f}, {.8f, .8f, .1f}},
-      {{.5f,  .5f,  .5f}, {0.0f, 0.0f, 0.0f}, {.8f, .8f, .1f}},
-      {{.5f, -.5f, -.5f}, {0.0f, 0.0f, 0.0f}, {.8f, .8f, .1f}},
-      {{.5f,  .5f,  .5f}, {0.0f, 0.0f, 0.0f}, {.8f, .8f, .1f}},
-      {{.5f,  .5f, -.5f}, {0.0f, 0.0f, 0.0f}, {.8f, .8f, .1f}},
+//       // right face (yellow)
+//       {{.5f, -.5f, -.5f}, {0.0f, 0.0f, 0.0f}, {.8f, .8f, .1f}},
+//       {{.5f, -.5f,  .5f}, {0.0f, 0.0f, 0.0f}, {.8f, .8f, .1f}},
+//       {{.5f,  .5f,  .5f}, {0.0f, 0.0f, 0.0f}, {.8f, .8f, .1f}},
+//       {{.5f, -.5f, -.5f}, {0.0f, 0.0f, 0.0f}, {.8f, .8f, .1f}},
+//       {{.5f,  .5f,  .5f}, {0.0f, 0.0f, 0.0f}, {.8f, .8f, .1f}},
+//       {{.5f,  .5f, -.5f}, {0.0f, 0.0f, 0.0f}, {.8f, .8f, .1f}},
  
-      // top face (orange, remember y axis points down)
-      {{-.5f, -.5f, -.5f}, {0.0f, 0.0f, 0.0f}, {.9f, .6f, .1f}},
-      {{-.5f, -.5f,  .5f}, {0.0f, 0.0f, 0.0f}, {.9f, .6f, .1f}},
-      {{ .5f, -.5f,  .5f}, {0.0f, 0.0f, 0.0f}, {.9f, .6f, .1f}},
-      {{-.5f, -.5f, -.5f}, {0.0f, 0.0f, 0.0f}, {.9f, .6f, .1f}},
-      {{ .5f, -.5f,  .5f}, {0.0f, 0.0f, 0.0f}, {.9f, .6f, .1f}},
-      {{ .5f, -.5f, -.5f}, {0.0f, 0.0f, 0.0f}, {.9f, .6f, .1f}},
+//       // top face (orange, remember y axis points down)
+//       {{-.5f, -.5f, -.5f}, {0.0f, 0.0f, 0.0f}, {.9f, .6f, .1f}},
+//       {{-.5f, -.5f,  .5f}, {0.0f, 0.0f, 0.0f}, {.9f, .6f, .1f}},
+//       {{ .5f, -.5f,  .5f}, {0.0f, 0.0f, 0.0f}, {.9f, .6f, .1f}},
+//       {{-.5f, -.5f, -.5f}, {0.0f, 0.0f, 0.0f}, {.9f, .6f, .1f}},
+//       {{ .5f, -.5f,  .5f}, {0.0f, 0.0f, 0.0f}, {.9f, .6f, .1f}},
+//       {{ .5f, -.5f, -.5f}, {0.0f, 0.0f, 0.0f}, {.9f, .6f, .1f}},
  
-      // bottom face (red)
-      {{-.5f, .5f, -.5f}, {0.0f, 0.0f, 0.0f}, {.8f, .1f, .1f}},
-      {{ .5f, .5f,  .5f}, {0.0f, 0.0f, 0.0f}, {.8f, .1f, .1f}},
-      {{-.5f, .5f,  .5f}, {0.0f, 0.0f, 0.0f}, {.8f, .1f, .1f}},
-      {{-.5f, .5f, -.5f}, {0.0f, 0.0f, 0.0f}, {.8f, .1f, .1f}},
-      {{ .5f, .5f, -.5f}, {0.0f, 0.0f, 0.0f}, {.8f, .1f, .1f}},
-      {{ .5f, .5f,  .5f}, {0.0f, 0.0f, 0.0f}, {.8f, .1f, .1f}},
+//       // bottom face (red)
+//       {{-.5f, .5f, -.5f}, {0.0f, 0.0f, 0.0f}, {.8f, .1f, .1f}},
+//       {{ .5f, .5f,  .5f}, {0.0f, 0.0f, 0.0f}, {.8f, .1f, .1f}},
+//       {{-.5f, .5f,  .5f}, {0.0f, 0.0f, 0.0f}, {.8f, .1f, .1f}},
+//       {{-.5f, .5f, -.5f}, {0.0f, 0.0f, 0.0f}, {.8f, .1f, .1f}},
+//       {{ .5f, .5f, -.5f}, {0.0f, 0.0f, 0.0f}, {.8f, .1f, .1f}},
+//       {{ .5f, .5f,  .5f}, {0.0f, 0.0f, 0.0f}, {.8f, .1f, .1f}},
  
-      // nose face (blue)
-      {{-.5f, -.5f, 0.5f}, {0.0f, 0.0f, 0.0f}, {.1f, .1f, .8f}},
-      {{-.5f,  .5f, 0.5f}, {0.0f, 0.0f, 0.0f}, {.1f, .1f, .8f}},
-      {{ .5f,  .5f, 0.5f}, {0.0f, 0.0f, 0.0f}, {.1f, .1f, .8f}},
-      {{-.5f, -.5f, 0.5f}, {0.0f, 0.0f, 0.0f}, {.1f, .1f, .8f}},
-      {{ .5f,  .5f, 0.5f}, {0.0f, 0.0f, 0.0f}, {.1f, .1f, .8f}},
-      {{ .5f, -.5f, 0.5f}, {0.0f, 0.0f, 0.0f}, {.1f, .1f, .8f}},
+//       // nose face (blue)
+//       {{-.5f, -.5f, 0.5f}, {0.0f, 0.0f, 0.0f}, {.1f, .1f, .8f}},
+//       {{-.5f,  .5f, 0.5f}, {0.0f, 0.0f, 0.0f}, {.1f, .1f, .8f}},
+//       {{ .5f,  .5f, 0.5f}, {0.0f, 0.0f, 0.0f}, {.1f, .1f, .8f}},
+//       {{-.5f, -.5f, 0.5f}, {0.0f, 0.0f, 0.0f}, {.1f, .1f, .8f}},
+//       {{ .5f,  .5f, 0.5f}, {0.0f, 0.0f, 0.0f}, {.1f, .1f, .8f}},
+//       {{ .5f, -.5f, 0.5f}, {0.0f, 0.0f, 0.0f}, {.1f, .1f, .8f}},
  
-      // tail face (green)
-      {{-.5f, -.5f, -0.5f}, {0.0f, 0.0f, 0.0f}, {.1f, .8f, .1f}},
-      {{ .5f,  .5f, -0.5f}, {0.0f, 0.0f, 0.0f}, {.1f, .8f, .1f}},
-      {{-.5f,  .5f, -0.5f}, {0.0f, 0.0f, 0.0f}, {.1f, .8f, .1f}},
-      {{-.5f, -.5f, -0.5f}, {0.0f, 0.0f, 0.0f}, {.1f, .8f, .1f}},
-      {{ .5f, -.5f, -0.5f}, {0.0f, 0.0f, 0.0f}, {.1f, .8f, .1f}},
-      {{ .5f,  .5f, -0.5f}, {0.0f, 0.0f, 0.0f}, {.1f, .8f, .1f}},
-  };
+//       // tail face (green)
+//       {{-.5f, -.5f, -0.5f}, {0.0f, 0.0f, 0.0f}, {.1f, .8f, .1f}},
+//       {{ .5f,  .5f, -0.5f}, {0.0f, 0.0f, 0.0f}, {.1f, .8f, .1f}},
+//       {{-.5f,  .5f, -0.5f}, {0.0f, 0.0f, 0.0f}, {.1f, .8f, .1f}},
+//       {{-.5f, -.5f, -0.5f}, {0.0f, 0.0f, 0.0f}, {.1f, .8f, .1f}},
+//       {{ .5f, -.5f, -0.5f}, {0.0f, 0.0f, 0.0f}, {.1f, .8f, .1f}},
+//       {{ .5f,  .5f, -0.5f}, {0.0f, 0.0f, 0.0f}, {.1f, .8f, .1f}},
+//   };
+
 
     auto floor_obj = GameObject::create_game_object();
     floor_obj.model = new Model(_device, floor);
@@ -173,12 +175,12 @@ void TestApp::load_game_objects()
     _game_objects.push_back(std::move(floor_obj));
 
 
-    auto triangle = GameObject::create_game_object();
-    triangle.model = new Model(_device, vertices);
-    triangle.transform.translation = { 0.f, 0.f, 3.5f};
-    triangle.transform.scale = { 0.5f, 0.5f, 0.5f};
+    auto cube_obj = GameObject::create_game_object();
+    cube_obj.model = Model::load_from_file(_device, "models/colored_cube.obj");
+    cube_obj.transform.translation = { 0.f, 0.f, 3.5f};
+    cube_obj.transform.scale = { 0.5f, 0.5f, 0.5f};
 
-    _game_objects.push_back(std::move(triangle));
+    _game_objects.push_back(std::move(cube_obj));
 }
 
 }

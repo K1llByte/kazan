@@ -1,13 +1,36 @@
 #include "model.hpp"
 
+#include "utils.hpp"
+
 #include <stdexcept>
 #include <cstring>
+#include <unordered_map>
 
 #define TINYOBJLOADER_IMPLEMENTATION
 #include "tiny_obj_loader.h"
+#define GLM_ENABLE_EXPERIMENTAL
+#include <glm/gtx/hash.hpp>
 
 // Debug
 #include <iostream>
+
+namespace std 
+{
+    // Template specialization of Vertex for std::hash
+    template<>
+    struct hash<kzn::Model::Vertex>
+    {
+        size_t operator()(const kzn::Model::Vertex& vtx) const
+        {
+            return kzn::utils::multiple_hash(
+                0, 
+                vtx.position,
+                vtx.normal,
+                vtx.uv);
+        }
+    };
+
+} // namespace std
 
 namespace kzn
 {
@@ -74,7 +97,7 @@ Model::~Model()
 }
 
 
-Model&& Model::load_from_file(Device& device, const std::string& file_path)
+Model* Model::load_from_file(Device& device, const std::string& file_path)
 {
     std::vector<Vertex> vertices{};
     std::vector<uint32_t> indices{};
@@ -89,6 +112,9 @@ Model&& Model::load_from_file(Device& device, const std::string& file_path)
         throw std::runtime_error(warn + err);
     }
 
+    const bool compute_indices = true;
+    std::unordered_map<Vertex, uint32_t> unique_vertices{};
+
     for(const auto& shape : shapes)
     {
         for(const auto& index : shape.mesh.indices)
@@ -101,6 +127,21 @@ Model&& Model::load_from_file(Device& device, const std::string& file_path)
                     attrib.vertices[3 * index.vertex_index + 1], // y
                     attrib.vertices[3 * index.vertex_index + 2], // z
                 };
+
+                size_t color_index = 3 * index.vertex_index + 2;
+                if(color_index < attrib.colors.size())
+                {
+                    vtx.color = {
+                        attrib.colors[color_index - 2], // r
+                        attrib.colors[color_index - 1], // g
+                        attrib.colors[color_index]      // b
+                    };
+                }
+                else
+                {
+                    // Default color
+                    vtx.color = { 6.f, 6.f, 6.f };
+                }
             }
 
             if(index.normal_index >= 0)
@@ -112,12 +153,34 @@ Model&& Model::load_from_file(Device& device, const std::string& file_path)
                 };
             }
 
-            // TODO: uv coordinates
-            vertices.push_back(std::move(vtx));
+            if(index.texcoord_index >= 0)
+            {
+                vtx.uv = {
+                    attrib.texcoords[3 * index.texcoord_index],     // u
+                    attrib.texcoords[3 * index.texcoord_index + 1], // v
+                };
+            }
+
+            if(compute_indices)
+            {
+                if(unique_vertices.count(vtx) == 0)
+                {
+                    unique_vertices[vtx] = unique_vertices.size();
+                    vertices.push_back(vtx);
+                }
+                indices.push_back(unique_vertices[vtx]);
+            }
+            else
+            {
+                vertices.push_back(std::move(vtx));
+            }
         }
     }
 
-    return std::move(Model(device, vertices, indices));
+    std::cout << "vertex count: " << vertices.size() << "\n";
+    std::cout << "indices count: " << indices.size() << "\n";
+
+    return new Model(device, vertices, indices);
 }
 
 
@@ -197,4 +260,4 @@ void Model::create_index_buffers(const std::vector<uint32_t>& indices)
     vkUnmapMemory(_device.device(), _index_buffer_memory);
 }
 
-}
+} // namespace kzn

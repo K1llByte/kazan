@@ -6,6 +6,7 @@
 
 #include <array>
 #include <stdexcept>
+#include <functional>
 
 // Debug
 #include <iostream>
@@ -20,6 +21,22 @@ namespace kzn
 
 namespace utils
 {
+
+template<typename T>
+constexpr size_t multiple_hash(size_t seed, const T& head)
+{
+    const size_t this_seed = std::hash<T>{}(head) + 0x9e3779b9 + (seed << 6) + (seed >> 2);
+    return seed ^ this_seed;
+}
+
+template<typename T, typename... Args>
+constexpr size_t multiple_hash(size_t seed, const T& head, const Args&... tail)
+{
+    const size_t this_seed = std::hash<T>{}(head) + 0x9e3779b9 + (seed << 6) + (seed >> 2);
+    const size_t tail_seed = multiple_hash(this_seed, tail...);
+    return seed ^ tail_seed;
+}
+
 
 template<typename T, size_t N>
 class Queue
