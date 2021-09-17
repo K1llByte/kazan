@@ -176,7 +176,7 @@ void TestApp::load_game_objects()
 
 
     auto cube_obj = GameObject::create_game_object();
-    cube_obj.model = Model::load_from_file(_device, "models/colored_cube.obj");
+    cube_obj.model = Model::load_from_file(_device, "models/monkey.obj");
     cube_obj.transform.translation = { 0.f, 0.f, 3.5f};
     cube_obj.transform.scale = { 0.5f, 0.5f, 0.5f};
 

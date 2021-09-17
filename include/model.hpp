@@ -9,6 +9,9 @@
 #define GLM_FORCE_DEPTH_ZERO_TO_ONE
 #include <glm/glm.hpp>
 
+// Debug
+#include <iostream>
+
 namespace kzn
 {
 
@@ -36,7 +39,7 @@ public:
         bool operator==(const Vertex& other) const
         {
             return position == other.position &&
-                normal == other.position &&
+                normal == other.normal &&
                 color == other.color &&
                 uv == other.uv;
         }

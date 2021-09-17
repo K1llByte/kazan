@@ -25,6 +25,7 @@ namespace std
             return kzn::utils::multiple_hash(
                 0, 
                 vtx.position,
+                vtx.color,
                 vtx.normal,
                 vtx.uv);
         }
@@ -165,7 +166,7 @@ Model* Model::load_from_file(Device& device, const std::string& file_path)
             {
                 if(unique_vertices.count(vtx) == 0)
                 {
-                    unique_vertices[vtx] = unique_vertices.size();
+                    unique_vertices[vtx] = static_cast<uint32_t>(unique_vertices.size());
                     vertices.push_back(vtx);
                 }
                 indices.push_back(unique_vertices[vtx]);
@@ -179,6 +180,7 @@ Model* Model::load_from_file(Device& device, const std::string& file_path)
 
     std::cout << "vertex count: " << vertices.size() << "\n";
     std::cout << "indices count: " << indices.size() << "\n";
+    std::cout << "total: " << vertices.size() * sizeof(Vertex) + indices.size() * sizeof(uint32_t) << " bytes\n";
 
     return new Model(device, vertices, indices);
 }
