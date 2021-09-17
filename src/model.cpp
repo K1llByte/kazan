@@ -3,6 +3,9 @@
 #include <stdexcept>
 #include <cstring>
 
+#define TINYOBJLOADER_IMPLEMENTATION
+#include "tiny_obj_loader.h"
+
 // Debug
 #include <iostream>
 
@@ -68,6 +71,53 @@ Model::~Model()
         vkDestroyBuffer(_device.device(), _index_buffer, nullptr);
         vkFreeMemory(_device.device(), _index_buffer_memory, nullptr);
     }
+}
+
+
+Model&& Model::load_from_file(Device& device, const std::string& file_path)
+{
+    std::vector<Vertex> vertices{};
+    std::vector<uint32_t> indices{};
+
+    tinyobj::attrib_t attrib;
+    std::vector<tinyobj::shape_t> shapes;
+    std::vector<tinyobj::material_t> materials;
+    std::string warn, err;
+
+    if(!tinyobj::LoadObj(&attrib, &shapes, &materials, &warn, &err, file_path.c_str()))
+    {
+        throw std::runtime_error(warn + err);
+    }
+
+    for(const auto& shape : shapes)
+    {
+        for(const auto& index : shape.mesh.indices)
+        {
+            Vertex vtx{};
+            if(index.vertex_index >= 0)
+            {
+                vtx.position = {
+                    attrib.vertices[3 * index.vertex_index],     // x
+                    attrib.vertices[3 * index.vertex_index + 1], // y
+                    attrib.vertices[3 * index.vertex_index + 2], // z
+                };
+            }
+
+            if(index.normal_index >= 0)
+            {
+                vtx.normal = {
+                    attrib.normals[3 * index.normal_index],     // x
+                    attrib.normals[3 * index.normal_index + 1], // y
+                    attrib.normals[3 * index.normal_index + 2], // z
+                };
+            }
+
+            // TODO: uv coordinates
+            vertices.push_back(std::move(vtx));
+        }
+    }
+
+    return std::move(Model(device, vertices, indices));
 }
 
 

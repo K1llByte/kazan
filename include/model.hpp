@@ -3,6 +3,8 @@
 
 #include "device.hpp"
 
+#include "tiny_obj_loader.h"
+
 #define GLM_FORCE_RADIANS
 #define GLM_FORCE_DEPTH_ZERO_TO_ONE
 #include <glm/glm.hpp>
@@ -49,6 +51,8 @@ public:
         const std::vector<Vertex>& vertices,
         const std::vector<uint32_t>& indices = std::vector<uint32_t>());
     ~Model();
+
+    static Model&& load_from_file(Device& device, const std::string& file_path);
 
     void bind(VkCommandBuffer command_buffer);
     void draw(VkCommandBuffer command_buffer);
