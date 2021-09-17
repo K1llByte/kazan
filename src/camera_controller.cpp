@@ -38,8 +38,8 @@ glm::vec3 to_cartesian(glm::vec3 coords)
 
 void CameraController::update(float dt)
 {
-    constexpr float move_speed = 1.0f;
-    constexpr float look_speed = 1.0f;
+    constexpr float move_speed = 1.5f;
+    constexpr float look_speed = 1.5f;
     glm::vec3 pos = _camera.position();
     glm::vec3 dir = _camera.direction();
     glm::vec3 up{0.f, -1.f, 0.f}; //= _camera.up();
