@@ -22,6 +22,8 @@ Window::Window(const std::string& name, int win_width, int win_height)
     _window = glfwCreateWindow(width, height, name.c_str(), nullptr, nullptr);
 
     glfwSetWindowUserPointer(_window, this);
+
+    glfwSetInputMode(_window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
     
     // On framebuffer resize callback
     glfwSetFramebufferSizeCallback(_window, framebuffer_resize_callback);
@@ -108,6 +110,21 @@ VkExtent2D Window::get_extent() const
         static_cast<uint32_t>(height)
     };
 }
+
+
+std::array<double,2> Window::get_cursor_position() const
+{
+    double x, y;
+    glfwGetCursorPos(_window, &x, &y);
+    return { x, y };
+}
+
+
+void Window::set_cursor_position(double x, double y)
+{
+    glfwSetCursorPos(_window, x, y);
+}
+
 
 
 VkSurfaceKHR Window::surface() const

@@ -41,6 +41,7 @@ public:
 
     static void framebuffer_resize_callback(GLFWwindow *window, int width, int height);
 
+
     bool should_close();
     bool was_resized() const;
     void reset_resized_flag();
@@ -49,6 +50,9 @@ public:
 
     // Input
     int get_key(int key_code);
+    std::array<double,2> get_cursor_position() const;
+
+    void set_cursor_position(double x, double y);
 
 // private:
 

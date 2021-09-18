@@ -38,6 +38,17 @@ glm::vec3 to_cartesian(glm::vec3 coords)
 
 void CameraController::update(float dt)
 {
+    // auto [x, y] = _window.get_cursor_position();
+    // std::cout << "( " << x << " , " << y << " )\n";
+    const VkExtent2D extent = _window.get_extent();
+    const auto [w, h] = extent;
+    const VkExtent2D half_extent { w / 2, h / 2};
+    const auto [hw, hh] = half_extent;
+
+    
+
+    _window.set_cursor_position(hw, hh);
+
     constexpr float move_speed = 1.5f;
     constexpr float look_speed = 1.5f;
     glm::vec3 pos = _camera.position();
