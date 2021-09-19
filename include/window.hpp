@@ -47,6 +47,7 @@ public:
     void reset_resized_flag();
     VkExtent2D get_extent() const;
     VkSurfaceKHR surface() const;
+    GLFWwindow* window();
 
     // Input
     int get_key(int key_code);

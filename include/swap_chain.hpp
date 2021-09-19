@@ -55,6 +55,7 @@ public:
     VkFramebuffer framebuffer(uint32_t image_index) const;
     VkExtent2D swap_chain_extent() const;
     float extent_aspect_ratio() const;
+    size_t image_count() const;
 
     // VkFormat find_depth_format();
 

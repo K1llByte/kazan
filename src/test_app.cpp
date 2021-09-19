@@ -37,6 +37,8 @@ TestApp::TestApp()
     // _renderer = std::make_unique<Renderer>(_window, _device);
     _renderer = Renderer(&_window, &_device);
 
+    _interface = Interface(_window, _instance, _device, _renderer);
+
     // After engine initialization
     load_game_objects();
 }
@@ -61,6 +63,8 @@ void TestApp::run()
     while(!_window.should_close())
     {
         glfwPollEvents();
+        
+        _interface.render();
 
         float aspect = _renderer.aspect_ratio();
         float dt = _renderer.delta_time();

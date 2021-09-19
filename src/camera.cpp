@@ -23,7 +23,7 @@ void Camera::set_prespective(float fov_y, float aspect, float near, float far)
     {
         throw std::runtime_error("Invalid 'aspect'");
     }
-    // assert(glm::abs(aspect - std::numeric_limits<float>::epsilon()) > 0.0f);
+    
     const float tan_half_fovy = tan(fov_y / 2.f);
     _projection_matrix = glm::mat4{0.0f};
     _projection_matrix[0][0] = 1.f / (aspect * tan_half_fovy);

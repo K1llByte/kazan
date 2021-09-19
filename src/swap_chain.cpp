@@ -124,6 +124,12 @@ float SwapChain::extent_aspect_ratio() const
 }
 
 
+size_t SwapChain::image_count() const
+{
+    return _color_images.size();
+}
+
+
 VkResult SwapChain::acquire_next_image(uint32_t* image_index)
 {
     vkWaitForFences(

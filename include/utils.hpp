@@ -38,6 +38,12 @@ constexpr size_t multiple_hash(size_t seed, const T& head, const Args&... tail)
 }
 
 
+constexpr float radians(const float degrees)
+{
+    return degrees * M_PI / 180.f;
+}
+
+
 template<typename T, size_t N>
 class Queue
 {

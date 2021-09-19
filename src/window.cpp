@@ -133,6 +133,12 @@ VkSurfaceKHR Window::surface() const
 }
 
 
+GLFWwindow* Window::window()
+{
+    return _window;
+}
+
+
 int Window::get_key(int key_code)
 {
     return glfwGetKey(_window, key_code);
