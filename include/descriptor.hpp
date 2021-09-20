@@ -2,9 +2,7 @@
 #define DESCRIPTOR_H
 
 #include "device.hpp"
-#include "renderer.hpp"
-// #include <vulkan/vulkan.h>
-// #include <vector>
+// #include "renderer.hpp"
 
 namespace kzn
 {
@@ -12,9 +10,9 @@ namespace kzn
 template<typename T>
 class UniformBuffer
 {
-private:
+public:
 
-    friend class Renderer;
+    // friend class Renderer;
     
     Device*                     device = nullptr;
     int*                        current_index = nullptr;
@@ -39,9 +37,9 @@ private:
 
 class DescriptorSet
 {
-private:
+public:
 
-    friend class Renderer;
+    // friend class Renderer;
 
     int*                         current_index;
     std::vector<VkDescriptorSet> descriptor_sets;

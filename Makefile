@@ -84,7 +84,8 @@ renderer_directories:
 	@mkdir -p bin
 
 clean:
-	rm -rf $(BUILD_DIR) bin/*
+	rm -rf $(BUILD_DIR)/*.o bin/*
+# rm -rf $(BUILD_DIR) bin/*
 
 ########################### Tests ###########################
 
