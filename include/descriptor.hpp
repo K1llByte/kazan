@@ -2,6 +2,7 @@
 #define DESCRIPTOR_H
 
 #include "device.hpp"
+#include "renderer.hpp"
 // #include <vulkan/vulkan.h>
 // #include <vector>
 
