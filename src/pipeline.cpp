@@ -257,14 +257,15 @@ void Pipeline::create_graphics_pipeline(
     const std::string& frag_path,
     const PipelineConfig& _config)
 {
+    
     if(_config.pipeline_layout == VK_NULL_HANDLE)
     {
-        throw std::runtime_error("Cannot create graphics pipeline: no 'pipeline_layout' provided in '_config'");
+        throw std::runtime_error("Cannot create graphics pipeline: no 'pipeline_layout' provided in PipelineConfig");
     }
 
     if(_config.render_pass == VK_NULL_HANDLE)
     {
-        throw std::runtime_error("Cannot create graphics pipeline: no 'render_pass' provided in '_config'");
+        throw std::runtime_error("Cannot create graphics pipeline: no 'render_pass' provided in PipelineConfig");
     }
 
     _vert_shader_module = create_shader_module(vert_path);

@@ -26,6 +26,10 @@ SimpleRenderSystem::SimpleRenderSystem(Device& device, VkRenderPass render_pass)
 
 SimpleRenderSystem::~SimpleRenderSystem()
 {
+    if(_descriptor_set_layout != VK_NULL_HANDLE)
+    {
+        vkDestroyDescriptorSetLayout(_device.device(), _descriptor_set_layout, nullptr);
+    }
     vkDestroyPipelineLayout(_device.device(), _pipeline_layout, nullptr);
 }
 
@@ -62,17 +66,49 @@ void SimpleRenderSystem::render_game_objects(
 
 void SimpleRenderSystem::create_pipeline_layout()
 {
+    ///////////////// Push Constants //////////////////
+
     VkPushConstantRange push_constant_range{};
     push_constant_range.stageFlags = VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT;
     push_constant_range.offset = 0;
     push_constant_range.size = sizeof(PushConstantsData);
 
+    ///////////////// Uniform Buffers /////////////////
+
+    // VkDescriptorSetLayoutBinding ubo_layout_binding{};
+    // ubo_layout_binding.binding = 0;
+    // ubo_layout_binding.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+    // ubo_layout_binding.descriptorCount = 1;
+    // ubo_layout_binding.stageFlags = VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT;
+    // ubo_layout_binding.pImmutableSamplers = nullptr; // Optional
+    
+    // VkDescriptorSetLayoutCreateInfo layout_info{};
+    // layout_info.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
+    // layout_info.bindingCount = 1;
+    // layout_info.pBindings = &ubo_layout_binding;
+
+    // if (vkCreateDescriptorSetLayout(_device.device(), &layout_info, nullptr, &_descriptor_set_layout) != VK_SUCCESS)
+    // {
+    //     throw std::runtime_error("failed to create descriptor set layout!");
+    // }
+
+    ///////////////////////////////////////////////////
+
     VkPipelineLayoutCreateInfo pipeline_layout_info{};
     pipeline_layout_info.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
+    
+    // With Push Constants
     pipeline_layout_info.setLayoutCount = 0;
     pipeline_layout_info.pSetLayouts = nullptr;
     pipeline_layout_info.pushConstantRangeCount = 1;
     pipeline_layout_info.pPushConstantRanges = &push_constant_range;
+
+    // // With Uniform Buffers
+    // pipeline_layout_info.setLayoutCount = 1;
+    // pipeline_layout_info.pSetLayouts = &_descriptor_set_layout;
+    // pipeline_layout_info.pushConstantRangeCount = 0;
+    // pipeline_layout_info.pPushConstantRanges = nullptr;
+
     if(vkCreatePipelineLayout(_device.device(), &pipeline_layout_info, nullptr, &_pipeline_layout) != VK_SUCCESS)
     {
         throw std::runtime_error("failed to create pipeline layout!");

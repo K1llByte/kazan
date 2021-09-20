@@ -15,6 +15,7 @@ private:
     Device&                   _device;
     std::unique_ptr<Pipeline> _pipeline;
     VkPipelineLayout          _pipeline_layout;
+    VkDescriptorSetLayout     _descriptor_set_layout = VK_NULL_HANDLE;
 
 public:
 
