@@ -46,7 +46,7 @@ Interface::Interface(
     // Setup Dear ImGui context
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
-    // ImGuiIO &io = ImGui::GetIO();
+    ImGuiIO &io = ImGui::GetIO();
     // Setup Platform/Renderer bindings
     ImGui_ImplGlfw_InitForVulkan(window.window(), true);
 

@@ -11,6 +11,7 @@
 namespace kzn
 {
 
+// TODO: Move to utils
 glm::vec3 to_spherical(glm::vec3 coords)
 {
     const float x = coords.x;
