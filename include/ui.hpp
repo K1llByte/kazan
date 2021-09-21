@@ -14,6 +14,7 @@ class Interface
 private:
 
     bool             initialized = false;
+    bool             render_ui = false;
     VkDevice         _device = VK_NULL_HANDLE;
     VkDescriptorPool imgui_pool;
 
@@ -28,6 +29,8 @@ public:
     // ~Interface();
 
     void cleanup();
+
+    void toggle();
 
     void render();
     void draw(VkCommandBuffer cmd_buffer);

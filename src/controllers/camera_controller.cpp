@@ -1,4 +1,4 @@
-#include "camera_controller.hpp"
+#include "controllers/camera_controller.hpp"
 
 // #include "utils.hpp"
 #include <glm/gtc/constants.hpp>
@@ -47,6 +47,7 @@ void CameraController::update(float dt)
     glm::vec3 up{0.f, -1.f, 0.f}; //= _camera.up();
     glm::vec3 right = glm::normalize(glm::cross(dir, up));
 
+    // Positional movement
     if(_window.get_key(key_maps.move_front) == GLFW_PRESS)
         pos += move_speed * dt * dir;
     if(_window.get_key(key_maps.move_back) == GLFW_PRESS)
@@ -62,6 +63,7 @@ void CameraController::update(float dt)
 
     glm::vec2 rotation{0.f};
 
+    // Direction rotation: Keys
     if(_window.get_key(key_maps.look_right) == GLFW_PRESS)
         rotation.y += look_speed * dt;
     if(_window.get_key(key_maps.look_left) == GLFW_PRESS)
@@ -71,27 +73,43 @@ void CameraController::update(float dt)
     if(_window.get_key(key_maps.look_down) == GLFW_PRESS)
         rotation.x -= look_speed * dt;
 
-
-    auto [x, y] = _window.get_cursor_position();
+    // Aux data
     const VkExtent2D extent = _window.get_extent();
     const auto [w, h] = extent;
     const VkExtent2D half_extent { w / 2, h / 2};
     const auto [hw, hh] = half_extent;
 
-    const float fovy = glm::radians(50.f);
-    const float aspect = w / h;
-    rotation.y -= ((hw - x) / hw) * fovy * sensibility;
-    rotation.x -= ((hh - y) / hh) * fovy * aspect * sensibility;
 
-    _window.set_cursor_position(hw, hh);
+    // Disable mouse (unique press)
+    static bool use_mouse = true;
+    static bool disable_mouse_press = false;
+    if(_window.get_key(key_maps.disable_mouse) == GLFW_PRESS)
+    {
+        disable_mouse_press = true;
+    }
+    if(disable_mouse_press && _window.get_key(key_maps.disable_mouse) == GLFW_RELEASE)
+    {
+        use_mouse = !use_mouse;
+        disable_mouse_press = !disable_mouse_press;
+        _window.set_cursor_position(hw, hh);
+    }
     
+    // Direction rotation: Mouse
+    if(use_mouse)
+    {
+        auto [x, y] = _window.get_cursor_position();
+        const float fovy = glm::radians(50.f);
+        const float aspect = w / h;
+        rotation.y -= ((hw - x) / hw) * fovy * sensibility;
+        rotation.x -= ((hh - y) / hh) * fovy * aspect * sensibility;
+
+        _window.set_cursor_position(hw, hh);
+    }
 
     const float clamp_error = 0.000001f;
     dir = to_spherical(dir);
     dir.y = std::clamp<float>(dir.y + rotation.y, -glm::pi<float>(), glm::pi<float>());
     dir.z = std::clamp<float>(dir.z + rotation.x, 0, glm::pi<float>() - clamp_error);
-    // dir.y += rotation.y;
-    // dir.z += rotation.x;
     dir = to_cartesian(dir);
 
     // right = to_spherical(right);

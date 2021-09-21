@@ -24,6 +24,8 @@ public:
         int look_down  = GLFW_KEY_DOWN;
         int look_right = GLFW_KEY_RIGHT;
         int look_left  = GLFW_KEY_LEFT;
+
+        int disable_mouse = GLFW_KEY_ESCAPE;
     };
 
 public:
@@ -32,8 +34,8 @@ public:
 
 private:
 
-    Camera& _camera;
-    Window& _window;
+    Camera&    _camera;
+    Window&    _window;
 
 public:
 

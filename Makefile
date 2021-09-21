@@ -80,7 +80,7 @@ endif
 
 renderer_directories:
 	@mkdir -p $(LIB_BUILD_DIRS)
-	@mkdir -p $(BUILD_DIR)
+	@mkdir -p $(BUILD_DIR)/controllers
 	@mkdir -p bin
 
 clean:

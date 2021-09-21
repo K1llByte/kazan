@@ -2,7 +2,8 @@
 
 #include "simple_render_system.hpp"
 #include "camera.hpp"
-#include "camera_controller.hpp"
+#include "controllers/camera_controller.hpp"
+#include "controllers/ui_controller.hpp"
 
 #include <chrono>
 
@@ -13,7 +14,7 @@ namespace kzn
 {
 
 TestApp::TestApp()
-    : _window("Hello Kazan", WIDTH, HEIGHT),
+    : _window("Kazan Engine", WIDTH, HEIGHT),
     _instance()
 {
     _instance.enable_extensions(_window.required_extensions())
@@ -53,24 +54,30 @@ void TestApp::run()
     SimpleRenderSystem render_system{_device, _renderer};
     Camera camera{};
     camera.lookat_direction(glm::vec3(0.f), glm::vec3(0.0f, 0.f, 1.f));
-    CameraController cam_controller(_window, camera);
     _interface = Interface(_window, _instance, _device, _renderer);
+    CameraController cam_controller(_window, camera);
+    UIController ui_controller(_window, _interface);
 
     _renderer.delta_time();
+    float aspect = 0;
 
     while(!_window.should_close())
     {
         glfwPollEvents();
-        
-        
 
-        float aspect = _renderer.aspect_ratio();
+        float new_aspect = _renderer.aspect_ratio();
+        if(aspect != new_aspect)
+        {
+            aspect = new_aspect;
+            camera.set_prespective(glm::radians(50.f), aspect, 0.1f, 100.0f);
+        }
+
         float dt = _renderer.delta_time();
         // std::cout << "fps: " << ( 1 / dt ) << '\n';
         // camera.set_orthographic(-aspect, aspect, -1, 1, -1, 1);
-        camera.set_prespective(glm::radians(50.f), aspect, 0.1f, 100.0f);
 
         cam_controller.update(dt);
+        ui_controller.update(dt);
         _interface.render();
 
         if(auto command_buffer = _renderer.begin_frame())

@@ -62,7 +62,6 @@ Interface::Interface(
     init_info.ImageCount = img_count;
     init_info.MSAASamples = VK_SAMPLE_COUNT_1_BIT;
 
-    std::cout << "ImGui_ImplVulkan_Init called\n";
     ImGui_ImplVulkan_Init(&init_info, renderer._swap_chain->render_pass());
 
     auto cmd_buffer = device.begin_single_time_commands();
@@ -83,7 +82,6 @@ void Interface::cleanup()
 {
     if(initialized)
     {
-        std::cout << "Destroyed things\n";
         vkDestroyDescriptorPool(_device, imgui_pool, nullptr);
 		ImGui_ImplVulkan_Shutdown();
 
@@ -93,13 +91,18 @@ void Interface::cleanup()
     }
 }
 
-    
+
+void Interface::toggle()
+{
+    render_ui = !render_ui;
+}
+
+
 void Interface::render()
 {
-    if(initialized)
+    if(initialized && render_ui)
     {
         // Render your GUI
-        std::cout << "ImGui_ImplVulkan_NewFrame\n";
         ImGui_ImplVulkan_NewFrame();
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
@@ -116,7 +119,10 @@ void Interface::render()
 
 void Interface::draw(VkCommandBuffer cmd_buffer)
 {
-    ImGui_ImplVulkan_RenderDrawData(ImGui::GetDrawData(), cmd_buffer);
+    if(render_ui)
+    {
+        ImGui_ImplVulkan_RenderDrawData(ImGui::GetDrawData(), cmd_buffer);
+    }
 }
 
 }
