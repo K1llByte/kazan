@@ -52,7 +52,7 @@ TestApp::~TestApp()
 
 void TestApp::run()
 {
-    SimpleRenderSystem render_system{_device, _renderer, _renderer.render_pass()};
+    SimpleRenderSystem render_system{_device, _renderer};
     Camera camera{};
     camera.lookat_direction(glm::vec3(0.f), glm::vec3(0.0f, 0.f, 1.f));
     CameraController cam_controller(_window, camera);

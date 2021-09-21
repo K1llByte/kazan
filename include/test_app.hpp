@@ -5,7 +5,7 @@
 #include "device.hpp"
 #include "renderer.hpp"
 #include "game_object.hpp"
-#include "ui.hpp"
+// #include "ui.hpp"
 
 namespace kzn
 {
@@ -23,7 +23,7 @@ private:
     Instance _instance;
     Device   _device;
     Renderer _renderer;
-    Interface _interface;
+    // Interface _interface;
     // std::unique_ptr<Renderer> _renderer = nullptr;
     std::vector<GameObject>   _game_objects;
 

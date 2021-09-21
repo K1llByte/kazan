@@ -32,10 +32,11 @@ private:
 
 public:
 
-    SimpleRenderSystem(Device& device, Renderer& renderer, VkRenderPass renderPass);
+    SimpleRenderSystem(Device& device, Renderer& renderer);
     ~SimpleRenderSystem();
 
-    void render_game_objects(VkCommandBuffer command_buffer,
+    void render_game_objects(
+        VkCommandBuffer command_buffer,
         std::vector<GameObject>& game_objects,
         const Camera& camera);
 

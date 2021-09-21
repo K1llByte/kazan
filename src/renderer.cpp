@@ -31,6 +31,12 @@ void Renderer::cleanup()
 {
     if(initialized())
     {
+        for(size_t i = 0; i < _uniform_buffers.size(); ++i)
+        {
+            vkDestroyBuffer(_device->device(), _uniform_buffers[i], nullptr);
+            vkFreeMemory(_device->device(), _uniform_buffers_memory[i], nullptr);
+        }
+
         // Destroy Descriptor Pool
         if(_descriptor_pool != VK_NULL_HANDLE)
         {
@@ -138,7 +144,7 @@ void Renderer::init_descriptor_pool(VkDescriptorSetLayout descriptor_set_layout)
     pool_info.pPoolSizes = &pool_size;
     pool_info.maxSets = img_count;
 
-    if (vkCreateDescriptorPool(_device->device(), &pool_info, nullptr, &_descriptor_pool) != VK_SUCCESS)
+    if(vkCreateDescriptorPool(_device->device(), &pool_info, nullptr, &_descriptor_pool) != VK_SUCCESS)
     {
         throw std::runtime_error("failed to create descriptor pool!");
     }
@@ -158,47 +164,47 @@ void Renderer::init_descriptor_pool(VkDescriptorSetLayout descriptor_set_layout)
 }
 
 
-template<typename T>
-UniformBuffer<T> Renderer::alloc_buffer(VkDescriptorSetLayoutBinding* layout_binding, VkShaderStageFlags stage)
-{
-    const size_t img_count = _swap_chain->image_count();
+// template<typename T>
+// UniformBuffer<T> Renderer::alloc_buffer(VkDescriptorSetLayoutBinding* layout_binding, VkShaderStageFlags stage)
+// {
+//     const size_t img_count = _swap_chain->image_count();
 
-    UniformBuffer<T> ub;
-    ub.device = &_device;
-    ub.buffers = std::vector(img_count);
-    ub.buffers_memory = std::vector(img_count);
-    ub.current_index = &_current_frame_index;
-    ub.binding = _descriptor_buffer_infos.size();
-    VkDeviceSize buffer_size = sizeof(T);
+//     UniformBuffer<T> ub;
+//     ub.device = &_device;
+//     ub.buffers = std::vector<VkBuffer>(img_count);
+//     ub.buffers_memory = std::vector<VkDeviceMemory>(img_count);
+//     ub.current_index = &_current_frame_index;
+//     ub.binding = _descriptor_buffer_infos.size();
+//     VkDeviceSize buffer_size = sizeof(T);
 
-    for(size_t i = 0; i < img_count; ++i)
-    {
-        _device->create_buffer(
-            buffer_size,
-            VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
-            VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
-            ub.buffers[i],
-            ub.buffers_memory[i]);
+//     for(size_t i = 0; i < img_count; ++i)
+//     {
+//         _device->create_buffer(
+//             buffer_size,
+//             VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
+//             VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
+//             ub.buffers[i],
+//             ub.buffers_memory[i]);
 
 
-        VkDescriptorBufferInfo buffer_info{};
-        buffer_info.buffer = ub.buffers[0];
-        buffer_info.offset = 0;
-        buffer_info.range = sizeof(T);
-        _descriptor_buffer_infos.push_back(buffer_info);
-    }
+//         VkDescriptorBufferInfo buffer_info{};
+//         buffer_info.buffer = ub.buffers[0];
+//         buffer_info.offset = 0;
+//         buffer_info.range = sizeof(T);
+//         _descriptor_buffer_infos.push_back(buffer_info);
+//     }
 
-    if(layout_binding != nullptr)
-    {
-        layout_binding->binding = ub.binding;
-        layout_binding->descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-        layout_binding->descriptorCount = 1;
-        layout_binding->stageFlags = stage; //VK_SHADER_STAGE_VERTEX_BIT;
-        layout_binding->pImmutableSamplers = nullptr; // Optional
-    }
+//     if(layout_binding != nullptr)
+//     {
+//         layout_binding->binding = ub.binding;
+//         layout_binding->descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+//         layout_binding->descriptorCount = 1;
+//         layout_binding->stageFlags = stage; //VK_SHADER_STAGE_VERTEX_BIT;
+//         layout_binding->pImmutableSamplers = nullptr; // Optional
+//     }
 
-    return ub;
-}
+//     return ub;
+// }
 
 
 DescriptorSet Renderer::init_descriptor_set()
@@ -220,17 +226,17 @@ DescriptorSet Renderer::init_descriptor_set()
             descriptor_writes[j].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
             descriptor_writes[j].descriptorCount = 1;
         
-            descriptor_writes[j].pBufferInfo = &_descriptor_buffer_infos[i*img_count + j];
+            descriptor_writes[j].pBufferInfo = &_descriptor_buffer_infos[j*img_count + i];
             descriptor_writes[j].pImageInfo = nullptr; // Optional
             descriptor_writes[j].pTexelBufferView = nullptr; // Optional
-
-            vkUpdateDescriptorSets(_device->device(), descriptor_writes.size(), descriptor_writes.data(), 0, nullptr);
         }
+
+        vkUpdateDescriptorSets(_device->device(), descriptor_writes.size(), descriptor_writes.data(), 0, nullptr);
         descriptor_writes.clear();
     }
 
     DescriptorSet descriptor_set{};
-    descriptor_set.current_index = &_current_frame_index;
+    descriptor_set.current_index = &_current_image_index;
     descriptor_set.descriptor_sets = _descriptor_sets;
     return descriptor_set;
 }

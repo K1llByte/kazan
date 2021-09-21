@@ -16,12 +16,12 @@ struct PushConstantsData
 };
 
 
-SimpleRenderSystem::SimpleRenderSystem(Device& device, Renderer& renderer, VkRenderPass render_pass)
+SimpleRenderSystem::SimpleRenderSystem(Device& device, Renderer& renderer)
     : _device{device},
     _renderer{renderer}
 {
     create_pipeline_layout();
-    create_pipeline(render_pass);
+    create_pipeline(renderer.render_pass());
 }
 
 
@@ -43,7 +43,7 @@ void SimpleRenderSystem::render_game_objects(
 
     _pipeline->bind(command_buffer);
     // auto projection_view = camera.projection() * camera.view();
-
+    
     for(auto& obj : game_objects)
     {
         // obj.transform.rotation.y = glm::mod(obj.transform.rotation.y + 0.01f, glm::two_pi<float>());
@@ -65,9 +65,10 @@ void SimpleRenderSystem::render_game_objects(
             .view = camera.view(),
             .projection = camera.projection(),
         });
+        _descriptor_set = _renderer.init_descriptor_set();
 
-        _descriptor_set.bind(command_buffer, _pipeline_layout);
         obj.model->bind(command_buffer);
+        _descriptor_set.bind(command_buffer, _pipeline_layout);
         obj.model->draw(command_buffer);
     }
 }
@@ -103,7 +104,10 @@ void SimpleRenderSystem::create_pipeline_layout()
 
     std::vector<VkDescriptorSetLayoutBinding> layout_bindings(1);
 
+    std::cout << "debug 1\n";
     _pvm_buffer = _renderer.alloc_buffer<PVM>(&layout_bindings[0]);
+    std::cout << "debug 2\n";
+    // _pvm_buffer = _renderer.alloc_buffer<PVM>(&layout_bindings[0]);
     // buffer2 = _renderer.alloc_buffer<PushConstantsData>(&layout_bindings[1]);
 
     VkDescriptorSetLayoutCreateInfo layout_info{};
