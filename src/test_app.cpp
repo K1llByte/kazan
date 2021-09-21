@@ -36,8 +36,6 @@ TestApp::TestApp()
 
     _renderer = Renderer(&_window, &_device);
 
-    // _interface = Interface(_window, _instance, _device, _renderer);
-
     // After engine initialization
     load_game_objects();
 }
@@ -56,6 +54,7 @@ void TestApp::run()
     Camera camera{};
     camera.lookat_direction(glm::vec3(0.f), glm::vec3(0.0f, 0.f, 1.f));
     CameraController cam_controller(_window, camera);
+    _interface = Interface(_window, _instance, _device, _renderer);
 
     _renderer.delta_time();
 
@@ -63,7 +62,7 @@ void TestApp::run()
     {
         glfwPollEvents();
         
-        // _interface.render();
+        
 
         float aspect = _renderer.aspect_ratio();
         float dt = _renderer.delta_time();
@@ -72,15 +71,19 @@ void TestApp::run()
         camera.set_prespective(glm::radians(50.f), aspect, 0.1f, 100.0f);
 
         cam_controller.update(dt);
+        _interface.render();
 
         if(auto command_buffer = _renderer.begin_frame())
         {
             _renderer.begin_render_pass(command_buffer);
             render_system.render_game_objects(command_buffer, _game_objects, camera);
+            _interface.draw(command_buffer);
             _renderer.end_render_pass(command_buffer);
             _renderer.end_frame();
         }
     }
+
+    _interface.cleanup();
 
     _device.wait_idle();
 }

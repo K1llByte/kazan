@@ -134,15 +134,31 @@ void Renderer::create_command_buffers()
 void Renderer::init_descriptor_pool(VkDescriptorSetLayout descriptor_set_layout)
 {
     const uint32_t img_count = static_cast<uint32_t>(_swap_chain->image_count());
-    VkDescriptorPoolSize pool_size{};
-    pool_size.type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-    pool_size.descriptorCount = img_count;
+
+    // std::vector<VkDescriptorPoolSize> pool_sizes = {
+	// 	{ VK_DESCRIPTOR_TYPE_SAMPLER, 1000 },
+	// 	{ VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1000 },
+	// 	{ VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE, 1000 },
+	// 	{ VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, 1000 },
+	// 	{ VK_DESCRIPTOR_TYPE_UNIFORM_TEXEL_BUFFER, 1000 },
+	// 	{ VK_DESCRIPTOR_TYPE_STORAGE_TEXEL_BUFFER, 1000 },
+	// 	{ VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 1000 },
+	// 	{ VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 1000 },
+	// 	{ VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC, 1000 },
+	// 	{ VK_DESCRIPTOR_TYPE_STORAGE_BUFFER_DYNAMIC, 1000 },
+	// 	{ VK_DESCRIPTOR_TYPE_INPUT_ATTACHMENT, 1000 }
+	// };
+
+    std::vector<VkDescriptorPoolSize> pool_sizes{
+        { VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, img_count },
+        { VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1 }
+    };
 
     VkDescriptorPoolCreateInfo pool_info{};
     pool_info.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
-    pool_info.poolSizeCount = 1;
-    pool_info.pPoolSizes = &pool_size;
-    pool_info.maxSets = img_count;
+    pool_info.poolSizeCount = pool_sizes.size();
+    pool_info.pPoolSizes = pool_sizes.data();
+    pool_info.maxSets = 10; //img_count;
 
     if(vkCreateDescriptorPool(_device->device(), &pool_info, nullptr, &_descriptor_pool) != VK_SUCCESS)
     {
@@ -153,7 +169,7 @@ void Renderer::init_descriptor_pool(VkDescriptorSetLayout descriptor_set_layout)
     VkDescriptorSetAllocateInfo alloc_info{};
     alloc_info.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
     alloc_info.descriptorPool = _descriptor_pool;
-    alloc_info.descriptorSetCount = img_count;
+    alloc_info.descriptorSetCount = layouts.size();
     alloc_info.pSetLayouts = layouts.data();
 
     _descriptor_sets.resize(img_count);
@@ -164,58 +180,16 @@ void Renderer::init_descriptor_pool(VkDescriptorSetLayout descriptor_set_layout)
 }
 
 
-// template<typename T>
-// UniformBuffer<T> Renderer::alloc_buffer(VkDescriptorSetLayoutBinding* layout_binding, VkShaderStageFlags stage)
-// {
-//     const size_t img_count = _swap_chain->image_count();
-
-//     UniformBuffer<T> ub;
-//     ub.device = &_device;
-//     ub.buffers = std::vector<VkBuffer>(img_count);
-//     ub.buffers_memory = std::vector<VkDeviceMemory>(img_count);
-//     ub.current_index = &_current_frame_index;
-//     ub.binding = _descriptor_buffer_infos.size();
-//     VkDeviceSize buffer_size = sizeof(T);
-
-//     for(size_t i = 0; i < img_count; ++i)
-//     {
-//         _device->create_buffer(
-//             buffer_size,
-//             VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
-//             VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
-//             ub.buffers[i],
-//             ub.buffers_memory[i]);
-
-
-//         VkDescriptorBufferInfo buffer_info{};
-//         buffer_info.buffer = ub.buffers[0];
-//         buffer_info.offset = 0;
-//         buffer_info.range = sizeof(T);
-//         _descriptor_buffer_infos.push_back(buffer_info);
-//     }
-
-//     if(layout_binding != nullptr)
-//     {
-//         layout_binding->binding = ub.binding;
-//         layout_binding->descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-//         layout_binding->descriptorCount = 1;
-//         layout_binding->stageFlags = stage; //VK_SHADER_STAGE_VERTEX_BIT;
-//         layout_binding->pImmutableSamplers = nullptr; // Optional
-//     }
-
-//     return ub;
-// }
-
-
 DescriptorSet Renderer::init_descriptor_set()
 {
     const size_t img_count = _swap_chain->image_count();
     const size_t buffers_count = _descriptor_buffer_infos.size() / img_count;
 
-    std::vector<VkWriteDescriptorSet> descriptor_writes(buffers_count);
+    std::vector<VkWriteDescriptorSet> descriptor_writes;
 
     for(size_t i = 0; i < img_count; ++i)
     {
+        descriptor_writes.resize(buffers_count);
         for(size_t j = 0; j < buffers_count; ++j)
         {
             descriptor_writes[j].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
@@ -239,6 +213,7 @@ DescriptorSet Renderer::init_descriptor_set()
     descriptor_set.current_index = &_current_image_index;
     descriptor_set.descriptor_sets = _descriptor_sets;
     return descriptor_set;
+
 }
 
 

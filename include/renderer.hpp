@@ -8,9 +8,6 @@
 
 #include <vector>
 
-// Debug
-#include <iostream>
-
 namespace kzn
 {
 
@@ -67,18 +64,18 @@ public:
     void end_render_pass(VkCommandBuffer command_buffer);
 };
 
+////////////////////////////////////////////////////////////////
 
 template<typename T>
 UniformBuffer<T> Renderer::alloc_buffer(VkDescriptorSetLayoutBinding* layout_binding, VkShaderStageFlags stage)
 {
     const size_t img_count = _swap_chain->image_count();
-    std::cout << "img_count (alloc_buffer):" << img_count << "\n";
 
     UniformBuffer<T> ub;
     ub.device = _device;
     ub.buffers = std::vector<VkBuffer>(img_count);
     ub.buffers_memory = std::vector<VkDeviceMemory>(img_count);
-    ub.current_index = &_current_frame_index;
+    ub.current_index = &_current_image_index;
     ub.binding = _descriptor_buffer_infos.size();
     VkDeviceSize buffer_size = sizeof(T);
 
@@ -99,7 +96,6 @@ UniformBuffer<T> Renderer::alloc_buffer(VkDescriptorSetLayoutBinding* layout_bin
         buffer_info.offset = 0;
         buffer_info.range = sizeof(T);
         _descriptor_buffer_infos.push_back(buffer_info);
-        std::cout << "Created buffer_info: set " << i << ": " << buffer_info.buffer << "\n";
 
     }
 

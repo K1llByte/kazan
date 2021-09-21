@@ -42,7 +42,6 @@ void SimpleRenderSystem::render_game_objects(
 {
 
     _pipeline->bind(command_buffer);
-    // auto projection_view = camera.projection() * camera.view();
     
     for(auto& obj : game_objects)
     {
@@ -65,10 +64,9 @@ void SimpleRenderSystem::render_game_objects(
             .view = camera.view(),
             .projection = camera.projection(),
         });
-        // _descriptor_set = _renderer.init_descriptor_set();
+        _descriptor_set.bind(command_buffer, _pipeline_layout);
 
         obj.model->bind(command_buffer);
-        // _descriptor_set.bind(command_buffer, _pipeline_layout);
         obj.model->draw(command_buffer);
     }
 }
@@ -85,30 +83,9 @@ void SimpleRenderSystem::create_pipeline_layout()
 
     ///////////////// Uniform Buffers /////////////////
 
-    // VkDescriptorSetLayoutBinding ubo_layout_binding{};
-    // ubo_layout_binding.binding = 0;
-    // ubo_layout_binding.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-    // ubo_layout_binding.descriptorCount = 1;
-    // ubo_layout_binding.stageFlags = VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT;
-    // ubo_layout_binding.pImmutableSamplers = nullptr; // Optional
-    
-    // VkDescriptorSetLayoutCreateInfo layout_info{};
-    // layout_info.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
-    // layout_info.bindingCount = 1;
-    // layout_info.pBindings = &ubo_layout_binding;
-
-    // if (vkCreateDescriptorSetLayout(_device.device(), &layout_info, nullptr, &_descriptor_set_layout) != VK_SUCCESS)
-    // {
-    //     throw std::runtime_error("failed to create descriptor set layout!");
-    // }
-
     std::vector<VkDescriptorSetLayoutBinding> layout_bindings(1);
 
-    std::cout << "debug 1\n";
     _pvm_buffer = _renderer.alloc_buffer<PVM>(&layout_bindings[0]);
-    std::cout << "debug 2\n";
-    // _pvm_buffer = _renderer.alloc_buffer<PVM>(&layout_bindings[0]);
-    // buffer2 = _renderer.alloc_buffer<PushConstantsData>(&layout_bindings[1]);
 
     VkDescriptorSetLayoutCreateInfo layout_info{};
     layout_info.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
@@ -158,10 +135,6 @@ void SimpleRenderSystem::create_pipeline(VkRenderPass render_pass)
         PipelineConfigBuilder(_pipeline_layout, render_pass)
         .set_topology(VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST)
         .build();
-    // PipelineConfig pipeline_config{};
-    // Pipeline::default_pipeline_config_info(pipeline_config);
-    // pipeline_config.render_pass = render_pass;
-    // pipeline_config.pipeline_layout = _pipeline_layout;
 
     // TODO: Try to change unique_ptr to
     // a stack allocated alternative
