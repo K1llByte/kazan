@@ -65,10 +65,10 @@ void SimpleRenderSystem::render_game_objects(
             .view = camera.view(),
             .projection = camera.projection(),
         });
-        _descriptor_set = _renderer.init_descriptor_set();
+        // _descriptor_set = _renderer.init_descriptor_set();
 
         obj.model->bind(command_buffer);
-        _descriptor_set.bind(command_buffer, _pipeline_layout);
+        // _descriptor_set.bind(command_buffer, _pipeline_layout);
         obj.model->draw(command_buffer);
     }
 }
