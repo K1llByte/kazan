@@ -129,20 +129,11 @@ Model* Model::load_from_file(Device& device, const std::string& file_path)
                     attrib.vertices[3 * index.vertex_index + 2], // z
                 };
 
-                size_t color_index = 3 * index.vertex_index + 2;
-                if(color_index < attrib.colors.size())
-                {
-                    vtx.color = {
-                        attrib.colors[color_index - 2], // r
-                        attrib.colors[color_index - 1], // g
-                        attrib.colors[color_index]      // b
-                    };
-                }
-                else
-                {
-                    // Default color
-                    vtx.color = { 6.f, 6.f, 6.f };
-                }
+                vtx.color = {
+                    attrib.colors[3 * index.vertex_index],     // x
+                    attrib.colors[3 * index.vertex_index + 1], // y
+                    attrib.colors[3 * index.vertex_index + 2], // z
+                };
             }
 
             if(index.normal_index >= 0)
