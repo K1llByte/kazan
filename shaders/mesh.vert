@@ -4,12 +4,13 @@
 layout(location = 0) in vec3 v_position;
 layout(location = 1) in vec3 v_normal;
 layout(location = 2) in vec3 v_color;
+layout(location = 3) in vec2 v_tex;
 
 // Uniform buffer block
 layout(set = 0, binding = 0) uniform PVM {
-	mat4 model;
-	mat4 view;
-	mat4 projection;
+    mat4 model;
+    mat4 view;
+    mat4 projection;
 } pvm;
 
 // Output
