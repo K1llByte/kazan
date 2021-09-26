@@ -16,6 +16,11 @@ struct PVM
     glm::mat4 projection;
 };
 
+struct CameraData
+{
+    glm::vec3 position;
+};
+
 
 class SimpleRenderSystem
 {
@@ -27,8 +32,9 @@ private:
     VkPipelineLayout          _pipeline_layout;
     VkDescriptorSetLayout     _descriptor_set_layout = VK_NULL_HANDLE;
 
-    UniformBuffer<PVM> _pvm_buffer;
-    DescriptorSet      _descriptor_set;
+    UniformBuffer<PVM>        _pvm_buffer;
+    UniformBuffer<CameraData> _cam_buffer;
+    DescriptorSet             _descriptor_set;
 
 public:
 

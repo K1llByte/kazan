@@ -64,6 +64,9 @@ void SimpleRenderSystem::render_game_objects(
             .view = camera.view(),
             .projection = camera.projection(),
         });
+        _cam_buffer.update({
+            .position = camera.position()
+        });
         _descriptor_set.bind(command_buffer, _pipeline_layout);
 
         obj.model->bind(command_buffer);
@@ -83,9 +86,10 @@ void SimpleRenderSystem::create_pipeline_layout()
 
     ///////////////// Uniform Buffers /////////////////
 
-    std::vector<VkDescriptorSetLayoutBinding> layout_bindings(1);
+    std::vector<VkDescriptorSetLayoutBinding> layout_bindings(2);
 
     _pvm_buffer = _renderer.alloc_buffer<PVM>(&layout_bindings[0]);
+    _cam_buffer = _renderer.alloc_buffer<CameraData>(&layout_bindings[1]);
 
     VkDescriptorSetLayoutCreateInfo layout_info{};
     layout_info.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
@@ -140,8 +144,8 @@ void SimpleRenderSystem::create_pipeline(VkRenderPass render_pass)
     // a stack allocated alternative
     _pipeline = std::make_unique<Pipeline>(
         _device,
-        "shaders/mesh.vert.spv",
-        "shaders/mesh.frag.spv",
+        "shaders/surface.vert.spv",
+        "shaders/surface.frag.spv",
         pipeline_config);
 }
 

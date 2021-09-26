@@ -150,8 +150,7 @@ void Renderer::init_descriptor_pool(VkDescriptorSetLayout descriptor_set_layout)
 	// };
 
     std::vector<VkDescriptorPoolSize> pool_sizes{
-        { VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, img_count },
-        { VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1 }
+        { VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, img_count*2 }
     };
 
     VkDescriptorPoolCreateInfo pool_info{};

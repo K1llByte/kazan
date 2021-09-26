@@ -76,7 +76,7 @@ UniformBuffer<T> Renderer::alloc_buffer(VkDescriptorSetLayoutBinding* layout_bin
     ub.buffers = std::vector<VkBuffer>(img_count);
     ub.buffers_memory = std::vector<VkDeviceMemory>(img_count);
     ub.current_index = &_current_image_index;
-    ub.binding = _descriptor_buffer_infos.size();
+    ub.binding = _descriptor_buffer_infos.size() / img_count;
     VkDeviceSize buffer_size = sizeof(T);
 
     for(size_t i = 0; i < img_count; ++i)
@@ -84,7 +84,7 @@ UniformBuffer<T> Renderer::alloc_buffer(VkDescriptorSetLayoutBinding* layout_bin
         _device->create_buffer(
             buffer_size,
             VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
-            VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT , //| VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
+            VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT, //| VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
             ub.buffers[i],
             ub.buffers_memory[i]);
 
@@ -96,7 +96,6 @@ UniformBuffer<T> Renderer::alloc_buffer(VkDescriptorSetLayoutBinding* layout_bin
         buffer_info.offset = 0;
         buffer_info.range = sizeof(T);
         _descriptor_buffer_infos.push_back(buffer_info);
-
     }
 
     if(layout_binding != nullptr)
