@@ -7,6 +7,11 @@ learn about other graphics APIs and Game Engine architectures.
 
 ## Requirements
 
+To install everything needed:
+```sh
+sudo pacman -S vulkan-devel glfw glm glslang
+```
+
 ### Vulkan Packages
 
 All this vulkan packages can be installed with pacman by installing the vulkan
@@ -35,7 +40,7 @@ sudo pacman -S vulkan-validation-layers spirv-tools
 
 ### GLFW
 
-Library for window creation and managment
+Library for window creation and managment & Input events
 
 ```sh
 sudo pacman -S glfw
@@ -63,7 +68,24 @@ A compiler and validator from GLSL to SPIR-V (Khronos Group)
 sudo pacman -S glslang
 ```
 
+Or alternatively the glslc compiler with clang like usage (Google)
+```sh
+sudo pacman -S shaderc
+```
+
+## Demo
+
+To run a demo of the kazan engine compile (shaders + code) and run using the makefile provided:
+```sh
+make shaders run
+```
+
+
 ___
 ## References
 
+https://www.khronos.org/registry/vulkan/specs/1.0-wsi_extensions/pdf/vkspec.pdf
+https://www.khronos.org/files/vulkan11-reference-guide.pdf
 https://vulkan-tutorial.com/Development_environment#page_Linux
+https://vkguide.dev/
+https://learnopengl.com/Lighting/Multiple-lights
