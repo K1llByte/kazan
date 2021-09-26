@@ -2,7 +2,7 @@
 
 // Input
 layout(location = 0) in vec3 frag_color;
-layout(location = 1) in vec3 frag_pos;
+layout(location = 1) in vec3 frag_position;
 layout(location = 2) in vec3 frag_normal;
 
 // Uniform buffer block
@@ -24,27 +24,40 @@ struct DirLight {
     vec3 specular;
 };
 
-// struct PointLight {
-//     vec3 position;
+struct PointLight {
+    vec3 position;
 
-//     float constant;
-//     float linear;
-//     float quadratic;  
+    float constant;
+    float linear;
+    float quadratic;  
 
-//     vec3 ambient;
-//     vec3 diffuse;
-//     vec3 specular;
-// };
+    vec3 ambient;
+    vec3 diffuse;
+    vec3 specular;
+};
 
+const float shininess = 1;
 
 const DirLight dir_light_0 = {
     normalize(vec3(1.0, -3.0, -1.0)),
+
     vec3(0.02f),
     vec3(1.f),
     vec3(1.f)
 };
 
-// const vec3 cam_position = vec3(0.f);
+const PointLight point_light_0 = {
+    vec3(2.f),
+
+    1.0f,
+    0.5f,
+    0.5f,
+
+    vec3(0.02f),
+    vec3(1.f),
+    vec3(1.f)
+};
+
 
 vec3 compute_dir_light(DirLight light, vec3 normal, vec3 view_dir)
 {
@@ -53,7 +66,7 @@ vec3 compute_dir_light(DirLight light, vec3 normal, vec3 view_dir)
     float diff = max(dot(normal, light_dir), 0.0);
     // specular shading
     vec3 reflect_dir = reflect(-light_dir, normal);
-    float spec = pow(max(dot(view_dir, reflect_dir), 0.0), 128);
+    float spec = pow(max(dot(view_dir, reflect_dir), 0.0), shininess);
     // combine results
     vec3 ambient  = light.ambient  * frag_color; //vec3(texture(material.diffuse, TexCoords));
     vec3 diffuse  = light.diffuse  * diff * frag_color; //vec3(texture(material.diffuse, TexCoords));
@@ -61,10 +74,33 @@ vec3 compute_dir_light(DirLight light, vec3 normal, vec3 view_dir)
     return (ambient + diffuse + specular);
 }
 
+vec3 compute_point_light(PointLight light, vec3 normal, vec3 frag_pos, vec3 view_dir)
+{
+    vec3 light_dir = normalize(light.position - frag_pos);
+    // diffuse shading
+    float diff = max(dot(normal, light_dir), 0.0);
+    // specular shading
+    vec3 reflect_dir = reflect(-light_dir, normal);
+    float spec = pow(max(dot(view_dir, reflect_dir), 0.0), shininess);
+    // attenuation
+    float distance    = length(light.position - frag_pos);
+    float attenuation = 1.0 / (light.constant + light.linear * distance + 
+  	    light.quadratic * (distance * distance));    
+    // combine results
+    vec3 ambient  = light.ambient  * frag_color;
+    vec3 diffuse  = light.diffuse  * diff * frag_color;
+    vec3 specular = light.specular * spec * frag_color;
+    ambient  *= attenuation;
+    diffuse  *= attenuation;
+    specular *= attenuation;
+    return (ambient + diffuse + specular);
+} 
+
 //////////////////////////////////////////////////////////
 
 void main()
 {
-    vec3 result = compute_dir_light(dir_light_0, frag_normal, cam.position);
+    // vec3 result = compute_dir_light(dir_light_0, frag_normal, cam.position);
+    vec3 result = compute_point_light(point_light_0, frag_normal, frag_position, cam.position);
     out_color = vec4(result, 1.0);
 }
