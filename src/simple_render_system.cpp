@@ -59,7 +59,7 @@ void SimpleRenderSystem::render_game_objects(
         //     sizeof(PushConstantsData),
         //     &push_data);
 
-        std::cout << "obj\n";
+        std::cout << "obj " << obj.id() << "\n";
         _pvm_buffer.update({
             .model = obj.transform.mat4(),
             .view = camera.view(),
