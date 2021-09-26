@@ -97,30 +97,30 @@ public:
 };
 
 
-// glm::vec3 to_spherical(glm::vec3 coords)
-// {
-//     const float x = coords.x;
-//     const float y = coords.y;
-//     const float z = coords.z;
-//     return glm::vec3{
-//         sqrt(x*x + y*y + z*z),
-//         atan2(x,z), // [0, pi]
-//         acos(y / sqrt(x*x + y*y + z*z)) // [0, 2pi]
-//     };
-// }
+constexpr glm::vec3 to_spherical(glm::vec3 coords)
+{
+    const float x = coords.x;
+    const float y = coords.y;
+    const float z = coords.z;
+    return glm::vec3{
+        sqrt(x*x + y*y + z*z),
+        atan2(x,z), // [0, pi]
+        acos(y / sqrt(x*x + y*y + z*z)) // [0, 2pi]
+    };
+}
 
 
-// glm::vec3 to_cartesian(glm::vec3 coords)
-// {
-//     const float p = coords.x;
-//     const float theta = coords.y;
-//     const float phi = coords.z;
-//     return glm::vec3{
-//         sin(theta) * sin(phi) * p,
-//         cos(phi) * p,
-//         sin(phi) * p * cos(theta)
-//     };
-// }
+constexpr glm::vec3 to_cartesian(glm::vec3 coords)
+{
+    const float p = coords.x;
+    const float theta = coords.y;
+    const float phi = coords.z;
+    return glm::vec3{
+        sin(theta) * sin(phi) * p,
+        cos(phi) * p,
+        sin(phi) * p * cos(theta)
+    };
+}
 
 
 // template<typename First, typename Second>

@@ -36,7 +36,7 @@ struct PointLight {
     vec3 specular;
 };
 
-const float shininess = 256.f;
+const float shininess = 128.5f;
 
 const DirLight dir_light_0 = {
     normalize(vec3(1.0, -3.0, -1.0)),
@@ -47,7 +47,7 @@ const DirLight dir_light_0 = {
 };
 
 const PointLight point_light_0 = {
-    vec3(0.6f, 0.3f, 0.5f),
+    vec3(1.6f, 1.3f, 1.5f),
 
     1.0f,
     0.0f,
@@ -93,7 +93,7 @@ vec3 compute_point_light(PointLight light, vec3 normal, vec3 frag_pos, vec3 view
     ambient  *= attenuation;
     diffuse  *= attenuation;
     specular *= attenuation;
-    return (ambient + diffuse + specular);
+    return (ambient + diffuse/*  + specular */);
 } 
 
 //////////////////////////////////////////////////////////

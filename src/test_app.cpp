@@ -2,6 +2,7 @@
 
 #include "simple_render_system.hpp"
 #include "camera.hpp"
+#include "generator.hpp"
 #include "controllers/camera_controller.hpp"
 #include "controllers/ui_controller.hpp"
 
@@ -182,18 +183,28 @@ void TestApp::load_game_objects()
 //   };
 
 
+
+
+    // auto cube_obj = GameObject::create_game_object();
+    // cube_obj.model = Model::load_from_file(_device, "models/colored_cube.obj");
+    // cube_obj.transform.translation = { 0.f, 0.f, 3.5f};
+    // cube_obj.transform.scale = { 0.5f, 0.5f, 0.5f};
+    // _game_objects.push_back(std::move(cube_obj));
+
     auto floor_obj = GameObject::create_game_object();
     floor_obj.model = new Model(_device, floor);
-
+    floor_obj.transform.translation = {4.0f, 0.0f, 0.0f};
     _game_objects.push_back(std::move(floor_obj));
+    
+    auto light_obj = GameObject::create_game_object();
+    light_obj.model = new Model(_device, ShapeGenerator::gen_sphere(0.1f, 10, 10));
+    light_obj.transform.translation = {-1.6f, 1.3f, 1.5f};
+    _game_objects.push_back(std::move(light_obj));
 
 
-    auto cube_obj = GameObject::create_game_object();
-    cube_obj.model = Model::load_from_file(_device, "models/colored_cube.obj");
-    cube_obj.transform.translation = { 0.f, 0.f, 3.5f};
-    cube_obj.transform.scale = { 0.5f, 0.5f, 0.5f};
-
-    _game_objects.push_back(std::move(cube_obj));
+    // auto sphere_obj = GameObject::create_game_object();
+    // sphere_obj.model = new Model(_device, ShapeGenerator::gen_sphere(1.f, 20, 20));
+    // _game_objects.push_back(std::move(sphere_obj));
 }
 
 }

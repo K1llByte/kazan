@@ -45,8 +45,8 @@ void SimpleRenderSystem::render_game_objects(
     
     for(auto& obj : game_objects)
     {
-        // obj.transform.rotation.y = glm::mod(obj.transform.rotation.y + 0.01f, glm::two_pi<float>());
-        // obj.transform.rotation.x = glm::mod(obj.transform.rotation.x + 0.005f, glm::two_pi<float>());
+        // obj.transform.translation.y = glm::mod(obj.transform.translation.y + 0.01f, glm::two_pi<float>());
+        // obj.transform.translation.x = glm::mod(obj.transform.translation.x + 0.005f, 1.f);
 
         // PushConstantsData push_data{};
         // push_data.pvm = projection_view * obj.transform.mat4();
@@ -59,6 +59,7 @@ void SimpleRenderSystem::render_game_objects(
         //     sizeof(PushConstantsData),
         //     &push_data);
 
+        std::cout << "obj\n";
         _pvm_buffer.update({
             .model = obj.transform.mat4(),
             .view = camera.view(),

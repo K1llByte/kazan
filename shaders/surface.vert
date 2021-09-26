@@ -24,6 +24,6 @@ void main()
 {
     gl_Position = pvm.projection * pvm.view * pvm.model * vec4(v_position, 1.0f);
     out_frag_pos = vec3(pvm.model * vec4(v_position, 1.0));
-    out_normal = v_normal;
+    out_normal = mat3(transpose(inverse(pvm.model))) * normalize(v_normal);
     out_color = v_color;
 }

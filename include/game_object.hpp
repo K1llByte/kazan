@@ -14,7 +14,7 @@ struct TransformComponent
     glm::vec3 scale{1.f, 1.f, 1.f};
     glm::vec3 rotation{};
   
-    glm::mat4 mat4()
+    glm::mat4 mat4() const
     {
         // auto transform = glm::translate(glm::mat4{1.f}, translation);
         // transform = glm::rotate(transform, rotation.y, { 0.f, 1.f, 0.f });
@@ -30,6 +30,7 @@ struct TransformComponent
         const float s2 = glm::sin(rotation.x);
         const float c1 = glm::cos(rotation.y);
         const float s1 = glm::sin(rotation.y);
+        std::cout << translation.x << ", " << translation.y << ", " << translation.z << '\n';
         return glm::mat4{
             {
                 scale.x * (c1 * c3 + s1 * s2 * s3),
@@ -71,7 +72,7 @@ public:
 
     GameObject(GameObject&& old_game_object);
     ~GameObject();
-    static GameObject create_game_object();    
+    static GameObject create_game_object();
     id_t id() const;
 
 private:
