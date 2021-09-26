@@ -53,7 +53,7 @@ vec3 compute_dir_light(DirLight light, vec3 normal, vec3 view_dir)
     float diff = max(dot(normal, light_dir), 0.0);
     // specular shading
     vec3 reflect_dir = reflect(-light_dir, normal);
-    float spec = pow(max(dot(view_dir, reflect_dir), 0.0), 32);
+    float spec = pow(max(dot(view_dir, reflect_dir), 0.0), 128);
     // combine results
     vec3 ambient  = light.ambient  * frag_color; //vec3(texture(material.diffuse, TexCoords));
     vec3 diffuse  = light.diffuse  * diff * frag_color; //vec3(texture(material.diffuse, TexCoords));
