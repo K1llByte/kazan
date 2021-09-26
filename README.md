@@ -1,33 +1,34 @@
 # Kazan
 
-An experimental computer graphics engine for learning purposes.
+This project is an experimental computer graphics engine for the author to
+learn about other graphics APIs and Game Engine architectures.
 
-<!-- 
-- **Drawing a triangle**
-<meter id="progress" min="0" max="17" optimum="17" value="6"/> -->
-
+<!-- An experimental computer graphics engine for learning purposes. -->
 
 ## Requirements
 
 ### Vulkan Packages
 
-All this vulkan packages can be installed with pacman by installing the vulkan development package.
+All this vulkan packages can be installed with pacman by installing the vulkan
+development package.
 ```sh
 sudo pacman -S vulkan-devel
 ```
 
 - **Command-line utilities** - Test if vulkan is functional.
 ```sh
-sudo pacman -S vulkan-validation-layers
+sudo pacman -S vulkan-tools
 ```
 
 - **Vulkan loader** - Looks up the functions in the driver at runtime.
 ```sh
 sudo pacman -S vulkan-icd-loader
 ```
-> Note: `vulkan-tools`  `vulkan-validation-layers` packages already include the ICD Loader
+> Note: `vulkan-tools`  `vulkan-validation-layers` packages already include the
+ICD Loader
 
-- **Validation layers & SPIR-V tools** - Standard validation layers and SPIR-V tools.
+- **Validation layers & SPIR-V tools** - Standard validation layers and SPIR-V
+tools.
 ```sh
 sudo pacman -S vulkan-validation-layers spirv-tools
 ```
