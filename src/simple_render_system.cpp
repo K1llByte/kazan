@@ -42,11 +42,20 @@ void SimpleRenderSystem::render_game_objects(
 {
 
     _pipeline->bind(command_buffer);
+    _cam_buffer.update({
+        .position = camera.position()
+    });
     
     for(auto& obj : game_objects)
     {
         // obj.transform.translation.y = glm::mod(obj.transform.translation.y + 0.01f, glm::two_pi<float>());
         // obj.transform.translation.x = glm::mod(obj.transform.translation.x + 0.005f, 1.f);
+
+        if(obj.id() == 1)
+            obj.transform.translation.x = glm::mod(obj.transform.translation.x + 0.005f, 1.f);
+        
+        if(obj.id() == 0)
+            obj.transform.translation.y = glm::mod(obj.transform.translation.y + 0.01f, 1.f);
 
         // PushConstantsData push_data{};
         // push_data.pvm = projection_view * obj.transform.mat4();
@@ -64,9 +73,6 @@ void SimpleRenderSystem::render_game_objects(
             .model = obj.transform.mat4(),
             .view = camera.view(),
             .projection = camera.projection(),
-        });
-        _cam_buffer.update({
-            .position = camera.position()
         });
         _descriptor_set.bind(command_buffer, _pipeline_layout);
 
