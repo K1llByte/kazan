@@ -54,7 +54,7 @@ void TestApp::run()
 {
     SimpleRenderSystem render_system{_device, _renderer};
     Camera camera{};
-    camera.lookat_direction(glm::vec3(0.f), glm::vec3(0.0f, 0.f, 1.f));
+    camera.lookat_target(glm::vec3(0.0f, 1.0f, 1.0f), glm::vec3(0.0f, 0.0f, 0.0f));
     _interface = Interface(_window, _instance, _device, _renderer);
     CameraController cam_controller(_window, camera);
     UIController ui_controller(_window, _interface);
@@ -124,12 +124,12 @@ void TestApp::load_game_objects()
     // };
 
     std::vector<Model::Vertex> floor{
-        {{-1.f, 0.f, -1.f}, {0.0f, 0.0f, 0.0f}, {.2f, .2f, .2f}},
-        {{ 1.f, 0.f,  1.f}, {0.0f, 0.0f, 0.0f}, {.2f, .2f, .2f}},
-        {{-1.f, 0.f,  1.f}, {0.0f, 0.0f, 0.0f}, {.2f, .2f, .2f}},
-        {{-1.f, 0.f, -1.f}, {0.0f, 0.0f, 0.0f}, {.2f, .2f, .2f}},
-        {{ 1.f, 0.f, -1.f}, {0.0f, 0.0f, 0.0f}, {.2f, .2f, .2f}},
-        {{ 1.f, 0.f,  1.f}, {0.0f, 0.0f, 0.0f}, {.2f, .2f, .2f}},
+        {{-1.f, 0.f, -1.f}, {0.0f, 1.0f, 0.0f}, {.2f, .2f, .2f}},
+        {{ 1.f, 0.f,  1.f}, {0.0f, 1.0f, 0.0f}, {.2f, .2f, .2f}},
+        {{-1.f, 0.f,  1.f}, {0.0f, 1.0f, 0.0f}, {.2f, .2f, .2f}},
+        {{-1.f, 0.f, -1.f}, {0.0f, 1.0f, 0.0f}, {.2f, .2f, .2f}},
+        {{ 1.f, 0.f, -1.f}, {0.0f, 1.0f, 0.0f}, {.2f, .2f, .2f}},
+        {{ 1.f, 0.f,  1.f}, {0.0f, 1.0f, 0.0f}, {.2f, .2f, .2f}},
     };
 
 //     std::vector<Model::Vertex> vertices{
@@ -193,12 +193,12 @@ void TestApp::load_game_objects()
 
     auto floor_obj = GameObject::create_game_object();
     floor_obj.model = new Model(_device, floor);
-    floor_obj.transform.translation = {4.0f, 0.0f, 0.0f};
+    floor_obj.transform.translation = {1.0f, 0.0f, 0.0f};
     _game_objects.push_back(std::move(floor_obj));
     
     auto light_obj = GameObject::create_game_object();
-    light_obj.model = new Model(_device, ShapeGenerator::gen_sphere(0.1f, 10, 10));
-    light_obj.transform.translation = {-1.6f, 1.3f, 1.5f};
+    light_obj.model = new Model(_device, ShapeGenerator::gen_sphere(0.5f, 30, 30));
+    light_obj.transform.translation = {0.0f, 1.0f, 0.0f};
     _game_objects.push_back(std::move(light_obj));
 
 

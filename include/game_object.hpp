@@ -30,7 +30,7 @@ struct TransformComponent
         const float s2 = glm::sin(rotation.x);
         const float c1 = glm::cos(rotation.y);
         const float s1 = glm::sin(rotation.y);
-        std::cout << translation.x << ", " << translation.y << ", " << translation.z << '\n';
+        // std::cout << translation.x << ", " << translation.y << ", " << translation.z << '\n';
         return glm::mat4{
             {
                 scale.x * (c1 * c3 + s1 * s2 * s3),

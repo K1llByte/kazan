@@ -41,21 +41,24 @@ void SimpleRenderSystem::render_game_objects(
     const Camera& camera)
 {
 
-    _pipeline->bind(command_buffer);
     _cam_buffer.update({
         .position = camera.position()
     });
+    // glm::mat4 projection_view = camera.projection() * camera.view();
+
+    // std::cout << "render loop (camera update above)\n";
+    _pipeline->bind(command_buffer);
     
     for(auto& obj : game_objects)
     {
         // obj.transform.translation.y = glm::mod(obj.transform.translation.y + 0.01f, glm::two_pi<float>());
         // obj.transform.translation.x = glm::mod(obj.transform.translation.x + 0.005f, 1.f);
 
-        if(obj.id() == 1)
-            obj.transform.translation.x = glm::mod(obj.transform.translation.x + 0.005f, 1.f);
+        // if(obj.id() == 1)
+        //     obj.transform.translation.x = glm::mod(obj.transform.translation.x + 0.005f, 1.f);
         
-        if(obj.id() == 0)
-            obj.transform.translation.y = glm::mod(obj.transform.translation.y + 0.01f, 1.f);
+        // if(obj.id() == 0)
+        //     obj.transform.translation.y = glm::mod(obj.transform.translation.y + 0.01f, 1.f);
 
         // PushConstantsData push_data{};
         // push_data.pvm = projection_view * obj.transform.mat4();
@@ -68,7 +71,7 @@ void SimpleRenderSystem::render_game_objects(
         //     sizeof(PushConstantsData),
         //     &push_data);
 
-        std::cout << "obj " << obj.id() << "\n";
+        // std::cout << "obj " << obj.id() << "\n";
         _pvm_buffer.update({
             .model = obj.transform.mat4(),
             .view = camera.view(),

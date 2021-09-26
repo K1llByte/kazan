@@ -13,18 +13,20 @@ layout(set = 0, binding = 0) uniform PVM {
     mat4 projection;
 } pvm;
 
-// Output
-layout(location = 0) out vec3 out_color;
-
-// Push constants block
+// // Push constants block
 // layout(push_constant) uniform constants
 // {
 //     vec4 data;
 //     mat4 pvm;
 // } push;
 
+// Output
+layout(location = 0) out vec3 out_color;
+
 const vec3 DIR_TO_LIGHT = normalize(vec3(1.0, -3.0, -1.0));
 const float AMBIENT_LIGHT = 0.02;
+
+//////////////////////////////////////////////////////////
 
 void main()
 {
@@ -32,6 +34,6 @@ void main()
     gl_Position = pvm.projection * pvm.view * pvm.model * vec4(v_position, 1.0f);
 
     vec3 transformed_normal = normalize(mat3(pvm.model) * v_normal);
-    float light_intensity = max(dot(transformed_normal, DIR_TO_LIGHT), 0) + AMBIENT_LIGHT;
+    float light_intensity = max(dot(v_normal, DIR_TO_LIGHT), 0) + AMBIENT_LIGHT;
     out_color = v_color * light_intensity;
 }
