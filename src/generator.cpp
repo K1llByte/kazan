@@ -248,4 +248,305 @@ std::vector<Model::Vertex> ShapeGenerator::gen_cylinder(const float radius, cons
     return vertex_list;
 }
 
+
+std::vector<Model::Vertex> ShapeGenerator::gen_box(const float width_x, const float width_y, const float width_z, const uint divisions, const Options opt)
+{
+    if(width_x <= 0 || width_y <= 0 || width_z <= 0)
+    {
+        throw std::runtime_error("invalid generator arguments");
+    }
+
+    const size_t NUM_VTX = (divisions+1)*(divisions+1)*36;
+    std::vector<Model::Vertex> vertex_list(NUM_VTX);
+
+    const float div_width_x = width_x / (divisions+1);
+    const float div_width_y = width_y / (divisions+1);
+    const float div_width_z = width_z / (divisions+1);
+    const float half_width_x = width_x / 2;
+    const float half_width_y = width_y / 2;
+    const float half_width_z = width_z / 2;
+
+    const float tex_width_x = 1.0f / 4.f;
+    const float tex_width_y = 1.0f / 3.f;
+
+    const float tex_div_width_x = tex_width_x / (divisions+1);
+    const float tex_div_width_y = tex_width_y / (divisions+1);
+    
+    uint it = 0;
+    uint it_n = 0;
+    uint it_t = 0;
+
+    for(uint i = 0 ; i < divisions+1 ; ++i)
+    {
+        for(uint j = 0 ; j < divisions+1 ; ++j)
+        {	
+            // Width X
+            const float wx1 = half_width_z - div_width_z*i;
+            const float wx2 = half_width_z - div_width_z*(i+1);
+            // Height X
+            const float hx1 = -half_width_y + div_width_y*j;
+            const float hx2 = -half_width_y + div_width_y*(j+1);
+
+            // =========== [ X Front Face ] =========== //
+
+            // Vertices
+            vertex_list[it++].position = { half_width_x , hx1 , wx1 };
+            vertex_list[it++].position = { half_width_x , hx2 , wx2 };
+            vertex_list[it++].position = { half_width_x , hx1 , wx2 };
+
+            vertex_list[it++].position = { half_width_x , hx1 , wx1 };
+            vertex_list[it++].position = { half_width_x , hx2 , wx1 };
+            vertex_list[it++].position = { half_width_x , hx2 , wx2 };
+
+            // Normals
+            vertex_list[it_n++].normal = { 1 , 0 , 0 };
+            vertex_list[it_n++].normal = { 1 , 0 , 0 };
+            vertex_list[it_n++].normal = { 1 , 0 , 0 };
+
+            vertex_list[it_n++].normal = { 1 , 0 , 0 };
+            vertex_list[it_n++].normal = { 1 , 0 , 0 };
+            vertex_list[it_n++].normal = { 1 , 0 , 0 };
+
+            // Texture_Coord
+            vertex_list[it_t++].uv = { 1*tex_width_x + i*tex_div_width_x     , 1*tex_width_y + j*tex_div_width_y     };
+            vertex_list[it_t++].uv = { 1*tex_width_x + (i+1)*tex_div_width_x , 1*tex_width_y + (j+1)*tex_div_width_y };
+            vertex_list[it_t++].uv = { 1*tex_width_x + (i+1)*tex_div_width_x , 1*tex_width_y + j*tex_div_width_y     };
+
+            vertex_list[it_t++].uv = { 1*tex_width_x + i*tex_div_width_x     , 1*tex_width_y + j*tex_div_width_y     };
+            vertex_list[it_t++].uv = { 1*tex_width_x + i*tex_div_width_x     , 1*tex_width_y + (j+1)*tex_div_width_y };
+            vertex_list[it_t++].uv = { 1*tex_width_x + (i+1)*tex_div_width_x , 1*tex_width_y + (j+1)*tex_div_width_y };
+
+            // Color
+            vertex_list[it_t-6].color = { 0.8f, 0.8f, 0.8f };
+            vertex_list[it_t-5].color = { 0.8f, 0.8f, 0.8f };
+            vertex_list[it_t-4].color = { 0.8f, 0.8f, 0.8f };
+
+            vertex_list[it_t-3].color = { 0.8f, 0.8f, 0.8f };
+            vertex_list[it_t-1].color = { 0.8f, 0.8f, 0.8f };
+            vertex_list[it_t-2].color = { 0.8f, 0.8f, 0.8f };
+
+            // =========== [ X Back Face ] =========== //
+
+            // Vertices
+            vertex_list[it++].position = { -half_width_x , hx1 , wx2 };
+            vertex_list[it++].position = { -half_width_x , hx2 , wx2 };
+            vertex_list[it++].position = { -half_width_x , hx1 , wx1 };
+
+            vertex_list[it++].position = { -half_width_x , hx2 , wx2 };
+            vertex_list[it++].position = { -half_width_x , hx2 , wx1 };
+            vertex_list[it++].position = { -half_width_x , hx1 , wx1 };
+
+            // Normals
+            vertex_list[it_n++].normal = { -1 , 0 , 0 };
+            vertex_list[it_n++].normal = { -1 , 0 , 0 };
+            vertex_list[it_n++].normal = { -1 , 0 , 0 };
+
+            vertex_list[it_n++].normal = { -1 , 0 , 0 };
+            vertex_list[it_n++].normal = { -1 , 0 , 0 };
+            vertex_list[it_n++].normal = { -1 , 0 , 0 };
+
+            // Texture_Coord
+            vertex_list[it_t++].uv = { 3*tex_width_x + (tex_width_x - (i+1)*tex_div_width_x) , 1*tex_width_y + j*tex_div_width_y     };
+            vertex_list[it_t++].uv = { 3*tex_width_x + (tex_width_x - (i+1)*tex_div_width_x) , 1*tex_width_y + (j+1)*tex_div_width_y };
+            vertex_list[it_t++].uv = { 3*tex_width_x + (tex_width_x - i*tex_div_width_x    ) , 1*tex_width_y + j*tex_div_width_y     };
+
+            vertex_list[it_t++].uv = { 3*tex_width_x + (tex_width_x - (i+1)*tex_div_width_x) , 1*tex_width_y + (j+1)*tex_div_width_y };
+            vertex_list[it_t++].uv = { 3*tex_width_x + (tex_width_x - i*tex_div_width_x    ) , 1*tex_width_y + (j+1)*tex_div_width_y };
+            vertex_list[it_t++].uv = { 3*tex_width_x + (tex_width_x - i*tex_div_width_x    ) , 1*tex_width_y + j*tex_div_width_y     };
+
+            // Color
+            vertex_list[it_t-6].color = { 0.8f, 0.8f, 0.8f };
+            vertex_list[it_t-4].color = { 0.8f, 0.8f, 0.8f };
+            vertex_list[it_t-5].color = { 0.8f, 0.8f, 0.8f };
+    
+            vertex_list[it_t-3].color = { 0.8f, 0.8f, 0.8f };
+            vertex_list[it_t-2].color = { 0.8f, 0.8f, 0.8f };
+            vertex_list[it_t-1].color = { 0.8f, 0.8f, 0.8f };
+
+
+            // Width Z
+            const float wz1_1 = -half_width_x + div_width_x*i;
+            const float wz2_1 = -half_width_x + div_width_x*(i+1);
+            // Height Z
+            const float hz1_1 = -half_width_y + div_width_y*j;
+            const float hz2_1 = -half_width_y + div_width_y*(j+1);
+
+            // =========== [ Z Front Face ] =========== //
+
+            // Vertices
+            vertex_list[it++].position = { wz2_1 , hz1_1 , half_width_z };
+            vertex_list[it++].position = { wz1_1 , hz1_1 , half_width_z };
+            vertex_list[it++].position = { wz2_1 , hz2_1 , half_width_z };
+
+            vertex_list[it++].position = { wz1_1 , hz1_1 , half_width_z };
+            vertex_list[it++].position = { wz1_1 , hz2_1 , half_width_z };
+            vertex_list[it++].position = { wz2_1 , hz2_1 , half_width_z };
+
+            // Normals
+            vertex_list[it_n++].normal = { 0 , 0 , 1 };
+            vertex_list[it_n++].normal = { 0 , 0 , 1 };
+            vertex_list[it_n++].normal = { 0 , 0 , 1 };
+
+            vertex_list[it_n++].normal = { 0 , 0 , 1 };
+            vertex_list[it_n++].normal = { 0 , 0 , 1 };
+            vertex_list[it_n++].normal = { 0 , 0 , 1 };
+
+            // Texture_Coord
+            vertex_list[it_t++].uv = { (i+1)*tex_div_width_x , 1*tex_width_y + j*tex_div_width_y     };
+            vertex_list[it_t++].uv = { i*tex_div_width_x     , 1*tex_width_y + j*tex_div_width_y     };
+            vertex_list[it_t++].uv = { (i+1)*tex_div_width_x , 1*tex_width_y + (j+1)*tex_div_width_y };
+
+            vertex_list[it_t++].uv = { i*tex_div_width_x     , 1*tex_width_y + j*tex_div_width_y     };
+            vertex_list[it_t++].uv = { i*tex_div_width_x     , 1*tex_width_y + (j+1)*tex_div_width_y };
+            vertex_list[it_t++].uv = { (i+1)*tex_div_width_x , 1*tex_width_y + (j+1)*tex_div_width_y };
+
+            // Color
+            vertex_list[it_t-6].color = { 0.8f, 0.8f, 0.8f };
+            vertex_list[it_t-4].color = { 0.8f, 0.8f, 0.8f };
+            vertex_list[it_t-5].color = { 0.8f, 0.8f, 0.8f };
+    
+            vertex_list[it_t-3].color = { 0.8f, 0.8f, 0.8f };
+            vertex_list[it_t-2].color = { 0.8f, 0.8f, 0.8f };
+            vertex_list[it_t-1].color = { 0.8f, 0.8f, 0.8f };
+
+            // =========== [ Z Back Face ] =========== //
+            
+            // Width Z
+            const float wz1_2 = half_width_x - div_width_x*i;
+            const float wz2_2 = half_width_x - div_width_x*(i+1);
+            // Height Z
+            const float hz1_2 = -half_width_y + div_width_y*j;
+            const float hz2_2 = -half_width_y + div_width_y*(j+1);
+            
+            // Vertices
+            vertex_list[it++].position = { wz1_2 , hz1_2 , -half_width_z };
+            vertex_list[it++].position = { wz2_2 , hz2_2 , -half_width_z };
+            vertex_list[it++].position = { wz2_2 , hz1_2 , -half_width_z };
+
+            vertex_list[it++].position = { wz1_2 , hz1_2 , -half_width_z };
+            vertex_list[it++].position = { wz1_2 , hz2_2 , -half_width_z };
+            vertex_list[it++].position = { wz2_2 , hz2_2 , -half_width_z };
+
+            // Normals
+            vertex_list[it_n++].normal = { 0 , 0 , -1 };
+            vertex_list[it_n++].normal = { 0 , 0 , -1 };
+            vertex_list[it_n++].normal = { 0 , 0 , -1 };
+
+            vertex_list[it_n++].normal = { 0 , 0 , -1 };
+            vertex_list[it_n++].normal = { 0 , 0 , -1 };
+            vertex_list[it_n++].normal = { 0 , 0 , -1 };
+
+            // Texture_Coord
+            vertex_list[it_t++].uv = { 2*tex_width_x + i*tex_div_width_x     , 1*tex_width_y + j*tex_div_width_y     };
+            vertex_list[it_t++].uv = { 2*tex_width_x + (i+1)*tex_div_width_x , 1*tex_width_y + (j+1)*tex_div_width_y };
+            vertex_list[it_t++].uv = { 2*tex_width_x + (i+1)*tex_div_width_x , 1*tex_width_y + j*tex_div_width_y     };
+
+            vertex_list[it_t++].uv = { 2*tex_width_x + i*tex_div_width_x     , 1*tex_width_y + j*tex_div_width_y     };
+            vertex_list[it_t++].uv = { 2*tex_width_x + i*tex_div_width_x     , 1*tex_width_y + (j+1)*tex_div_width_y };
+            vertex_list[it_t++].uv = { 2*tex_width_x + (i+1)*tex_div_width_x , 1*tex_width_y + (j+1)*tex_div_width_y };
+
+            // Color
+            vertex_list[it_t-6].color = { 0.8f, 0.8f, 0.8f };
+            vertex_list[it_t-4].color = { 0.8f, 0.8f, 0.8f };
+            vertex_list[it_t-5].color = { 0.8f, 0.8f, 0.8f };
+    
+            vertex_list[it_t-3].color = { 0.8f, 0.8f, 0.8f };
+            vertex_list[it_t-2].color = { 0.8f, 0.8f, 0.8f };
+            vertex_list[it_t-1].color = { 0.8f, 0.8f, 0.8f };
+
+            // =========== [ Y Front Face ] =========== //
+
+            // Width Y
+            const float wy1_1 = half_width_x - div_width_x*i;
+            const float wy2_1 = half_width_x - div_width_x*(i+1);
+            // Height Y
+            const float hy1_1 = half_width_z - div_width_z*j;
+            const float hy2_1 = half_width_z - div_width_z*(j+1);
+
+            // Vertices
+            vertex_list[it++].position = { wy1_1 , half_width_y , hy1_1 };
+            vertex_list[it++].position = { wy2_1 , half_width_y , hy1_1 };
+            vertex_list[it++].position = { wy2_1 , half_width_y , hy2_1 };
+
+            vertex_list[it++].position = { wy1_1 , half_width_y , hy1_1 };
+            vertex_list[it++].position = { wy2_1 , half_width_y , hy2_1 };
+            vertex_list[it++].position = { wy1_1 , half_width_y , hy2_1 };
+
+            // Normals
+            vertex_list[it_n++].normal = { 0 , 1 , 0 };
+            vertex_list[it_n++].normal = { 0 , 1 , 0 };
+            vertex_list[it_n++].normal = { 0 , 1 , 0 };
+
+            vertex_list[it_n++].normal = { 0 , 1 , 0 };
+            vertex_list[it_n++].normal = { 0 , 1 , 0 };
+            vertex_list[it_n++].normal = { 0 , 1 , 0 };
+
+            // Texture_Coord
+            vertex_list[it_t++].uv = { 1*tex_width_x + j*tex_div_width_x     , 2*tex_width_y + i*tex_div_width_y     };
+            vertex_list[it_t++].uv = { 1*tex_width_x + j*tex_div_width_x , 2*tex_width_y + (i+1)*tex_div_width_y     };
+            vertex_list[it_t++].uv = { 1*tex_width_x + (j+1)*tex_div_width_x , 2*tex_width_y + (i+1)*tex_div_width_y };
+
+            vertex_list[it_t++].uv = { 1*tex_width_x + j*tex_div_width_x     , 2*tex_width_y + i*tex_div_width_y     };
+            vertex_list[it_t++].uv = { 1*tex_width_x + (j+1)*tex_div_width_x , 2*tex_width_y + (i+1)*tex_div_width_y };
+            vertex_list[it_t++].uv = { 1*tex_width_x + (j+1)*tex_div_width_x     , 2*tex_width_y + i*tex_div_width_y };
+
+            // Color
+            vertex_list[it_t-6].color = { 0.8f, 0.8f, 0.8f };
+            vertex_list[it_t-4].color = { 0.8f, 0.8f, 0.8f };
+            vertex_list[it_t-5].color = { 0.8f, 0.8f, 0.8f };
+    
+            vertex_list[it_t-3].color = { 0.8f, 0.8f, 0.8f };
+            vertex_list[it_t-2].color = { 0.8f, 0.8f, 0.8f };
+            vertex_list[it_t-1].color = { 0.8f, 0.8f, 0.8f };
+        
+            // =========== [ Y Back Face ] =========== //
+
+            // Width Y
+            const float wy1_2 = -half_width_x + div_width_x*i;
+            const float wy2_2 = -half_width_x + div_width_x*(i+1);
+            // Height Y
+            const float hy1_2 = half_width_z - div_width_z*j;
+            const float hy2_2 = half_width_z - div_width_z*(j+1);
+
+            // Vertices
+            vertex_list[it++].position = { wy2_2 , -half_width_y , hy2_2 };
+            vertex_list[it++].position = { wy1_2 , -half_width_y , hy1_2 };
+            vertex_list[it++].position = { wy2_2 , -half_width_y , hy1_2 };
+
+            vertex_list[it++].position = { wy2_2 , -half_width_y , hy2_2 };
+            vertex_list[it++].position = { wy1_2 , -half_width_y , hy2_2 };
+            vertex_list[it++].position = { wy1_2 , -half_width_y , hy1_2 };
+
+            // Normals
+            vertex_list[it_n++].normal = { 0 , -1 , 0 };
+            vertex_list[it_n++].normal = { 0 , -1 , 0 };
+            vertex_list[it_n++].normal = { 0 , -1 , 0 };
+
+            vertex_list[it_n++].normal = { 0 , -1 , 0 };
+            vertex_list[it_n++].normal = { 0 , -1 , 0 };
+            vertex_list[it_n++].normal = { 0 , -1 , 0 };
+
+            // Texture_Coord
+            vertex_list[it_t++].uv = { 1*tex_width_x + (j+1)*tex_div_width_x , (i+1)*tex_div_width_y };
+            vertex_list[it_t++].uv = { 1*tex_width_x + j*tex_div_width_x     , i*tex_div_width_y     };
+            vertex_list[it_t++].uv = { 1*tex_width_x + j*tex_div_width_x     , (i+1)*tex_div_width_y };
+
+            vertex_list[it_t++].uv = { 1*tex_width_x + (j+1)*tex_div_width_x , (i+1)*tex_div_width_y };
+            vertex_list[it_t++].uv = { 1*tex_width_x + (j+1)*tex_div_width_x , i*tex_div_width_y     };
+            vertex_list[it_t++].uv = { 1*tex_width_x + j*tex_div_width_x     , i*tex_div_width_y     };
+
+            // Color
+            vertex_list[it_t-6].color = { 0.8f, 0.8f, 0.8f };
+            vertex_list[it_t-4].color = { 0.8f, 0.8f, 0.8f };
+            vertex_list[it_t-5].color = { 0.8f, 0.8f, 0.8f };
+    
+            vertex_list[it_t-3].color = { 0.8f, 0.8f, 0.8f };
+            vertex_list[it_t-2].color = { 0.8f, 0.8f, 0.8f };
+            vertex_list[it_t-1].color = { 0.8f, 0.8f, 0.8f };
+        }
+    }
+
+    return vertex_list;
+}
+
 } // namespace kzn
