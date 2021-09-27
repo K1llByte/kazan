@@ -6,7 +6,7 @@ layout(location = 1) in vec3 frag_position;
 layout(location = 2) in vec3 frag_normal;
 
 // Uniform buffer block
-layout(set = 0, binding = 1) uniform Camera {
+layout(set = 0, binding = 0) uniform Camera {
     vec3 position;
 } cam;
 
@@ -36,7 +36,7 @@ struct PointLight {
     vec3 specular;
 };
 
-const float shininess = 128.5f;
+const float shininess = 8.0f;
 
 const DirLight dir_light_0 = {
     normalize(vec3(1.0, -3.0, -1.0)),
@@ -47,15 +47,15 @@ const DirLight dir_light_0 = {
 };
 
 const PointLight point_light_0 = {
-    vec3(1.6f, 1.3f, 1.5f),
+    vec3(2.0f, 2.0f, 2.0f),
 
-    1.0f,
-    0.0f,
+    0.2f,
+    1.f,
     0.0f,
 
     vec3(0.2f),
     vec3(0.8f),
-    vec3(1.f)
+    vec3(1.0f)
 };
 
 
@@ -87,13 +87,13 @@ vec3 compute_point_light(PointLight light, vec3 normal, vec3 frag_pos, vec3 view
     float attenuation = 1.0 / (light.constant + light.linear * distance + 
   	    light.quadratic * (distance * distance));    
     // combine results
-    vec3 ambient  = light.ambient  * frag_color;
-    vec3 diffuse  = light.diffuse  * diff * frag_color;
-    vec3 specular = light.specular * spec * frag_color;
-    ambient  *= attenuation;
-    diffuse  *= attenuation;
-    specular *= attenuation;
-    return (ambient + diffuse/*  + specular */);
+    vec3 ambient  = attenuation * light.ambient  /* * frag_color */;
+    vec3 diffuse  = attenuation * light.diffuse  * diff /* * frag_color */;
+    vec3 specular = attenuation * light.specular * spec /* * frag_color */;
+    // ambient  *= attenuation;
+    // diffuse  *= attenuation;
+    // specular *= attenuation;
+    return (ambient + diffuse + specular) * frag_color;
 } 
 
 //////////////////////////////////////////////////////////
@@ -101,6 +101,6 @@ vec3 compute_point_light(PointLight light, vec3 normal, vec3 frag_pos, vec3 view
 void main()
 {
     // vec3 result = compute_dir_light(dir_light_0, frag_normal, cam.position);
-    vec3 result = compute_point_light(point_light_0, frag_normal, frag_position, cam.position);
+    vec3 result = compute_point_light(point_light_0, frag_normal, frag_position, normalize(cam.position - frag_position));
     out_color = vec4(result, 1.0);
 }

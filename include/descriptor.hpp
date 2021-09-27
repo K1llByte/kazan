@@ -101,8 +101,6 @@ public:
 template<typename T>
 void UniformBuffer<T>::update(const T& data)
 {
-    std::cout << "binding: " << binding << '\n';
-    std::cout << "buffers.size()" << buffers.size() << "\n";
     void* device_data;
     vkMapMemory(device->device(), buffers_memory[*current_index], 0, sizeof(T), 0, &device_data);
     memcpy(device_data, &data, sizeof(T));

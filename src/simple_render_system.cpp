@@ -11,8 +11,8 @@ namespace kzn
 
 struct PushConstantsData
 {
-    glm::vec4 data;
-    glm::mat4 pvm;
+    glm::mat4 proj_view;
+    glm::mat4 model;
 };
 
 
@@ -48,35 +48,31 @@ void SimpleRenderSystem::render_game_objects(
 
     // std::cout << "render loop (camera update above)\n";
     _pipeline->bind(command_buffer);
+    PushConstantsData push_data {
+        .proj_view = camera.projection() * camera.view(),
+    };
     
     for(auto& obj : game_objects)
     {
         // obj.transform.translation.y = glm::mod(obj.transform.translation.y + 0.01f, glm::two_pi<float>());
         // obj.transform.translation.x = glm::mod(obj.transform.translation.x + 0.005f, 1.f);
 
-        // if(obj.id() == 1)
-        //     obj.transform.translation.x = glm::mod(obj.transform.translation.x + 0.005f, 1.f);
-        
-        // if(obj.id() == 0)
-        //     obj.transform.translation.y = glm::mod(obj.transform.translation.y + 0.01f, 1.f);
+        push_data.model = obj.transform.mat4();
 
-        // PushConstantsData push_data{};
-        // push_data.pvm = projection_view * obj.transform.mat4();
-
-        // vkCmdPushConstants(
-        //     command_buffer,
-        //     _pipeline_layout,
-        //     VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT,
-        //     0,
-        //     sizeof(PushConstantsData),
-        //     &push_data);
+        vkCmdPushConstants(
+            command_buffer,
+            _pipeline_layout,
+            VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT,
+            0,
+            sizeof(PushConstantsData),
+            &push_data);
 
         // std::cout << "obj " << obj.id() << "\n";
-        _pvm_buffer.update({
-            .model = obj.transform.mat4(),
-            .view = camera.view(),
-            .projection = camera.projection(),
-        });
+        // _pvm_buffer.update({
+        //     .model = obj.transform.mat4(),
+        //     .view = camera.view(),
+        //     .projection = camera.projection(),
+        // });
         _descriptor_set.bind(command_buffer, _pipeline_layout);
 
         obj.model->bind(command_buffer);
@@ -89,17 +85,17 @@ void SimpleRenderSystem::create_pipeline_layout()
 {
     ///////////////// Push Constants //////////////////
 
-    // VkPushConstantRange push_constant_range{};
-    // push_constant_range.stageFlags = VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT;
-    // push_constant_range.offset = 0;
-    // push_constant_range.size = sizeof(PushConstantsData);
+    VkPushConstantRange push_constant_range{};
+    push_constant_range.stageFlags = VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT;
+    push_constant_range.offset = 0;
+    push_constant_range.size = sizeof(PushConstantsData);
 
     ///////////////// Uniform Buffers /////////////////
 
-    std::vector<VkDescriptorSetLayoutBinding> layout_bindings(2);
+    std::vector<VkDescriptorSetLayoutBinding> layout_bindings(1);
 
-    _pvm_buffer = _renderer.alloc_buffer<PVM>(&layout_bindings[0]);
-    _cam_buffer = _renderer.alloc_buffer<CameraData>(&layout_bindings[1]);
+    // _pvm_buffer = _renderer.alloc_buffer<PVM>(&layout_bindings[0]);
+    _cam_buffer = _renderer.alloc_buffer<CameraData>(&layout_bindings[0]);
 
     VkDescriptorSetLayoutCreateInfo layout_info{};
     layout_info.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
@@ -125,11 +121,17 @@ void SimpleRenderSystem::create_pipeline_layout()
     // pipeline_layout_info.pushConstantRangeCount = 1;
     // pipeline_layout_info.pPushConstantRanges = &push_constant_range;
 
-    // With Uniform Buffers
+    // // With Uniform Buffers
+    // pipeline_layout_info.setLayoutCount = 1;
+    // pipeline_layout_info.pSetLayouts = &_descriptor_set_layout;
+    // pipeline_layout_info.pushConstantRangeCount = 0;
+    // pipeline_layout_info.pPushConstantRanges = nullptr;
+
+    // With Both
     pipeline_layout_info.setLayoutCount = 1;
     pipeline_layout_info.pSetLayouts = &_descriptor_set_layout;
-    pipeline_layout_info.pushConstantRangeCount = 0;
-    pipeline_layout_info.pPushConstantRanges = nullptr;
+    pipeline_layout_info.pushConstantRangeCount = 1;
+    pipeline_layout_info.pPushConstantRanges = &push_constant_range;
 
     if(vkCreatePipelineLayout(_device.device(), &pipeline_layout_info, nullptr, &_pipeline_layout) != VK_SUCCESS)
     {

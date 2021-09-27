@@ -182,9 +182,6 @@ void TestApp::load_game_objects()
 //       {{ .5f,  .5f, -0.5f}, {0.0f, 0.0f, 0.0f}, {.1f, .8f, .1f}},
 //   };
 
-
-
-
     // auto cube_obj = GameObject::create_game_object();
     // cube_obj.model = Model::load_from_file(_device, "models/colored_cube.obj");
     // cube_obj.transform.translation = { 0.f, 0.f, 3.5f};
@@ -197,7 +194,7 @@ void TestApp::load_game_objects()
     _game_objects.push_back(std::move(floor_obj));
     
     auto light_obj = GameObject::create_game_object();
-    light_obj.model = new Model(_device, ShapeGenerator::gen_sphere(0.5f, 30, 30));
+    light_obj.model = new Model(_device, ShapeGenerator::gen_sphere(0.5f, 50, 50));
     light_obj.transform.translation = {0.0f, 1.0f, 0.0f};
     _game_objects.push_back(std::move(light_obj));
 
