@@ -183,7 +183,7 @@ void TestApp::load_game_objects()
 //   };
 
     // auto cube_obj = GameObject::create_game_object();
-    // cube_obj.model = Model::load_from_file(_device, "models/colored_cube.obj");
+    // cube_obj.model = Model::load_from_file(_device, "models/monkey.obj");
     // cube_obj.transform.translation = { 0.f, 0.f, 3.5f};
     // cube_obj.transform.scale = { 0.5f, 0.5f, 0.5f};
     // _game_objects.push_back(std::move(cube_obj));
@@ -194,8 +194,8 @@ void TestApp::load_game_objects()
     _game_objects.push_back(std::move(floor_obj));
     
     auto shape_obj = GameObject::create_game_object();
-    shape_obj.model = new Model(_device, ShapeGenerator::gen_box(1.f, 1.f, 1.f, 0)); // gen_sphere(0.5f, 50, 50)
-    shape_obj.transform.translation = {0.0f, 1.0f, 0.0f};
+    shape_obj.model = new Model(_device, ShapeGenerator::gen_torus(1.0f, 0.3f, 40, 40));
+    shape_obj.transform.translation = {0.0f, 0.0f, 0.0f};
     _game_objects.push_back(std::move(shape_obj));
 
 

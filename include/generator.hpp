@@ -1,7 +1,6 @@
 #ifndef GENERATOR_H
 #define GENERATOR_H
 
-#include "utils.hpp"
 #include "model.hpp"
 
 namespace kzn
@@ -25,6 +24,10 @@ public:
     static std::vector<Model::Vertex> gen_box(const float width_x, const float width_y, const float width_z, const uint divisions, const Options opt = {});
 
     static std::vector<Model::Vertex> gen_cone(const float radius, const float height, const uint slices, const uint stacks, const Options opt = {});
+
+    static std::vector<Model::Vertex> gen_plane(const float width, const Options opt = {});
+
+    static std::vector<Model::Vertex> gen_torus(const float radius, const float cyl_radius, const uint slices, const uint cyl_slices, const Options opt = {});
 };
 
 ////////////////////////////////////////////////////////////////

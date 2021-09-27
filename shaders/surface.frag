@@ -41,9 +41,9 @@ const float shininess = 16.0f;
 const DirLight dir_light_0 = {
     normalize(vec3(1.0, -3.0, -1.0)),
 
-    vec3(0.02f),
-    vec3(1.f),
-    vec3(1.f)
+    vec3(0.2f),
+    vec3(0.8f),
+    vec3(1.0f)
 };
 
 const PointLight point_light_0 = {
@@ -90,9 +90,6 @@ vec3 compute_point_light(PointLight light, vec3 normal, vec3 frag_pos, vec3 view
     vec3 ambient  = attenuation * light.ambient  /* * frag_color */;
     vec3 diffuse  = attenuation * light.diffuse  * diff /* * frag_color */;
     vec3 specular = attenuation * light.specular * spec /* * frag_color */;
-    // ambient  *= attenuation;
-    // diffuse  *= attenuation;
-    // specular *= attenuation;
     return (ambient + diffuse + specular) * frag_color;
 } 
 
@@ -100,7 +97,8 @@ vec3 compute_point_light(PointLight light, vec3 normal, vec3 frag_pos, vec3 view
 
 void main()
 {
-    // vec3 result = compute_dir_light(dir_light_0, frag_normal, cam.position);
-    vec3 result = compute_point_light(point_light_0, frag_normal, frag_position, normalize(cam.position - frag_position));
+    const vec3 view_dir = normalize(cam.position - frag_position);
+    vec3 result = compute_dir_light(dir_light_0, normalize(frag_normal), view_dir);
+    // vec3 result = compute_point_light(point_light_0, normalize(frag_normal), frag_position, view_dir);
     out_color = vec4(result, 1.0);
 }

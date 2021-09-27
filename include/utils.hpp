@@ -97,7 +97,7 @@ public:
 };
 
 
-constexpr glm::vec3 to_spherical(glm::vec3 coords)
+constexpr glm::vec3 cartesian_to_spherical(glm::vec3 coords)
 {
     const float x = coords.x;
     const float y = coords.y;
@@ -110,7 +110,7 @@ constexpr glm::vec3 to_spherical(glm::vec3 coords)
 }
 
 
-constexpr glm::vec3 to_cartesian(glm::vec3 coords)
+constexpr glm::vec3 spherical_to_cartesian(glm::vec3 coords)
 {
     const float p = coords.x;
     const float theta = coords.y;
@@ -120,6 +120,24 @@ constexpr glm::vec3 to_cartesian(glm::vec3 coords)
         cos(phi) * p,
         sin(phi) * p * cos(theta)
     };
+}
+
+
+constexpr glm::vec3 polar_to_cartesian(glm::vec3 coords)
+{
+    const float s_radius = coords.x;
+    const float y = coords.y;
+    const float s_theta = coords.z;
+    return glm::vec3(s_radius*sin(s_theta) , y , s_radius*cos(s_theta));
+}
+
+
+constexpr glm::vec3 cartesian_to_polar(glm::vec3 coords)
+{
+    const float x = coords.x;
+    const float y = coords.y;
+    const float z = coords.z;
+    return { sqrt(x*x + z*z) , y , atan2(x,z) };
 }
 
 
