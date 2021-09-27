@@ -194,7 +194,7 @@ void TestApp::load_game_objects()
     _game_objects.push_back(std::move(floor_obj));
     
     auto light_obj = GameObject::create_game_object();
-    light_obj.model = new Model(_device, ShapeGenerator::gen_sphere(0.5f, 50, 50));
+    light_obj.model = new Model(_device, ShapeGenerator::gen_cylinder(0.5f, 1.3f, 20)); // gen_sphere(0.5f, 50, 50)
     light_obj.transform.translation = {0.0f, 1.0f, 0.0f};
     _game_objects.push_back(std::move(light_obj));
 
