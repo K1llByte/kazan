@@ -54,7 +54,7 @@ void TestApp::run()
 {
     SimpleRenderSystem render_system{_device, _renderer};
     Camera camera{};
-    camera.lookat_target(glm::vec3(0.0f, 1.0f, 1.0f), glm::vec3(0.0f, 0.0f, 0.0f));
+    camera.lookat_target(glm::vec3(0.0f, 2.0f, 2.0f), glm::vec3(0.0f, 0.0f, 0.0f));
     _interface = Interface(_window, _instance, _device, _renderer);
     CameraController cam_controller(_window, camera);
     UIController ui_controller(_window, _interface);
@@ -123,14 +123,14 @@ void TestApp::load_game_objects()
     //     {{-0.5f,  0.5f, 0.0f}, {0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 1.0f}}
     // };
 
-    std::vector<Model::Vertex> floor{
-        {{-1.f, 0.f, -1.f}, {0.0f, 1.0f, 0.0f}, {.2f, .2f, .2f}},
-        {{ 1.f, 0.f,  1.f}, {0.0f, 1.0f, 0.0f}, {.2f, .2f, .2f}},
-        {{-1.f, 0.f,  1.f}, {0.0f, 1.0f, 0.0f}, {.2f, .2f, .2f}},
-        {{-1.f, 0.f, -1.f}, {0.0f, 1.0f, 0.0f}, {.2f, .2f, .2f}},
-        {{ 1.f, 0.f, -1.f}, {0.0f, 1.0f, 0.0f}, {.2f, .2f, .2f}},
-        {{ 1.f, 0.f,  1.f}, {0.0f, 1.0f, 0.0f}, {.2f, .2f, .2f}},
-    };
+    // std::vector<Model::Vertex> floor{
+    //     {{-1.f, 0.f, -1.f}, {0.0f, 1.0f, 0.0f}, {.2f, .2f, .2f}},
+    //     {{ 1.f, 0.f,  1.f}, {0.0f, 1.0f, 0.0f}, {.2f, .2f, .2f}},
+    //     {{-1.f, 0.f,  1.f}, {0.0f, 1.0f, 0.0f}, {.2f, .2f, .2f}},
+    //     {{-1.f, 0.f, -1.f}, {0.0f, 1.0f, 0.0f}, {.2f, .2f, .2f}},
+    //     {{ 1.f, 0.f, -1.f}, {0.0f, 1.0f, 0.0f}, {.2f, .2f, .2f}},
+    //     {{ 1.f, 0.f,  1.f}, {0.0f, 1.0f, 0.0f}, {.2f, .2f, .2f}},
+    // };
 
 //     std::vector<Model::Vertex> vertices{
 //       // left face (white)
@@ -188,14 +188,14 @@ void TestApp::load_game_objects()
     // cube_obj.transform.scale = { 0.5f, 0.5f, 0.5f};
     // _game_objects.push_back(std::move(cube_obj));
 
-    auto floor_obj = GameObject::create_game_object();
-    floor_obj.model = new Model(_device, floor);
-    floor_obj.transform.translation = {1.0f, 0.0f, 0.0f};
-    _game_objects.push_back(std::move(floor_obj));
+    // auto floor_obj = GameObject::create_game_object();
+    // floor_obj.model = new Model(_device, floor);
+    // floor_obj.transform.translation = {1.0f, 0.0f, 0.0f};
+    // _game_objects.push_back(std::move(floor_obj));
     
     auto shape_obj = GameObject::create_game_object();
-    shape_obj.model = new Model(_device, ShapeGenerator::gen_torus(1.0f, 0.3f, 40, 40));
-    shape_obj.transform.translation = {0.0f, 0.0f, 0.0f};
+    shape_obj.model = new Model(_device, ShapeGenerator::gen_sphere(1.0f, 50, 50));
+    // shape_obj.transform.translation = {0.0f, 0.0f, 0.0f};
     _game_objects.push_back(std::move(shape_obj));
 
 

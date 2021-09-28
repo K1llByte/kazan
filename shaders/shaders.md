@@ -21,7 +21,7 @@ one vertex and color.
 <span style="color:#999999">This shader takes no input.</span>
 
 <details>
-    <img src="https://www.collinsdictionary.com/images/full/cube_112883917.jpg" width=300/>
+    <img src="https://i.imgur.com/LA5B1d8.png" width="80%"/>
 </details>
 
 ___
@@ -44,7 +44,7 @@ Basic surface shaders to render a 3D mesh
         - `mat4 model;`
 
 <details>
-    <img src="https://www.collinsdictionary.com/images/full/cube_112883917.jpg" width=300/>
+    <img src="https://i.imgur.com/T3t3AUv.png" width="80%"/>
 </details>
 
 ___
@@ -75,5 +75,5 @@ This shader must be invoked with 1 instance.
         - `vec3 position;`
 
 <details>
-    <img src="https://www.collinsdictionary.com/images/full/cube_112883917.jpg" width=300/>
+    <img src="https://imgur.com/g4JQWuq" width="80%"/>
 </details>
