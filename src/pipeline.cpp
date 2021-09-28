@@ -318,7 +318,7 @@ void Pipeline::create_graphics_pipeline(
     pipeline_info.basePipelineIndex = -1;
     pipeline_info.basePipelineHandle = VK_NULL_HANDLE;
 
-    if (vkCreateGraphicsPipelines(
+    if(vkCreateGraphicsPipelines(
             _device.device(),
             VK_NULL_HANDLE,
             1,

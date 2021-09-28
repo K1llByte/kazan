@@ -6,7 +6,7 @@ layout(location = 1) in vec3 frag_position;
 layout(location = 2) in vec3 frag_normal;
 
 // Uniform buffer block
-layout(set = 0, binding = 0) uniform Camera {
+layout(binding = 0) uniform Camera {
     vec3 position;
 } cam;
 
