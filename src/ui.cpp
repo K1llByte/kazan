@@ -35,7 +35,7 @@ Interface::Interface(
     pool_info.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
     pool_info.flags = VK_DESCRIPTOR_POOL_CREATE_FREE_DESCRIPTOR_SET_BIT;
     pool_info.maxSets = 1000;
-    pool_info.poolSizeCount = pool_sizes.size();
+    pool_info.poolSizeCount = static_cast<uint32_t>(pool_sizes.size());
     pool_info.pPoolSizes = pool_sizes.data();
 
     if(vkCreateDescriptorPool(_device, &pool_info, nullptr, &imgui_pool) != VK_SUCCESS)
@@ -46,7 +46,7 @@ Interface::Interface(
     // Setup Dear ImGui context
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
-    ImGuiIO &io = ImGui::GetIO();
+    /* ImGuiIO &io = */ ImGui::GetIO();
     // Setup Platform/Renderer bindings
     ImGui_ImplGlfw_InitForVulkan(window.window(), true);
 
@@ -57,7 +57,7 @@ Interface::Interface(
     init_info.Device = _device;
     init_info.Queue = device._graphics_queue;
     init_info.DescriptorPool = imgui_pool;
-    const uint32_t img_count = renderer._swap_chain->image_count();
+    const uint32_t img_count = static_cast<uint32_t>(renderer._swap_chain->image_count());
     init_info.MinImageCount = img_count;
     init_info.ImageCount = img_count;
     init_info.MSAASamples = VK_SAMPLE_COUNT_1_BIT;

@@ -12,6 +12,7 @@
 #include <iostream>
 
 #include <glm/glm.hpp>
+#include <glm/gtc/constants.hpp>
 
 // // Either
 // #include <functional>
@@ -40,7 +41,7 @@ constexpr size_t multiple_hash(size_t seed, const T& head, const Args&... tail)
 
 constexpr float radians(const float degrees)
 {
-    return degrees * M_PI / 180.f;
+    return degrees * static_cast<float>(M_PI) / 180.f;
 }
 
 

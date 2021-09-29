@@ -48,9 +48,8 @@ void SimpleRenderSystem::render_game_objects(
 
     // std::cout << "render loop (camera update above)\n";
     _pipeline->bind(command_buffer);
-    PushConstantsData push_data {
-        .proj_view = camera.projection() * camera.view(),
-    };
+    PushConstantsData push_data{};
+    push_data.proj_view = camera.projection() * camera.view();
     
     for(auto& obj : game_objects)
     {
@@ -99,7 +98,7 @@ void SimpleRenderSystem::create_pipeline_layout()
 
     VkDescriptorSetLayoutCreateInfo layout_info{};
     layout_info.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
-    layout_info.bindingCount = layout_bindings.size();
+    layout_info.bindingCount = static_cast<uint32_t>(layout_bindings.size());
     layout_info.pBindings = layout_bindings.data();
 
     if(vkCreateDescriptorSetLayout(_device.device(), &layout_info, nullptr, &_descriptor_set_layout) != VK_SUCCESS)

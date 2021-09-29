@@ -2,10 +2,12 @@
 
 #include "utils.hpp"
 
+#define PI glm::pi<float>()
+
 namespace kzn
 {
 
-std::vector<Model::Vertex> ShapeGenerator::gen_sphere(const float radius, const uint slices, const uint stacks, const Options opt)
+std::vector<Model::Vertex> ShapeGenerator::gen_sphere(const float radius, const uint slices, const uint stacks, const Options)
 {
     if(radius <= 0 || slices < 3 || stacks < 2)
     {
@@ -15,9 +17,10 @@ std::vector<Model::Vertex> ShapeGenerator::gen_sphere(const float radius, const 
     const size_t NUM_VTX = (6*stacks-6)*slices;
     std::vector<Model::Vertex> vertex_list(NUM_VTX);
     
-    const float pi_f = M_PI;
-    const float stack_angle = M_PI / stacks;
-    const float slices_angle = 2*M_PI / slices;
+    
+    const float pi_f = PI;
+    const float stack_angle = PI / stacks;
+    const float slices_angle = 2*PI / slices;
 
     const float tex_slice = (1.f / slices);
     const float tex_stacks = (1.f / stacks);
@@ -28,7 +31,7 @@ std::vector<Model::Vertex> ShapeGenerator::gen_sphere(const float radius, const 
 
     using kzn::utils::spherical_to_cartesian;
 
-    for(uint i = 0 ; i < slices ; ++i)
+    for(size_t i = 0 ; i < slices ; ++i)
     {	
         // Vertices //////////////////////////////////////////////////////
 
@@ -134,7 +137,7 @@ std::vector<Model::Vertex> ShapeGenerator::gen_sphere(const float radius, const 
 }
 
 
-std::vector<Model::Vertex> ShapeGenerator::gen_cylinder(const float radius, const float height, const uint slices, const Options opt)
+std::vector<Model::Vertex> ShapeGenerator::gen_cylinder(const float radius, const float height, const uint slices, const Options)
 {
     if(radius <= 0 || slices < 3)
     {
@@ -143,17 +146,17 @@ std::vector<Model::Vertex> ShapeGenerator::gen_cylinder(const float radius, cons
     
     const size_t NUM_VTX = 12*slices;
     std::vector<Model::Vertex> vertex_list(NUM_VTX);
-    const float angle = 2*M_PI / slices;
+    const float angle = 2*PI / static_cast<float>(slices);
     const float half_height = height / 2;
 
-    const float tex_div_width = 1.0f / slices;
+    const float tex_div_width = 1.0f / static_cast<float>(slices);
     //std::cout << tex_div_width << "\n";
 
     uint it = 0;
     uint it_n = 0;
     uint it_t = 0;
 
-    for(uint i = 0 ; i < slices ; ++i)
+    for(size_t i = 0 ; i < slices ; ++i)
     {
         // Sides
         const float tmp1 = i*angle;
@@ -250,7 +253,7 @@ std::vector<Model::Vertex> ShapeGenerator::gen_cylinder(const float radius, cons
 }
 
 
-std::vector<Model::Vertex> ShapeGenerator::gen_box(const float width_x, const float width_y, const float width_z, const uint divisions, const Options opt)
+std::vector<Model::Vertex> ShapeGenerator::gen_box(const float width_x, const float width_y, const float width_z, const uint divisions, const Options)
 {
     if(width_x <= 0 || width_y <= 0 || width_z <= 0)
     {
@@ -277,7 +280,7 @@ std::vector<Model::Vertex> ShapeGenerator::gen_box(const float width_x, const fl
     uint it_n = 0;
     uint it_t = 0;
 
-    for(uint i = 0 ; i < divisions+1 ; ++i)
+    for(size_t i = 0 ; i < divisions+1 ; ++i)
     {
         for(uint j = 0 ; j < divisions+1 ; ++j)
         {	
@@ -551,7 +554,7 @@ std::vector<Model::Vertex> ShapeGenerator::gen_box(const float width_x, const fl
 }
 
 
-std::vector<Model::Vertex> ShapeGenerator::gen_cone(const float radius, const float height, const uint slices, const uint stacks, const Options opt)
+std::vector<Model::Vertex> ShapeGenerator::gen_cone(const float radius, const float height, const uint slices, const uint stacks, const Options)
 {
     if(radius <= 0 || height < 0 || slices < 3 || stacks < 1)
     {
@@ -560,11 +563,11 @@ std::vector<Model::Vertex> ShapeGenerator::gen_cone(const float radius, const fl
 
     const size_t NUM_VTX = 6*slices*stacks;
     std::vector<Model::Vertex> vertex_list(NUM_VTX);
-    const float angle = 2*M_PI / slices;
+    const float angle = 2*PI / slices;
     const float stack_height = height / stacks;
     const float stack_radius = radius / stacks;
 
-    const float tex_div_slice = 2*M_PI / slices;
+    const float tex_div_slice = 2*PI / slices;
     
     using kzn::utils::polar_to_cartesian;
 
@@ -572,7 +575,7 @@ std::vector<Model::Vertex> ShapeGenerator::gen_cone(const float radius, const fl
     uint it_n = 0;
     uint it_t = 0;
 
-    for(uint i = 0 ; i < slices ; ++i)
+    for(size_t i = 0 ; i < slices ; ++i)
     {
         const float a1 = i*angle;
         const float a2 = (i+1)*angle;
@@ -669,7 +672,7 @@ std::vector<Model::Vertex> ShapeGenerator::gen_cone(const float radius, const fl
 }
 
 
-std::vector<Model::Vertex> ShapeGenerator::gen_plane(const float width, const Options opt)
+std::vector<Model::Vertex> ShapeGenerator::gen_plane(const float width, const Options)
 {
     if(width <= 0)
     {
@@ -720,7 +723,7 @@ std::vector<Model::Vertex> ShapeGenerator::gen_plane(const float width, const Op
 }
 
 
-std::vector<Model::Vertex> ShapeGenerator::gen_torus(const float radius, const float cyl_radius, const uint slices, const uint cyl_slices, const Options opt)
+std::vector<Model::Vertex> ShapeGenerator::gen_torus(const float radius, const float cyl_radius, const uint slices, const uint cyl_slices, const Options)
 {
     if(radius <= 0 || cyl_radius <= 0 || cyl_radius >= radius || slices < 3 || cyl_slices < 3)
     {
@@ -730,8 +733,8 @@ std::vector<Model::Vertex> ShapeGenerator::gen_torus(const float radius, const f
     const size_t NUM_VTX = 6*slices*cyl_slices;
 
     std::vector<Model::Vertex> vertex_list(NUM_VTX);
-    const float angle = 2*M_PI / slices;
-    const float cyl_angle = 2*M_PI / cyl_slices;
+    const float angle = 2*PI / slices;
+    const float cyl_angle = 2*PI / cyl_slices;
     const float cyl_distance = radius - cyl_radius;
 
     const float tex_div_slice = 1.0f / slices;
@@ -742,7 +745,7 @@ std::vector<Model::Vertex> ShapeGenerator::gen_torus(const float radius, const f
     uint it_n = 0;
     uint it_t = 0;
 
-    for(uint i = 0 ; i < slices ; ++i)
+    for(size_t i = 0 ; i < slices ; ++i)
     {
         // Sides
         const float a1 = i*angle;
