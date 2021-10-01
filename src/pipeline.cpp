@@ -119,6 +119,26 @@ PipelineConfig&& PipelineConfigBuilder::build()
 }
 
 
+PipelineLayoutBuilder::PipelineLayoutBuilder(Renderer& renderer)
+{
+    
+}
+
+
+template<typename T>
+[[no_discard]] UniformBuffer<T> PipelineLayoutBuilder::create_uniform_buffer(VkShaderStageFlags stages)
+{
+    
+}
+
+
+template<typename T>
+[[no_discard]] PushConstant<T> PipelineLayoutBuilder::create_push_constant(VkShaderStageFlags stages)
+{
+    
+}
+
+
 Pipeline::Pipeline(
         Device& device,
         const std::string& vert_shader_path,

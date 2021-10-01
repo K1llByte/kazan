@@ -82,6 +82,17 @@ void SimpleRenderSystem::render_game_objects(
 
 void SimpleRenderSystem::create_pipeline_layout()
 {
+    // auto dsb = descriptor_pool.descriptor_set_builder(); //DescriptorSetBuilder();
+    // UniformBuffer<PVM> pvm_ub = dsb.create_uniform_buffer(VK_SHADER_STAGE_VERTEX_BIT);
+    // DescriptorSet descriptor_set = dsb.build();
+
+    
+    // PushConstant<PVM> pvm_pc(VK_SHADER_STAGE_VERTEX_BIT);
+    // VkPipelineLayout layout = PipelineLayoutBuilder()
+    //     .push_constant(pvm_pc)
+    //     .descriptor_set(descriptor_set)
+    //     .build();
+
     ///////////////// Push Constants //////////////////
 
     VkPushConstantRange push_constant_range{};

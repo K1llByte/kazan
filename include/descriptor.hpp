@@ -76,11 +76,28 @@ public:
     ~UniformBuffer() = default;
 
     void update(const T& data);
-
-private:
-
-    constexpr bool initialized();
 };
+
+
+template<typename T>
+class PushConstant
+{
+public:
+
+    // friend class Renderer;
+
+    // T                  _data;
+    VkShaderStageFlags stages;
+
+public:
+
+    // PushConstant(const PushConstant&) = default;
+    PushConstant() = default;
+    ~PushConstant() = default;
+
+    void push(VkCommandBuffer command_buffer, VkPipelineLayout layout, const T& data);
+};
+
 
 class DescriptorSet
 {
@@ -109,10 +126,23 @@ void UniformBuffer<T>::update(const T& data)
 
 
 template<typename T>
-constexpr bool UniformBuffer<T>::initialized()
+void PushConstant<T>::push(VkCommandBuffer command_buffer, VkPipelineLayout layout, const T& data)
 {
-    return device != nullptr;
+    vkCmdPushConstants(
+        command_buffer,
+        layout,
+        stages,
+        0,
+        sizeof(T),
+        &data);
 }
+
+
+// template<typename T>
+// constexpr bool UniformBuffer<T>::initialized()
+// {
+//     return device != nullptr;
+// }
 
 }
 

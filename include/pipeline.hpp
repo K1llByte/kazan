@@ -2,6 +2,7 @@
 #define PIPELINE_H
 
 #include "device.hpp"
+#include "renderer.hpp"
 
 namespace kzn
 {
@@ -43,6 +44,25 @@ public:
     PipelineConfigBuilder& set_topology(VkPrimitiveTopology topology);
 
     PipelineConfig&& build();
+};
+
+
+class PipelineLayoutBuilder
+{
+private:
+
+public:
+
+    PipelineLayoutBuilder(Renderer& renderer);
+    ~PipelineLayoutBuilder() = default;
+
+    template<typename T>
+    [[no_discard]] UniformBuffer<T> create_uniform_buffer(VkShaderStageFlags stages = VK_SHADER_STAGE_ALL_GRAPHICS);
+
+    template<typename T>
+    [[no_discard]] PushConstant<T> create_push_constant(VkShaderStageFlags stages = VK_SHADER_STAGE_ALL_GRAPHICS);
+
+    VkPipelineLayout build();
 };
 
 
