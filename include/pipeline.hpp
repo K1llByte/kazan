@@ -57,10 +57,10 @@ public:
     ~PipelineLayoutBuilder() = default;
 
     template<typename T>
-    [[no_discard]] UniformBuffer<T> create_uniform_buffer(VkShaderStageFlags stages = VK_SHADER_STAGE_ALL_GRAPHICS);
+    [[nodiscard]] UniformBuffer<T> create_uniform_buffer(VkShaderStageFlags stages = VK_SHADER_STAGE_ALL_GRAPHICS);
 
     template<typename T>
-    [[no_discard]] PushConstant<T> create_push_constant(VkShaderStageFlags stages = VK_SHADER_STAGE_ALL_GRAPHICS);
+    [[nodiscard]] PushConstant<T> create_push_constant(VkShaderStageFlags stages = VK_SHADER_STAGE_ALL_GRAPHICS);
 
     VkPipelineLayout build();
 };
