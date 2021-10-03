@@ -79,6 +79,29 @@ public:
 };
 
 
+template<typename T, size_t N>
+class UniformBufferArray
+{
+public:
+
+    // friend class Renderer;
+
+    Device*                                   device = nullptr;
+    uint32_t*                                 current_index = nullptr;
+    uint32_t                                  binding;
+    std::vector<VkBuffer>                     buffers;
+    std::vector<VkDeviceMemory>               buffers_memory;
+
+public:
+
+    // UniformBuffer(const UniformBuffer&) = default;
+    UniformBufferArray() = default;
+    ~UniformBufferArray() = default;
+
+    void update(const std::array<T,N>& data);
+};
+
+
 template<typename T>
 class PushConstant
 {
@@ -121,6 +144,16 @@ void UniformBuffer<T>::update(const T& data)
     void* device_data;
     vkMapMemory(device->device(), buffers_memory[*current_index], 0, sizeof(T), 0, &device_data);
     memcpy(device_data, &data, sizeof(T));
+    vkUnmapMemory(device->device(), buffers_memory[*current_index]);
+}
+
+
+template<typename T, size_t N>
+void UniformBufferArray<T,N>::update(const std::array<T,N>& data)
+{
+    void* device_data;
+    vkMapMemory(device->device(), buffers_memory[*current_index], 0, sizeof(T), 0, &device_data);
+    memcpy(device_data, &data, sizeof(T)*N);
     vkUnmapMemory(device->device(), buffers_memory[*current_index]);
 }
 
