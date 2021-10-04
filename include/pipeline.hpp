@@ -2,7 +2,8 @@
 #define PIPELINE_H
 
 #include "device.hpp"
-#include "renderer.hpp"
+#include "descriptor.hpp"
+// #include "renderer.hpp"
 
 namespace kzn
 {
@@ -100,13 +101,6 @@ private:
 };
 
 ////////////////////////////////////////////////////////////////
-
-PipelineLayoutBuilder& PipelineLayoutBuilder::add_descriptor_set(const DescriptorSet& set)
-{
-    set_layouts.push_back(set.descriptor_set_layout);
-    return *this;
-}
-
 
 template<typename T>
 PipelineLayoutBuilder& PipelineLayoutBuilder::add_push_constant(const PushConstant<T>& push)

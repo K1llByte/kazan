@@ -119,18 +119,25 @@ PipelineConfig&& PipelineConfigBuilder::build()
 }
 
 
+PipelineLayoutBuilder& PipelineLayoutBuilder::add_descriptor_set(const DescriptorSet& set)
+{
+    set_layouts.push_back(set.descriptor_set_layout);
+    return *this;
+}
+
+
 VkPipelineLayout PipelineLayoutBuilder::build()
 {
     VkPipelineLayoutCreateInfo pipeline_layout_info{};
     pipeline_layout_info.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
 
-    pipeline_layout_info.setLayoutCount = 1;
-    pipeline_layout_info.pSetLayouts = &_descriptor_set_layout;
-    pipeline_layout_info.pushConstantRangeCount = 1;
-    pipeline_layout_info.pPushConstantRanges = &push_constant_range;
+    pipeline_layout_info.setLayoutCount = static_cast<uint32_t>(set_layouts.size());
+    pipeline_layout_info.pSetLayouts = set_layouts.data();
+    pipeline_layout_info.pushConstantRangeCount = static_cast<uint32_t>(push_ranges.size());
+    pipeline_layout_info.pPushConstantRanges = push_ranges.data();
 
     VkPipelineLayout pipeline_layout;
-    if(vkCreatePipelineLayout(device.device(), &pipeline_layout_info, nullptr, &pipeline_layout) != VK_SUCCESS)
+    if(vkCreatePipelineLayout(device->device(), &pipeline_layout_info, nullptr, &pipeline_layout) != VK_SUCCESS)
     {
         throw std::runtime_error("failed to create pipeline layout!");
     }

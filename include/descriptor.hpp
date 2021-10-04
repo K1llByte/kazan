@@ -71,10 +71,6 @@ public:
 
 public:
 
-    // UniformBuffer(const UniformBuffer&) = default;
-    UniformBuffer() = default;
-    ~UniformBuffer() = default;
-
     void update(const T& data);
 };
 
@@ -115,7 +111,8 @@ public:
 public:
 
     // PushConstant(const PushConstant&) = default;
-    PushConstant() = default;
+    PushConstant(VkShaderStageFlags _stages = VK_SHADER_STAGE_ALL_GRAPHICS)
+        : stages{_stages} {}
     ~PushConstant() = default;
 
     void push(VkCommandBuffer command_buffer, VkPipelineLayout layout, const T& data);
@@ -182,6 +179,9 @@ template<typename T>
 void UniformBuffer<T>::update(const T& data)
 {
     void* device_data;
+    
+    std::cout << "debug 1\n";
+    std::cout << "current_index: " << current_index << "\n";
     vkMapMemory(device->device(), buffers_memory[*current_index], 0, sizeof(T), 0, &device_data);
     memcpy(device_data, &data, sizeof(T));
     vkUnmapMemory(device->device(), buffers_memory[*current_index]);
@@ -219,7 +219,8 @@ UniformBuffer<T> DescriptorSetBuilder::create_uniform_buffer(VkShaderStageFlags 
     ub.device = this->device;
     ub.buffers = std::vector<VkBuffer>(image_count);
     ub.buffers_memory = std::vector<VkDeviceMemory>(image_count);
-    ub.current_index = current_index;
+    std::cout << "on creation: " << this->current_index << "\n";
+    ub.current_index = this->current_index;
     ub.binding = static_cast<uint32_t>(descriptor_buffer_infos.size()) / image_count;
     VkDeviceSize buffer_size = sizeof(T);
 

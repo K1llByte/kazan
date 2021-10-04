@@ -38,6 +38,7 @@ DescriptorSet DescriptorSetBuilder::build()
     alloc_info.descriptorSetCount = layouts.size();
     alloc_info.pSetLayouts = layouts.data();
 
+    std::cout << "DescriptorSetBuilder::build current_index: " << current_index << "\n";
     auto set = DescriptorSet{
         .current_index = current_index,
         .descriptor_sets = std::vector<VkDescriptorSet>(image_count),
@@ -52,11 +53,11 @@ DescriptorSet DescriptorSetBuilder::build()
     // Update DescriptorSets
     const size_t buffers_count = descriptor_buffer_infos.size() / image_count;
 
-    std::vector<VkWriteDescriptorSet> descriptor_writes(buffers_count);
+    std::vector<VkWriteDescriptorSet> descriptor_writes;
 
     for(size_t i = 0; i < image_count; ++i)
     {
-        // descriptor_writes.resize(buffers_count);
+        descriptor_writes.resize(buffers_count);
         for(size_t j = 0; j < buffers_count; ++j)
         {
             descriptor_writes[j].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;

@@ -9,12 +9,6 @@
 namespace kzn
 {
 
-struct PVMData
-{
-    glm::mat4 proj_view;
-    glm::mat4 model;
-};
-
 
 SimpleRenderSystem::SimpleRenderSystem(Device& device, Renderer& renderer)
     : _device{device},
@@ -41,13 +35,16 @@ void SimpleRenderSystem::render_game_objects(
     const Camera& camera)
 {
 
+    std::cout << "debug 0\n";
     _cam_buffer.update({
         .position = camera.position()
     });
     // glm::mat4 projection_view = camera.projection() * camera.view();
 
     // std::cout << "render loop (camera update above)\n";
+    std::cout << "debug 1\n";
     _pipeline->bind(command_buffer);
+    std::cout << "debug 2\n";
     PVMData push_data{};
     push_data.proj_view = camera.projection() * camera.view();
     
@@ -58,7 +55,7 @@ void SimpleRenderSystem::render_game_objects(
 
         push_data.model = obj.transform.mat4();
 
-        _pvm_buffer.push(command_buffer, _pipeline_layout, push_data);
+        _pvm_push.push(command_buffer, _pipeline_layout, push_data);
 
         _set1.bind(command_buffer, _pipeline_layout);
 
@@ -141,8 +138,11 @@ void SimpleRenderSystem::create_pipeline_layout()
     DescriptorPool pool = _renderer.create_descriptor_pool({});
 
     DescriptorSetBuilder ds_builder = pool.descriptor_set_builder();
-    UniformBuffer<CameraData> cam_buffer = ds_builder.create_uniform_buffer<CameraData>();
+    _cam_buffer = ds_builder.create_uniform_buffer<CameraData>();
     _set1 = ds_builder.build();
+
+    _pvm_push = PushConstant<PVMData>(
+        VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT);
 
     PipelineLayoutBuilder layout_builder = _renderer.pipeline_layout_builder();
     _pipeline_layout = layout_builder
