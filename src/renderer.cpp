@@ -131,6 +131,35 @@ void Renderer::create_command_buffers()
 }
 
 
+DescriptorPool Renderer::create_descriptor_pool(const std::vector<VkDescriptorPoolSize>& /* _pool_sizes */)
+{
+    const uint32_t img_count = static_cast<uint32_t>(_swap_chain->image_count());
+
+    std::vector<VkDescriptorPoolSize> pool_sizes{
+        { VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, img_count*2 }
+    };
+
+    VkDescriptorPoolCreateInfo pool_info{};
+    pool_info.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
+    pool_info.poolSizeCount = pool_sizes.size();
+    pool_info.pPoolSizes = pool_sizes.data();
+    pool_info.maxSets = 10; //img_count;
+
+    VkDescriptorPool descriptor_pool = VK_NULL_HANDLE;
+    if(vkCreateDescriptorPool(_device->device(), &pool_info, nullptr, &descriptor_pool) != VK_SUCCESS)
+    {
+        throw std::runtime_error("failed to create descriptor pool!");
+    }
+
+    return DescriptorPool{
+        .device = _device,
+        .pool = descriptor_pool,
+        .current_index = &_current_image_index,
+        .image_count = img_count
+    };
+}
+
+
 void Renderer::init_descriptor_pool(VkDescriptorSetLayout descriptor_set_layout)
 {
     const uint32_t img_count = static_cast<uint32_t>(_swap_chain->image_count());

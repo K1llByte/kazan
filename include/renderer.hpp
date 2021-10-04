@@ -47,6 +47,7 @@ public:
     void recreate_swap_chain();
     void create_command_buffers();
     
+    DescriptorPool create_descriptor_pool(const std::vector<VkDescriptorPoolSize>& );
     void init_descriptor_pool(VkDescriptorSetLayout descriptor_set_layout);
 
     template<typename T>
