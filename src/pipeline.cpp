@@ -119,23 +119,23 @@ PipelineConfig&& PipelineConfigBuilder::build()
 }
 
 
-PipelineLayoutBuilder::PipelineLayoutBuilder(Renderer& renderer)
+VkPipelineLayout PipelineLayoutBuilder::build()
 {
-    
-}
+    VkPipelineLayoutCreateInfo pipeline_layout_info{};
+    pipeline_layout_info.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
 
+    pipeline_layout_info.setLayoutCount = 1;
+    pipeline_layout_info.pSetLayouts = &_descriptor_set_layout;
+    pipeline_layout_info.pushConstantRangeCount = 1;
+    pipeline_layout_info.pPushConstantRanges = &push_constant_range;
 
-template<typename T>
-[[no_discard]] UniformBuffer<T> PipelineLayoutBuilder::create_uniform_buffer(VkShaderStageFlags stages)
-{
-    
-}
+    VkPipelineLayout pipeline_layout;
+    if(vkCreatePipelineLayout(device.device(), &pipeline_layout_info, nullptr, &pipeline_layout) != VK_SUCCESS)
+    {
+        throw std::runtime_error("failed to create pipeline layout!");
+    }
 
-
-template<typename T>
-[[no_discard]] PushConstant<T> PipelineLayoutBuilder::create_push_constant(VkShaderStageFlags stages)
-{
-    
+    return pipeline_layout;
 }
 
 

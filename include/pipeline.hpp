@@ -49,18 +49,18 @@ public:
 
 class PipelineLayoutBuilder
 {
-private:
+public:
+
+    Device*                            device;
+    std::vector<VkDescriptorSetLayout> set_layouts;
+    std::vector<VkPushConstantRange>   push_ranges;
 
 public:
 
-    PipelineLayoutBuilder(Renderer& renderer);
-    ~PipelineLayoutBuilder() = default;
+    PipelineLayoutBuilder& add_descriptor_set(const DescriptorSet& set);
 
     template<typename T>
-    [[nodiscard]] UniformBuffer<T> create_uniform_buffer(VkShaderStageFlags stages = VK_SHADER_STAGE_ALL_GRAPHICS);
-
-    template<typename T>
-    [[nodiscard]] PushConstant<T> create_push_constant(VkShaderStageFlags stages = VK_SHADER_STAGE_ALL_GRAPHICS);
+    PipelineLayoutBuilder& add_push_constant(const PushConstant<T>& push);
 
     VkPipelineLayout build();
 };
@@ -98,6 +98,28 @@ private:
         const PipelineConfig& config_info);
 
 };
+
+////////////////////////////////////////////////////////////////
+
+PipelineLayoutBuilder& PipelineLayoutBuilder::add_descriptor_set(const DescriptorSet& set)
+{
+    set_layouts.push_back(set.descriptor_set_layout);
+    return *this;
+}
+
+
+template<typename T>
+PipelineLayoutBuilder& PipelineLayoutBuilder::add_push_constant(const PushConstant<T>& push)
+{
+    push_ranges.push_back(
+        VkPushConstantRange{
+            .stageFlags = push.stages,
+            .offset = 0,
+            .size = sizeof(T)
+        }
+    );
+    return *this;
+}
 
 }
 

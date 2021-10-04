@@ -130,6 +130,7 @@ public:
 
     uint32_t*                    current_index;
     std::vector<VkDescriptorSet> descriptor_sets;
+    VkDescriptorSetLayout        descriptor_set_layout;
 
 public:
 
@@ -148,6 +149,7 @@ public:
 
     std::vector<VkDescriptorBufferInfo>       descriptor_buffer_infos;
     std::vector<VkDescriptorSetLayoutBinding> layout_bindings;
+    VkDescriptorSetLayout                     descriptor_set_layout;
     
 public:
 
@@ -238,7 +240,7 @@ UniformBuffer<T> DescriptorSetBuilder::create_uniform_buffer(VkShaderStageFlags 
         // buffer_info.offset = 0;
         // buffer_info.range = sizeof(T);
         // descriptor_buffer_infos.push_back(buffer_info);
-        
+
         descriptor_buffer_infos.push_back(
             VkDescriptorBufferInfo{
                 .buffer = ub.buffers[i],
@@ -254,7 +256,7 @@ UniformBuffer<T> DescriptorSetBuilder::create_uniform_buffer(VkShaderStageFlags 
         .descriptorCount =    1,
         .stageFlags =         stage,
         .pImmutableSamplers = nullptr
-    })
+    });
 
     return ub;
 }

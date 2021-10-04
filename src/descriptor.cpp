@@ -25,7 +25,6 @@ DescriptorSet DescriptorSetBuilder::build()
     layout_info.bindingCount = static_cast<uint32_t>(layout_bindings.size());
     layout_info.pBindings = layout_bindings.data();
 
-    VkDescriptorSetLayout descriptor_set_layout;
     if(vkCreateDescriptorSetLayout(device->device(), &layout_info, nullptr, &descriptor_set_layout) != VK_SUCCESS)
     {
         throw std::runtime_error("failed to create descriptor set layout!");
@@ -41,7 +40,8 @@ DescriptorSet DescriptorSetBuilder::build()
 
     auto set = DescriptorSet{
         .current_index = current_index,
-        .descriptor_sets = std::vector<VkDescriptorSet>(image_count)
+        .descriptor_sets = std::vector<VkDescriptorSet>(image_count),
+        .descriptor_set_layout = descriptor_set_layout
     };
     
     if(vkAllocateDescriptorSets(device->device(), &alloc_info, set.descriptor_sets.data()) != VK_SUCCESS)
@@ -86,7 +86,7 @@ DescriptorSetBuilder DescriptorPool::descriptor_set_builder()
         .device = this->device,
         .pool = this->pool,
         .current_index = this->current_index,
-        .image_count = this->image_count
+        .image_count = this->image_count,
     };
 }
 

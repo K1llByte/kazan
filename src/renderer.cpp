@@ -160,6 +160,14 @@ DescriptorPool Renderer::create_descriptor_pool(const std::vector<VkDescriptorPo
 }
 
 
+PipelineLayoutBuilder Renderer::pipeline_layout_builder()
+{
+    return PipelineLayoutBuilder{
+        _device
+    };
+}
+
+
 void Renderer::init_descriptor_pool(VkDescriptorSetLayout descriptor_set_layout)
 {
     const uint32_t img_count = static_cast<uint32_t>(_swap_chain->image_count());

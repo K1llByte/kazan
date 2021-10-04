@@ -9,7 +9,7 @@
 namespace kzn
 {
 
-struct PushConstantsData
+struct PVMData
 {
     glm::mat4 proj_view;
     glm::mat4 model;
@@ -48,7 +48,7 @@ void SimpleRenderSystem::render_game_objects(
 
     // std::cout << "render loop (camera update above)\n";
     _pipeline->bind(command_buffer);
-    PushConstantsData push_data{};
+    PVMData push_data{};
     push_data.proj_view = camera.projection() * camera.view();
     
     for(auto& obj : game_objects)
@@ -58,21 +58,9 @@ void SimpleRenderSystem::render_game_objects(
 
         push_data.model = obj.transform.mat4();
 
-        vkCmdPushConstants(
-            command_buffer,
-            _pipeline_layout,
-            VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT,
-            0,
-            sizeof(PushConstantsData),
-            &push_data);
+        _pvm_buffer.push(command_buffer, _pipeline_layout, push_data);
 
-        // std::cout << "obj " << obj.id() << "\n";
-        // _pvm_buffer.update({
-        //     .model = obj.transform.mat4(),
-        //     .view = camera.view(),
-        //     .projection = camera.projection(),
-        // });
-        _descriptor_set.bind(command_buffer, _pipeline_layout);
+        _set1.bind(command_buffer, _pipeline_layout);
 
         obj.model->bind(command_buffer);
         obj.model->draw(command_buffer);
@@ -95,58 +83,72 @@ void SimpleRenderSystem::create_pipeline_layout()
 
     ///////////////// Push Constants //////////////////
 
-    VkPushConstantRange push_constant_range{};
-    push_constant_range.stageFlags = VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT;
-    push_constant_range.offset = 0;
-    push_constant_range.size = sizeof(PushConstantsData);
+    // VkPushConstantRange push_constant_range{};
+    // push_constant_range.stageFlags = VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT;
+    // push_constant_range.offset = 0;
+    // push_constant_range.size = sizeof(PushConstantsData);
 
-    ///////////////// Uniform Buffers /////////////////
+    // ///////////////// Uniform Buffers /////////////////
 
-    std::vector<VkDescriptorSetLayoutBinding> layout_bindings(1);
+    // std::vector<VkDescriptorSetLayoutBinding> layout_bindings(1);
 
-    // _pvm_buffer = _renderer.alloc_buffer<PVM>(&layout_bindings[0]);
-    _cam_buffer = _renderer.alloc_buffer<CameraData>(&layout_bindings[0]);
+    // // _pvm_buffer = _renderer.alloc_buffer<PVM>(&layout_bindings[0]);
+    // _cam_buffer = _renderer.alloc_buffer<CameraData>(&layout_bindings[0]);
 
-    VkDescriptorSetLayoutCreateInfo layout_info{};
-    layout_info.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
-    layout_info.bindingCount = static_cast<uint32_t>(layout_bindings.size());
-    layout_info.pBindings = layout_bindings.data();
+    // VkDescriptorSetLayoutCreateInfo layout_info{};
+    // layout_info.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
+    // layout_info.bindingCount = static_cast<uint32_t>(layout_bindings.size());
+    // layout_info.pBindings = layout_bindings.data();
 
-    if(vkCreateDescriptorSetLayout(_device.device(), &layout_info, nullptr, &_descriptor_set_layout) != VK_SUCCESS)
-    {
-        throw std::runtime_error("failed to create descriptor set layout!");
-    }
+    // if(vkCreateDescriptorSetLayout(_device.device(), &layout_info, nullptr, &_descriptor_set_layout) != VK_SUCCESS)
+    // {
+    //     throw std::runtime_error("failed to create descriptor set layout!");
+    // }
 
-    _renderer.init_descriptor_pool(_descriptor_set_layout);
-    _descriptor_set = _renderer.init_descriptor_set();
+    // _renderer.init_descriptor_pool(_descriptor_set_layout);
+    // _descriptor_set = _renderer.init_descriptor_set();
 
-    ///////////////////////////////////////////////////
+    // ///////////////////////////////////////////////////
 
-    VkPipelineLayoutCreateInfo pipeline_layout_info{};
-    pipeline_layout_info.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
-    
-    // // With Push Constants
-    // pipeline_layout_info.setLayoutCount = 0;
-    // pipeline_layout_info.pSetLayouts = nullptr;
+    // VkPipelineLayoutCreateInfo pipeline_layout_info{};
+    // pipeline_layout_info.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
+
+    // // // With Push Constants
+    // // pipeline_layout_info.setLayoutCount = 0;
+    // // pipeline_layout_info.pSetLayouts = nullptr;
+    // // pipeline_layout_info.pushConstantRangeCount = 1;
+    // // pipeline_layout_info.pPushConstantRanges = &push_constant_range;
+
+    // // // With Uniform Buffers
+    // // pipeline_layout_info.setLayoutCount = 1;
+    // // pipeline_layout_info.pSetLayouts = &_descriptor_set_layout;
+    // // pipeline_layout_info.pushConstantRangeCount = 0;
+    // // pipeline_layout_info.pPushConstantRanges = nullptr;
+
+    // // With Both
+    // pipeline_layout_info.setLayoutCount = 1;
+    // pipeline_layout_info.pSetLayouts = &_descriptor_set_layout;
     // pipeline_layout_info.pushConstantRangeCount = 1;
     // pipeline_layout_info.pPushConstantRanges = &push_constant_range;
 
-    // // With Uniform Buffers
-    // pipeline_layout_info.setLayoutCount = 1;
-    // pipeline_layout_info.pSetLayouts = &_descriptor_set_layout;
-    // pipeline_layout_info.pushConstantRangeCount = 0;
-    // pipeline_layout_info.pPushConstantRanges = nullptr;
+    // if(vkCreatePipelineLayout(_device.device(), &pipeline_layout_info, nullptr, &_pipeline_layout) != VK_SUCCESS)
+    // {
+    //     throw std::runtime_error("failed to create pipeline layout!");
+    // }
 
-    // With Both
-    pipeline_layout_info.setLayoutCount = 1;
-    pipeline_layout_info.pSetLayouts = &_descriptor_set_layout;
-    pipeline_layout_info.pushConstantRangeCount = 1;
-    pipeline_layout_info.pPushConstantRanges = &push_constant_range;
+    ///////////////// Refactored code /////////////////
 
-    if(vkCreatePipelineLayout(_device.device(), &pipeline_layout_info, nullptr, &_pipeline_layout) != VK_SUCCESS)
-    {
-        throw std::runtime_error("failed to create pipeline layout!");
-    }
+    DescriptorPool pool = _renderer.create_descriptor_pool({});
+
+    DescriptorSetBuilder ds_builder = pool.descriptor_set_builder();
+    UniformBuffer<CameraData> cam_buffer = ds_builder.create_uniform_buffer<CameraData>();
+    _set1 = ds_builder.build();
+
+    PipelineLayoutBuilder layout_builder = _renderer.pipeline_layout_builder();
+    _pipeline_layout = layout_builder
+        .add_descriptor_set(_set1)
+        .add_push_constant(_pvm_push)
+        .build();
 }
 
 

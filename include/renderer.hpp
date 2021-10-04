@@ -5,6 +5,7 @@
 #include "device.hpp"
 #include "swap_chain.hpp"
 #include "descriptor.hpp"
+#include "pipeline.hpp"
 
 #include <vector>
 
@@ -48,6 +49,8 @@ public:
     void create_command_buffers();
     
     DescriptorPool create_descriptor_pool(const std::vector<VkDescriptorPoolSize>& );
+    PipelineLayoutBuilder pipeline_layout_builder();
+
     void init_descriptor_pool(VkDescriptorSetLayout descriptor_set_layout);
 
     template<typename T>
