@@ -38,7 +38,6 @@ DescriptorSet DescriptorSetBuilder::build()
     alloc_info.descriptorSetCount = layouts.size();
     alloc_info.pSetLayouts = layouts.data();
 
-    std::cout << "DescriptorSetBuilder::build current_index: " << current_index << "\n";
     auto set = DescriptorSet{
         .current_index = current_index,
         .descriptor_sets = std::vector<VkDescriptorSet>(image_count),
@@ -78,6 +77,15 @@ DescriptorSet DescriptorSetBuilder::build()
     }
 
     return set;
+}
+
+
+void DescriptorPool::cleanup()
+{
+    if(pool != VK_NULL_HANDLE)
+    {
+        vkDestroyDescriptorPool(device->device(), pool, nullptr);
+    }
 }
 
 

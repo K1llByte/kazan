@@ -38,6 +38,7 @@ private:
     VkPipelineLayout          _pipeline_layout;
     VkDescriptorSetLayout     _descriptor_set_layout = VK_NULL_HANDLE;
 
+    DescriptorPool            _pool;
     PushConstant<PVMData>     _pvm_push;
     UniformBuffer<CameraData> _cam_buffer;
     DescriptorSet             _set1;

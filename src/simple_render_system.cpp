@@ -21,6 +21,8 @@ SimpleRenderSystem::SimpleRenderSystem(Device& device, Renderer& renderer)
 
 SimpleRenderSystem::~SimpleRenderSystem()
 {
+    _cam_buffer.cleanup();
+    _pool.cleanup();
     if(_descriptor_set_layout != VK_NULL_HANDLE)
     {
         vkDestroyDescriptorSetLayout(_device.device(), _descriptor_set_layout, nullptr);
@@ -35,16 +37,13 @@ void SimpleRenderSystem::render_game_objects(
     const Camera& camera)
 {
 
-    std::cout << "debug 0\n";
     _cam_buffer.update({
         .position = camera.position()
     });
     // glm::mat4 projection_view = camera.projection() * camera.view();
 
     // std::cout << "render loop (camera update above)\n";
-    std::cout << "debug 1\n";
     _pipeline->bind(command_buffer);
-    std::cout << "debug 2\n";
     PVMData push_data{};
     push_data.proj_view = camera.projection() * camera.view();
     
@@ -135,9 +134,9 @@ void SimpleRenderSystem::create_pipeline_layout()
 
     ///////////////// Refactored code /////////////////
 
-    DescriptorPool pool = _renderer.create_descriptor_pool({});
+    _pool = _renderer.create_descriptor_pool({});
 
-    DescriptorSetBuilder ds_builder = pool.descriptor_set_builder();
+    DescriptorSetBuilder ds_builder = _pool.descriptor_set_builder();
     _cam_buffer = ds_builder.create_uniform_buffer<CameraData>();
     _set1 = ds_builder.build();
 

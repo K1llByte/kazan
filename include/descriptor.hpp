@@ -71,6 +71,8 @@ public:
 
 public:
 
+    void cleanup();
+
     void update(const T& data);
 };
 
@@ -170,18 +172,28 @@ public:
 
 public:
 
+    void cleanup();
+
     DescriptorSetBuilder descriptor_set_builder();
 };
 
 ////////////////////////////////////////////////////////////////
 
 template<typename T>
+void UniformBuffer<T>::cleanup()
+{
+    for(size_t i = 0; i < buffers.size(); ++i)
+    {
+        vkDestroyBuffer(device->device(), buffers[i], nullptr);
+        vkFreeMemory(device->device(), buffers_memory[i], nullptr);
+    }
+}
+
+
+template<typename T>
 void UniformBuffer<T>::update(const T& data)
 {
     void* device_data;
-    
-    std::cout << "debug 1\n";
-    std::cout << "current_index: " << current_index << "\n";
     vkMapMemory(device->device(), buffers_memory[*current_index], 0, sizeof(T), 0, &device_data);
     memcpy(device_data, &data, sizeof(T));
     vkUnmapMemory(device->device(), buffers_memory[*current_index]);
@@ -219,7 +231,6 @@ UniformBuffer<T> DescriptorSetBuilder::create_uniform_buffer(VkShaderStageFlags 
     ub.device = this->device;
     ub.buffers = std::vector<VkBuffer>(image_count);
     ub.buffers_memory = std::vector<VkDeviceMemory>(image_count);
-    std::cout << "on creation: " << this->current_index << "\n";
     ub.current_index = this->current_index;
     ub.binding = static_cast<uint32_t>(descriptor_buffer_infos.size()) / image_count;
     VkDeviceSize buffer_size = sizeof(T);
