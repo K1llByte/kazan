@@ -16,6 +16,13 @@ SimpleRenderSystem::SimpleRenderSystem(Device& device, Renderer& renderer)
 {
     create_pipeline_layout();
     create_pipeline(renderer.render_pass());
+    
+    lights.lights[0] = PointLight(
+        glm::vec3{2.0f, 2.0f, 2.0f},
+        0.2f,
+        1.f,
+        0.0f);
+    lights.used = 1;
 }
 
 
@@ -40,6 +47,7 @@ void SimpleRenderSystem::render_game_objects(
     _cam_buffer.update({
         .position = camera.position()
     });
+    _lights_buffer.update(lights);
     // glm::mat4 projection_view = camera.projection() * camera.view();
 
     // std::cout << "render loop (camera update above)\n";
@@ -138,6 +146,7 @@ void SimpleRenderSystem::create_pipeline_layout()
 
     DescriptorSetBuilder ds_builder = _pool.descriptor_set_builder();
     _cam_buffer = ds_builder.create_uniform_buffer<CameraData>();
+    _lights_buffer = ds_builder.create_uniform_buffer<LightsData>(VK_SHADER_STAGE_FRAGMENT_BIT);
     _set1 = ds_builder.build();
 
     _pvm_push = PushConstant<PVMData>(

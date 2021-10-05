@@ -5,6 +5,7 @@
 #include "pipeline.hpp"
 #include "game_object.hpp"
 #include "camera.hpp"
+#include "light.hpp"
 
 namespace kzn
 {
@@ -27,6 +28,12 @@ struct PVMData
     glm::mat4 model;
 };
 
+struct LightsData
+{
+    uint                used = 0;
+    std::array<Light,8> lights;
+};
+
 
 class SimpleRenderSystem
 {
@@ -41,7 +48,10 @@ private:
     DescriptorPool            _pool;
     PushConstant<PVMData>     _pvm_push;
     UniformBuffer<CameraData> _cam_buffer;
+    UniformBuffer<LightsData> _lights_buffer;
     DescriptorSet             _set1;
+
+    LightsData lights;
 
 public:
 
