@@ -29,6 +29,7 @@ SimpleRenderSystem::SimpleRenderSystem(Device& device, Renderer& renderer)
 SimpleRenderSystem::~SimpleRenderSystem()
 {
     _cam_buffer.cleanup();
+    _lights_buffer.cleanup();
     _pool.cleanup();
     if(_descriptor_set_layout != VK_NULL_HANDLE)
     {

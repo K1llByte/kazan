@@ -15,22 +15,22 @@ struct Light
         SPOT_LIGHT  = 2
     };
 
-    Type type;
+    alignas(4) Type type;
 
     // Common
-    glm::vec3 ambient;
-    glm::vec3 diffuse;
-    glm::vec3 specular;
+    alignas(16) glm::vec3 ambient;
+    alignas(16) glm::vec3 diffuse;
+    alignas(16) glm::vec3 specular;
   
     // Spotlight & PointLight
-    glm::vec3 position;
+    alignas(16) glm::vec3 position;
     // Spotlight & DirLight
-    glm::vec3 direction;
+    alignas(16) glm::vec3 direction;
 
-    // SpotLight
-    float constant;
-    float linear;
-    float quadratic;
+    // PointLight
+    alignas(4) float constant;
+    alignas(4) float linear;
+    alignas(4) float quadratic;
 };
 
 

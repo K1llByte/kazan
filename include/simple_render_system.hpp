@@ -30,8 +30,8 @@ struct PVMData
 
 struct LightsData
 {
-    uint                used = 0;
-    std::array<Light,8> lights;
+    alignas(4) uint  used = 0;
+    alignas(16) Light lights[8];
 };
 
 
