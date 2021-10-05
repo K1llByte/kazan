@@ -17,11 +17,13 @@ SimpleRenderSystem::SimpleRenderSystem(Device& device, Renderer& renderer)
     create_pipeline_layout();
     create_pipeline(renderer.render_pass());
     
-    lights.lights[0] = PointLight(
-        glm::vec3{2.0f, 2.0f, 2.0f},
-        0.2f,
-        1.f,
-        0.0f);
+    // lights.lights[0] = PointLight(
+    //     glm::vec3{2.0f, 2.0f, 2.0f},
+    //     0.2f,
+    //     1.f,
+    //     0.0f);
+    lights.lights[0] = DirLight(
+        glm::normalize(glm::vec3{1.0, -3.0, -1.0}));
     lights.used = 1;
 }
 

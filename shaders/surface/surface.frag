@@ -29,11 +29,6 @@ struct Light {
     float quadratic;
 };
 
-// struct Lights {
-//     uint used;
-//     Light lights[8];
-// };
-
 layout(binding = 1) uniform Lights{
     uint used;
     Light lights[8];
@@ -53,34 +48,34 @@ layout(location = 0) out vec4 out_color;
 //     vec3 specular;
 // };
 
-struct PointLight {
-    vec3 position;
+// struct PointLight {
+//     vec3 position;
 
-    float constant;
-    float linear;
-    float quadratic;
+//     float constant;
+//     float linear;
+//     float quadratic;
 
-    vec3 ambient;
-    vec3 diffuse;
-    vec3 specular;
-};
+//     vec3 ambient;
+//     vec3 diffuse;
+//     vec3 specular;
+// };
 
-const float shininess = 128.0f;
+const float shininess = 64.0f;
 
-const Light dir_light_0 = {
-    0,
+// const Light dir_light_0 = {
+//     0,
 
-    vec3(0.2f),
-    vec3(0.8f),
-    vec3(1.0f),
+//     vec3(0.2f),
+//     vec3(0.8f),
+//     vec3(1.0f),
 
-    vec3(0.0f), // null
-    normalize(vec3(1.0, -3.0, -1.0)),
+//     vec3(0.0f), // null
+//     normalize(vec3(1.0, -3.0, -1.0)),
 
-    0.2f,
-    1.f,
-    0.0f
-};
+//     0.2f,
+//     1.f,
+//     0.0f
+// };
 
 // const DirLight dir_light_0 = {
 //     normalize(vec3(1.0, -3.0, -1.0)),
@@ -105,17 +100,17 @@ const Light dir_light_0 = {
 //     0.0f
 // };
 
-const PointLight point_light_0 = {
-    vec3(2.0f, 2.0f, 2.0f),
+// const PointLight point_light_0 = {
+//     vec3(2.0f, 2.0f, 2.0f),
 
-    0.2f,
-    1.f,
-    0.0f,
+//     1.0f,
+//     1.0f,
+//     0.0f,
 
-    vec3(0.2f),
-    vec3(0.8f),
-    vec3(1.0f)
-};
+//     vec3(0.2f),
+//     vec3(0.8f),
+//     vec3(1.0f)
+// };
 
 
 vec3 compute_dir_light(Light light, vec3 normal, vec3 view_dir)
@@ -133,7 +128,7 @@ vec3 compute_dir_light(Light light, vec3 normal, vec3 view_dir)
     return (ambient + diffuse + specular);
 }
 
-vec3 compute_point_light(PointLight light, vec3 normal, vec3 frag_pos, vec3 view_dir)
+vec3 compute_point_light(Light light, vec3 normal, vec3 frag_pos, vec3 view_dir)
 {
     vec3 light_dir = normalize(light.position - frag_pos);
     // diffuse shading
@@ -144,7 +139,7 @@ vec3 compute_point_light(PointLight light, vec3 normal, vec3 frag_pos, vec3 view
     // attenuation
     float distance    = length(light.position - frag_pos);
     float attenuation = 1.0 / (light.constant + light.linear * distance + 
-  	    light.quadratic * (distance * distance));    
+  	    light.quadratic * (distance * distance));
     // combine results
     vec3 ambient  = attenuation * light.ambient  /* * frag_color */;
     vec3 diffuse  = attenuation * light.diffuse  * diff /* * frag_color */;
@@ -154,7 +149,7 @@ vec3 compute_point_light(PointLight light, vec3 normal, vec3 frag_pos, vec3 view
 
 vec3 compute_lights()
 {
-    vec3 result = vec3(1.0f, 0.0f, 0.0f); //vec3(0.0);
+    vec3 result = vec3(0.0f);
     const vec3 view_dir = normalize(cam.position - frag_position);
     const vec3 norm_frag_normal = normalize(frag_normal);
     
@@ -166,8 +161,7 @@ vec3 compute_lights()
                 result += compute_dir_light(all_lights.lights[i], norm_frag_normal, view_dir);
                 break;
             case 1:
-                //all_lights.lights[i]
-                result = compute_point_light(point_light_0, norm_frag_normal, frag_position, view_dir);
+                result += compute_point_light(all_lights.lights[i], norm_frag_normal, frag_position, view_dir);
                 break;
         }
     }
@@ -180,8 +174,8 @@ vec3 compute_lights()
 void main()
 {
     const vec3 view_dir = normalize(cam.position - frag_position);
-    vec3 result = compute_dir_light(dir_light_0, normalize(frag_normal), view_dir);
+    // vec3 result = compute_dir_light(dir_light_0, normalize(frag_normal), view_dir);
     // vec3 result = compute_point_light(point_light_0, normalize(frag_normal), frag_position, view_dir);
-    // vec3 result = compute_lights();
+    vec3 result = compute_lights();
     out_color = vec4(result, 1.0);
 }
