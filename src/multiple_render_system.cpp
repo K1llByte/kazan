@@ -1,4 +1,4 @@
-#include "simple_render_system.hpp"
+#include "multiple_render_system.hpp"
 
 #include <glm/glm.hpp>
 #include <stdexcept>
@@ -9,8 +9,7 @@
 namespace kzn
 {
 
-
-SimpleRenderSystem::SimpleRenderSystem(Device& device, Renderer& renderer)
+MultipleRenderSystem::MultipleRenderSystem(Device& device, Renderer& renderer)
     : _device{device},
     _renderer{renderer}
 {
@@ -28,7 +27,7 @@ SimpleRenderSystem::SimpleRenderSystem(Device& device, Renderer& renderer)
 }
 
 
-SimpleRenderSystem::~SimpleRenderSystem()
+MultipleRenderSystem::~MultipleRenderSystem()
 {
     _cam_buffer.cleanup();
     _lights_buffer.cleanup();
@@ -41,7 +40,7 @@ SimpleRenderSystem::~SimpleRenderSystem()
 }
 
 
-void SimpleRenderSystem::render_game_objects(
+void MultipleRenderSystem::render_game_objects(
     VkCommandBuffer command_buffer,
     std::vector<GameObject>& game_objects,
     const Camera& camera)
@@ -75,8 +74,9 @@ void SimpleRenderSystem::render_game_objects(
 }
 
 
-void SimpleRenderSystem::create_pipeline_layout()
+void MultipleRenderSystem::create_pipeline_layout()
 {
+    // TODO: delete this commented code 
     // auto dsb = descriptor_pool.descriptor_set_builder(); //DescriptorSetBuilder();
     // UniformBuffer<PVM> pvm_ub = dsb.create_uniform_buffer(VK_SHADER_STAGE_VERTEX_BIT);
     // DescriptorSet descriptor_set = dsb.build();
@@ -163,7 +163,7 @@ void SimpleRenderSystem::create_pipeline_layout()
 }
 
 
-void SimpleRenderSystem::create_pipeline(VkRenderPass render_pass)
+void MultipleRenderSystem::create_pipeline(VkRenderPass render_pass)
 {
     if(_pipeline_layout == VK_NULL_HANDLE)
     {
@@ -173,7 +173,6 @@ void SimpleRenderSystem::create_pipeline(VkRenderPass render_pass)
     PipelineConfig pipeline_config = 
         PipelineConfigBuilder(_pipeline_layout, render_pass)
         .set_topology(VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST)
-        // .set_polygon_mode(VK_POLYGON_MODE_FILL)
         .build();
 
     // TODO: Try to change unique_ptr to

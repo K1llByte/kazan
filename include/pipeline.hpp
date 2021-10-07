@@ -44,6 +44,9 @@ public:
     // Input Assemply
     PipelineConfigBuilder& set_topology(VkPrimitiveTopology topology);
 
+    // Rasterization Stage
+    PipelineConfigBuilder& set_polygon_mode(VkPolygonMode polygon_mode);
+
     PipelineConfig&& build();
 };
 
@@ -86,8 +89,6 @@ public:
     ~Pipeline();
 
     void bind(VkCommandBuffer command_buffer);
-
-    static void default_pipeline_config_info(PipelineConfig& config_info);
 
 private:
 
