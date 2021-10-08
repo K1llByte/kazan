@@ -60,7 +60,7 @@ layout(location = 0) out vec4 out_color;
 //     vec3 specular;
 // };
 
-const float shininess = 64.0f;
+const float shininess = 32.0f;
 
 // const Light dir_light_0 = {
 //     0,

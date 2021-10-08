@@ -173,7 +173,7 @@ void SimpleRenderSystem::create_pipeline(VkRenderPass render_pass)
     PipelineConfig pipeline_config = 
         PipelineConfigBuilder(_pipeline_layout, render_pass)
         .set_topology(VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST)
-        // .set_polygon_mode(VK_POLYGON_MODE_FILL)
+        .set_polygon_mode(VK_POLYGON_MODE_FILL)
         .build();
 
     // TODO: Try to change unique_ptr to
