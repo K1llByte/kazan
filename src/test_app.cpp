@@ -99,21 +99,24 @@ void TestApp::run()
 
 void TestApp::load_game_objects()
 {
+    const float pi = 3.14159;
 
-    // auto cube_obj = GameObject::create_game_object();
-    // cube_obj.model = Model::load_from_file(_device, "models/monkey.obj");
-    // cube_obj.transform.translation = { 0.f, 0.f, 3.5f};
+    auto cube_obj = GameObject::create_game_object();
+    cube_obj.model = Model::load_from_file(_device, "models/monkey.obj");
+    cube_obj.transform.translation = { 2.0f, 1.45f, 0.0f};
     // cube_obj.transform.scale = { 0.5f, 0.5f, 0.5f};
-    // _game_objects.push_back(std::move(cube_obj));
+    cube_obj.transform.rotation = { 0.f, -2, 0.0f};
+    _game_objects.push_back(std::move(cube_obj));
 
-    // auto floor_obj = GameObject::create_game_object();
-    // floor_obj.model = new Model(_device, floor);
+    auto floor_obj = GameObject::create_game_object();
+    floor_obj.model = new Model(_device, ShapeGenerator::gen_plane(6));
     // floor_obj.transform.translation = {1.0f, 0.0f, 0.0f};
-    // _game_objects.push_back(std::move(floor_obj));
+    floor_obj.transform.scale = {1.2f, 1.0f, 1.0f};
+    _game_objects.push_back(std::move(floor_obj));
     
     auto shape_obj = GameObject::create_game_object();
     shape_obj.model = new Model(_device, ShapeGenerator::gen_sphere(1.0f, 50, 50));
-    // shape_obj.transform.translation = {0.0f, 0.0f, 0.0f};
+    shape_obj.transform.translation = {0.0f, 0.5f, 0.0f};
     _game_objects.push_back(std::move(shape_obj));
 
 
