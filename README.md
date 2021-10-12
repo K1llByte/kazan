@@ -3,6 +3,8 @@
 This project is an experimental computer graphics engine for the author to
 learn about other graphics APIs and Game Engine architectures.
 
+![](https://i.imgur.com/u8C2qSc.png)
+
 <!-- An experimental computer graphics engine for learning purposes. -->
 
 ## Requirements
