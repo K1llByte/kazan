@@ -102,7 +102,7 @@ void TestApp::load_game_objects()
     const float pi = 3.14159;
 
     auto cube_obj = GameObject::create_game_object();
-    cube_obj.model = Model::load_from_file(_device, "models/monkey.obj");
+    cube_obj.model = Model::load_from_file(_device, "models/hp_castle/Hogwarts.obj");
     cube_obj.transform.translation = { 2.0f, 1.45f, 0.0f};
     // cube_obj.transform.scale = { 0.5f, 0.5f, 0.5f};
     cube_obj.transform.rotation = { 0.f, -2, 0.0f};
