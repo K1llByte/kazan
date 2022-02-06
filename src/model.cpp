@@ -132,9 +132,9 @@ Model* Model::load_from_file(Device& device, const std::string& file_path)
             if(index.vertex_index >= 0)
             {
                 vtx.position = {
-                    attrib.vertices[3 * index.vertex_index],     // x
-                    attrib.vertices[3 * index.vertex_index + 1], // y
                     attrib.vertices[3 * index.vertex_index + 2], // z
+                    attrib.vertices[3 * index.vertex_index + 1], // y
+                    attrib.vertices[3 * index.vertex_index],     // x
                 };
 
                 vtx.color = {
