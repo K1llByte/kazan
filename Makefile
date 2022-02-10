@@ -3,7 +3,7 @@ LIB_INCLUDE = $(patsubst %, -I %, $(LIB_INCLUDE_DIRS))
 INCLUDE = -I include/ $(LIB_INCLUDE)
 WARNIGNS = -Wall -Wextra -Wshadow -Wfatal-errors -Wpedantic # -Wconversion
 FLAGS = $(WARNIGNS) -std=c++2a -O2 $(INCLUDE) # -fsanitize=address
-LIB_FLAGS = -lglfw -lvulkan -ldl -lpthread -lX11 -lXxf86vm -lXrandr -lXi
+LIB_FLAGS = -lglfw -lvulkan -lpthread -lX11 -lXxf86vm -lXrandr -lXi
 SRC_EXT = cpp
 
 # GLSLC = glslc

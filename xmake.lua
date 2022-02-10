@@ -1,29 +1,23 @@
--- add_requires("vulkan-headers")
--- add_requires("vulkan-headers")
+-- Package Requirements
 add_requires("vulkan-headers")
--- add_requires("glfw")
-
--- add_cxxflags("-lglfw", "-lvulkan", "-ldl", "-lpthread", "-lX11", "-lXxf86vm", "-lXrandr", "-lXi")
--- add_cxxflags("-std=c++2a", "-O2")
--- add_cxxflags("-Wall", "-Wextra", "-Wshadow", "-Wfatal-errors", "-Wpedantic")
-
-
--- add_shflags("xxx")
+add_requires("glfw")
 
 target("renderer")
-    set_languages("cxx20")
-    -- add_shflags("-lglfw", "-lvulkan", "-ldl", "-lpthread", "-lX11", "-lXxf86vm", "-lXrandr", "-lXi")
-    -- add_shflags("-lvulkan")
-    -- add_mxxflags("-std=c++2a", "-O2")
-    -- add_mxxflags("-Wall", "-Wextra", "-Wshadow", "-Wfatal-errors", "-Wpedantic")
-    add_ldflags("-ldl", "-lpthread", "-lX11", "-lXxf86vm", "-lXrandr", "-lXi")
-    set_warnings("allextra")
-    set_optimize("fastest")
-
+    -- Compiler Options
+    set_languages("cxx20") -- -std=c++20
+    set_warnings("allextra") -- -Wall -Wextra
+    set_optimize("fastest") -- -O3
+    set_targetdir("bin/")
+    add_links("pthread") -- -lpthread
+    add_cxxflags("-Wshadow", "-Wfatal-errors", "-Wpedantic")
     add_includedirs("include")
     add_includedirs("include/lib/imgui")
     add_includedirs("include/lib/pegtl")
     add_includedirs("include/lib/tiny_obj_loader")
+    -- Executable
     set_kind("binary")
     add_files("src/**.cpp")
+    -- Dependencies
     add_packages("vulkan-headers", {links = "vulkan"})
+    add_packages("glfw")
+

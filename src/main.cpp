@@ -9,6 +9,17 @@
 
 // #include "utils.hpp"
 
+
+class Foo
+{
+    public:
+    Foo(int foo)
+        : foo(foo) {}
+
+    private:
+    int foo;
+};
+
 int main()
 {
     kzn::TestApp app;
