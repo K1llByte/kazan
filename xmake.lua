@@ -1,5 +1,6 @@
 -- Package Requirements
 add_requires("vulkan-headers")
+-- add_requires("vulkan-validationlayers")
 add_requires("glm")
 add_requires("glfw")
 
