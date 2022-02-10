@@ -1,5 +1,6 @@
 -- Package Requirements
 add_requires("vulkan-headers")
+add_requires("glm")
 add_requires("glfw")
 
 target("renderer")
@@ -20,4 +21,4 @@ target("renderer")
     -- Dependencies
     add_packages("vulkan-headers", {links = "vulkan"})
     add_packages("glfw")
-
+    add_packages("glm")
