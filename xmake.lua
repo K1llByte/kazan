@@ -1,6 +1,7 @@
 -- add_requires("vulkan-headers")
 -- add_requires("vulkan-headers")
 add_requires("vulkan-headers")
+-- add_requires("glfw")
 
 -- add_cxxflags("-lglfw", "-lvulkan", "-ldl", "-lpthread", "-lX11", "-lXxf86vm", "-lXrandr", "-lXi")
 -- add_cxxflags("-std=c++2a", "-O2")
@@ -15,7 +16,7 @@ target("renderer")
     -- add_shflags("-lvulkan")
     -- add_mxxflags("-std=c++2a", "-O2")
     -- add_mxxflags("-Wall", "-Wextra", "-Wshadow", "-Wfatal-errors", "-Wpedantic")
-    add_ldflags("-lglfw", "-ldl", "-lpthread", "-lX11", "-lXxf86vm", "-lXrandr", "-lXi")
+    add_ldflags("-ldl", "-lpthread", "-lX11", "-lXxf86vm", "-lXrandr", "-lXi")
     set_warnings("allextra")
     set_optimize("fastest")
 
