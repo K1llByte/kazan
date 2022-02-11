@@ -15,6 +15,7 @@
 - ImGUI setup for Kazui
     - Make UI
     - Make Renderer render to a render target (ImGUI Viewport)
+- Entt setup
 
 <!-- Today -->
 - Lightning
@@ -70,16 +71,40 @@
 ## Engine usage
 ```c++
 auto window = Window(1700, 800, "Name")
-auto engine = Renderer()
+auto renderer = Renderer()
+auto device = renderer.device();
 renderer.render_to(window);
 
 // Load Assets and scene
-Model::load("models.obj")
+auto model_1 = Model::load("model.obj")
+auto scene = Scene {
+
+};
+
+
+```
+
+## Scene Hierarchy
+
+
+Node<T> {
+    Array<T>
+}
+
+Scene {
+    Ref<MainCamera>
+    Node<Camera>
+    Node<Model>
+}
+
+## Builder patterns
+kzn::Ref<T> reference counted object
+```c++
+Ref::from()
 ```
 
 
 
-## Builder patterns
 For each complex instantiation
 ```c++
 auto device = DeviceSelector()
@@ -87,4 +112,65 @@ auto device = DeviceSelector()
     .select();
 
 auto device = Device()
+```
+
+## Device Dependent class instanciation
+
+```c++
+// With device as argument
+auto device = renderer.device();
+Model::load(device, "file.obj")
+
+// With global device
+Model::load("file.obj")
+
+
+auto model = Model::load("file.obj")
+renderer.create(model);
+```
+
+
+
+<!-- Do exceptions in the beginning -->
+## Error handling
+```c++
+Result<T,Error> foo()
+{
+    return 
+}
+```
+
+## Pipeline creation
+```c++
+DescriptorSetBuilder ds_builder = _pool.descriptor_set_builder();
+auto cam_buffer = ds_builder.create_uniform_buffer<CameraData>();
+auto lights_buffer = ds_builder.create_uniform_buffer<LightsData>(VK_SHADER_STAGE_FRAGMENT_BIT);
+auto set = ds_builder.build();
+
+auto pvm_push = PushConstant<PVMData>(VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT);
+
+auto pipeline_layout = PipelineLayoutBuilder(device)
+    .add_descriptor_set(set)
+    .add_push_constant(pvm_push)
+    .build();
+
+auto pipeline_config =
+    PipelineConfig(pipeline_layout, render_pass)
+    .set_topology(VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST)
+    .set_polygon_mode(VK_POLYGON_MODE_FILL);
+
+auto pipeline = PipelineBuilder(device,"shader.vert","shader.frag")
+    .geometry_shader("shader.geom")
+    .build();
+```
+
+```c++
+auto pipeline_layout = PipelineLayoutBuilder(device)
+    .build();
+
+auto pipeline_config =
+    PipelineConfig(pipeline_layout, render_pass);
+
+auto pipeline = PipelineBuilder(pipeline_config, "shader.vert","shader.frag")
+    .build();
 ```
