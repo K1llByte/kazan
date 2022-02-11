@@ -2,35 +2,36 @@
 
 ## In Progress
 
+- Textures
 - Refactor code
+    - Error handling
+    - Init and cleanup consistency
+    - Consistent general API with configurability
+    - Low level and High level building blocks (Renderer, ...)
     - change implicit conversions
 
 ## Todo 
 
+- ImGUI setup for Kazui
+    - Make UI
+    - Make Renderer render to a render target (ImGUI Viewport)
 
 <!-- Today -->
 - Lightning
-    - Array Uniform Buffer 
+    - Array Uniform Buffer (test and finish) 
     - PBR (no material hardcoded values)
 
 <!----------->
 
+- Logger singleton
 - Add VK_EXT_extended_dynamic_state and use it
 
-- Enable multiple pipelines at the same time (MultipleRenderSystem)
+- Enable multiple pipelines at the same time (Entity Component System)
 
 - Refactor code
     - enhance GameObject creation
     - change compiler options to provide better warnings
-    - make Kazan prepared for basic engine usage
 
-- ImGui Commands GUI
-- ImGui Logger GUI
-
-- Textures
-
-- GPU Driven Rendring (https://vkguide.dev/docs/gpudriven)
-    - Use transformation matrices from uniform buffers
 
 - Primitive Generator
     - [x] Sphere
@@ -40,6 +41,10 @@
     - [x] Plane
     - [x] Torus
     - [ ] Patches
+
+## See Later
+- GPU Driven Rendring (https://vkguide.dev/docs/gpudriven)
+- Quaternions rotation
 
 ## Done
 - Refactor code
@@ -58,3 +63,28 @@
         Uniform buffers are bound when the command buffer
         is recording, the update() call changes the buffer
         and every object will use same transformation matrix
+    - ! Possible solution, update uniform buffers 
+
+# Example
+
+## Engine usage
+```c++
+auto window = Window(1700, 800, "Name")
+auto engine = Renderer()
+renderer.render_to(window);
+
+// Load Assets and scene
+Model::load("models.obj")
+```
+
+
+
+## Builder patterns
+For each complex instantiation
+```c++
+auto device = DeviceSelector()
+    .require_ext(a)
+    .select();
+
+auto device = Device()
+```
