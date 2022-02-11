@@ -125,11 +125,14 @@ public:
 
     // friend class Renderer;
 
+    Device*                      device;
     uint32_t*                    current_index;
     std::vector<VkDescriptorSet> descriptor_sets;
     VkDescriptorSetLayout        descriptor_set_layout;
 
 public:
+
+    void cleanup();
 
     void bind(VkCommandBuffer command_buffer, VkPipelineLayout layout) const;
 };

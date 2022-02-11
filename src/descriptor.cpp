@@ -3,6 +3,14 @@
 namespace kzn
 {
 
+void DescriptorSet::cleanup()
+{
+    if(descriptor_set_layout != VK_NULL_HANDLE)
+    {
+        vkDestroyDescriptorSetLayout(device->device(), descriptor_set_layout, nullptr);
+    }
+}
+
 void DescriptorSet::bind(VkCommandBuffer command_buffer, VkPipelineLayout layout) const
 {
     vkCmdBindDescriptorSets(
@@ -39,6 +47,7 @@ DescriptorSet DescriptorSetBuilder::build()
     alloc_info.pSetLayouts = layouts.data();
 
     auto set = DescriptorSet{
+        .device = device,
         .current_index = current_index,
         .descriptor_sets = std::vector<VkDescriptorSet>(image_count),
         .descriptor_set_layout = descriptor_set_layout

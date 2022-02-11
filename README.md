@@ -1,7 +1,13 @@
 # Kazan
 
-This project is an experimental computer graphics engine for the author to
-learn about other graphics APIs and Game Engine architectures.
+This project is an experimental computer graphics engine for experimentation and learning.
+
+<!--
+- Computer Graphics
+- Vulkan graphics API
+- Game Engine Architectures
+- Game development
+-->
 
 ![](https://i.imgur.com/u8C2qSc.png)
 
@@ -9,7 +15,12 @@ learn about other graphics APIs and Game Engine architectures.
 
 ## Requirements
 
-To install everything needed:
+- Vulkan Devel SDK
+- GLFW
+- GLM
+- Shader SPIR-V compiler (Optional)
+
+<!-- To install everything needed:
 ```sh
 sudo pacman -S vulkan-devel glfw glm glslang
 ```
@@ -48,22 +59,14 @@ Library for window creation and managment & Input events
 sudo pacman -S glfw
 ```
 
-<!-- ```sh
-# for x11
-sudo pacman -S glfw-x11
-
-# or for wayland
-sudo pacman -S glfw-wayland
-```  -->
-
 ### GLM
 
 Header only linear algebra library for computer graphics
 ```sh
 sudo pacman -S glm
-```
+``` -->
 
-### Shader Compiler
+<!-- ### Shader Compiler
 
 A compiler and validator from GLSL to SPIR-V (Khronos Group)
 ```sh
@@ -73,13 +76,27 @@ sudo pacman -S glslang
 Or alternatively the glslc compiler with clang like usage (Google)
 ```sh
 sudo pacman -S shaderc
+``` -->
+
+## Building
+
+Before trying the engine out it need to be compiled, and for that `xmake`
+is required for building this project.
+
+There are some requirements for compilation, but `xmake` will install all missing dependencies,
+if something doesn't work or cant be installed automatically by xmake, you can install manually any
+required dependency listed [here](#requirements)
+```sh
+git clone git@github.com:K1llByte/kazan.git
+cd kazan
+xmake build
 ```
 
 ## Demo
 
-To run a demo of the kazan engine compile (shaders + code) and run using the makefile provided:
+To run a demo of the kazan engine after compilation just run:
 ```sh
-make shaders run
+./bin/renderer
 ```
 
 

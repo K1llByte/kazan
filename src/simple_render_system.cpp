@@ -33,10 +33,7 @@ SimpleRenderSystem::~SimpleRenderSystem()
     _cam_buffer.cleanup();
     _lights_buffer.cleanup();
     _pool.cleanup();
-    if(_descriptor_set_layout != VK_NULL_HANDLE)
-    {
-        vkDestroyDescriptorSetLayout(_device.device(), _descriptor_set_layout, nullptr);
-    }
+    _set1.cleanup(); // Cleanup the descriptor layout
     vkDestroyPipelineLayout(_device.device(), _pipeline_layout, nullptr);
 }
 

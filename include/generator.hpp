@@ -15,8 +15,8 @@ public:
     };
 
     // NOTE: Possible generator options:
-    // - No validation
-    // - Clockwise or Counter Clockwise face
+    // - [ ] No validation
+    // - [x] Clockwise or Counter Clockwise face
     static std::vector<Model::Vertex> gen_sphere(const float radius, const uint slices, const uint stacks, const Options opt = {});
 
     static std::vector<Model::Vertex> gen_cylinder(const float radius, const float height, const uint slices, const Options opt = {});
