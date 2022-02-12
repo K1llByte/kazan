@@ -174,3 +174,8 @@ auto pipeline_config =
 auto pipeline = PipelineBuilder(pipeline_config, "shader.vert","shader.frag")
     .build();
 ```
+
+## Texture
+```c++
+auto texture = Texture(device, "file.txt")
+```

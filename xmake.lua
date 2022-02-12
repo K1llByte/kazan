@@ -50,6 +50,7 @@ target("renderer")
     add_links("pthread") -- -lpthread
     add_cxxflags("-Wshadow", "-Wfatal-errors", "-Wpedantic")
     add_includedirs("include")
+    add_includedirs("include/lib/stb")
     add_includedirs("include/lib/imgui")
     add_includedirs("include/lib/pegtl")
     add_includedirs("include/lib/tiny_obj_loader")
