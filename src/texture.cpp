@@ -22,6 +22,9 @@ namespace kzn
         }
         
         // 1.2 Create staging buffer
+        VkBuffer staging_buffer;
+        VkDeviceMemory staging_buffer_memory;
+
         device.create_buffer(
             image_size,
             VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
@@ -77,10 +80,45 @@ namespace kzn
         vkBindImageMemory(device.device(), texture_image, texture_image_memory, 0);
     }
 
+    void Texture::transition_image_layout(VkImage image, VkFormat format, VkImageLayout old_layout, VkImageLayout new_layout)
+    {
+        auto command_buffer = device.begin_single_time_commands();
+        
+        VkImageMemoryBarrier barrier{};
+        barrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
+        barrier.oldLayout = old_layout;
+        barrier.newLayout = new_layout;
+        barrier.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+        barrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+        barrier.image = image;
+        barrier.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+        barrier.subresourceRange.baseMipLevel = 0;
+        barrier.subresourceRange.levelCount = 1;
+        barrier.subresourceRange.baseArrayLayer = 0;
+        barrier.subresourceRange.layerCount = 1;
+        barrier.srcAccessMask = 0; // TODO
+        barrier.dstAccessMask = 0; // TODO
+        vkCmdPipelineBarrier(
+            command_buffer,
+            0 /* TODO */,
+            0 /* TODO */,
+            0,
+            0,
+            nullptr,
+            0,
+            nullptr,
+            1,
+            &barrier
+        );
+
+        device.end_single_time_commands(command_buffer);
+    }
+
 
     Texture::~Texture()
     {
-
+        vkDestroyImage(device.device(), texture_image, nullptr);
+        vkFreeMemory(device.device(), texture_image_memory, nullptr);
     }
 
 }

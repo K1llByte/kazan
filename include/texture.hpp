@@ -8,18 +8,16 @@ namespace kzn
 
     class Texture
     {
-        private:
-
-        Device& device;
-        VkBuffer staging_buffer;
-        VkDeviceMemory staging_buffer_memory;
+    private:
+        Device &device;
         VkImage texture_image;
         VkDeviceMemory texture_image_memory;
 
-        public:
-
-        Texture(Device& device, std::string file);
+    public:
+        Texture(Device &device, std::string file);
         ~Texture();
+
+        void transition_image_layout(VkImage image, VkFormat format, VkImageLayout old_layout, VkImageLayout new_layout);
     };
 
 }
