@@ -129,6 +129,8 @@ void Device::create_buffer(
     VkBuffer&             buffer,
     VkDeviceMemory&       buffer_memory)
 {
+    // NOTE: Since this auxiliar function already creates, allocates and binds the buffer
+    // theres no need to use vmaCreateBuffer
     VkBufferCreateInfo buffer_info{};
     buffer_info.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
     buffer_info.size = size;

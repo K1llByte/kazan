@@ -17,7 +17,9 @@ namespace kzn
         Texture(Device &device, std::string file);
         ~Texture();
 
+    private:
         void transition_image_layout(VkImage image, VkFormat format, VkImageLayout old_layout, VkImageLayout new_layout);
+        void copy_buffer_to_image(VkBuffer buffer, VkImage image, uint32_t width, uint32_t height);
     };
 
 }
