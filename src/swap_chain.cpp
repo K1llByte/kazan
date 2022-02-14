@@ -1,5 +1,7 @@
 #include "swap_chain.hpp"
 
+#include "logger.hpp"
+
 // std
 #include <array>
 #include <cstdlib>
@@ -39,7 +41,7 @@ void SwapChain::init()
     create_depth_resources();
     create_framebuffers();
     create_sync_objects();
-    std::cout << "+ SwapChain created successfully\n";
+    Logger::debug("+ SwapChain created successfully");
 }
 
 
@@ -83,7 +85,7 @@ void SwapChain::cleanup()
         vkDestroySemaphore(_device.device(), _image_available_semaphores[i], nullptr);
         vkDestroyFence(_device.device(), _in_flight_fences[i], nullptr);
     }
-    std::cout << "- SwapChain destroyed successfully\n";
+    Logger::debug("- SwapChain destroyed successfully");
 }
 
 

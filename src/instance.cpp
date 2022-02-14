@@ -1,5 +1,7 @@
 #include "instance.hpp"
 
+#include "logger.hpp"
+
 #include <stdexcept>
 #include <cstring>
 
@@ -21,7 +23,7 @@ VkResult CreateDebugUtilsMessenger(
 
     if(func != nullptr)
     {
-        std::cout << "+ Debug messeger created successfully\n";
+        Logger::debug("+ Debug messeger created successfully");
         return func(instance, p_create_info, p_allocator, p_debug_messenger);
     }
     else
@@ -47,7 +49,7 @@ void DestroyDebugUtilsMessenger(
 
     if(func != nullptr)
     {
-        std::cout << "- Debug messeger destroyed successfully\n";
+        Logger::debug("- Debug messeger destroyed successfully");
         func(instance, debug_messenger, p_allocator);
     }
     
@@ -214,13 +216,13 @@ void Instance::init()
         _tmp_data->_create_info.ppEnabledExtensionNames = _extensions.data();
 
         ///////////////// LOGS /////////////////
-        // std::cout << "[INFO] > Enabled Extensions:\n";
+        // Logger::info("Enabled Extensions:");
         // for (const auto& ext : _extensions)
         //     std::cout << " - " << ext << '\n';
         ////////////////////////////////////////
 
         // Create instance
-        std::cout << "+ Instance created successfully\n";
+        Logger::debug("+ Instance created successfully");
         if(vkCreateInstance(&_tmp_data->_create_info, nullptr, &_instance) != VK_SUCCESS)
         {
             throw std::runtime_error("failed to create instance!");
@@ -258,7 +260,7 @@ void Instance::cleanup()
 
         // Destroy vulkan instance
         vkDestroyInstance(_instance, nullptr);
-        std::cout << "- Destroyed vulkan instance\n";
+        Logger::debug("- Destroyed vulkan instance");
     }
     else
     {

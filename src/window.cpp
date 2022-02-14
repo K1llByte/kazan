@@ -1,5 +1,7 @@
 #include "window.hpp"
 
+#include "logger.hpp"
+
 #include <stdexcept>
 #include <iostream>
 
@@ -28,7 +30,7 @@ Window::Window(const std::string& name, int win_width, int win_height)
     // On framebuffer resize callback
     glfwSetFramebufferSizeCallback(_window, framebuffer_resize_callback);
 
-    std::cout << "+ Created window\n";
+    Logger::debug("+ Created window");
 }
 
 
@@ -40,7 +42,7 @@ Window::~Window()
     // Destroy glfw
     glfwTerminate();
 
-    std::cout << "- Destroyed window\n";
+    Logger::debug("- Destroyed window");
 }
 
 
@@ -61,7 +63,7 @@ VkSurfaceKHR Window::create_surface(Instance& instance)
     {
         throw std::runtime_error("failed to create window surface!");
     }
-    std::cout << "+ Surface created successfully\n";
+    Logger::debug("+ Surface created successfully");
 
     return _surface;
 }
@@ -72,7 +74,7 @@ void Window::destroy_surface(Instance& instance)
     // Destroy window surface
     vkDestroySurfaceKHR(instance.instance(), _surface, nullptr);
     _surface = VK_NULL_HANDLE;
-    std::cout << "- Surface destroyed successfully\n";
+    Logger::debug("- Surface destroyed successfully");
 }
 
 

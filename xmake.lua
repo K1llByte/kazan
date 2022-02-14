@@ -27,16 +27,16 @@ rule("glsl")
     end)
 
 
--- -- Target Shaders Compilation
--- target("shaders")
---     set_kind("object")
+-- Target Shaders Compilation
+target("shaders")
+    set_kind("object")
 
---     -- make the test target support the construction rules of the spir-v files
---     add_rules("glsl")
+    -- make the test target support the construction rules of the spir-v files
+    add_rules("glsl")
 
---     -- adding shader files to build
---     add_files("shaders/**.vert")
---     add_files("shaders/**.frag")
+    -- adding shader files to build
+    add_files("shaders/**.vert")
+    add_files("shaders/**.frag")
 
 -------------------- Renderer --------------------
 

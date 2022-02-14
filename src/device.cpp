@@ -1,5 +1,7 @@
 #include "device.hpp"
 
+#include "logger.hpp"
+
 #include <stdexcept>
 #include <iostream>
 #include <set>
@@ -258,11 +260,12 @@ PhysicalDevice PhysicalDeviceSelector::select()
     }
     else
     {
-        std::cout << "+ Physical device selected successfully\n";
+        Logger::debug("+ Physical device selected successfully");
 
         VkPhysicalDeviceProperties device_properties;
         vkGetPhysicalDeviceProperties(physical_device, &device_properties);
-        std::cout << "[INFO] > Using " << device_properties.deviceName << "\n";
+
+        Logger::info("Using " + std::string(device_properties.deviceName));
 
         return PhysicalDevice(
             physical_device,
