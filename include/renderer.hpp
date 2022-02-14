@@ -51,7 +51,7 @@ public:
     DescriptorPool create_descriptor_pool(const std::vector<VkDescriptorPoolSize>& );
     PipelineLayoutBuilder pipeline_layout_builder();
 
-    void init_descriptor_pool(VkDescriptorSetLayout descriptor_set_layout);
+    // void init_descriptor_pool(VkDescriptorSetLayout descriptor_set_layout);
 
     template<typename T>
     UniformBuffer<T> alloc_buffer(
@@ -70,6 +70,7 @@ public:
 
 ////////////////////////////////////////////////////////////////
 
+// FIXME: Unused (maybe remove)
 template<typename T>
 UniformBuffer<T> Renderer::alloc_buffer(VkDescriptorSetLayoutBinding* layout_binding, VkShaderStageFlags stage)
 {

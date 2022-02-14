@@ -2,7 +2,7 @@
 #define DESCRIPTOR_H
 
 #include "device.hpp"
-// #include "renderer.hpp"
+#include "texture.hpp"
 
 #include <cstring>
 
@@ -148,6 +148,7 @@ public:
     size_t                              image_count;
 
     std::vector<VkDescriptorBufferInfo>       descriptor_buffer_infos;
+    std::vector<VkDescriptorImageInfo>        descriptor_image_infos;
     std::vector<VkDescriptorSetLayoutBinding> layout_bindings;
     VkDescriptorSetLayout                     descriptor_set_layout;
     
@@ -155,6 +156,7 @@ public:
 
     template<typename T>
     UniformBuffer<T> create_uniform_buffer(VkShaderStageFlags stage = VK_SHADER_STAGE_ALL_GRAPHICS);
+    void create_image_sampler(Texture* tex, VkShaderStageFlags stage = VK_SHADER_STAGE_FRAGMENT_BIT);
     template<typename T, size_t N>
     UniformBufferArray<T,N> create_uniform_buffer_array(VkShaderStageFlags stage = VK_SHADER_STAGE_ALL_GRAPHICS);
 

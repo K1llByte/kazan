@@ -1,7 +1,7 @@
 #ifndef PIPELINE_H
 #define PIPELINE_H
 
-#include "device.hpp"
+// #include "device.hpp"
 #include "descriptor.hpp"
 // #include "renderer.hpp"
 

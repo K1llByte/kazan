@@ -47,6 +47,7 @@
 - GPU Driven Rendring (https://vkguide.dev/docs/gpudriven)
 - Quaternions rotation
 - C++ Auto indent
+- PhysicalDeviceProperties is being fetched too many times (fetch once, move ownership, or see which cost os more effective)
 
 ## Done
 - Refactor code

@@ -49,6 +49,7 @@ private:
     PushConstant<PVMData>     _pvm_push;
     UniformBuffer<CameraData> _cam_buffer;
     UniformBuffer<LightsData> _lights_buffer;
+    std::unique_ptr<Texture>  texture = nullptr;
     DescriptorSet             _set1;
 
     LightsData lights;

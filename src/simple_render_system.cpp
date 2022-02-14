@@ -140,6 +140,8 @@ void SimpleRenderSystem::create_pipeline_layout()
     //     throw std::runtime_error("failed to create pipeline layout!");
     // }
 
+    texture = std::make_unique<Texture>(_device, "textures/cat.png");
+
     ///////////////// Refactored code /////////////////
 
     _pool = _renderer.create_descriptor_pool({});
@@ -147,6 +149,7 @@ void SimpleRenderSystem::create_pipeline_layout()
     DescriptorSetBuilder ds_builder = _pool.descriptor_set_builder();
     _cam_buffer = ds_builder.create_uniform_buffer<CameraData>();
     _lights_buffer = ds_builder.create_uniform_buffer<LightsData>(VK_SHADER_STAGE_FRAGMENT_BIT);
+    ds_builder.create_image_sampler(texture.get(), VK_SHADER_STAGE_FRAGMENT_BIT);
     _set1 = ds_builder.build();
 
     _pvm_push = PushConstant<PVMData>(
@@ -177,8 +180,8 @@ void SimpleRenderSystem::create_pipeline(VkRenderPass render_pass)
     // a stack allocated alternative
     _pipeline = std::make_unique<Pipeline>(
         _device,
-        "shaders/surface/surface.vert.spv",
-        "shaders/surface/surface.frag.spv",
+        "shaders/surface_texture/surface_texture.vert.spv",
+        "shaders/surface_texture/surface_texture.frag.spv",
         pipeline_config);
 }
 

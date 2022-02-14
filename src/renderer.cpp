@@ -135,9 +135,26 @@ DescriptorPool Renderer::create_descriptor_pool(const std::vector<VkDescriptorPo
 {
     const uint32_t img_count = static_cast<uint32_t>(_swap_chain->image_count());
 
-    std::vector<VkDescriptorPoolSize> pool_sizes{
-        { VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, img_count*2 }
-    };
+// FIXME: delete
+    // std::vector<VkDescriptorPoolSize> pool_sizes{
+    //     { VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, img_count*2 },
+    //     { VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, img_count*2 },
+    // };
+
+    constexpr uint32_t DESCRIPTOR_MAX_COUNT = 1000;
+    std::vector<VkDescriptorPoolSize> pool_sizes {
+		{ VK_DESCRIPTOR_TYPE_SAMPLER,                DESCRIPTOR_MAX_COUNT },
+		{ VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, DESCRIPTOR_MAX_COUNT },
+		{ VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE,          DESCRIPTOR_MAX_COUNT },
+		{ VK_DESCRIPTOR_TYPE_STORAGE_IMAGE,          DESCRIPTOR_MAX_COUNT },
+		{ VK_DESCRIPTOR_TYPE_UNIFORM_TEXEL_BUFFER,   DESCRIPTOR_MAX_COUNT },
+		{ VK_DESCRIPTOR_TYPE_STORAGE_TEXEL_BUFFER,   DESCRIPTOR_MAX_COUNT },
+		{ VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,         DESCRIPTOR_MAX_COUNT },
+		{ VK_DESCRIPTOR_TYPE_STORAGE_BUFFER,         DESCRIPTOR_MAX_COUNT },
+		{ VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC, DESCRIPTOR_MAX_COUNT },
+		{ VK_DESCRIPTOR_TYPE_STORAGE_BUFFER_DYNAMIC, DESCRIPTOR_MAX_COUNT },
+		{ VK_DESCRIPTOR_TYPE_INPUT_ATTACHMENT,       DESCRIPTOR_MAX_COUNT }
+	};
 
     VkDescriptorPoolCreateInfo pool_info{};
     pool_info.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
@@ -168,52 +185,52 @@ PipelineLayoutBuilder Renderer::pipeline_layout_builder()
 }
 
 
-void Renderer::init_descriptor_pool(VkDescriptorSetLayout descriptor_set_layout)
-{
-    const uint32_t img_count = static_cast<uint32_t>(_swap_chain->image_count());
+// void Renderer::init_descriptor_pool(VkDescriptorSetLayout descriptor_set_layout)
+// {
+//     const uint32_t img_count = static_cast<uint32_t>(_swap_chain->image_count());
 
-    // std::vector<VkDescriptorPoolSize> pool_sizes = {
-	// 	{ VK_DESCRIPTOR_TYPE_SAMPLER, 1000 },
-	// 	{ VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1000 },
-	// 	{ VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE, 1000 },
-	// 	{ VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, 1000 },
-	// 	{ VK_DESCRIPTOR_TYPE_UNIFORM_TEXEL_BUFFER, 1000 },
-	// 	{ VK_DESCRIPTOR_TYPE_STORAGE_TEXEL_BUFFER, 1000 },
-	// 	{ VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 1000 },
-	// 	{ VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 1000 },
-	// 	{ VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC, 1000 },
-	// 	{ VK_DESCRIPTOR_TYPE_STORAGE_BUFFER_DYNAMIC, 1000 },
-	// 	{ VK_DESCRIPTOR_TYPE_INPUT_ATTACHMENT, 1000 }
-	// };
+//     // std::vector<VkDescriptorPoolSize> pool_sizes = {
+// 	// 	{ VK_DESCRIPTOR_TYPE_SAMPLER, 1000 },
+// 	// 	{ VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1000 },
+// 	// 	{ VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE, 1000 },
+// 	// 	{ VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, 1000 },
+// 	// 	{ VK_DESCRIPTOR_TYPE_UNIFORM_TEXEL_BUFFER, 1000 },
+// 	// 	{ VK_DESCRIPTOR_TYPE_STORAGE_TEXEL_BUFFER, 1000 },
+// 	// 	{ VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 1000 },
+// 	// 	{ VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 1000 },
+// 	// 	{ VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC, 1000 },
+// 	// 	{ VK_DESCRIPTOR_TYPE_STORAGE_BUFFER_DYNAMIC, 1000 },
+// 	// 	{ VK_DESCRIPTOR_TYPE_INPUT_ATTACHMENT, 1000 }
+// 	// };
 
-    std::vector<VkDescriptorPoolSize> pool_sizes{
-        { VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, img_count*2 }
-    };
+//     std::vector<VkDescriptorPoolSize> pool_sizes{
+//         { VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, img_count*2 }
+//     };
 
-    VkDescriptorPoolCreateInfo pool_info{};
-    pool_info.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
-    pool_info.poolSizeCount = pool_sizes.size();
-    pool_info.pPoolSizes = pool_sizes.data();
-    pool_info.maxSets = 10; //img_count;
+//     VkDescriptorPoolCreateInfo pool_info{};
+//     pool_info.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
+//     pool_info.poolSizeCount = pool_sizes.size();
+//     pool_info.pPoolSizes = pool_sizes.data();
+//     pool_info.maxSets = 10; //img_count;
 
-    if(vkCreateDescriptorPool(_device->device(), &pool_info, nullptr, &_descriptor_pool) != VK_SUCCESS)
-    {
-        throw std::runtime_error("failed to create descriptor pool!");
-    }
+//     if(vkCreateDescriptorPool(_device->device(), &pool_info, nullptr, &_descriptor_pool) != VK_SUCCESS)
+//     {
+//         throw std::runtime_error("failed to create descriptor pool!");
+//     }
 
-    std::vector<VkDescriptorSetLayout> layouts(img_count, descriptor_set_layout);
-    VkDescriptorSetAllocateInfo alloc_info{};
-    alloc_info.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
-    alloc_info.descriptorPool = _descriptor_pool;
-    alloc_info.descriptorSetCount = layouts.size();
-    alloc_info.pSetLayouts = layouts.data();
+//     std::vector<VkDescriptorSetLayout> layouts(img_count, descriptor_set_layout);
+//     VkDescriptorSetAllocateInfo alloc_info{};
+//     alloc_info.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
+//     alloc_info.descriptorPool = _descriptor_pool;
+//     alloc_info.descriptorSetCount = layouts.size();
+//     alloc_info.pSetLayouts = layouts.data();
 
-    _descriptor_sets.resize(img_count);
-    if(vkAllocateDescriptorSets(_device->device(), &alloc_info, _descriptor_sets.data()) != VK_SUCCESS)
-    {
-        throw std::runtime_error("failed to allocate descriptor sets!");
-    }
-}
+//     _descriptor_sets.resize(img_count);
+//     if(vkAllocateDescriptorSets(_device->device(), &alloc_info, _descriptor_sets.data()) != VK_SUCCESS)
+//     {
+//         throw std::runtime_error("failed to allocate descriptor sets!");
+//     }
+// }
 
 
 DescriptorSet Renderer::init_descriptor_set()

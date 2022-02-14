@@ -123,6 +123,8 @@ public:
     VkDevice device() const;
     VkCommandPool command_pool() const;
 
+    const VkPhysicalDeviceLimits limits();
+
     // Functionality methods
 
     SwapChainSupportDetails query_swap_chain_support(VkSurfaceKHR surface);

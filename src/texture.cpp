@@ -4,6 +4,7 @@
 #include "stb_image.h"
 
 #include <stdexcept>
+#include <iostream>
 
 namespace kzn
 {
@@ -18,6 +19,7 @@ namespace kzn
         stbi_uc* pixels = stbi_load(filename.c_str(), &width, &height, &channels, STBI_rgb_alpha);
         // NOTE: 4 channels but texture might have less
         VkDeviceSize image_size = width * height * 4;
+        std::cout << "Texture size: (" << width << ", " << height << ", " << channels << ")\n"; 
 
         if(pixels == nullptr)
         {
@@ -108,6 +110,36 @@ namespace kzn
         if(vkCreateImageView(device.device(), &view_info, nullptr, &texture_image_view) != VK_SUCCESS)
         {
             throw std::runtime_error("failed to create texture image view!");
+        }
+
+        // 3. Create Sampler
+        VkSamplerCreateInfo sampler_info{};
+        sampler_info.sType = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO;
+        // Filter
+        sampler_info.magFilter = VK_FILTER_LINEAR;
+        sampler_info.minFilter = VK_FILTER_LINEAR;
+        // Addressing mode
+        sampler_info.addressModeU = VK_SAMPLER_ADDRESS_MODE_REPEAT;
+        sampler_info.addressModeV = VK_SAMPLER_ADDRESS_MODE_REPEAT;
+        sampler_info.addressModeW = VK_SAMPLER_ADDRESS_MODE_REPEAT;
+        // Anisotropy filtering
+        sampler_info.anisotropyEnable = VK_TRUE;
+        // Needs to check the device properties
+        const auto limits = device.limits();
+        sampler_info.maxAnisotropy = limits.maxSamplerAnisotropy;
+        sampler_info.borderColor = VK_BORDER_COLOR_INT_OPAQUE_BLACK;
+        // NOTE: this is for image sampling in [0,1] instead of [0,width:height]
+        sampler_info.unnormalizedCoordinates = VK_FALSE;
+        sampler_info.compareEnable = VK_FALSE;
+        sampler_info.compareOp = VK_COMPARE_OP_ALWAYS;
+        sampler_info.mipmapMode = VK_SAMPLER_MIPMAP_MODE_LINEAR;
+        sampler_info.mipLodBias = 0.0f;
+        sampler_info.minLod = 0.0f;
+        sampler_info.maxLod = 0.0f;
+
+        if(vkCreateSampler(device.device(), &sampler_info, nullptr, &texture_sampler) != VK_SUCCESS)
+        {
+            throw std::runtime_error("failed to create texture sampler!");
         }
     }
 
@@ -208,6 +240,7 @@ namespace kzn
 
     Texture::~Texture()
     {
+        vkDestroySampler(device.device(), texture_sampler, nullptr);
         vkDestroyImageView(device.device(), texture_image_view, nullptr);
         vkDestroyImage(device.device(), texture_image, nullptr);
         vkFreeMemory(device.device(), texture_image_memory, nullptr);

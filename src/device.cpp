@@ -47,8 +47,8 @@ bool PhysicalDeviceSelector::is_device_suitable(VkPhysicalDevice physical_device
     VkPhysicalDeviceProperties device_properties;
     vkGetPhysicalDeviceProperties(physical_device, &device_properties);
 
-    // VkPhysicalDeviceFeatures device_features;
-    // vkGetPhysicalDeviceFeatures(device, &device_features);
+    VkPhysicalDeviceFeatures device_features;
+    vkGetPhysicalDeviceFeatures(physical_device, &device_features);
 
     if(device_properties.deviceType != VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU)
         return false;
@@ -59,13 +59,13 @@ bool PhysicalDeviceSelector::is_device_suitable(VkPhysicalDevice physical_device
     bool extensions_supported = check_device_extension_support(physical_device);
 
     bool swap_chain_adequate = false;
-    if (extensions_supported)
+    if(extensions_supported)
     {
         _swap_chain_support = query_swap_chain_support(physical_device);
         swap_chain_adequate = !_swap_chain_support.formats.empty() && !_swap_chain_support.present_modes.empty();
     }
 
-    return _indices.is_complete() && swap_chain_adequate;
+    return _indices.is_complete() && swap_chain_adequate && device_features.samplerAnisotropy;
 }
 
 
@@ -315,6 +315,7 @@ void Device::init()
     }
 
     VkPhysicalDeviceFeatures device_features{};
+    device_features.samplerAnisotropy = VK_TRUE;
 
     VkDeviceCreateInfo create_info{};
     create_info.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
@@ -409,6 +410,14 @@ VkDevice Device::device() const
 VkCommandPool Device::command_pool() const
 {
     return _command_pool;
+}
+
+
+const VkPhysicalDeviceLimits Device::limits()
+{
+    VkPhysicalDeviceProperties properties;
+    vkGetPhysicalDeviceProperties(_physical_device, &properties);
+    return properties.limits;
 }
 
 

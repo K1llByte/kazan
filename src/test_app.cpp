@@ -102,7 +102,7 @@ void TestApp::load_game_objects()
     const float pi = 3.14159;
 
     // Texture tex1 = Texture(_device, "textures/cat.png");
-    textures.emplace_back(_device, "textures/cat.png");
+    // textures.emplace_back(_device, "textures/cat.png");
 
     auto cube_obj = GameObject::create_game_object();
     cube_obj.model = Model::load_from_file(_device, "models/colored_cube.obj");

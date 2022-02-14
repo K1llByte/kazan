@@ -13,10 +13,16 @@ namespace kzn
         VkImage texture_image;
         VkImageView texture_image_view;
         VkDeviceMemory texture_image_memory;
+        VkSampler texture_sampler;
 
     public:
         Texture(Device& device, const std::string& filename);
         ~Texture();
+
+        const VkImageView image_view() const
+        { return texture_image_view; }
+        const VkSampler sampler() const
+        { return texture_sampler; }
 
     private:
         void transition_image_layout(VkImage image, VkFormat format, VkImageLayout old_layout, VkImageLayout new_layout);
