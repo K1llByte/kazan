@@ -46,6 +46,7 @@
 ## See Later
 - GPU Driven Rendring (https://vkguide.dev/docs/gpudriven)
 - Quaternions rotation
+- C++ Auto indent
 
 ## Done
 - Refactor code

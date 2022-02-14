@@ -11,10 +11,11 @@ namespace kzn
     private:
         Device &device;
         VkImage texture_image;
+        VkImageView texture_image_view;
         VkDeviceMemory texture_image_memory;
 
     public:
-        Texture(Device &device, const std::string& file);
+        Texture(Device& device, const std::string& filename);
         ~Texture();
 
     private:

@@ -8,11 +8,14 @@
 namespace kzn
 {
 
-    Texture::Texture(Device& device, const std::string& file)
+    Texture::Texture(Device& device, const std::string& filename)
+        : device(device)
     {
-        // 1.1 Load texture buffer
+        // 1. Create Image
+        // NOTE: This texture object is going to only be present in GPU memory
+        // 1.1.1 Load texture buffer
         int width, height, channels;
-        stbi_uc* pixels = stbi_load(file.c_str(), &width, &height, &channels, STBI_rgb_alpha);
+        stbi_uc* pixels = stbi_load(filename.c_str(), &width, &height, &channels, STBI_rgb_alpha);
         // NOTE: 4 channels but texture might have less
         VkDeviceSize image_size = width * height * 4;
 
@@ -21,7 +24,7 @@ namespace kzn
             throw std::runtime_error("failed to load texture image!");
         }
         
-        // 1.2 Create staging buffer
+        // 1.1.2 Create staging buffer
         VkBuffer staging_buffer;
         VkDeviceMemory staging_buffer_memory;
 
@@ -32,16 +35,16 @@ namespace kzn
             staging_buffer,
             staging_buffer_memory);
 
-        // 1.3 Copy texture data to GPU memory
+        // 1.1.3 Copy texture data to GPU memory
         void* data;
         vkMapMemory(device.device(), staging_buffer_memory, 0, image_size, 0, &data);
         memcpy(data, pixels, static_cast<size_t>(image_size));
         vkUnmapMemory(device.device(), staging_buffer_memory);
 
-        // 1.4 Free texture data in main memory
+        // 1.1.4 Free texture data in main memory
         stbi_image_free(pixels);
 
-        // 2.1 Create Image for optimal shader acess
+        // 1.2.1 Create Image for optimal shader acess
         VkImageCreateInfo image_info{};
         image_info.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
         image_info.imageType = VK_IMAGE_TYPE_2D;
@@ -63,7 +66,7 @@ namespace kzn
             throw std::runtime_error("failed to create image!");
         }
 
-        // 2.2 Allocate memory (Not sure about this step)
+        // 1.2.2 Allocate memory (Not sure about this step)
         VkMemoryRequirements mem_requirements;
         vkGetImageMemoryRequirements(device.device(), texture_image, &mem_requirements);
         
@@ -79,13 +82,33 @@ namespace kzn
         
         vkBindImageMemory(device.device(), texture_image, texture_image_memory, 0);
 
-        // 3.1 Transition Image layout to DST_OPTIMAL
+        // 1.3.1 Transition Image layout to DST_OPTIMAL
         transition_image_layout(texture_image, VK_FORMAT_R8G8B8A8_SRGB, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
-        // 3.2 Copy buffer contents to Image buffer
+        // 1.3.2 Copy buffer contents to Image buffer
         copy_buffer_to_image(staging_buffer, texture_image, static_cast<uint32_t>(width), static_cast<uint32_t>(height));
-        // 3.3 Transition Image layout to SHADER_READ_ONLY_OPTIMAL
+        // 1.3.3 Transition Image layout to SHADER_READ_ONLY_OPTIMAL
         transition_image_layout(texture_image, VK_FORMAT_R8G8B8A8_SRGB, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 
+        // 1.4. Destroy staging buffer
+        vkDestroyBuffer(device.device(), staging_buffer, nullptr);
+        vkFreeMemory(device.device(), staging_buffer_memory, nullptr);
+
+        // 2. Create ImageView
+        VkImageViewCreateInfo view_info{};
+        view_info.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
+        view_info.image = texture_image;
+        view_info.viewType = VK_IMAGE_VIEW_TYPE_2D;
+        view_info.format = VK_FORMAT_R8G8B8A8_SRGB;
+        view_info.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+        view_info.subresourceRange.baseMipLevel = 0;
+        view_info.subresourceRange.levelCount = 1;
+        view_info.subresourceRange.baseArrayLayer = 0;
+        view_info.subresourceRange.layerCount = 1;
+
+        if(vkCreateImageView(device.device(), &view_info, nullptr, &texture_image_view) != VK_SUCCESS)
+        {
+            throw std::runtime_error("failed to create texture image view!");
+        }
     }
 
     void Texture::transition_image_layout(VkImage image, VkFormat format, VkImageLayout old_layout, VkImageLayout new_layout)
@@ -106,10 +129,37 @@ namespace kzn
         barrier.subresourceRange.layerCount = 1;
         barrier.srcAccessMask = 0; // TODO
         barrier.dstAccessMask = 0; // TODO
+
+        // TODO: To avoid this if statements create 2 separate methods for each layout transition
+        // 'transition_image_layout_dst_opt'
+        // and 'transition_image_layout_shader_read'
+        VkPipelineStageFlags source_stage;
+        VkPipelineStageFlags destination_stage;
+        if (old_layout == VK_IMAGE_LAYOUT_UNDEFINED && new_layout == VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL)
+        {
+            barrier.srcAccessMask = 0;
+            barrier.dstAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
+
+            source_stage = VK_PIPELINE_STAGE_TOP_OF_PIPE_BIT;
+            destination_stage = VK_PIPELINE_STAGE_TRANSFER_BIT;
+        }
+        else if (old_layout == VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL && new_layout == VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL)
+        {
+            barrier.srcAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT;
+            barrier.dstAccessMask = VK_ACCESS_SHADER_READ_BIT;
+
+            source_stage = VK_PIPELINE_STAGE_TRANSFER_BIT;
+            destination_stage = VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT;
+        }
+        else
+        {
+            throw std::invalid_argument("unsupported layout transition!");
+        }
+
         vkCmdPipelineBarrier(
             command_buffer,
-            0 /* TODO */,
-            0 /* TODO */,
+            source_stage,
+            destination_stage,
             0,
             0,
             nullptr,
@@ -158,6 +208,7 @@ namespace kzn
 
     Texture::~Texture()
     {
+        vkDestroyImageView(device.device(), texture_image_view, nullptr);
         vkDestroyImage(device.device(), texture_image, nullptr);
         vkFreeMemory(device.device(), texture_image_memory, nullptr);
     }

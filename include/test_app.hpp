@@ -5,6 +5,7 @@
 #include "device.hpp"
 #include "renderer.hpp"
 #include "game_object.hpp"
+#include "texture.hpp"
 #include "ui.hpp"
 
 namespace kzn
@@ -25,7 +26,8 @@ private:
     Renderer _renderer;
     Interface _interface;
     // std::unique_ptr<Renderer> _renderer = nullptr;
-    std::vector<GameObject>   _game_objects;
+    std::vector<GameObject>  _game_objects;
+    std::vector<Texture>     textures;
 
 
 public:
