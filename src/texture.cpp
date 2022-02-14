@@ -8,11 +8,11 @@
 namespace kzn
 {
 
-    Texture::Texture(Device& device, std::string file)
+    Texture::Texture(Device& device, const std::string& file)
     {
         // 1.1 Load texture buffer
         int width, height, channels;
-        stbi_uc* pixels = stbi_load("textures/texture.jpg", &width, &height, &channels, STBI_rgb_alpha);
+        stbi_uc* pixels = stbi_load(file.c_str(), &width, &height, &channels, STBI_rgb_alpha);
         // NOTE: 4 channels but texture might have less
         VkDeviceSize image_size = width * height * 4;
 
@@ -78,6 +78,14 @@ namespace kzn
         }
         
         vkBindImageMemory(device.device(), texture_image, texture_image_memory, 0);
+
+        // 3.1 Transition Image layout to DST_OPTIMAL
+        transition_image_layout(texture_image, VK_FORMAT_R8G8B8A8_SRGB, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
+        // 3.2 Copy buffer contents to Image buffer
+        copy_buffer_to_image(staging_buffer, texture_image, static_cast<uint32_t>(width), static_cast<uint32_t>(height));
+        // 3.3 Transition Image layout to SHADER_READ_ONLY_OPTIMAL
+        transition_image_layout(texture_image, VK_FORMAT_R8G8B8A8_SRGB, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+
     }
 
     void Texture::transition_image_layout(VkImage image, VkFormat format, VkImageLayout old_layout, VkImageLayout new_layout)

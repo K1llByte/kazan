@@ -14,7 +14,7 @@ namespace kzn
         VkDeviceMemory texture_image_memory;
 
     public:
-        Texture(Device &device, std::string file);
+        Texture(Device &device, const std::string& file);
         ~Texture();
 
     private:
