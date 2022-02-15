@@ -1,6 +1,7 @@
 #include "model.hpp"
 
 #include "utils.hpp"
+#include "logger.hpp"
 
 #include <stdexcept>
 #include <cstring>
@@ -156,9 +157,10 @@ Model* Model::load_from_file(Device& device, const std::string& file_path)
             if(index.texcoord_index >= 0)
             {
                 vtx.uv = {
-                    attrib.texcoords[3 * index.texcoord_index],     // u
-                    attrib.texcoords[3 * index.texcoord_index + 1], // v
+                    attrib.texcoords[2 * index.texcoord_index],     // u
+                    1. - attrib.texcoords[2 * index.texcoord_index + 1], // v
                 };
+                
             }
 
             if(compute_indices)

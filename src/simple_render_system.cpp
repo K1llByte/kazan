@@ -140,7 +140,7 @@ void SimpleRenderSystem::create_pipeline_layout()
     //     throw std::runtime_error("failed to create pipeline layout!");
     // }
 
-    texture = std::make_unique<Texture>(_device, "textures/cat.png");
+    texture = std::make_unique<Texture>(_device, "textures/viking_room.png");
 
     ///////////////// Refactored code /////////////////
 

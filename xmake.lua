@@ -15,14 +15,15 @@ rule("glsl")
         -- make sure build directory exists
         os.mkdir(target:targetdir())
 
-        -- replace .md with .html
-        local targetfile = path.join(target:targetdir(), sourcefile .. ".html")
+        -- append target file with .spv
+        -- local targetfile = path.join(target:targetdir(), sourcefile .. ".spv")
+        local targetfile =  sourcefile .. ".spv"
 
         -- only rebuild the file if its changed since last run
         depend.on_changed(function ()
-            -- call pandoc to make a standalone html file from a markdown file
+            -- call glslangValidator to compile glsl to spv
             os.vrunv('glslangValidator', {"-V", sourcefile, "-o", targetfile})
-            progress.show(opt.progress, "${color.build.object}shader %s", sourcefile)
+            progress.show(opt.progress, "${color.build.object}shader %s to %s", sourcefile, targetfile)
         end, {files = sourcefile})
     end)
 
@@ -33,6 +34,7 @@ target("shaders")
 
     -- make the test target support the construction rules of the spir-v files
     add_rules("glsl")
+    set_targetdir("./")
 
     -- adding shader files to build
     add_files("shaders/**.vert")

@@ -83,7 +83,7 @@ vec3 compute_lights()
     vec3 result = vec3(0.0f);
     const vec3 view_dir = normalize(cam.position - frag_position);
     const vec3 norm_frag_normal = normalize(frag_normal);
-    const vec3 color = vec3(texture(tex_sampler, frag_tex * 2.0));
+    const vec3 color = vec3(texture(tex_sampler, frag_tex));
 
     for(int i = 0; i < all_lights.used; ++i)
     {
