@@ -19,9 +19,9 @@
 
 <!-- Today -->
 - Lightning
-    - Array Uniform Buffer (test and finish) 
     - PBR (no material hardcoded values)
-
+- Generate Mipmaps
+- Multisampling (MXAA)
 <!----------->
 
 - Logger singleton
@@ -61,6 +61,8 @@
 
 ## Arquived
 
+- Lightning
+    - Array Uniform Buffer (test and finish)
 - Fix
     - ! Fix transformations (push constants for now)
         Uniform buffers are bound when the command buffer
