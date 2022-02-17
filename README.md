@@ -9,7 +9,9 @@ This project is an experimental computer graphics engine for experimentation and
 - Game development
 -->
 
-![](https://i.imgur.com/u8C2qSc.png)
+![](https://i.imgur.com/miT8j6t.png)
+<!-- ![](https://i.imgur.com/u8C2qSc.png) -->
+
 
 <!-- An experimental computer graphics engine for learning purposes. -->
 
