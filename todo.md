@@ -4,6 +4,8 @@
 
 - Textures
 - Refactor code
+
+
     - Error handling
     - Init and cleanup consistency
     - Consistent general API with configurability
@@ -24,7 +26,8 @@
 - Multisampling (MXAA)
 <!----------->
 
-- Logger singleton
+- Quick: Change "Logger" class to "Log"
+- Setup reference docs generation
 - Add VK_EXT_extended_dynamic_state and use it
 
 - Enable multiple pipelines at the same time (Entity Component System)
@@ -71,6 +74,17 @@
     - ! Possible solution, update uniform buffers 
 
 # Example
+
+## Engine singleton
+
+Single instance class, with core data needed for usage like device.
+
+Engine: 
+    - Device
+
+Renderer: 
+    - time_delta
+
 
 ## Engine usage
 ```c++
@@ -145,6 +159,7 @@ Result<T,Error> foo()
 ```
 
 ## Pipeline creation
+NEEDS REWORK
 ```c++
 DescriptorSetBuilder ds_builder = _pool.descriptor_set_builder();
 auto cam_buffer = ds_builder.create_uniform_buffer<CameraData>();
@@ -182,4 +197,20 @@ auto pipeline = PipelineBuilder(pipeline_config, "shader.vert","shader.frag")
 ## Texture
 ```c++
 auto texture = Texture(device, "file.txt")
+```
+
+## Material
+```c++
+// In game loop
+auto m = Material(flat_color_shader);
+auto mi = MaterialInstance(m);
+cube.set_material(mi);
+
+renderer.submit(mi, cube, transform);
+```
+
+## Rendering scenes (proposals)
+
+```c++
+
 ```
