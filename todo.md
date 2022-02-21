@@ -7,9 +7,8 @@
     - Low level and High level building blocks (Renderer, ...)
     - Distinguish every API bounds (group files by: core, core::platform, utils, math)
     - Error handling
-    - Init and cleanup consistency
+    - Init and cleanup consistency (RAII) instead of this
     - Consistent general API with configurability
-    - change implicit conversions
     - kazan.hpp include with all public API includes
 
 ## Todo 
