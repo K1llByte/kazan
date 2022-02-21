@@ -101,11 +101,11 @@ void TestApp::load_game_objects()
 {
     const float pi = 3.14159;
 
-    // Texture tex1 = Texture(_device, "textures/cat.png");
-    // textures.emplace_back(_device, "textures/cat.png");
+    // Texture tex1 = Texture(_device, "assets/textures/cat.png");
+    // textures.emplace_back(_device, "assets/textures/cat.png");
 
     auto cube_obj = GameObject::create_game_object();
-    cube_obj.model = Model::load_from_file(_device, "models/viking_room.obj");
+    cube_obj.model = Model::load_from_file(_device, "assets/models/viking_room.obj");
     // cube_obj.transform.translation = { 2.0f, 1.45f, 0.0f};
     // cube_obj.transform.scale = { 0.5f, 0.5f, 0.5f};
     cube_obj.transform.rotation = { 0.0f, 0.0f, 1.570796f};

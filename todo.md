@@ -4,13 +4,13 @@
 
 - Textures
 - Refactor code
-
-
+    - Low level and High level building blocks (Renderer, ...)
+    - Distinguish every API bounds (group files by: core, core::platform, utils, math)
     - Error handling
     - Init and cleanup consistency
     - Consistent general API with configurability
-    - Low level and High level building blocks (Renderer, ...)
     - change implicit conversions
+    - kazan.hpp include with all public API includes
 
 ## Todo 
 
@@ -78,6 +78,10 @@
 ## Engine singleton
 
 Single instance class, with core data needed for usage like device.
+
+Problem: Engine needs to be singleton but device may have a configuration stage, where the actual physical device is chosen with properties
+
+Engine::create();
 
 Engine: 
     - Device

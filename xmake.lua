@@ -37,8 +37,8 @@ target("shaders")
     set_targetdir("./")
 
     -- adding shader files to build
-    add_files("shaders/**.vert")
-    add_files("shaders/**.frag")
+    add_files("assets/shaders/**.vert")
+    add_files("assets/shaders/**.frag")
 
 -------------------- Renderer --------------------
 

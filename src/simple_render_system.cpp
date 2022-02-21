@@ -140,7 +140,7 @@ void SimpleRenderSystem::create_pipeline_layout()
     //     throw std::runtime_error("failed to create pipeline layout!");
     // }
 
-    texture = std::make_unique<Texture>(_device, "textures/viking_room.png");
+    texture = std::make_unique<Texture>(_device, "assets/textures/viking_room.png");
 
     ///////////////// Refactored code /////////////////
 
@@ -180,8 +180,8 @@ void SimpleRenderSystem::create_pipeline(VkRenderPass render_pass)
     // a stack allocated alternative
     _pipeline = std::make_unique<Pipeline>(
         _device,
-        "shaders/surface_texture/surface_texture.vert.spv",
-        "shaders/surface_texture/surface_texture.frag.spv",
+        "assets/shaders/surface_texture/surface_texture.vert.spv",
+        "assets/shaders/surface_texture/surface_texture.frag.spv",
         pipeline_config);
 }
 

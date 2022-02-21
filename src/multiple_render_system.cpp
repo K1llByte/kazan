@@ -179,8 +179,8 @@ void MultipleRenderSystem::create_pipeline(VkRenderPass render_pass)
     // a stack allocated alternative
     _pipeline = std::make_unique<Pipeline>(
         _device,
-        "shaders/surface/surface.vert.spv",
-        "shaders/surface/surface.frag.spv",
+        "assets/shaders/surface/surface.vert.spv",
+        "assets/shaders/surface/surface.frag.spv",
         pipeline_config);
 }
 
