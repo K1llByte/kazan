@@ -3,5 +3,5 @@
 
 int main()
 {
-    fmt::format("Hello {}!", "World");
+    fmt::print("Hello {}!\n", 11);
 }
