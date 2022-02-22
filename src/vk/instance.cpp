@@ -10,7 +10,7 @@ static VKAPI_ATTR VkBool32 VKAPI_CALL debug_callback(
     const VkDebugUtilsMessengerCallbackDataEXT* p_callback_data,
     void* p_user_data)
 {
-    kzn::Log::warning("VALIDATION > {}", p_callback_data->pMessage);
+    kzn::Log::warning(p_callback_data->pMessage);
     return VK_FALSE;
 }
 
@@ -47,11 +47,11 @@ namespace kzn::vk
 {
     Instance::~Instance()
     {
-        vkDestroyInstance(vkinstance, nullptr);
         if(with_validation_layers)
         {
             DestroyDebugUtilsMessengerEXT(vkinstance, debug_messenger, nullptr);
         }
+        vkDestroyInstance(vkinstance, nullptr);
         Log::debug("VkInstance destroyed");
     }
 
