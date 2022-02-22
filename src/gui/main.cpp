@@ -9,5 +9,4 @@ int main()
     auto instance = vk::InstanceBuilder()
         .enable_validation_layers()
         .build();
-
 }

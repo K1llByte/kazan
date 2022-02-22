@@ -9,16 +9,26 @@
 
 namespace kzn::vk
 {
-    struct Instance
+    class Instance
     {
-
+        friend class InstanceBuilder;
+    public:
+        ~Instance();
+    
+    private:
+        Instance() = default;
+        
+    private:
+        bool                     with_validation_layers;
+        VkDebugUtilsMessengerEXT debug_messenger;
+        VkInstance               vkinstance;
     };
 
     class InstanceBuilder
     {
     public:
         InstanceBuilder() = default;
-        ~InstanceBuilder();
+        ~InstanceBuilder() = default;
 
         InstanceBuilder& enable_validation_layers() noexcept;
 

@@ -45,7 +45,7 @@ void DestroyDebugUtilsMessengerEXT(
 
 namespace kzn::vk
 {
-    InstanceBuilder::~InstanceBuilder()
+    Instance::~Instance()
     {
         if(with_validation_layers)
         {
@@ -171,6 +171,16 @@ namespace kzn::vk
             }
         }
 
-        return Instance{};
+        // TODO: This is maybe being initialized by default ctor
+        Instance instance;
+        instance.with_validation_layers = with_validation_layers;
+        instance.debug_messenger = debug_messenger;
+        instance.vkinstance = vkinstance;
+        // return Instance {
+        //     .with_validation_layers = with_validation_layers,
+        //     .debug_messenger = debug_messenger,
+        //     .vkinstance = vkinstance,
+        // };
+        return instance;
     }
 }
