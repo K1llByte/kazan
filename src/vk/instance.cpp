@@ -47,11 +47,11 @@ namespace kzn::vk
 {
     Instance::~Instance()
     {
+        vkDestroyInstance(vkinstance, nullptr);
         if(with_validation_layers)
         {
             DestroyDebugUtilsMessengerEXT(vkinstance, debug_messenger, nullptr);
         }
-        vkDestroyInstance(vkinstance, nullptr);
         Log::debug("VkInstance destroyed");
     }
 
