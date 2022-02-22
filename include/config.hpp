@@ -1,1 +1,2 @@
-// #define KZN_VK_DEBUG_LAYERS
+#define KZN_DEBUG_LOGS
+#define KZN_VK_DEBUG_LAYERS

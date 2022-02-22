@@ -1,5 +1,12 @@
 # Todo
 
+## NOTES
+
+USE noexcept (maybe?)
+USE const 
+kazan.hpp include with all public API includes
+
+
 ## In Progress
 
 - Textures
@@ -9,7 +16,6 @@
     - Error handling
     - Init and cleanup consistency (RAII) instead of this
     - Consistent general API with configurability
-    - kazan.hpp include with all public API includes
 
 ## Todo 
 
@@ -73,6 +79,25 @@
     - ! Possible solution, update uniform buffers 
 
 # Example
+
+## Project structure
+
+- include/
+    - core/
+    - vk/
+    - math/
+    - gui/
+    - input/
+    ...
+    - kazan.hpp
+    - config.hpp
+- src/
+    - core/
+    - vk/
+    - math/
+    - gui/
+    - input/
+    ...
 
 ## Engine singleton
 

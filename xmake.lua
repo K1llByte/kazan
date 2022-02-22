@@ -61,10 +61,12 @@ target("kazan")
     set_kind("static")
     add_files("src/**.cpp")
     remove_files("src/gui/**.cpp")
+    remove_files("src/main.cpp")
     -- Dependencies
     add_packages("vulkan-headers", {links = "vulkan"})
     add_packages("glfw")
     add_packages("glm")
+    add_packages("fmt")
 
 -------------------- Kazan GUI -------------------
 
@@ -88,4 +90,3 @@ target("demo")
     -- Library
     set_kind("binary")
     add_files("src/gui/*.cpp")
-    -- add_files("src/gui/**/*.cpp")

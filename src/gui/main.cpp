@@ -1,7 +1,13 @@
-// #include <iostream>
-#include <fmt/core.h>
+#include "kazan.hpp"
+
+using namespace kzn;
 
 int main()
 {
-    fmt::print("Hello {}!\n", 11);
+    Log::info("Hello World!");
+    
+    auto instance = vk::InstanceBuilder()
+        .enable_validation_layers()
+        .build();
+
 }

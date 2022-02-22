@@ -1,6 +1,9 @@
 #ifndef KAZAN_HPP
 #define KAZAN_HPP
 
-#include "test_app.hpp"
+#include "core/log.hpp"
+
+#include "vk/instance.hpp"
+#include "vk/utils.hpp"
 
 #endif // KAZAN_HPP
