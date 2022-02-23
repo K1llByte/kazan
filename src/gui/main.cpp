@@ -14,5 +14,10 @@ int main()
         .enable_validation_layers()
         .build();
 
-    auto physical_device = vk::PhysicalDeviceSelector(instance).select();
+    try {
+        auto physical_device = vk::PhysicalDeviceSelector(instance).select();
+    }
+    catch(const vk::NoGPUSuitable& e) {
+        Log::error(e.what());
+    }
 }

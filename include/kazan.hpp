@@ -6,5 +6,6 @@
 #include "vk/instance.hpp"
 #include "vk/device.hpp"
 #include "vk/utils.hpp"
+#include "vk/error.hpp"
 
 #endif // KAZAN_HPP
