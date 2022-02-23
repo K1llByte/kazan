@@ -24,10 +24,10 @@ namespace kzn
             return instance;
         }
 
-        static void info(const std::string& text);
-        static void debug(const std::string& text);
-        static void warning(const std::string& text);
-        static void error(const std::string& text);
+        static void info(std::string_view text);
+        static void debug(std::string_view text);
+        static void warning(std::string_view text);
+        static void error(std::string_view text);
 
         // Format versions
         template<typename... Args>

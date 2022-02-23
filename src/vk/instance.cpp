@@ -1,6 +1,7 @@
 #include "vk/instance.hpp"
 
 #include "vk/utils.hpp"
+#include "config.hpp"
 
 #include <array>
 
@@ -70,6 +71,7 @@ namespace kzn::vk
 
         // Create info data is changed in 1.
         VkInstanceCreateInfo create_info{};
+        VkInstance vkinstance = VK_NULL_HANDLE;
 
         // 1. Enable validation layers //
         if(with_validation_layers)
@@ -152,6 +154,8 @@ namespace kzn::vk
         // 4. Setup debug messeger //
         if(with_validation_layers)
         {
+            // FIXME: Consider moving this setup of the debug messeger to the
+            // Instance method since it can be dynamicly changed
             VkDebugUtilsMessengerCreateInfoEXT create_info{};
             create_info.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT;
             create_info.messageSeverity = VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT
@@ -183,4 +187,4 @@ namespace kzn::vk
         // };
         return instance;
     }
-}
+} // namespace kzn::vk

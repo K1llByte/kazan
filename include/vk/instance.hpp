@@ -1,5 +1,5 @@
-#ifndef INSTANCE_HPP
-#define INSTANCE_HPP
+#ifndef KZN_VK_INSTANCE_HPP
+#define KZN_VK_INSTANCE_HPP
 
 #ifndef GLFW_INCLUDE_VULKAN
 #   include <vulkan/vulkan.h>
@@ -9,11 +9,15 @@
 
 namespace kzn::vk
 {
+    // TODO: InstanceError, an exception for errors from
+    // the instance or instance creations
     class Instance
     {
         friend class InstanceBuilder;
     public:
         ~Instance();
+
+        VkInstance vk_instance() noexcept { return vkinstance; }
     
     private:
         Instance() = default;
@@ -35,11 +39,10 @@ namespace kzn::vk
         Instance build();
 
     private:
-        bool                     with_validation_layers;
+        bool                     with_validation_layers = false;
         std::vector<const char*> extensions;
-        VkDebugUtilsMessengerEXT debug_messenger;
-        VkInstance               vkinstance;
+        VkDebugUtilsMessengerEXT debug_messenger = VK_NULL_HANDLE;
     };
-}
+} // namespace kzn::vk
 
-#endif // INSTANCE_HPP
+#endif // KZN_VK_INSTANCE_HPP
