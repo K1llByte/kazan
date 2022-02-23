@@ -1,6 +1,8 @@
 #include "vk/device.hpp"
 
 #include "core/log.hpp"
+#include "vk/error.hpp"
+
 
 namespace kzn::vk
 {
@@ -13,7 +15,7 @@ namespace kzn::vk
         if(device_count == 0)
         {
             // TODO: Wrap in PhysicalDeviceError
-            std::__throw_runtime_error("Failed to find GPUs with Vulkan support!");
+            throw NoGPUSupport();
         }
 
         available_devices.resize(device_count);
@@ -35,7 +37,7 @@ namespace kzn::vk
         if(physical_device == VK_NULL_HANDLE)
         {
             // TODO: Wrap in PhysicalDeviceError
-            std::__throw_runtime_error("Failed to find a suitable GPU!");
+            throw NoGPUSuitable();
         }
         else
         {

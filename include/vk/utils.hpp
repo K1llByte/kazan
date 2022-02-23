@@ -8,6 +8,8 @@
 #   include <vulkan/vulkan.h>
 #endif
 
+// NOTE: If this file won't have more things besides VK_CHECK's
+// then consider moving everything from error.hpp to here
 // TODO: Enhace the VkResult conversion to string
 #define VK_CHECK(res)                         \
         {                                     \
@@ -31,9 +33,8 @@
 
 namespace kzn::vk
 {
-    // FIXME: This class isn't an exception,
-    // maybe consider extending std::exception
-    // or other.
+    // FIXME: Make this class extend std::exception and
+    // implement what()
     class ResultError
     {
     public:
