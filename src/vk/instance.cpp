@@ -22,7 +22,9 @@ VkResult CreateDebugUtilsMessengerEXT(
     VkDebugUtilsMessengerEXT* p_debug_messenger)
 {
     // TODO: Change to static_cast
-    auto func = (PFN_vkCreateDebugUtilsMessengerEXT) vkGetInstanceProcAddr(instance, "vkCreateDebugUtilsMessengerEXT");
+    auto func = reinterpret_cast<PFN_vkCreateDebugUtilsMessengerEXT>(
+        vkGetInstanceProcAddr(instance, "vkCreateDebugUtilsMessengerEXT")
+    );
     if (func != nullptr)
     {
         return func(instance, p_create_info, p_allocator, p_debug_messenger);
