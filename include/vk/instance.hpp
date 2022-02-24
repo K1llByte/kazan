@@ -1,9 +1,8 @@
 #ifndef KZN_VK_INSTANCE_HPP
 #define KZN_VK_INSTANCE_HPP
 
-#ifndef GLFW_INCLUDE_VULKAN
-#   include <vulkan/vulkan.h>
-#endif
+#define GLFW_INCLUDE_VULKAN
+#include <GLFW/glfw3.h>
 
 #include <vector>
 
@@ -18,6 +17,9 @@ namespace kzn::vk
         ~Instance();
 
         VkInstance vk_instance() noexcept { return vkinstance; }
+
+        VkSurfaceKHR create_surface(GLFWwindow* glfw_window);
+        void destroy_surface(VkSurfaceKHR surface);
     
     private:
         Instance() = default;

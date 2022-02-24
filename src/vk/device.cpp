@@ -15,7 +15,7 @@ namespace kzn::vk
         Log::debug("Device destroyed");
     }
 
-    QueueFamilyIndices DeviceBuilder::get_queue_families(VkPhysicalDevice physical_device)
+    QueueFamilyIndices get_queue_families(VkPhysicalDevice physical_device)
     {
 
         // Logic to find queue family indices to populate struct with
@@ -134,7 +134,7 @@ namespace kzn::vk
         VkPhysicalDeviceFeatures device_features{};
         device_features.samplerAnisotropy = VK_TRUE;
 
-        // TODO: Fetch this from vk::Instance instead of hardcoded 
+        // TODO: Fetch this from Instance instead of hardcoded 
         std::vector<const char*> validation_layers{"VK_LAYER_KHRONOS_validation"};
         std::vector<const char*> device_extensions{}; // {VK_KHR_SWAPCHAIN_EXTENSION_NAME};
         VkDeviceCreateInfo create_info{};

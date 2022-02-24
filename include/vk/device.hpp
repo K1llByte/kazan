@@ -47,11 +47,8 @@ namespace kzn::vk
     public:
         DeviceBuilder(Instance& instance);
         ~DeviceBuilder() = default;
-    
+
         Device build();
-    
-    private:
-        QueueFamilyIndices get_queue_families(VkPhysicalDevice physical_device);
 
     private:
         std::vector<VkPhysicalDevice> available_devices;

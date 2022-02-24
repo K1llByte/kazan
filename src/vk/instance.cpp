@@ -58,6 +58,23 @@ namespace kzn::vk
         Log::debug("Instance destroyed");
     }
 
+    VkSurfaceKHR Instance::create_surface(GLFWwindow* glfw_window)
+    {
+        // Create surface
+        VkSurfaceKHR surface;
+        auto result = glfwCreateWindowSurface(vkinstance, glfw_window, nullptr, &surface);
+        VK_CHECK_MSG(result, "Failed to create window surface!");
+        Log::debug("Surface created");
+        return surface;
+    }
+
+    void Instance::destroy_surface(VkSurfaceKHR surface)
+    {
+        // Destroy surface
+        vkDestroySurfaceKHR(vkinstance, surface, nullptr);
+        Log::debug("Surface destroyed");
+    }
+
     InstanceBuilder& InstanceBuilder::enable_validation_layers() noexcept
     {
         with_validation_layers = true;

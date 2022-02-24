@@ -84,19 +84,19 @@ kazan.hpp include with all public API includes
 
 - include/
     - core/
+        - input/
     - vk/
     - math/
     - gui/
-    - input/
     ...
     - kazan.hpp
     - config.hpp
 - src/
     - core/
+        - input/
     - vk/
     - math/
     - gui/
-    - input/
     ...
 
 ## Engine singleton
@@ -113,7 +113,6 @@ Engine:
 Renderer: 
     - time_delta
 
-
 ## Engine usage
 ```c++
 auto window = Window(1700, 800, "Name")
@@ -126,8 +125,13 @@ auto model_1 = Model::load("model.obj")
 auto scene = Scene {
 
 };
+```
 
-
+Alternative window render targer API
+```c++
+auto window = Window(...);
+WindowTarget win_target = window.render_target();
+renderer.render_to(win_target);
 ```
 
 ## Scene Hierarchy
