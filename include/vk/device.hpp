@@ -8,12 +8,6 @@
 
 namespace kzn::vk
 {
-    class PhysicalDevice
-    {
-        friend class PhysicalDeviceSelector;
-    public:
-    };
-
     struct QueueFamilyIndices
     {
         std::optional<uint32_t> graphics_family;
@@ -33,26 +27,37 @@ namespace kzn::vk
     //     std::vector<VkPresentModeKHR>   present_modes;
     // };
 
-    class PhysicalDeviceSelector
+    class Device
+    {
+        friend class DeviceBuilder;
+    public:
+        ~Device();
+
+        VkDevice vk_device() noexcept { return vkdevice; }
+
+    private:
+        Device() = default;
+
+    private:
+        VkDevice vkdevice;
+    };
+
+    class DeviceBuilder
     {
     public:
-        PhysicalDeviceSelector(Instance& instance);
-        ~PhysicalDeviceSelector() = default;
-
-        // TODO: Specific selection method
-        // like dedicated_gpu() or compute_support()
-        PhysicalDevice select();
+        DeviceBuilder(Instance& instance);
+        ~DeviceBuilder() = default;
+    
+        Device build();
+    
+    private:
+        QueueFamilyIndices get_queue_families(VkPhysicalDevice physical_device);
 
     private:
-        bool is_device_suitable(VkPhysicalDevice physical_device);
-        QueueFamilyIndices find_queue_families(VkPhysicalDevice physical_device);
-
-    private:
-        VkInstance                    vkinstance = VK_NULL_HANDLE;
         std::vector<VkPhysicalDevice> available_devices;
-        std::vector<const char*>      device_extensions = {VK_KHR_SWAPCHAIN_EXTENSION_NAME};
-        QueueFamilyIndices            indices;
-
+        VkPhysicalDevice              vkphysical_device = VK_NULL_HANDLE;
+        VkQueue                       graphics_queue = VK_NULL_HANDLE;
+        VkQueue                       present_queue = VK_NULL_HANDLE;
     };
 } // namespace kzn::vk
 

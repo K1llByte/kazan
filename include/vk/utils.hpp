@@ -1,4 +1,3 @@
-// TODO: Change this to KZN_VK_UTILS_HPP or equivalent
 #ifndef KZN_VK_UTILS_HPP
 #define KZN_VK_UTILS_HPP
 
@@ -10,7 +9,7 @@
 
 // NOTE: If this file won't have more things besides VK_CHECK's
 // then consider moving everything from error.hpp to here
-// TODO: Enhace the VkResult conversion to string
+
 #define VK_CHECK(res)                         \
         {                                     \
             if(res != VK_SUCCESS)             \

@@ -53,7 +53,7 @@ namespace kzn::vk
             DestroyDebugUtilsMessengerEXT(vkinstance, debug_messenger, nullptr);
         }
         vkDestroyInstance(vkinstance, nullptr);
-        Log::debug("VkInstance destroyed");
+        Log::debug("Instance destroyed");
     }
 
     InstanceBuilder& InstanceBuilder::enable_validation_layers() noexcept
@@ -149,7 +149,7 @@ namespace kzn::vk
 
         auto result = vkCreateInstance(&create_info, nullptr, &vkinstance);
         VK_CHECK_MSG(result, "Failed to create VkInstance (VkResult = {})");
-        Log::debug("VkInstance created");
+        Log::debug("Instance created");
 
         // 4. Setup debug messeger //
         if(with_validation_layers)

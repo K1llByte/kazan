@@ -6,6 +6,9 @@
 
 using namespace kzn;
 
+// TODO:
+// - Window
+
 int main()
 {
     // Log::info("Hello World!");
@@ -14,10 +17,9 @@ int main()
         .enable_validation_layers()
         .build();
 
-    try {
-        auto physical_device = vk::PhysicalDeviceSelector(instance).select();
-    }
-    catch(const vk::NoGPUSuitable& e) {
-        Log::error(e.what());
-    }
+    auto device = vk::DeviceBuilder(instance)
+        .build();
+
+    // List all devices if you want to choose the device
+    // auto available_gpus = vk::Device::available_devices(instance);
 }
