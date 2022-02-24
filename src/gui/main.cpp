@@ -11,18 +11,15 @@ class Application
 {
 public:
     Application()
-    {
-        window = Window("Hello World!", 800, 600);
-        instance = vk::InstanceBuilder()
+        : window("Hello World!", 800, 600),
+        instance(vk::InstanceBuilder()
             .enable_validation_layers()
-            .build();
+            .build()),
+        device(vk::DeviceBuilder(instance)
+            .build())
+    {}
 
-        device = vk::DeviceBuilder(instance)
-            .build();
-    }
-
-private:
-    void run() noexcept
+    void run()
     {
         while(!window.should_close())
         {
@@ -32,8 +29,8 @@ private:
 
 private:
     Window window;
-    Instance instance;
-    Device device;
+    vk::Instance instance;
+    vk::Device device;
 };
 
 int main()
@@ -59,6 +56,6 @@ int main()
     // Create default device
     // auto device = vk::Device::default();
 
-    Application app();
+    auto app = Application();
     app.run();
 }
