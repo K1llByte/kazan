@@ -37,6 +37,7 @@ namespace kzn::vk
         ~InstanceBuilder() = default;
 
         InstanceBuilder& enable_validation_layers() noexcept;
+        InstanceBuilder& set_extensions(std::vector<const char*>&&) noexcept;
 
         Instance build();
 

@@ -16,8 +16,10 @@
 namespace kzn::vk
 {
     KZN_VK_IMPL_ERROR(NoGPUSupport, "Failed to find GPUs with Vulkan support!")
-
     KZN_VK_IMPL_ERROR(NoGPUSuitable, "Failed to find a suitable GPU!")
+
+    KZN_VK_IMPL_ERROR(FailedDebugMessenger, "Failed to set up debug messenger!")
+    KZN_VK_IMPL_ERROR(FailedValidationLayers, "Validation Layers not available!")
 }
 
 #endif // KZN_VK_ERROR_HPP

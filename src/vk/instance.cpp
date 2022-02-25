@@ -1,6 +1,7 @@
 #include "vk/instance.hpp"
 
 #include "vk/utils.hpp"
+#include "vk/error.hpp"
 #include "config.hpp"
 
 #include <array>
@@ -81,6 +82,12 @@ namespace kzn::vk
         return *this;
     }
 
+    InstanceBuilder& InstanceBuilder::set_extensions(std::vector<const char*>&& extensions) noexcept
+    {
+        this->extensions = std::move(extensions);
+        return *this;
+    }
+
     Instance InstanceBuilder::build()
     {
         // 1. Enable validation layers
@@ -124,8 +131,7 @@ namespace kzn::vk
             if(!has_validation_layers)
             {
                 Log::error("Validation Layers not available");
-                // TODO: Change to custom Exception like ResultError
-                std::__throw_runtime_error("Validation Layers not available");
+                throw FailedValidationLayers();
             }
             else
             {
@@ -138,18 +144,18 @@ namespace kzn::vk
         }
 
         // 2. Enable extensions //
-        // uint32_t extension_count = 0;
-        // vkEnumerateInstanceExtensionProperties(nullptr, &extension_count, nullptr);
-        // // TODO: Change std::vector to custom vector without used variable
-        // // (ocupies less space)
-        // std::vector<VkExtensionProperties> extensions(extension_count);
-        // vkEnumerateInstanceExtensionProperties(nullptr, &extension_count, extensions.data());
+        uint32_t extension_count = 0;
+        vkEnumerateInstanceExtensionProperties(nullptr, &extension_count, nullptr);
+        // TODO: Change std::vector to custom vector without used variable
+        // (ocupies less space)
+        std::vector<VkExtensionProperties> available_extensions(extension_count);
+        vkEnumerateInstanceExtensionProperties(nullptr, &extension_count, available_extensions.data());
 
-        // Log::debug("Available extensions:");
-        // for (const auto& extension : extensions)
-        // {
-        //     Log::debug(extension.extensionName);
-        // }
+        Log::debug("Available extensions:");
+        for (const auto& extension : available_extensions)
+        {
+            Log::debug(extension.extensionName);
+        }
 
         // 3. Enable validation layers //
         VkApplicationInfo app_info{};
@@ -163,7 +169,7 @@ namespace kzn::vk
         // Extensions get loaded from outside
         create_info.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
         create_info.pApplicationInfo = &app_info;
-        create_info.enabledExtensionCount = static_cast<uint32_t>(extensions.size());;
+        create_info.enabledExtensionCount = static_cast<uint32_t>(extensions.size());
         create_info.ppEnabledExtensionNames = extensions.data();
 
         auto result = vkCreateInstance(&create_info, nullptr, &vkinstance);
@@ -175,26 +181,27 @@ namespace kzn::vk
         {
             // FIXME: Consider moving this setup of the debug messeger to the
             // Instance method since it can be dynamicly changed
-            VkDebugUtilsMessengerCreateInfoEXT create_info{};
-            create_info.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT;
-            create_info.messageSeverity = VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT
+            VkDebugUtilsMessengerCreateInfoEXT messenger_create_info{};
+            messenger_create_info.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT;
+            messenger_create_info.messageSeverity = VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT
                                         | VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT
                                         // | VK_DEBUG_UTILS_MESSAGE_SEVERITY_INFO_BIT_EXT
                                         // | VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT
                                         ;
-            create_info.messageType = VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT
+            messenger_create_info.messageType = VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT
                                     | VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT
                                     | VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT
                                     ;
-            create_info.pfnUserCallback = debug_callback;
-            create_info.pUserData = nullptr; // Optional
+            messenger_create_info.pfnUserCallback = debug_callback;
+            messenger_create_info.pUserData = nullptr; // Optional
             
-            if(CreateDebugUtilsMessengerEXT(vkinstance, &create_info, nullptr, &debug_messenger) != VK_SUCCESS) {
-                std::__throw_runtime_error("Failed to set up debug messenger!");
+            if(CreateDebugUtilsMessengerEXT(vkinstance, &messenger_create_info, nullptr, &debug_messenger) != VK_SUCCESS)
+            {
+                throw FailedDebugMessenger();
             }
         }
 
-        // TODO: This is maybe being initialized by default ctor
+        // TODO: This is being initialized by default ctor, thats no good
         Instance instance;
         instance.with_validation_layers = with_validation_layers;
         instance.debug_messenger = debug_messenger;

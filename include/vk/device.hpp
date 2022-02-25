@@ -11,12 +11,12 @@ namespace kzn::vk
     struct QueueFamilyIndices
     {
         std::optional<uint32_t> graphics_family;
-        // std::optional<uint32_t> present_family;
+        std::optional<uint32_t> present_family;
 
         bool is_complete() const noexcept
         {
-            return graphics_family.has_value();
-                // && present_family.has_value();
+            return graphics_family.has_value()
+                && present_family.has_value();
         }
     };
 
@@ -48,6 +48,8 @@ namespace kzn::vk
         DeviceBuilder(Instance& instance);
         ~DeviceBuilder() = default;
 
+        DeviceBuilder& set_surface(VkSurfaceKHR);
+
         Device build();
 
     private:
@@ -55,6 +57,7 @@ namespace kzn::vk
         VkPhysicalDevice              vkphysical_device = VK_NULL_HANDLE;
         VkQueue                       graphics_queue = VK_NULL_HANDLE;
         VkQueue                       present_queue = VK_NULL_HANDLE;
+        VkSurfaceKHR                  surface = VK_NULL_HANDLE;
     };
 } // namespace kzn::vk
 

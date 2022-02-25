@@ -39,6 +39,7 @@ int main()
     auto window = Window("Hello World!", 800, 600);
     auto instance = vk::InstanceBuilder()
         .enable_validation_layers()
+        .set_extensions(window.required_extensions())
         .build();
 
     auto device = vk::DeviceBuilder(instance)
