@@ -17,15 +17,18 @@ namespace kzn::vk
         ~Instance();
 
         VkInstance vk_instance() noexcept { return vkinstance; }
+        const std::vector<const char*>& get_validation_layers() const noexcept;
 
         VkSurfaceKHR create_surface(GLFWwindow* glfw_window);
         void destroy_surface(VkSurfaceKHR surface);
+
     
     private:
         Instance() = default;
         
     private:
         bool                     with_validation_layers;
+        std::vector<const char*> validation_layers;
         VkDebugUtilsMessengerEXT debug_messenger;
         VkInstance               vkinstance;
     };
@@ -43,6 +46,7 @@ namespace kzn::vk
 
     private:
         bool                     with_validation_layers = false;
+        std::vector<const char*> validation_layers{"VK_LAYER_KHRONOS_validation"};
         std::vector<const char*> extensions;
         VkDebugUtilsMessengerEXT debug_messenger = VK_NULL_HANDLE;
     };

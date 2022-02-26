@@ -59,6 +59,11 @@ namespace kzn::vk
         Log::debug("Instance destroyed");
     }
 
+    const std::vector<const char*>& Instance::get_validation_layers() const noexcept
+    {
+        return validation_layers; 
+    }
+
     VkSurfaceKHR Instance::create_surface(GLFWwindow* glfw_window)
     {
         // Create surface
@@ -109,7 +114,6 @@ namespace kzn::vk
             vkEnumerateInstanceLayerProperties(&layer_count, available_layers.data());
 
             bool has_validation_layers = true;
-            const auto validation_layers = std::array{"VK_LAYER_KHRONOS_validation"};
             for (const char* layerName : validation_layers)
             {
                 bool layer_found = false;
@@ -151,11 +155,11 @@ namespace kzn::vk
         std::vector<VkExtensionProperties> available_extensions(extension_count);
         vkEnumerateInstanceExtensionProperties(nullptr, &extension_count, available_extensions.data());
 
-        Log::debug("Available extensions:");
-        for (const auto& extension : available_extensions)
-        {
-            Log::debug(extension.extensionName);
-        }
+        // Log::debug("Available extensions:");
+        // for (const auto& extension : available_extensions)
+        // {
+        //     Log::debug(extension.extensionName);
+        // }
 
         // 3. Enable validation layers //
         VkApplicationInfo app_info{};
@@ -164,13 +168,18 @@ namespace kzn::vk
         app_info.applicationVersion = VK_MAKE_VERSION(1, 0, 0);
         app_info.pEngineName = "Kazan";
         app_info.engineVersion = VK_MAKE_VERSION(1, 0, 0);
-        app_info.apiVersion = VK_API_VERSION_1_0;
+        app_info.apiVersion =  VK_API_VERSION_1_2; // VK_API_VERSION_1_0;
 
         // Extensions get loaded from outside
         create_info.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
         create_info.pApplicationInfo = &app_info;
         create_info.enabledExtensionCount = static_cast<uint32_t>(extensions.size());
         create_info.ppEnabledExtensionNames = extensions.data();
+        Log::debug("Enabled extensions:");
+        for (const auto& extension_name : extensions)
+        {
+            Log::debug("- {}", extension_name);
+        }
 
         auto result = vkCreateInstance(&create_info, nullptr, &vkinstance);
         VK_CHECK_MSG(result, "Failed to create VkInstance (VkResult = {})");
@@ -206,11 +215,7 @@ namespace kzn::vk
         instance.with_validation_layers = with_validation_layers;
         instance.debug_messenger = debug_messenger;
         instance.vkinstance = vkinstance;
-        // return Instance {
-        //     .with_validation_layers = with_validation_layers,
-        //     .debug_messenger = debug_messenger,
-        //     .vkinstance = vkinstance,
-        // };
+        instance.validation_layers = std::move(validation_layers);
         return instance;
     }
 } // namespace kzn::vk

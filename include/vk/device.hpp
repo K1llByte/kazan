@@ -54,6 +54,7 @@ namespace kzn::vk
 
     private:
         std::vector<VkPhysicalDevice> available_devices;
+        std::vector<const char*>      validation_layers;
         VkPhysicalDevice              vkphysical_device = VK_NULL_HANDLE;
         VkQueue                       graphics_queue = VK_NULL_HANDLE;
         VkQueue                       present_queue = VK_NULL_HANDLE;
