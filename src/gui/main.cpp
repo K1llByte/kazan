@@ -6,33 +6,6 @@
 
 using namespace kzn;
 
-
-// class Application
-// {
-// public:
-//     Application()
-//         : window("Hello World!", 800, 600),
-//         instance(vk::InstanceBuilder()
-//             .enable_validation_layers()
-//             .build()),
-//         device(vk::DeviceBuilder(instance)
-//             .build())
-//     {}
-
-//     void run()
-//     {
-//         while(!window.should_close())
-//         {
-//             window.poll_events();
-//         }
-//     }
-
-// private:
-//     Window window;
-//     vk::Instance instance;
-//     vk::Device device;
-// };
-
 int main()
 {
     // Log::info("Hello World!");
