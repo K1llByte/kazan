@@ -2,13 +2,14 @@
 
 #include <thread>
 #include <functional>
-// #include <chrono>
+#include <iostream>
+#include <string_view>
 
 using namespace kzn;
 
+
 int main()
 {
-    // Log::info("Hello World!");
     auto window = Window("Hello World!", 800, 600);
     auto instance = vk::InstanceBuilder()
         .enable_validation_layers()
@@ -18,6 +19,7 @@ int main()
 
     auto device = vk::DeviceBuilder(instance)
         .set_surface(surface)
+        // .set_extensions({VK_KHR_SWAPCHAIN_EXTENSION_NAME})
         .build();
 
     while(!window.should_close())

@@ -45,6 +45,25 @@ namespace kzn::vk
         return indices;
     }
 
+    bool check_device_extensions_support(VkPhysicalDevice physical_device, const std::vector<const char*>& device_extensions)
+    {
+        uint32_t extension_count;
+        vkEnumerateDeviceExtensionProperties(physical_device, nullptr, &extension_count, nullptr);
+        std::vector<VkExtensionProperties> available_extensions(extension_count);
+        vkEnumerateDeviceExtensionProperties(physical_device, nullptr, &extension_count, available_extensions.data());
+
+        // TODO: Change set creation to faster check
+        std::unordered_set<std::string> required_extensions(
+            device_extensions.begin(),
+            device_extensions.end()
+            );
+        for (const auto& extension : available_extensions)
+        {
+            required_extensions.erase(extension.extensionName);
+        }
+        return required_extensions.empty();
+    }
+
     DeviceBuilder::DeviceBuilder(Instance& instance)
     {
         auto vkinstance = instance.vk_instance();
@@ -69,6 +88,16 @@ namespace kzn::vk
         return *this;
     }
 
+    DeviceBuilder& DeviceBuilder::set_extensions(const std::vector<const char*>& extensions)
+    {
+        this->device_extensions.insert(
+            this->device_extensions.end(),
+            extensions.begin(),
+            extensions.end()
+            );
+        return *this;
+    }
+
     Device DeviceBuilder::build()
     {
         // 1. Select physical device.
@@ -80,18 +109,39 @@ namespace kzn::vk
         // For each available device check if is suitable.
         VkPhysicalDevice vkphysical_device = VK_NULL_HANDLE;
         QueueFamilyIndices indices;
-        for (const auto& device : available_devices)
+        for (const auto& iter_device : available_devices)
         {
-            bool is_device_suitable = false;
-
+            // Loop body to check if its a suitable device
             VkPhysicalDeviceProperties device_properties;
-            vkGetPhysicalDeviceProperties(device, &device_properties);
+            vkGetPhysicalDeviceProperties(iter_device, &device_properties);
             VkPhysicalDeviceFeatures device_features;
-            vkGetPhysicalDeviceFeatures(device, &device_features);
-            // Require to be a dedicated GPU
+            vkGetPhysicalDeviceFeatures(iter_device, &device_features);
+            // TODO: This if statements are going too diagonal, maybe make it more vertical
+            // NOTE: Serveral if statements are being made so that the
+            // work of the next checks isnt being done for no reason
+
+            // 1. Require to be a dedicated GPU
             if(device_properties.deviceType == VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU)
             {
-                indices = get_queue_families(device, surface);
+                indices = get_queue_families(iter_device, surface);
+                // 2. Require to have all needed queue families
+                if(indices.is_complete())
+                {
+                    // 3. Require to support required device extensions
+                    if(check_device_extensions_support(iter_device, device_extensions))
+                    {
+                        // // 4. Require SwapChain support
+                        // if(!swap_chain_support.formats.empty() && !swap_chain_support.present_modes.empty())
+                        // {
+
+                        // }
+
+                        // This device is suitable, end loop!
+                        vkphysical_device = iter_device;
+                        break;
+                    }
+                }
+                
                 // bool extensions_supported = check_device_extension_support(physical_device);
                 // bool swap_chain_adequate = false;
                 // if(extensions_supported)
@@ -100,14 +150,15 @@ namespace kzn::vk
                 //     swap_chain_adequate = !swap_chain_support.formats.empty() && !swap_chain_support.present_modes.empty();
                 // }
                 // return _indices.is_complete() && swap_chain_adequate && device_features.samplerAnisotropy;
-                is_device_suitable = indices.is_complete(); //&& extensions_supported;
+
+                // is_device_suitable = indices.is_complete(); //&& extensions_supported;
             }
 
-            if(is_device_suitable)
-            {
-                vkphysical_device = device;
-                break;
-            }
+            // if(is_device_suitable)
+            // {
+            //     vkphysical_device = iter_device;
+            //     break;
+            // }
         }
 
         if(vkphysical_device == VK_NULL_HANDLE)

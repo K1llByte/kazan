@@ -87,9 +87,13 @@ namespace kzn::vk
         return *this;
     }
 
-    InstanceBuilder& InstanceBuilder::set_extensions(std::vector<const char*>&& extensions) noexcept
+    InstanceBuilder& InstanceBuilder::set_extensions(const std::vector<const char*>& extensions) noexcept
     {
-        this->extensions = std::move(extensions);
+        this->instance_extensions.insert(
+            this->instance_extensions.end(),
+            extensions.begin(),
+            extensions.end()
+            );
         return *this;
     }
 
@@ -143,7 +147,7 @@ namespace kzn::vk
                 create_info.enabledLayerCount = static_cast<uint32_t>(validation_layers.size());
                 create_info.ppEnabledLayerNames = validation_layers.data();
 
-                extensions.push_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
+                instance_extensions.push_back(VK_EXT_DEBUG_UTILS_EXTENSION_NAME);
             }
         }
 
@@ -173,10 +177,10 @@ namespace kzn::vk
         // Extensions get loaded from outside
         create_info.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
         create_info.pApplicationInfo = &app_info;
-        create_info.enabledExtensionCount = static_cast<uint32_t>(extensions.size());
-        create_info.ppEnabledExtensionNames = extensions.data();
+        create_info.enabledExtensionCount = static_cast<uint32_t>(instance_extensions.size());
+        create_info.ppEnabledExtensionNames = instance_extensions.data();
         Log::debug("Enabled extensions:");
-        for (const auto& extension_name : extensions)
+        for (const auto& extension_name : instance_extensions)
         {
             Log::debug("- {}", extension_name);
         }

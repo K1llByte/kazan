@@ -2,6 +2,7 @@
 #define KAZAN_HPP
 
 #include "core/log.hpp"
+#include "core/utils.hpp"
 #include "core/window.hpp"
 
 #include "vk/instance.hpp"

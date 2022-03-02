@@ -49,12 +49,14 @@ namespace kzn::vk
         ~DeviceBuilder() = default;
 
         DeviceBuilder& set_surface(VkSurfaceKHR);
+        DeviceBuilder& set_extensions(const std::vector<const char*>& extensions);
 
         Device build();
 
     private:
         std::vector<VkPhysicalDevice> available_devices;
         std::vector<const char*>      validation_layers;
+        std::vector<const char*>      device_extensions;
         VkPhysicalDevice              vkphysical_device = VK_NULL_HANDLE;
         VkQueue                       graphics_queue = VK_NULL_HANDLE;
         VkQueue                       present_queue = VK_NULL_HANDLE;
