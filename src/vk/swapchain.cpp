@@ -7,6 +7,7 @@ namespace kzn::vk
     Swapchain::~Swapchain()
     {
         vkDestroySwapchainKHR(device->vk_device(), vkswapchain, nullptr);
+        Log::debug("Swapchain destroyed");
     }
 
     SwapchainBuilder::SwapchainBuilder(Device* device, VkSurfaceKHR surface)
@@ -73,6 +74,7 @@ namespace kzn::vk
         VkSwapchainKHR vkswapchain;
         auto result = vkCreateSwapchainKHR(device->vk_device(), &create_info, nullptr, &vkswapchain);
         VK_CHECK_MSG(result, "Failed to create swap chain!");
+        Log::debug("Swapchain created");
 
         auto swapchain = Swapchain();
         swapchain.vkswapchain = vkswapchain;

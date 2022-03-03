@@ -7,6 +7,7 @@
 
 #include "vk/instance.hpp"
 #include "vk/device.hpp"
+#include "vk/swapchain.hpp"
 #include "vk/utils.hpp"
 #include "vk/error.hpp"
 
