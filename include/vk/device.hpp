@@ -21,14 +21,16 @@ namespace kzn::vk
         }
     };
 
-    // TODO: Make this struct private within Device
+    // TODO: Move this to swapchain file
     struct SwapChainSupport
     {
         VkSurfaceCapabilitiesKHR        capabilities;
         std::vector<VkSurfaceFormatKHR> formats;
         std::vector<VkPresentModeKHR>   present_modes;
-        // TODO: Format selector method
-        // TODO: Present mode selector method
+
+        VkSurfaceFormatKHR select_format() const noexcept;
+        VkPresentModeKHR select_present_mode() const noexcept;
+        VkExtent2D select_extent() const noexcept;
     };
 
     class Device
@@ -38,12 +40,16 @@ namespace kzn::vk
         ~Device();
 
         VkDevice vk_device() noexcept { return vkdevice; }
+        const SwapChainSupport& swapchain_support_details() const noexcept { return swapchain_support; }
+        const QueueFamilyIndices& queue_families() const noexcept { return queue_family_indices; }
 
     private:
         Device() = default;
 
     private:
-        VkDevice vkdevice;
+        VkDevice           vkdevice;
+        SwapChainSupport   swapchain_support;
+        QueueFamilyIndices queue_family_indices;
     };
 
     class DeviceBuilder

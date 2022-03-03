@@ -5,6 +5,8 @@
 #include "vk/utils.hpp"
 
 #include <unordered_set>
+#include <algorithm>
+#include <limits>
 
 namespace kzn::vk
 {
@@ -57,13 +59,6 @@ namespace kzn::vk
         return required_extensions.empty();
     }
 
-    Device::~Device()
-    {
-        // Destroy logical device instance
-        vkDestroyDevice(vkdevice, nullptr);
-        Log::debug("Device destroyed");
-    }
-
     SwapChainSupport get_swapchain_support(VkPhysicalDevice physical_device, VkSurfaceKHR surface)
     {
         SwapChainSupport support;
@@ -90,6 +85,70 @@ namespace kzn::vk
         }
 
         return support;
+    }
+
+    VkSurfaceFormatKHR SwapChainSupport::select_format() const noexcept
+    {
+        for(const auto& format : formats)
+        {
+            if(format.format == VK_FORMAT_B8G8R8A8_SRGB
+                && format.colorSpace == VK_COLOR_SPACE_SRGB_NONLINEAR_KHR)
+            {
+                return format;
+            }
+        }
+        // Possible seg fault (not if its garanteed that the
+        // formats list has at least one value)
+        return formats[0];
+    }
+
+    VkPresentModeKHR SwapChainSupport::select_present_mode() const noexcept
+    {
+        for(const auto& present_mode : present_modes)
+        {
+            if (present_mode == VK_PRESENT_MODE_MAILBOX_KHR)
+            {
+                return present_mode;
+            }
+        }
+        // FIFO mode is guaranteed to be available
+        return VK_PRESENT_MODE_FIFO_KHR;
+    }
+
+    VkExtent2D SwapChainSupport::select_extent(/* VkExtent2D request_extent */) const noexcept
+    {
+        // Window managers set currentExtent width and height when ...
+        // 
+        if(capabilities.currentExtent.width != std::numeric_limits<uint32_t>::max())
+        {
+            return capabilities.currentExtent;
+        }
+        else
+        {
+            // Move this to window and pass it as argument
+            int width, height;
+            // glfwGetFramebufferSize(window, &width, &height);
+            VkExtent2D actual_extent = {
+                static_cast<uint32_t>(width),
+                static_cast<uint32_t>(height)
+            };
+            actual_extent.width = std::clamp(
+                actual_extent.width,
+                capabilities.minImageExtent.width,
+                capabilities.maxImageExtent.width);
+            actual_extent.height = std::clamp(
+                actual_extent.height,
+                capabilities.minImageExtent.height,
+                capabilities.maxImageExtent.height);
+            return actual_extent;
+        }
+    }
+
+    Device::~Device()
+    {
+        // Destroy logical device instance
+        vkDestroyDevice(vkdevice, nullptr);
+        Log::debug("Device destroyed");
     }
 
     DeviceBuilder::DeviceBuilder(Instance& instance)
@@ -137,6 +196,7 @@ namespace kzn::vk
         // For each available device check if is suitable.
         VkPhysicalDevice vkphysical_device = VK_NULL_HANDLE;
         QueueFamilyIndices indices;
+        SwapChainSupport swapchain_support;
         for(const auto& iter_device : available_devices)
         {
             // Loop body to check if its a suitable device
@@ -163,7 +223,7 @@ namespace kzn::vk
             if(!check_device_extensions_support(iter_device, device_extensions))
                 continue;
             
-            auto swapchain_support = get_swapchain_support(iter_device, surface);
+            swapchain_support = get_swapchain_support(iter_device, surface);
             // 4. Require SwapChain support
             if(swapchain_support.formats.empty() || swapchain_support.present_modes.empty())
                 continue;
@@ -179,7 +239,6 @@ namespace kzn::vk
         }
         else
         {
-            // Log::debug("Physical device selected successfully");
             VkPhysicalDeviceProperties device_properties;
             vkGetPhysicalDeviceProperties(vkphysical_device, &device_properties);
             Log::info("Selected GPU: {}", device_properties.deviceName);
@@ -221,7 +280,7 @@ namespace kzn::vk
             Log::debug("- {}", vl);
         }
         // TODO: Setters for device extensions
-        std::vector<const char*> device_extensions{}; // {VK_KHR_SWAPCHAIN_EXTENSION_NAME};
+        // std::vector<const char*> device_extensions{}; // {VK_KHR_SWAPCHAIN_EXTENSION_NAME};
         VkDeviceCreateInfo create_info{};
         create_info.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
         create_info.pQueueCreateInfos = queue_create_infos.data();
@@ -256,6 +315,8 @@ namespace kzn::vk
 
         auto device = Device();
         device.vkdevice = vkdevice;
+        device.swapchain_support = std::move(swapchain_support);
+        device.queue_family_indices = std::move(indices);
         return device;
     }
 } // namespace kzn::vk
