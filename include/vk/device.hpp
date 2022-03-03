@@ -8,6 +8,7 @@
 
 namespace kzn::vk
 {
+    // TODO: Make this struct private within Device
     struct QueueFamilyIndices
     {
         std::optional<uint32_t> graphics_family;
@@ -20,12 +21,15 @@ namespace kzn::vk
         }
     };
 
-    // struct SwapChainSupportDetails
-    // {
-    //     VkSurfaceCapabilitiesKHR        capabilities;
-    //     std::vector<VkSurfaceFormatKHR> formats;
-    //     std::vector<VkPresentModeKHR>   present_modes;
-    // };
+    // TODO: Make this struct private within Device
+    struct SwapChainSupport
+    {
+        VkSurfaceCapabilitiesKHR        capabilities;
+        std::vector<VkSurfaceFormatKHR> formats;
+        std::vector<VkPresentModeKHR>   present_modes;
+        // TODO: Format selector method
+        // TODO: Present mode selector method
+    };
 
     class Device
     {

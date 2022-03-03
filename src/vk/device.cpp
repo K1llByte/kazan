@@ -8,13 +8,6 @@
 
 namespace kzn::vk
 {
-    Device::~Device()
-    {
-        // Destroy logical device instance
-        vkDestroyDevice(vkdevice, nullptr);
-        Log::debug("Device destroyed");
-    }
-
     QueueFamilyIndices get_queue_families(VkPhysicalDevice physical_device, VkSurfaceKHR surface)
     {
 
@@ -64,6 +57,41 @@ namespace kzn::vk
         return required_extensions.empty();
     }
 
+    Device::~Device()
+    {
+        // Destroy logical device instance
+        vkDestroyDevice(vkdevice, nullptr);
+        Log::debug("Device destroyed");
+    }
+
+    SwapChainSupport get_swapchain_support(VkPhysicalDevice physical_device, VkSurfaceKHR surface)
+    {
+        SwapChainSupport support;
+
+        // 1. Get Surface capabilities
+        vkGetPhysicalDeviceSurfaceCapabilitiesKHR(physical_device, surface, &support.capabilities);
+
+        // 2. Get Surface possible formats
+        uint32_t format_count;
+        vkGetPhysicalDeviceSurfaceFormatsKHR(physical_device, surface, &format_count, nullptr);
+        if(format_count != 0)
+        {
+            support.formats.resize(format_count);
+            vkGetPhysicalDeviceSurfaceFormatsKHR(physical_device, surface, &format_count, support.formats.data());
+        }
+
+        // 3. Get Surface possible present modes
+        uint32_t present_mode_count;
+        vkGetPhysicalDeviceSurfacePresentModesKHR(physical_device, surface, &present_mode_count, nullptr);
+        if(present_mode_count != 0)
+        {
+            support.present_modes.resize(present_mode_count);
+            vkGetPhysicalDeviceSurfacePresentModesKHR(physical_device, surface, &present_mode_count, support.present_modes.data());
+        }
+
+        return support;
+    }
+
     DeviceBuilder::DeviceBuilder(Instance& instance)
     {
         auto vkinstance = instance.vk_instance();
@@ -109,56 +137,40 @@ namespace kzn::vk
         // For each available device check if is suitable.
         VkPhysicalDevice vkphysical_device = VK_NULL_HANDLE;
         QueueFamilyIndices indices;
-        for (const auto& iter_device : available_devices)
+        for(const auto& iter_device : available_devices)
         {
             // Loop body to check if its a suitable device
             VkPhysicalDeviceProperties device_properties;
             vkGetPhysicalDeviceProperties(iter_device, &device_properties);
             VkPhysicalDeviceFeatures device_features;
             vkGetPhysicalDeviceFeatures(iter_device, &device_features);
+
             // TODO: This if statements are going too diagonal, maybe make it more vertical
+            // Fix: if(!condition) { continue; }
             // NOTE: Serveral if statements are being made so that the
             // work of the next checks isnt being done for no reason
 
             // 1. Require to be a dedicated GPU
-            if(device_properties.deviceType == VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU)
-            {
-                indices = get_queue_families(iter_device, surface);
-                // 2. Require to have all needed queue families
-                if(indices.is_complete())
-                {
-                    // 3. Require to support required device extensions
-                    if(check_device_extensions_support(iter_device, device_extensions))
-                    {
-                        // // 4. Require SwapChain support
-                        // if(!swap_chain_support.formats.empty() && !swap_chain_support.present_modes.empty())
-                        // {
+            if(device_properties.deviceType != VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU)
+                continue;
 
-                        // }
+            indices = get_queue_families(iter_device, surface);
+            // 2. Require to have all needed queue families
+            if(!indices.is_complete())
+                continue;
 
-                        // This device is suitable, end loop!
-                        vkphysical_device = iter_device;
-                        break;
-                    }
-                }
-                
-                // bool extensions_supported = check_device_extension_support(physical_device);
-                // bool swap_chain_adequate = false;
-                // if(extensions_supported)
-                // {
-                //     swap_chain_support = query_swap_chain_support(physical_device);
-                //     swap_chain_adequate = !swap_chain_support.formats.empty() && !swap_chain_support.present_modes.empty();
-                // }
-                // return _indices.is_complete() && swap_chain_adequate && device_features.samplerAnisotropy;
-
-                // is_device_suitable = indices.is_complete(); //&& extensions_supported;
-            }
-
-            // if(is_device_suitable)
-            // {
-            //     vkphysical_device = iter_device;
-            //     break;
-            // }
+            // 3. Require to support required device extensions
+            if(!check_device_extensions_support(iter_device, device_extensions))
+                continue;
+            
+            auto swapchain_support = get_swapchain_support(iter_device, surface);
+            // 4. Require SwapChain support
+            if(swapchain_support.formats.empty() || swapchain_support.present_modes.empty())
+                continue;
+            
+            // This device is suitable, end loop!
+            vkphysical_device = iter_device;
+            break;
         }
 
         if(vkphysical_device == VK_NULL_HANDLE)
