@@ -21,6 +21,8 @@ namespace kzn
         GLFWwindow* ptr() noexcept { return glfw_window; }
 
         std::vector<const char*> required_extensions();
+        // TODO: make const
+        VkExtent2D extent() const noexcept;
         
     private:
         GLFWwindow*  glfw_window;

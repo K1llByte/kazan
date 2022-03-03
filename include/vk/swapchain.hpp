@@ -24,13 +24,14 @@ namespace kzn::vk
     class SwapchainBuilder
     {
     public:
-        SwapchainBuilder(Device* device, VkSurfaceKHR surface);
+        SwapchainBuilder(Device* device, VkSurfaceKHR surface, VkExtent2D extent);
         ~SwapchainBuilder() = default;
 
         Swapchain build();
 
     private:
-        VkSurfaceKHR surface;
+        VkSurfaceKHR surface = VK_NULL_HANDLE;
+        VkExtent2D   requested_extent;
         Device*      device;
     };
 } // namespace kzn::vk

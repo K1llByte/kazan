@@ -10,8 +10,8 @@ namespace kzn::vk
         Log::debug("Swapchain destroyed");
     }
 
-    SwapchainBuilder::SwapchainBuilder(Device* device, VkSurfaceKHR surface)
-        : device(device) {}
+    SwapchainBuilder::SwapchainBuilder(Device* device, VkSurfaceKHR surface, VkExtent2D extent)
+        : device(device), surface(surface), requested_extent(extent) {}
 
     Swapchain SwapchainBuilder::build()
     {
@@ -22,7 +22,7 @@ namespace kzn::vk
         
         auto surface_format = swapchain_support.select_format();
         auto present_mode = swapchain_support.select_present_mode();
-        auto extent = swapchain_support.select_extent(/* Pass in Window extent here */);
+        auto extent = swapchain_support.select_extent(requested_extent);
 
         // Select image count
         auto image_count = swapchain_support.capabilities.minImageCount + 1;
@@ -70,11 +70,16 @@ namespace kzn::vk
         create_info.compositeAlpha = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR;
         create_info.presentMode = present_mode;
         create_info.clipped = VK_TRUE;
+        create_info.oldSwapchain = VK_NULL_HANDLE;
+
 
         VkSwapchainKHR vkswapchain;
-        auto result = vkCreateSwapchainKHR(device->vk_device(), &create_info, nullptr, &vkswapchain);
+        Log::debug("debug 4");
+        auto vkdevice = device->vk_device();
+        auto result = vkCreateSwapchainKHR(vkdevice, &create_info, nullptr, &vkswapchain);
         VK_CHECK_MSG(result, "Failed to create swap chain!");
-        Log::debug("Swapchain created");
+        // Log::debug("Swapchain created");
+        Log::debug("debug 0");
 
         auto swapchain = Swapchain();
         swapchain.vkswapchain = vkswapchain;

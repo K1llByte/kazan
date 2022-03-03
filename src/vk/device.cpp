@@ -115,7 +115,7 @@ namespace kzn::vk
         return VK_PRESENT_MODE_FIFO_KHR;
     }
 
-    VkExtent2D SwapChainSupport::select_extent(/* VkExtent2D request_extent */) const noexcept
+    VkExtent2D SwapChainSupport::select_extent(VkExtent2D extent) const noexcept
     {
         // Window managers set currentExtent width and height when ...
         // 
@@ -128,19 +128,19 @@ namespace kzn::vk
             // Move this to window and pass it as argument
             int width, height;
             // glfwGetFramebufferSize(window, &width, &height);
-            VkExtent2D actual_extent = {
+            VkExtent2D extent = {
                 static_cast<uint32_t>(width),
                 static_cast<uint32_t>(height)
             };
-            actual_extent.width = std::clamp(
-                actual_extent.width,
+            extent.width = std::clamp(
+                extent.width,
                 capabilities.minImageExtent.width,
                 capabilities.maxImageExtent.width);
-            actual_extent.height = std::clamp(
-                actual_extent.height,
+            extent.height = std::clamp(
+                extent.height,
                 capabilities.minImageExtent.height,
                 capabilities.maxImageExtent.height);
-            return actual_extent;
+            return extent;
         }
     }
 

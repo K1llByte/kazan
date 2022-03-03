@@ -50,4 +50,14 @@ namespace kzn
             glfw_extensions,
             glfw_extensions + glfw_extension_count);
     }
+
+    VkExtent2D Window::extent() const noexcept
+    {
+        int width, height;
+        glfwGetFramebufferSize(glfw_window, &width, &height);
+        return VkExtent2D {
+            static_cast<uint32_t>(width),
+            static_cast<uint32_t>(height)
+        };
+    }
 }

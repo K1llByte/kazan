@@ -22,7 +22,10 @@ int main()
         // .set_extensions({VK_KHR_SWAPCHAIN_EXTENSION_NAME})
         .build();
 
-    auto swapchain = SwapchainBuilder(&device, surface).build();
+    
+
+    auto swapchain = vk::SwapchainBuilder(&device, surface, window.extent())
+        .build();
 
     while(!window.should_close())
     {

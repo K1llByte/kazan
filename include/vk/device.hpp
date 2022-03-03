@@ -30,7 +30,7 @@ namespace kzn::vk
 
         VkSurfaceFormatKHR select_format() const noexcept;
         VkPresentModeKHR select_present_mode() const noexcept;
-        VkExtent2D select_extent() const noexcept;
+        VkExtent2D select_extent(VkExtent2D extent) const noexcept;
     };
 
     class Device
