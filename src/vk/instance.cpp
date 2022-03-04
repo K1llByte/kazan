@@ -79,13 +79,6 @@ namespace kzn::vk
         return surface;
     }
 
-    void Instance::destroy_surface(VkSurfaceKHR surface)
-    {
-        // Destroy surface
-        vkDestroySurfaceKHR(vkinstance, surface, nullptr);
-        Log::debug("Surface destroyed");
-    }
-
     InstanceBuilder& InstanceBuilder::enable_validation_layers() noexcept
     {
         with_validation_layers = true;

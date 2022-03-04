@@ -20,7 +20,6 @@ namespace kzn::vk
         const std::vector<const char*>& get_validation_layers() const noexcept;
 
         VkSurfaceKHR create_surface(GLFWwindow* glfw_window);
-        void destroy_surface(VkSurfaceKHR surface);
 
     
     private:

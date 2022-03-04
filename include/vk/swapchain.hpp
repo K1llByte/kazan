@@ -15,10 +15,12 @@ namespace kzn::vk
         Swapchain() = default;
 
     private:
-        VkSwapchainKHR vkswapchain;
+        VkSwapchainKHR           vkswapchain;
+        std::vector<VkImage>     swapchain_images;
+        std::vector<VkImageView> swapchain_image_views;
         // Since device must allways outlive the Swapchain for now
         // ill use a pointer reference FIXME: change to an alternative
-        Device*        device;
+        Device*                  device;
     };
 
     class SwapchainBuilder
@@ -32,6 +34,8 @@ namespace kzn::vk
     private:
         VkSurfaceKHR surface = VK_NULL_HANDLE;
         VkExtent2D   requested_extent;
+        // Since device must allways outlive the Swapchain for now
+        // ill use a pointer reference FIXME: change to an alternative
         Device*      device = nullptr;
     };
 } // namespace kzn::vk
