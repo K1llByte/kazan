@@ -2,6 +2,7 @@
 #define KZN_VK_DEVICE_HPP
 
 #include "vk/instance.hpp"
+#include "core/log.hpp" // TODO: Delete after debug
 
 #include <optional>
 #include <exception>
@@ -32,6 +33,10 @@ namespace kzn::vk
         VkPresentModeKHR select_present_mode() const noexcept;
         VkExtent2D select_extent(VkExtent2D extent) const noexcept;
     };
+
+    // TODO: Delete these methods
+    void print_indices(const QueueFamilyIndices& indices);
+    void print_support(const SwapChainSupport& support);
 
     class Device
     {

@@ -31,6 +31,7 @@ namespace kzn::vk
         std::vector<const char*> validation_layers;
         VkDebugUtilsMessengerEXT debug_messenger;
         VkInstance               vkinstance;
+        VkSurfaceKHR             surface = VK_NULL_HANDLE;
     };
 
     class InstanceBuilder

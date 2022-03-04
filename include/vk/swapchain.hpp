@@ -32,7 +32,7 @@ namespace kzn::vk
     private:
         VkSurfaceKHR surface = VK_NULL_HANDLE;
         VkExtent2D   requested_extent;
-        Device*      device;
+        Device*      device = nullptr;
     };
 } // namespace kzn::vk
 

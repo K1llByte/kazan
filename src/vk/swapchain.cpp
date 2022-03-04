@@ -22,7 +22,9 @@ namespace kzn::vk
         // 1. Create Swapchain.
         
         auto surface_format = swapchain_support.select_format();
+        Log::warning("format: {}, color_space: {}", surface_format.format, surface_format.colorSpace);
         auto present_mode = swapchain_support.select_present_mode();
+        Log::warning("present_mode: {}", present_mode);
         auto extent = swapchain_support.select_extent(requested_extent);
 
         // Select image count
@@ -74,9 +76,10 @@ namespace kzn::vk
         create_info.oldSwapchain = VK_NULL_HANDLE;
 
 
-        VkSwapchainKHR vkswapchain;
+        VkSwapchainKHR vkswapchain = VK_NULL_HANDLE;
         Log::debug("debug 4");
         auto vkdevice = device->vk_device();
+        
         auto result = vkCreateSwapchainKHR(vkdevice, &create_info, nullptr, &vkswapchain);
         VK_CHECK_MSG(result, "Failed to create swap chain!");
         // Log::debug("Swapchain created");

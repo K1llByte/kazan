@@ -31,7 +31,8 @@ kazan.hpp include with all public API includes
 - Multisampling (MXAA)
 <!----------->
 
-- Quick: Change "Logger" class to "Log"
+- Make a check if Swapchain extension(s) are loaded in Swapchain 
+
 - Setup reference docs generation
 - Add VK_EXT_extended_dynamic_state and use it
 

@@ -19,11 +19,11 @@ int main()
 
     auto device = vk::DeviceBuilder(instance)
         .set_surface(surface)
-        // .set_extensions({VK_KHR_SWAPCHAIN_EXTENSION_NAME})
+        // NOTE: IF THIS EXTENSION ISN'T LOADED THEN THE SwapchainBuilder
+        // will give a seg fault
+        .set_extensions({VK_KHR_SWAPCHAIN_EXTENSION_NAME})
         .build();
-
     
-
     auto swapchain = vk::SwapchainBuilder(&device, surface, window.extent())
         .build();
 
@@ -31,7 +31,7 @@ int main()
     {
         window.poll_events();
     }
-    instance.destroy_surface(surface);
+    // instance.destroy_surface(surface);
 
     // List all devices if you want to choose the device
     // auto available_gpus = vk::Device::available_devices(instance);

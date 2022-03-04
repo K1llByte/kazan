@@ -55,6 +55,12 @@ namespace kzn::vk
         {
             DestroyDebugUtilsMessengerEXT(vkinstance, debug_messenger, nullptr);
         }
+        if(surface != VK_NULL_HANDLE)
+        {
+            // Destroy surface
+            vkDestroySurfaceKHR(vkinstance, surface, nullptr);
+            Log::debug("Surface destroyed");
+        }
         vkDestroyInstance(vkinstance, nullptr);
         Log::debug("Instance destroyed");
     }
@@ -67,7 +73,6 @@ namespace kzn::vk
     VkSurfaceKHR Instance::create_surface(GLFWwindow* glfw_window)
     {
         // Create surface
-        VkSurfaceKHR surface;
         auto result = glfwCreateWindowSurface(vkinstance, glfw_window, nullptr, &surface);
         VK_CHECK_MSG(result, "Failed to create window surface!");
         Log::debug("Surface created");
