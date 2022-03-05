@@ -27,6 +27,14 @@ int main()
     auto swapchain = vk::SwapchainBuilder(&device, surface, window.extent())
         .build();
 
+    // TODO: Make VkPipelineLayout and VkRenderpass mandatory args
+    auto pipeline_layout = vk::PipelineLayoutBuilder(&device)
+        .build();
+    // auto pipeline = vk::PipelineConfigBuilder()
+    //     .set_topology(VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST)
+    //     .set_polygon_mode(VK_POLYGON_MODE_FILL)
+    //     .build();
+
     while(!window.should_close())
     {
         window.poll_events();

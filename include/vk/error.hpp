@@ -22,6 +22,13 @@ namespace kzn::vk
     // Device
     KZN_VK_IMPL_ERROR(FailedDebugMessenger, "Failed to set up debug messenger!")
     KZN_VK_IMPL_ERROR(FailedValidationLayers, "Validation Layers not available!")
+
+    // Pipeline
+    KZN_VK_IMPL_ERROR(ShaderModError, "Failed to create shader module!")
+
+    // TODO: Maybe put this into core/error.hpp
+    // IO
+    KZN_VK_IMPL_ERROR(FileError, "Failed to open file!")
 }
 
 #endif // KZN_VK_ERROR_HPP

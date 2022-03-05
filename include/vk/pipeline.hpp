@@ -44,28 +44,37 @@ namespace kzn::vk
         PipelineConfig config;
     };
 
+    class PipelineLayoutBuilder
+    {
+    public:
+        PipelineLayoutBuilder(Device* device);
+
+        // PipelineLayoutBuilder& add_descriptor_set(const DescriptorSet& set);
+        // template<typename T>
+        // PipelineLayoutBuilder& add_push_constant(const PushConstant<T>& push);
+
+        VkPipelineLayout build();
+
+    private:
+        Device* device = nullptr;
+        // std::vector<VkDescriptorSetLayout> set_layouts;
+        // std::vector<VkPushConstantRange>   push_ranges;
+    };
+
     class Pipeline
     {
     public:
         Pipeline(
-            Device& device,
-            const std::string& vert_shader_path,
-            const std::string& frag_shader_path,
+            Device* device,
+            const std::string_view& vert_shader_path,
+            const std::string_view& frag_shader_path,
             const PipelineConfig& config_info);
         ~Pipeline();
 
         void bind(VkCommandBuffer command_buffer);
 
     private:
-        VkShaderModule create_shader_module(const std::string& file_path);
-
-        void create_graphics_pipeline(
-            const std::string& vert_path,
-            const std::string& frag_path,
-            const PipelineConfig& config_info);
-
-    private:
-        Device&        device;
+        Device*        device = nullptr;
         VkPipeline     graphics_pipeline;
         VkShaderModule vert_shader_module;
         VkShaderModule frag_shader_module;
