@@ -37,7 +37,7 @@ namespace kzn::vk
 
     PipelineConfigBuilder::PipelineConfigBuilder(
         VkPipelineLayout layout,
-        VkRenderPass render_pass)
+        RenderPass& render_pass)
         : config{}
     {
         config.input_assembly_info.sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
@@ -111,7 +111,7 @@ namespace kzn::vk
         config.dynamic_state_info.flags = 0;
 
         config.pipeline_layout = layout;
-        config.render_pass = render_pass;
+        config.render_pass = render_pass.vk_render_pass();
     }
 
     PipelineConfigBuilder& PipelineConfigBuilder::set_layout(VkPipelineLayout layout)
@@ -155,7 +155,7 @@ namespace kzn::vk
     PipelineLayoutBuilder::PipelineLayoutBuilder(Device* device)
         : device(device) {}
 
-    VkPipelineLayout PipelineLayoutBuilder::build()
+    VkPipelineLayout PipelineLayoutBuilder::build() noexcept
     {
         VkPipelineLayoutCreateInfo pipeline_layout_info{};
         pipeline_layout_info.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
@@ -194,6 +194,7 @@ namespace kzn::vk
 
         vert_shader_module = create_shader_module(*device, vert_shader_path);
         frag_shader_module = create_shader_module(*device, frag_shader_path);
+        pipeline_layout = config.pipeline_layout;
 
         VkPipelineShaderStageCreateInfo shader_stages[2];
         // Vertex Shader
@@ -256,12 +257,15 @@ namespace kzn::vk
                 nullptr,
                 &graphics_pipeline);
         VK_CHECK_MSG(result, "Failed to create graphics pipeline!");
+        Log::debug("Pipeline created");
     }
 
     Pipeline::~Pipeline()
     {
         vkDestroyShaderModule(device->vk_device(), vert_shader_module, nullptr);
         vkDestroyShaderModule(device->vk_device(), frag_shader_module, nullptr);
+        vkDestroyPipelineLayout(device->vk_device(), pipeline_layout, nullptr);
         vkDestroyPipeline(device->vk_device(), graphics_pipeline, nullptr);
+        Log::debug("Pipeline destroyed");
     }
 }

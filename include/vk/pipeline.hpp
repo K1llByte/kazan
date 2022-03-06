@@ -2,6 +2,7 @@
 #define KZN_VK_PIPELINE_HPP
 
 #include "vk/device.hpp"
+#include "vk/render_pass.hpp"
 
 namespace kzn::vk
 {
@@ -25,8 +26,8 @@ namespace kzn::vk
     {
     public:
         PipelineConfigBuilder(
-            VkPipelineLayout layout = VK_NULL_HANDLE,
-            VkRenderPass render_pass = VK_NULL_HANDLE);
+            VkPipelineLayout layout,
+            RenderPass& render_pass);
         ~PipelineConfigBuilder() = default;
 
         PipelineConfigBuilder& set_layout(VkPipelineLayout layout);
@@ -53,7 +54,7 @@ namespace kzn::vk
         // template<typename T>
         // PipelineLayoutBuilder& add_push_constant(const PushConstant<T>& push);
 
-        VkPipelineLayout build();
+        VkPipelineLayout build() noexcept;
 
     private:
         Device* device = nullptr;
@@ -64,6 +65,7 @@ namespace kzn::vk
     class Pipeline
     {
     public:
+        // TODO: Make a Builder for Pipeline too
         Pipeline(
             Device* device,
             const std::string_view& vert_shader_path,
@@ -74,10 +76,11 @@ namespace kzn::vk
         void bind(VkCommandBuffer command_buffer);
 
     private:
-        Device*        device = nullptr;
-        VkPipeline     graphics_pipeline;
-        VkShaderModule vert_shader_module;
-        VkShaderModule frag_shader_module;
+        Device*          device = nullptr;
+        VkPipeline       graphics_pipeline;
+        VkPipelineLayout pipeline_layout;
+        VkShaderModule   vert_shader_module;
+        VkShaderModule   frag_shader_module;
     };
 } // namespace kzn::vk
 

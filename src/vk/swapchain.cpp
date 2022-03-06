@@ -21,6 +21,8 @@ namespace kzn::vk
 
     Swapchain SwapchainBuilder::build()
     {
+        auto swapchain = Swapchain();
+
         Log::debug("({},{})", requested_extent.width, requested_extent.height);
         auto swapchain_support = device->swapchain_support_details();
         auto indices = device->queue_families();
@@ -30,9 +32,9 @@ namespace kzn::vk
         // 3. Create VkImageView handles
         
         // 1. Create Swapchain //
-        auto surface_format = swapchain_support.select_format();
-        auto present_mode = swapchain_support.select_present_mode();
-        auto extent = swapchain_support.select_extent(requested_extent);
+        swapchain.surface_format = swapchain_support.select_format();
+        swapchain.present_mode = swapchain_support.select_present_mode();
+        swapchain.extent = swapchain_support.select_extent(requested_extent);
 
         // Select image count
         auto image_count = swapchain_support.capabilities.minImageCount + 1;
@@ -48,9 +50,9 @@ namespace kzn::vk
         create_info.sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR;
         create_info.surface = surface;
         create_info.minImageCount = image_count;
-        create_info.imageFormat = surface_format.format;
-        create_info.imageColorSpace = surface_format.colorSpace;
-        create_info.imageExtent = extent;
+        create_info.imageFormat = swapchain.surface_format.format;
+        create_info.imageColorSpace = swapchain.surface_format.colorSpace;
+        create_info.imageExtent = swapchain.extent;
         create_info.imageArrayLayers = 1;
         create_info.imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
 
@@ -78,7 +80,7 @@ namespace kzn::vk
         create_info.preTransform = swapchain_support.capabilities.currentTransform;
         // Composite blend with other windows
         create_info.compositeAlpha = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR;
-        create_info.presentMode = present_mode;
+        create_info.presentMode = swapchain.present_mode;
         create_info.clipped = VK_TRUE;
         create_info.oldSwapchain = VK_NULL_HANDLE;
 
@@ -92,7 +94,7 @@ namespace kzn::vk
         // Log::debug("Swapchain created");
         Log::debug("debug 0");
 
-        auto swapchain = Swapchain();
+        
         swapchain.vkswapchain = vkswapchain;
         swapchain.device = device;
 
@@ -112,7 +114,7 @@ namespace kzn::vk
             create_info.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
             create_info.image = swapchain.swapchain_images[i];
             create_info.viewType = VK_IMAGE_VIEW_TYPE_2D;
-            create_info.format = surface_format.format;
+            create_info.format = swapchain.surface_format.format;
             create_info.components.r = VK_COMPONENT_SWIZZLE_IDENTITY;
             create_info.components.g = VK_COMPONENT_SWIZZLE_IDENTITY;
             create_info.components.b = VK_COMPONENT_SWIZZLE_IDENTITY;
