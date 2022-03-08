@@ -84,17 +84,12 @@ namespace kzn::vk
         create_info.clipped = VK_TRUE;
         create_info.oldSwapchain = VK_NULL_HANDLE;
 
-
         VkSwapchainKHR vkswapchain = VK_NULL_HANDLE;
-        Log::debug("debug 4");
         auto vkdevice = device->vk_device();
-        
+
         auto result = vkCreateSwapchainKHR(vkdevice, &create_info, nullptr, &vkswapchain);
         VK_CHECK_MSG(result, "Failed to create swap chain!");
-        // Log::debug("Swapchain created");
-        Log::debug("debug 0");
 
-        
         swapchain.vkswapchain = vkswapchain;
         swapchain.device = device;
 

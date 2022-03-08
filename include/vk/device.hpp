@@ -34,10 +34,6 @@ namespace kzn::vk
         VkExtent2D select_extent(VkExtent2D extent) const noexcept;
     };
 
-    // TODO: Delete these methods
-    void print_indices(const QueueFamilyIndices& indices);
-    void print_support(const SwapChainSupport& support);
-
     class Device
     {
         friend class DeviceBuilder;
@@ -55,6 +51,10 @@ namespace kzn::vk
         VkDevice           vkdevice;
         SwapChainSupport   swapchain_support;
         QueueFamilyIndices queue_family_indices;
+        // FIXME: If there's support for multiple cmd pools then the 
+        // create_command_pool method returns VkCommandPool and theres no
+        // member with the cmd pool variable (must be given on cmd buffer creation)
+        VkCommandPool      command_pool = VK_NULL_HANDLE;
     };
 
     class DeviceBuilder

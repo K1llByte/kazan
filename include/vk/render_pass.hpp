@@ -2,6 +2,7 @@
 #define KZN_VK_RENDER_PASS_HPP
 
 #include "vk/device.hpp"
+#include "vk/swapchain.hpp"
 
 namespace kzn::vk
 {
@@ -13,12 +14,17 @@ namespace kzn::vk
     
         VkRenderPass vk_render_pass() noexcept { return vkrender_pass; }
 
+        void create_framebuffers(Swapchain& swapchain);
+        void begin(const Swapchain& swapchain);
+        void end();
+
     private:
         RenderPass() = default;
 
     private:
-        VkRenderPass vkrender_pass;
-        Device*      device;
+        VkRenderPass               vkrender_pass;
+        Device*                    device;
+        std::vector<VkFramebuffer> framebuffers;
     };
 
     class RenderPassBuilder

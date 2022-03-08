@@ -59,7 +59,65 @@ namespace kzn::vk
     
     RenderPass::~RenderPass()
     {
+        for(const auto& framebuffer : framebuffers)
+        {
+            vkDestroyFramebuffer(device->vk_device(), framebuffer, nullptr);
+        }
+        Log::debug("Framebuffers destroyed");
         vkDestroyRenderPass(device->vk_device(), vkrender_pass, nullptr);
         Log::debug("RenderPass destroyed");
+    }
+
+    void RenderPass::create_framebuffers(Swapchain& swapchain)
+    {
+        const auto num_images = swapchain.num_images();
+        framebuffers.resize(num_images);
+        auto& image_views = swapchain.image_views();
+        auto& extent = swapchain.get_extent();
+        for(std::size_t i = 0; i < num_images; ++i)
+        {
+            auto attachments = std::array{
+                image_views[i]
+            };
+
+            VkFramebufferCreateInfo create_info{};
+            create_info.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
+            create_info.renderPass = vkrender_pass;
+            create_info.attachmentCount = static_cast<uint32_t>(attachments.size());
+            create_info.pAttachments = attachments.data();
+            create_info.width = extent.width;
+            create_info.height = extent.height;
+            create_info.layers = 1;
+
+            auto result = vkCreateFramebuffer(device->vk_device(), &create_info, nullptr, &framebuffers[i]);
+            VK_CHECK_MSG(result, "Failed to create framebuffer!");
+        }
+        Log::debug("Framebuffers created");
+    }
+
+    void RenderPass::begin(CommandBuffer& cmd_buffer, const Swapchain& swapchain)
+    {
+        VkRenderPassBeginInfo begin_info{};
+        begin_info.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
+        begin_info.renderPass = vkrender_pass;
+        begin_info.framebuffer = framebuffers[swapchain.current_index()];
+        begin_info.renderArea.offset = {0, 0};
+        begin_info.renderArea.extent = swapchain.get_extent();
+
+        VkClearValue clear_color = {{{0.0f, 0.0f, 0.0f, 1.0f}}};
+        begin_info.clearValueCount = 1;
+        begin_info.pClearValues = &clear_color;
+
+        // VK_SUBPASS_CONTENTS_INLINE: The render pass commands
+        // will be embedded in the primary command buffer itself and
+        // no secondary command buffers will be executed.
+        // VK_SUBPASS_CONTENTS_SECONDARY_COMMAND_BUFFERS: The render
+        // pass commands will be executed from secondary command buffers.
+        vkCmdBeginRenderPass(cmd_buffer.vk_command_buffer(), &begin_info, VK_SUBPASS_CONTENTS_INLINE);
+    }
+
+    void RenderPass::end(CommandBuffer& cmd_buffer)
+    {
+        vkCmdEndRenderPass(cmd_buffer.vk_command_buffer());
     }
 }

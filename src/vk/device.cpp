@@ -8,22 +8,6 @@
 #include <algorithm>
 #include <limits>
 
-void kzn::vk::print_indices(const QueueFamilyIndices& indices)
-{
-    Log::debug("QueueFamilyIndices:");
-    Log::debug("graphics_family = {}", indices.graphics_family.value());
-    Log::debug("present_family = {}", indices.present_family.value());
-}
-
-void kzn::vk::print_support(const SwapChainSupport& support)
-{
-    Log::debug("SwapChainSupport:");
-    Log::debug("capabilities = \{");
-    Log::debug("  minImageCount = {}", support.capabilities.minImageCount);
-    Log::debug("  maxImageCount = {}", support.capabilities.maxImageCount);
-    Log::debug("\}");
-}
-
 namespace kzn::vk
 {
     QueueFamilyIndices get_queue_families(VkPhysicalDevice physical_device, VkSurfaceKHR surface)

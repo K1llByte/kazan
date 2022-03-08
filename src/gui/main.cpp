@@ -7,6 +7,7 @@
 
 using namespace kzn;
 
+// TODO: New todo list and priority rearrangement
 
 int main()
 {
@@ -34,8 +35,8 @@ int main()
     auto pipeline_layout = vk::PipelineLayoutBuilder(&device)
         .build();
     auto pipeline_config = vk::PipelineConfigBuilder(pipeline_layout, render_pass)
-        .set_topology(VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST)
-        .set_polygon_mode(VK_POLYGON_MODE_FILL)
+        .set_topology(VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST) // Optional
+        .set_polygon_mode(VK_POLYGON_MODE_FILL) // Optional
         .build();
     auto pipeline = vk::Pipeline(
         &device,
@@ -44,12 +45,30 @@ int main()
         pipeline_config
     );
 
+    render_pass.create_framebuffers(swapchain);
+
+    // Create command pool and buffers
+
+    // // Option 1
+    // device.create_command_pool();
+    // device.create_command_buffer();
+
+    // // Option 2: Avantage of this is that there's no check for
+    // // null cmd_pool and support for more than 1 cmd pool and buffer
+    // auto cmd_pool = vk::CommandPool(&device);
+    // auto cmd_buffer = vk::CommandBuffer(cmd_pool);
+    // cmd_buffer.begin();
+
+    // Option 3:
+    auto cmd_pool = vk::CommandPool(&device);
+    auto cmd_buffer = cmd_pool.allocate();
+    cmd_buffer.begin();
+    cmd_buffer.end(); // throws ResultError if it fails to record command buffer
 
     while(!window.should_close())
     {
         window.poll_events();
     }
-    // instance.destroy_surface(surface);
 
     // List all devices if you want to choose the device
     // auto available_gpus = vk::Device::available_devices(instance);

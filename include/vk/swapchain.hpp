@@ -14,6 +14,8 @@ namespace kzn::vk
         const VkSurfaceFormatKHR get_surface_format() const noexcept { return surface_format; }
         const VkPresentModeKHR get_present_mode() const noexcept { return present_mode; }
         const VkExtent2D get_extent() const noexcept { return extent; }
+        std::size_t num_images() const noexcept { return swapchain_image_views.size(); }
+        const std::vector<VkImageView>& image_views() noexcept { return swapchain_image_views; }
 
     private:
         Swapchain() = default;
