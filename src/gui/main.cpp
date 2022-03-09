@@ -69,12 +69,12 @@ int main()
         cmd_buffer.reset();
         cmd_buffer.begin();
         render_pass.begin(cmd_buffer, swapchain);
-
         pipeline.bind(cmd_buffer);
         vkCmdDraw(cmd_buffer.vk_command_buffer(), 3, 1, 0, 0);
-
+        // Log::info("Drawed");
         render_pass.end(cmd_buffer);
         cmd_buffer.end(); // throws ResultError if it fails to record command buffer
+
         device.graphics_queue_submit(cmd_buffer, img_available, finished_render, in_flight_fence);
         device.present_queue_present(swapchain, finished_render);
         //////////////////////////////////
