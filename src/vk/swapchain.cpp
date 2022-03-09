@@ -32,6 +32,12 @@ namespace kzn::vk
     SwapchainBuilder::SwapchainBuilder(Device* device, VkSurfaceKHR surface, VkExtent2D extent)
         : device(device), surface(surface), requested_extent(extent) {}
 
+    SwapchainBuilder& SwapchainBuilder::set_present_mode(VkPresentModeKHR _present_mode) noexcept
+    {
+        present_mode = _present_mode;
+        return *this;
+    }
+
     Swapchain SwapchainBuilder::build()
     {
         auto swapchain = Swapchain();
@@ -45,7 +51,8 @@ namespace kzn::vk
         
         // 1. Create Swapchain //
         swapchain.surface_format = swapchain_support.select_format();
-        swapchain.present_mode = swapchain_support.select_present_mode();
+        // swapchain.present_mode = swapchain_support.select_present_mode();
+        swapchain.present_mode = present_mode;
         swapchain.extent = swapchain_support.select_extent(requested_extent);
 
         // Select image count

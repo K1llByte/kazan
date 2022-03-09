@@ -14,6 +14,7 @@ namespace kzn::vk
     class Swapchain;
     
     // TODO: Make this struct private within Device
+    // Rename QueueFamilies
     struct QueueFamilyIndices
     {
         std::optional<uint32_t> graphics_family;

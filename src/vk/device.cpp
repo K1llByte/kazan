@@ -116,6 +116,7 @@ namespace kzn::vk
         }
         // FIFO mode is guaranteed to be available
         return VK_PRESENT_MODE_FIFO_KHR;
+        // return VK_PRESENT_MODE_IMMEDIATE_KHR;
     }
 
     VkExtent2D SwapChainSupport::select_extent(VkExtent2D extent) const noexcept

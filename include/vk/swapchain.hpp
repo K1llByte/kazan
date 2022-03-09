@@ -44,14 +44,17 @@ namespace kzn::vk
         SwapchainBuilder(Device* device, VkSurfaceKHR surface, VkExtent2D extent);
         ~SwapchainBuilder() = default;
 
+        SwapchainBuilder& set_present_mode(VkPresentModeKHR _present_mode) noexcept;
+
         Swapchain build();
 
     private:
-        VkSurfaceKHR surface = VK_NULL_HANDLE;
-        VkExtent2D   requested_extent;
+        VkSurfaceKHR     surface = VK_NULL_HANDLE;
+        VkExtent2D       requested_extent;
+        VkPresentModeKHR present_mode = VK_PRESENT_MODE_IMMEDIATE_KHR;
         // Since device must allways outlive the Swapchain for now
         // ill use a pointer reference FIXME: change to an alternative
-        Device*      device = nullptr;
+        Device*          device = nullptr;
     };
 } // namespace kzn::vk
 
