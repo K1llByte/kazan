@@ -1,5 +1,7 @@
 #include "vk/cmd_buffers.hpp"
 
+#include "vk/utils.hpp"
+
 namespace kzn::vk
 {
     CommandPool::CommandPool(Device* device)
@@ -29,18 +31,15 @@ namespace kzn::vk
 
     CommandBuffer CommandPool::allocate()
     {
-        return CommandBuffer(*this);
-    }
-
-    CommandBuffer::CommandBuffer(const CommandPool& cmd_pool)
-    {
+        CommandBuffer cmd_buffer;
         VkCommandBufferAllocateInfo alloc_info{};
         alloc_info.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
-        alloc_info.commandPool = cmd_pool->vk_command_pool();
+        alloc_info.commandPool = vkcommand_pool;
         alloc_info.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
         alloc_info.commandBufferCount = 1;
-        auto result = vkAllocateCommandBuffers(device->vk_device(), &alloc_info, &vkcommand_buffer);
+        auto result = vkAllocateCommandBuffers(device->vk_device(), &alloc_info, &cmd_buffer.vkcommand_buffer);
         VK_CHECK_MSG(result, "Failed to allocate command buffers!");
+        return cmd_buffer;
     }
 
     void CommandBuffer::begin()
@@ -63,5 +62,10 @@ namespace kzn::vk
     {
         auto result = vkEndCommandBuffer(vkcommand_buffer);
         VK_CHECK_MSG(result, "Failed to record command buffer!")
+    }
+
+    void CommandBuffer::reset() noexcept
+    {
+        vkResetCommandBuffer(vkcommand_buffer, 0);
     }
 } // namespace kzn::vk

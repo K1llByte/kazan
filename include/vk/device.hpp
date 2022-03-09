@@ -9,6 +9,10 @@
 
 namespace kzn::vk
 {
+    // Forward declarations
+    class CommandBuffer;
+    class Swapchain;
+    
     // TODO: Make this struct private within Device
     struct QueueFamilyIndices
     {
@@ -44,6 +48,15 @@ namespace kzn::vk
         const SwapChainSupport& swapchain_support_details() const noexcept { return swapchain_support; }
         const QueueFamilyIndices& queue_families() const noexcept { return queue_family_indices; }
 
+        // TODO: Consider making individual queue handles
+        void graphics_queue_submit(
+            CommandBuffer& cmd_buffer,
+            VkSemaphore wait_semaphore,
+            VkSemaphore signal_semaphore,
+            VkFence fence);
+        void present_queue_present(Swapchain& swapchain, VkSemaphore wait_semaphore) noexcept;
+        void wait_idle() noexcept;
+
     private:
         Device() = default;
 
@@ -54,7 +67,8 @@ namespace kzn::vk
         // FIXME: If there's support for multiple cmd pools then the 
         // create_command_pool method returns VkCommandPool and theres no
         // member with the cmd pool variable (must be given on cmd buffer creation)
-        VkCommandPool      command_pool = VK_NULL_HANDLE;
+        VkQueue            graphics_queue = VK_NULL_HANDLE;
+        VkQueue            present_queue = VK_NULL_HANDLE;
     };
 
     class DeviceBuilder
@@ -73,8 +87,6 @@ namespace kzn::vk
         std::vector<const char*>      validation_layers;
         std::vector<const char*>      device_extensions;
         VkPhysicalDevice              vkphysical_device = VK_NULL_HANDLE;
-        VkQueue                       graphics_queue = VK_NULL_HANDLE;
-        VkQueue                       present_queue = VK_NULL_HANDLE;
         VkSurfaceKHR                  surface = VK_NULL_HANDLE;
     };
 } // namespace kzn::vk

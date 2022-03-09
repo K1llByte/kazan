@@ -3,12 +3,15 @@
 
 #include "vk/device.hpp"
 #include "vk/render_pass.hpp"
+#include "vk/cmd_buffers.hpp"
 
 namespace kzn::vk
 {
     struct PipelineConfig
     {
         VkPipelineViewportStateCreateInfo      viewport_info;
+        std::vector<VkViewport>                viewports;
+        std::vector<VkRect2D>                  scissors;
         VkPipelineInputAssemblyStateCreateInfo input_assembly_info;
         VkPipelineRasterizationStateCreateInfo rasterization_info;
         VkPipelineMultisampleStateCreateInfo   multisample_info;
@@ -27,7 +30,8 @@ namespace kzn::vk
     public:
         PipelineConfigBuilder(
             VkPipelineLayout layout,
-            RenderPass& render_pass);
+            RenderPass& render_pass,
+            VkExtent2D viewport_extent);
         ~PipelineConfigBuilder() = default;
 
         PipelineConfigBuilder& set_layout(VkPipelineLayout layout);
@@ -73,7 +77,7 @@ namespace kzn::vk
             const PipelineConfig& config_info);
         ~Pipeline();
 
-        void bind(VkCommandBuffer command_buffer);
+        void bind(CommandBuffer cmd_buffer);
 
     private:
         Device*          device = nullptr;

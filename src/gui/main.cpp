@@ -34,7 +34,7 @@ int main()
 
     auto pipeline_layout = vk::PipelineLayoutBuilder(&device)
         .build();
-    auto pipeline_config = vk::PipelineConfigBuilder(pipeline_layout, render_pass)
+    auto pipeline_config = vk::PipelineConfigBuilder(pipeline_layout, render_pass, swapchain.get_extent())
         .set_topology(VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST) // Optional
         .set_polygon_mode(VK_POLYGON_MODE_FILL) // Optional
         .build();
@@ -48,27 +48,42 @@ int main()
     render_pass.create_framebuffers(swapchain);
 
     // Create command pool and buffers
-
-    // // Option 1
-    // device.create_command_pool();
-    // device.create_command_buffer();
-
-    // // Option 2: Avantage of this is that there's no check for
-    // // null cmd_pool and support for more than 1 cmd pool and buffer
-    // auto cmd_pool = vk::CommandPool(&device);
-    // auto cmd_buffer = vk::CommandBuffer(cmd_pool);
-    // cmd_buffer.begin();
-
-    // Option 3:
     auto cmd_pool = vk::CommandPool(&device);
     auto cmd_buffer = cmd_pool.allocate();
-    cmd_buffer.begin();
-    cmd_buffer.end(); // throws ResultError if it fails to record command buffer
+
+    // Initialize sync primitives
+    VkSemaphore img_available = vk::create_semaphore(device);
+    VkSemaphore finished_render = vk::create_semaphore(device);
+    VkFence in_flight_fence = vk::create_fence(device);
 
     while(!window.should_close())
     {
         window.poll_events();
+
+        ////////// Draw Section //////////
+        vkWaitForFences(device.vk_device(), 1, &in_flight_fence, VK_TRUE, UINT64_MAX);
+        vkResetFences(device.vk_device(), 1, &in_flight_fence);
+
+        auto img_idx = swapchain.acquire_next(img_available);
+
+        cmd_buffer.reset();
+        cmd_buffer.begin();
+        render_pass.begin(cmd_buffer, swapchain);
+
+        pipeline.bind(cmd_buffer);
+        vkCmdDraw(cmd_buffer.vk_command_buffer(), 3, 1, 0, 0);
+
+        render_pass.end(cmd_buffer);
+        cmd_buffer.end(); // throws ResultError if it fails to record command buffer
+        device.graphics_queue_submit(cmd_buffer, img_available, finished_render, in_flight_fence);
+        device.present_queue_present(swapchain, finished_render);
+        //////////////////////////////////
     }
+    device.wait_idle();
+
+    vk::destroy_semaphore(device, img_available);
+    vk::destroy_semaphore(device, finished_render);
+    vk::destroy_fence(device, in_flight_fence);
 
     // List all devices if you want to choose the device
     // auto available_gpus = vk::Device::available_devices(instance);

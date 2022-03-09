@@ -1,10 +1,12 @@
-#ifndef KZN_VK_DEVICE_HPP
-#define KZN_VK_DEVICE_HPP
+#ifndef KZN_VK_CMD_BUFFERS_HPP
+#define KZN_VK_CMD_BUFFERS_HPP
 
 #include "vk/device.hpp"
 
 namespace kzn::vk
 {
+    class CommandBuffer;
+
     class CommandPool
     {
     public:
@@ -22,18 +24,22 @@ namespace kzn::vk
 
     class CommandBuffer
     {
+        friend class CommandPool;
     public:
-        CommandBuffer(const CommandPool& cmd_pool);
         ~CommandBuffer() = default;
 
         VkCommandBuffer vk_command_buffer() noexcept { return vkcommand_buffer; }
 
         void begin() /* const noexcept */;
         void end() /* const noexcept */;
+        void reset() noexcept;
 
+    private:
+        CommandBuffer() = default;
+        
     private:
         VkCommandBuffer vkcommand_buffer;
     };
 } // namespace kzn::vk
 
-#endif // KZN_VK_DEVICE_HPP
+#endif // KZN_VK_CMD_BUFFERS_HPP

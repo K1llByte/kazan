@@ -11,11 +11,16 @@ namespace kzn::vk
     public:
         ~Swapchain();
 
+        VkSwapchainKHR vk_swapchain() noexcept { return vkswapchain; }
+
         const VkSurfaceFormatKHR get_surface_format() const noexcept { return surface_format; }
         const VkPresentModeKHR get_present_mode() const noexcept { return present_mode; }
         const VkExtent2D get_extent() const noexcept { return extent; }
         std::size_t num_images() const noexcept { return swapchain_image_views.size(); }
         const std::vector<VkImageView>& image_views() noexcept { return swapchain_image_views; }
+        std::size_t current_index() const noexcept { return current_image_idx; }
+
+        uint32_t acquire_next(VkSemaphore img_available_semaphore) noexcept;
 
     private:
         Swapchain() = default;
@@ -30,6 +35,7 @@ namespace kzn::vk
         // Since device must allways outlive the Swapchain for now
         // ill use a pointer reference FIXME: change to an alternative
         Device*                  device;
+        uint32_t                 current_image_idx;
     };
 
     class SwapchainBuilder

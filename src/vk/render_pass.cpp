@@ -46,6 +46,18 @@ namespace kzn::vk
         render_pass_info.pAttachments = &color_attachment;
         render_pass_info.subpassCount = 1;
         render_pass_info.pSubpasses = &subpass;
+        // Subpass dependencies
+        VkSubpassDependency dependency{};
+        dependency.srcSubpass = VK_SUBPASS_EXTERNAL;
+        dependency.dstSubpass = 0;
+        dependency.srcStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
+        dependency.srcAccessMask = 0;
+        dependency.dstStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
+        dependency.dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
+
+        render_pass_info.dependencyCount = 1;
+        render_pass_info.pDependencies = &dependency;
+        
 
         auto result = vkCreateRenderPass(device->vk_device(), &render_pass_info, nullptr, &vkrender_pass);
         VK_CHECK_MSG(result, "Failed to create render pass!");
@@ -104,7 +116,7 @@ namespace kzn::vk
         begin_info.renderArea.offset = {0, 0};
         begin_info.renderArea.extent = swapchain.get_extent();
 
-        VkClearValue clear_color = {{{0.0f, 0.0f, 0.0f, 1.0f}}};
+        VkClearValue clear_color = {{{0.008f, 0.008f, 0.008f, 1.0f}}};
         begin_info.clearValueCount = 1;
         begin_info.pClearValues = &clear_color;
 

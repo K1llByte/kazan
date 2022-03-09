@@ -3,6 +3,7 @@
 
 #include "vk/device.hpp"
 #include "vk/swapchain.hpp"
+#include "vk/cmd_buffers.hpp"
 
 namespace kzn::vk
 {
@@ -15,8 +16,8 @@ namespace kzn::vk
         VkRenderPass vk_render_pass() noexcept { return vkrender_pass; }
 
         void create_framebuffers(Swapchain& swapchain);
-        void begin(const Swapchain& swapchain);
-        void end();
+        void begin(CommandBuffer& cmd_buffer, const Swapchain& swapchain);
+        void end(CommandBuffer& cmd_buffer);
 
     private:
         RenderPass() = default;

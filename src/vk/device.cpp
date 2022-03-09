@@ -3,6 +3,9 @@
 #include "core/log.hpp"
 #include "vk/error.hpp"
 #include "vk/utils.hpp"
+#include "vk/cmd_buffers.hpp"
+#include "vk/swapchain.hpp"
+
 
 #include <unordered_set>
 #include <algorithm>
@@ -151,6 +154,53 @@ namespace kzn::vk
         Log::debug("Device destroyed");
     }
 
+    void Device::graphics_queue_submit(
+        CommandBuffer& cmd_buffer,
+        VkSemaphore wait_semaphore,
+        VkSemaphore signal_semaphore,
+        VkFence fence)
+    {
+        VkSubmitInfo submit_info{};
+        submit_info.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+        // Semaphores to wait
+        // FIXME: This is hardcoded make it better later
+        VkPipelineStageFlags wait_stages[] = {VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT};
+        submit_info.waitSemaphoreCount = 1;
+        submit_info.pWaitSemaphores = &wait_semaphore;
+        submit_info.pWaitDstStageMask = wait_stages;
+        // Command Buffers
+        submit_info.commandBufferCount = 1;
+        VkCommandBuffer cmd_buffers[] = {cmd_buffer.vk_command_buffer()};
+        submit_info.pCommandBuffers = cmd_buffers;
+        // Semaphores to signal
+        submit_info.signalSemaphoreCount = 1;
+        submit_info.pSignalSemaphores = &signal_semaphore;
+
+        auto result = vkQueueSubmit(graphics_queue, 1, &submit_info, fence);
+        VK_CHECK_MSG(result, "Failed to submit draw command buffer!");
+    }
+
+    void Device::present_queue_present(Swapchain& swapchain, VkSemaphore wait_semaphore) noexcept
+    {
+        VkPresentInfoKHR present_info{};
+        present_info.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
+        present_info.waitSemaphoreCount = 1;
+        present_info.pWaitSemaphores = &wait_semaphore;
+        present_info.swapchainCount = 1;
+        VkSwapchainKHR swapchains[] = { swapchain.vk_swapchain() };
+        present_info.pSwapchains = swapchains;
+        uint32_t indices[] = { swapchain.current_index() };
+        present_info.pImageIndices = indices;
+        present_info.pResults = nullptr; // Optional
+        vkQueuePresentKHR(present_queue, &present_info);
+    }
+
+    void Device::wait_idle() noexcept
+    {
+        vkDeviceWaitIdle(vkdevice);
+    }
+
+
     DeviceBuilder::DeviceBuilder(Instance& instance)
     {
         auto vkinstance = instance.vk_instance();
@@ -296,24 +346,12 @@ namespace kzn::vk
         VK_CHECK_MSG(result, "Failed to create logical device!");
         Log::debug("Device created");
 
-        // 2.1. Create device queues //
-        vkGetDeviceQueue(vkdevice, indices.graphics_family.value(), 0, &graphics_queue);
-        vkGetDeviceQueue(vkdevice, indices.present_family.value(), 0, &present_queue);
-
-        // // 2.2. Create cmd pool //
-        // // TODO: Consider moving this to a separate method in Device
-        // // like create_cmd_pool
-        // VkCommandPoolCreateInfo pool_info{};
-        // pool_info.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
-        // pool_info.queueFamilyIndex = indices.graphics_family.value();
-        // pool_info.flags = VK_COMMAND_POOL_CREATE_TRANSIENT_BIT
-        //                 | VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT;
-
-        // VkCommandPool command_pool;
-        // result = vkCreateCommandPool(vkdevice, &pool_info, nullptr, &command_pool);
-        // VK_CHECK_MSG(result, "Failed to create command pool!");
 
         auto device = Device();
+        // 2.1. Create device queues //
+        vkGetDeviceQueue(vkdevice, indices.graphics_family.value(), 0, &device.graphics_queue);
+        vkGetDeviceQueue(vkdevice, indices.present_family.value(), 0, &device.present_queue);
+
         device.vkdevice = vkdevice;
         device.swapchain_support = std::move(swapchain_support);
         device.queue_family_indices = std::move(indices);

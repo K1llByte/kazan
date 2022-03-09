@@ -37,18 +37,32 @@ namespace kzn::vk
 
     PipelineConfigBuilder::PipelineConfigBuilder(
         VkPipelineLayout layout,
-        RenderPass& render_pass)
+        RenderPass& render_pass,
+        VkExtent2D viewport_extent)
         : config{}
     {
         config.input_assembly_info.sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
         config.input_assembly_info.topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;
         config.input_assembly_info.primitiveRestartEnable = VK_FALSE;
 
+        VkViewport viewport{};
+        viewport.x = 0.0f;
+        viewport.y = 0.0f;
+        viewport.width = (float) viewport_extent.width;
+        viewport.height = (float) viewport_extent.height;
+        viewport.minDepth = 0.0f;
+        viewport.maxDepth = 1.0f;
+        config.viewports.push_back(viewport);        
+        VkRect2D scissor{};
+        scissor.offset = {0, 0};
+        scissor.extent = viewport_extent;
+        config.scissors.push_back(scissor);
+        
         config.viewport_info.sType = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO;
-        config.viewport_info.viewportCount = 1;
-        config.viewport_info.pViewports = nullptr;
-        config.viewport_info.scissorCount = 1;
-        config.viewport_info.pScissors = nullptr;
+        config.viewport_info.viewportCount = config.viewports.size();
+        config.viewport_info.pViewports = config.viewports.data();
+        config.viewport_info.scissorCount = config.scissors.size();
+        config.viewport_info.pScissors = config.scissors.data();
 
         config.rasterization_info.sType = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO;
         config.rasterization_info.depthClampEnable = VK_FALSE;
@@ -103,7 +117,9 @@ namespace kzn::vk
         config.depth_stencil_info.front = {};  // Optional
         config.depth_stencil_info.back = {};   // Optional
 
-        config.dynamic_state_enables = { VK_DYNAMIC_STATE_VIEWPORT, VK_DYNAMIC_STATE_SCISSOR };
+        // config.dynamic_state_enables = { VK_DYNAMIC_STATE_VIEWPORT, VK_DYNAMIC_STATE_SCISSOR };
+        // TODO: Setters to configure dynamic states
+        config.dynamic_state_enables = { VK_DYNAMIC_STATE_VIEWPORT, VK_DYNAMIC_STATE_LINE_WIDTH };
         config.dynamic_state_info.sType = VK_STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO;
         config.dynamic_state_info.pDynamicStates = config.dynamic_state_enables.data();
         config.dynamic_state_info.dynamicStateCount =
@@ -239,8 +255,8 @@ namespace kzn::vk
         pipeline_info.pRasterizationState = &config.rasterization_info;
         pipeline_info.pMultisampleState = &config.multisample_info;
         pipeline_info.pColorBlendState = &config.color_blend_info;
-        pipeline_info.pDepthStencilState = &config.depth_stencil_info;
-        pipeline_info.pDynamicState = &config.dynamic_state_info;
+        pipeline_info.pDepthStencilState = nullptr; //&config.depth_stencil_info;
+        pipeline_info.pDynamicState = nullptr; //&config.dynamic_state_info;
 
         pipeline_info.layout = config.pipeline_layout;
         pipeline_info.renderPass = config.render_pass;
@@ -267,5 +283,14 @@ namespace kzn::vk
         vkDestroyPipelineLayout(device->vk_device(), pipeline_layout, nullptr);
         vkDestroyPipeline(device->vk_device(), graphics_pipeline, nullptr);
         Log::debug("Pipeline destroyed");
+    }
+
+    void Pipeline::bind(CommandBuffer cmd_buffer)
+    {
+        vkCmdBindPipeline(
+            cmd_buffer.vk_command_buffer(),
+            VK_PIPELINE_BIND_POINT_GRAPHICS,
+            graphics_pipeline
+        );
     }
 }

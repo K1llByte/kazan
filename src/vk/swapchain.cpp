@@ -16,6 +16,19 @@ namespace kzn::vk
         Log::debug("Swapchain destroyed");
     }
 
+    uint32_t Swapchain::acquire_next(VkSemaphore img_available_semaphore) noexcept
+    {
+        vkAcquireNextImageKHR(
+            device->vk_device(),
+            vkswapchain,
+            UINT64_MAX,
+            img_available_semaphore,
+            VK_NULL_HANDLE,
+            &current_image_idx
+        );
+        return current_image_idx;
+    }
+
     SwapchainBuilder::SwapchainBuilder(Device* device, VkSurfaceKHR surface, VkExtent2D extent)
         : device(device), surface(surface), requested_extent(extent) {}
 
