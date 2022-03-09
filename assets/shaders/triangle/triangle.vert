@@ -9,13 +9,7 @@ const vec2 position[3] = vec2[] (
     vec2(-0.5,  0.5)
 );
 
-// // Big Triangle
-// vec2 position[3] = vec2[] (
-//     vec2( 0.0, -1.0),
-//     vec2( 1.0,  1.0),
-//     vec2(-1.0,  1.0)
-// );
-
+// Triangle colors
 const vec3 colors[3] = vec3[](
     vec3(1.0, 0.0, 0.0),
     vec3(0.0, 1.0, 0.0),

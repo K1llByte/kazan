@@ -36,7 +36,6 @@ namespace kzn::vk
     {
         auto swapchain = Swapchain();
 
-        Log::debug("({},{})", requested_extent.width, requested_extent.height);
         auto swapchain_support = device->swapchain_support_details();
         auto indices = device->queue_families();
 
