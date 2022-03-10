@@ -41,6 +41,11 @@ namespace kzn
         glfwPollEvents();
     }
 
+    void Window::set_title(const std::string_view& name) noexcept
+    {
+        glfwSetWindowTitle(glfw_window, name.data());
+    }
+
     std::vector<const char*> Window::required_extensions()
     {
         uint32_t glfw_extension_count = 0;

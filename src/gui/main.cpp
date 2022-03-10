@@ -97,7 +97,6 @@ int main()
     {
         per_frame_data.emplace_back(&device, cmd_pool);
     }
-    Log::warning("size: {}", per_frame_data.size());
 
     while (!window.should_close())
     {
@@ -137,7 +136,7 @@ int main()
         auto end = std::chrono::high_resolution_clock::now();
         auto seconds = duration_cast<std::chrono::duration<double>>(end - begin).count();
         //////////////////////
-        Log::info("FPS: {}", 1 / seconds);
+        window.set_title(fmt::format("FPS: {:.0f}", 1 / seconds));
         //////////////////////////////////
     }
     device.wait_idle();

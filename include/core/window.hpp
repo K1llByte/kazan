@@ -18,6 +18,7 @@ namespace kzn
 
         bool should_close() const noexcept;
         void poll_events() const noexcept;
+        void set_title(const std::string_view& name) noexcept;
         GLFWwindow* ptr() noexcept { return glfw_window; }
 
         std::vector<const char*> required_extensions();
