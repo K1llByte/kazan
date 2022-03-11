@@ -101,6 +101,7 @@ int main()
     auto viewport = vk::create_viewport(window.extent());
     while (!window.should_close())
     {
+        Log::info("New Loop");
         window.poll_events();
 
         ////////// Draw Section //////////
@@ -115,25 +116,22 @@ int main()
         auto finished_render = per_frame_data[frame_idx].finished_render;
         auto in_flight_fence = per_frame_data[frame_idx].in_flight_fence;
 
+        Log::warning("Begin try");
+        vkWaitForFences(device.vk_device(), 1, &in_flight_fence, VK_TRUE, UINT64_MAX);
         try {
-            vkWaitForFences(device.vk_device(), 1, &in_flight_fence, VK_TRUE, UINT64_MAX);
             swapchain.acquire_next(img_available);
-            vkResetFences(device.vk_device(), 1, &in_flight_fence);
         }
-        catch(const vk::SwapchainResized&) {
+        catch(...) {//const vk::SwapchainResized& e) {
             Log::warning("SwapchainResized on acquire_next");
-            window.set_resized(true);
-        }
-
-        if(window.was_resized())
-        {
-            Log::warning("window.was_resized");
             auto win_extent = window.extent();
             swapchain.recreate(win_extent);
             viewport = vk::create_viewport(win_extent);
             render_pass.recreate_framebuffers(swapchain);
-            continue; // Pass to the next frame
+            continue;
         }
+        
+        vkResetFences(device.vk_device(), 1, &in_flight_fence);
+        Log::warning("End try");
 
         cmd_buffer.reset();
         cmd_buffer.begin();
@@ -141,7 +139,7 @@ int main()
 
         pipeline.set_viewport(cmd_buffer, viewport);
         pipeline.bind(cmd_buffer);
-        Log::info("Drawed");
+        // Log::info("Drawed");
         vkCmdDraw(cmd_buffer.vk_command_buffer(), 3, 1, 0, 0);
         render_pass.end(cmd_buffer);
         cmd_buffer.end(); // throws ResultError if it fails to record command buffer
@@ -152,16 +150,23 @@ int main()
         }
         catch(const vk::SwapchainResized&) {
             Log::warning("SwapchainResized on present_queue_present");
+            window.set_resized(true);
+            
+        }
+        if(window.was_resized())
+        {
+            Log::warning("window.was_resized");
             auto win_extent = window.extent();
             swapchain.recreate(win_extent);
             viewport = vk::create_viewport(win_extent);
             render_pass.recreate_framebuffers(swapchain);
+            continue; // Pass to the next frame
         }
 
         // Frame time begin //
         auto end = std::chrono::high_resolution_clock::now();
         auto seconds = duration_cast<std::chrono::duration<double>>(end - begin).count();
-        Log::warning("End loop");
+        Log::info("End loop");
         //////////////////////
         window.set_title(fmt::format("FPS: {:.0f}", 1 / seconds));
         //////////////////////////////////

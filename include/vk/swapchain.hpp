@@ -20,7 +20,7 @@ namespace kzn::vk
         const std::vector<VkImageView>& image_views() noexcept { return swapchain_image_views; }
         std::size_t current_index() const noexcept { return current_image_idx; }
 
-        uint32_t acquire_next(VkSemaphore img_available_semaphore) noexcept;
+        uint32_t acquire_next(VkSemaphore img_available_semaphore);
         void recreate(VkExtent2D new_extent);
 
     private:

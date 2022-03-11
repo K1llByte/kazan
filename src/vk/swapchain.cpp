@@ -17,7 +17,7 @@ namespace kzn::vk
         Log::debug("Swapchain destroyed");
     }
 
-    uint32_t Swapchain::acquire_next(VkSemaphore img_available_semaphore) noexcept
+    uint32_t Swapchain::acquire_next(VkSemaphore img_available_semaphore)
     {
         auto result = vkAcquireNextImageKHR(
             device->vk_device(),
