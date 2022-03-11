@@ -16,6 +16,7 @@ namespace kzn::vk
         VkRenderPass vk_render_pass() noexcept { return vkrender_pass; }
 
         void create_framebuffers(Swapchain& swapchain);
+        void recreate_framebuffers(Swapchain& swapchain);
         void begin(CommandBuffer& cmd_buffer, const Swapchain& swapchain);
         void end(CommandBuffer& cmd_buffer);
 

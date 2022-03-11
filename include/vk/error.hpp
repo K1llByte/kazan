@@ -23,6 +23,10 @@ namespace kzn::vk
     KZN_VK_IMPL_ERROR(FailedDebugMessenger, "Failed to set up debug messenger!")
     KZN_VK_IMPL_ERROR(FailedValidationLayers, "Validation Layers not available!")
 
+    // Swapchain
+    KZN_VK_IMPL_ERROR(SwapchainResized, "Swapchain VkImages were resized!")
+    KZN_VK_IMPL_ERROR(AcquireImageError, "Failed acquiring next image in the swapchain!")
+
     // Pipeline
     KZN_VK_IMPL_ERROR(ShaderModError, "Failed to create shader module!")
 

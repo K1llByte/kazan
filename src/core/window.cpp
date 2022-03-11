@@ -3,6 +3,11 @@
 #include "core/log.hpp"
 #include "vk/utils.hpp"
 
+static void framebuffer_resized(GLFWwindow* window, int width, int height) {
+    auto app = reinterpret_cast<kzn::Window*>(glfwGetWindowUserPointer(window));
+    app->has_resized = true;
+}
+
 namespace kzn
 {
     Window::Window(const std::string_view& name, int width, int height)
@@ -12,13 +17,13 @@ namespace kzn
         // Turn off OpenGl context initialization
         glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
         // Turn off resizable window
-        glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
+        // glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
         // Initialize window
         glfw_window = glfwCreateWindow(width, height, name.data(), nullptr, nullptr);
         glfwSetWindowUserPointer(glfw_window, this);
         glfwSetInputMode(glfw_window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
         // On framebuffer resize callback
-        // glfwSetFramebufferSizeCallback(glfw_window, framebuffer_resize_callback);
+        glfwSetFramebufferSizeCallback(glfw_window, framebuffer_resized);
         Log::debug("Window created");
     }
 
@@ -46,6 +51,18 @@ namespace kzn
         glfwSetWindowTitle(glfw_window, name.data());
     }
 
+    void Window::set_resized(bool resized) noexcept
+    {
+        has_resized = resized;
+    }
+
+    bool Window::was_resized() noexcept
+    {
+        const auto was_resized = has_resized;
+        has_resized = false;
+        return was_resized;
+    }
+
     std::vector<const char*> Window::required_extensions()
     {
         uint32_t glfw_extension_count = 0;
@@ -60,6 +77,12 @@ namespace kzn
     {
         int width, height;
         glfwGetFramebufferSize(glfw_window, &width, &height);
+        // Special case for minimized window
+        while (width == 0 || height == 0)
+        {
+            glfwGetFramebufferSize(glfw_window, &width, &height);
+            glfwWaitEvents();
+        }
         return VkExtent2D {
             static_cast<uint32_t>(width),
             static_cast<uint32_t>(height)

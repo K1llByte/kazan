@@ -34,4 +34,16 @@ namespace kzn::vk
     {
         vkDestroyFence(device.vk_device(), fence, nullptr);
     }
+
+    VkViewport create_viewport(VkExtent2D extent)
+    {
+        return VkViewport{
+            .x = 0,
+            .y = 0,
+            .width = extent.width,
+            .height = extent.height,
+            .minDepth = 0.0,
+            .maxDepth = 1.0,
+        };
+    }
 }

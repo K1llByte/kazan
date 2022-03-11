@@ -51,6 +51,7 @@ target("kazan")
     set_optimize("fastest") -- -O3
     set_targetdir("bin/")
     add_links("pthread") -- -lpthread
+    -- FIXME: Not working
     add_cxxflags("-Wshadow", "-Wfatal-errors", "-Wpedantic")
     add_includedirs("include")
     add_includedirs("include/lib/stb")
@@ -74,9 +75,10 @@ target("kazan")
 target("demo")
     -- Compiler Options
     set_languages("cxx20") -- -std=c++20
-    set_warnings("allextra") -- -Wall -Wextra
+    set_warnings("allextra", "error") -- -Wall -Wextra -Wfatal-errors
     set_optimize("fastest") -- -O3
     set_targetdir("bin/")
+    -- FIXME: Not working
     add_cxxflags("-Wshadow", "-Wfatal-errors", "-Wpedantic")
     add_includedirs("include") -- Only kazan.hpp is allowed to be included
     -- add_includedirs("include/gui")

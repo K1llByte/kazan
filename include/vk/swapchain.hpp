@@ -13,14 +13,15 @@ namespace kzn::vk
 
         VkSwapchainKHR vk_swapchain() noexcept { return vkswapchain; }
 
-        const VkSurfaceFormatKHR get_surface_format() const noexcept { return surface_format; }
-        const VkPresentModeKHR get_present_mode() const noexcept { return present_mode; }
-        const VkExtent2D get_extent() const noexcept { return extent; }
+        VkSurfaceFormatKHR get_surface_format() const noexcept { return surface_format; }
+        VkPresentModeKHR get_present_mode() const noexcept { return present_mode; }
+        VkExtent2D get_extent() const noexcept { return extent; }
         std::size_t num_images() const noexcept { return swapchain_image_views.size(); }
         const std::vector<VkImageView>& image_views() noexcept { return swapchain_image_views; }
         std::size_t current_index() const noexcept { return current_image_idx; }
 
         uint32_t acquire_next(VkSemaphore img_available_semaphore) noexcept;
+        void recreate(VkExtent2D new_extent);
 
     private:
         Swapchain() = default;
@@ -29,6 +30,7 @@ namespace kzn::vk
         VkSwapchainKHR           vkswapchain;
         std::vector<VkImage>     swapchain_images;
         std::vector<VkImageView> swapchain_image_views;
+        VkSurfaceKHR             surface;
         VkSurfaceFormatKHR       surface_format;
         VkPresentModeKHR         present_mode;
         VkExtent2D               extent;

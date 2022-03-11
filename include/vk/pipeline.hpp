@@ -34,9 +34,6 @@ namespace kzn::vk
             VkExtent2D viewport_extent);
         ~PipelineConfigBuilder() = default;
 
-        PipelineConfigBuilder& set_layout(VkPipelineLayout layout);
-        PipelineConfigBuilder& set_render_pass(VkRenderPass render_pass);
-
         // Input Assemply
         PipelineConfigBuilder& set_topology(VkPrimitiveTopology topology);
 
@@ -77,6 +74,7 @@ namespace kzn::vk
             const PipelineConfig& config_info);
         ~Pipeline();
 
+        void set_viewport(CommandBuffer& cmd_buffer, VkViewport viewport);
         void bind(CommandBuffer cmd_buffer);
 
     private:
@@ -85,6 +83,7 @@ namespace kzn::vk
         VkPipelineLayout pipeline_layout;
         VkShaderModule   vert_shader_module;
         VkShaderModule   frag_shader_module;
+        VkViewport       viewport;
     };
 } // namespace kzn::vk
 

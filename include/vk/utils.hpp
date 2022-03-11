@@ -61,6 +61,8 @@ namespace kzn::vk
     void destroy_semaphore(Device& device, VkSemaphore semaphore) noexcept;
 
     void destroy_fence(Device& device, VkFence fence) noexcept;
+
+    VkViewport create_viewport(VkExtent2D extent);
 }
 
 #endif // KZN_VK_UTILS_HPP

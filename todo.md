@@ -14,7 +14,6 @@ kazan.hpp include with all public API includes
     - Low level and High level building blocks (Renderer, ...)
     - Distinguish every API bounds (group files by: core, core::platform, utils, math)
     - Error handling
-    - Init and cleanup consistency (RAII) instead of this
     - Consistent general API with configurability
 
 ## Todo 
@@ -246,4 +245,70 @@ renderer.submit(mi, cube, transform);
 
 ```c++
 
+```
+
+## Swapchain recreation
+
+Window resize must be handled outsize the vk:: handlers
+
+There are two scenarios where the swapchain might need to be recreated,
+1. At the beginning of `draw`, when `vkAcquireNextImageKHR` returns `VK_ERROR_OUT_OF_DATE_KHR`
+2. At the end of `draw`, when `vkQueuePresentKHR` returns `VK_ERROR_OUT_OF_DATE_KHR` or `VK_SUBOPTIMAL_KHR`
+3. When the glfw window Framebuffer resized callback signals that a resize occurred
+
+```c++
+// Create RenderPass
+auto render_pass = vk::RenderPassBuilder(&device)
+    .set_format(swapchain.get_surface_format().format)
+    .build();
+```
+```c++
+// Create SwapChain
+auto swapchain = vk::SwapchainBuilder(&device, surface, window.extent())
+                     .set_present_mode(VK_PRESENT_MODE_FIFO_KHR) // Optional (Default: IMMEDIATE)
+                     .build();
+```
+```c++
+// Create Pipeline
+auto pipeline_layout = vk::PipelineLayoutBuilder(&device)
+                           .build();
+auto pipeline_config = vk::PipelineConfigBuilder(pipeline_layout, render_pass, swapchain.get_extent())
+                           .build();
+auto pipeline = vk::Pipeline(
+    &device,
+    "assets/shaders/triangle/triangle.vert.spv",
+    "assets/shaders/triangle/triangle.frag.spv",
+    pipeline_config);
+```
+Resizing ...
+```c++
+
+// 1. 
+try {
+    swapchain.acquire_next(img_available);
+}
+catch(const SwapchainResized&) {
+    window.set_resized(true);
+}
+
+// 3.
+if(window.was_resized())
+{
+    auto win_extent = window.extent();
+    swapchain.recreate(win_extent);
+    // MUST BE INSIDE PIPELINE BIND
+    // pipeline.set_viewport(cmd_buffer, create_viewport(win_extent));
+    render_pass.recreate_framebuffers(swapchain);
+}
+
+// 2.
+try {
+    device.present_queue_present(swapchain, finished_render);
+}
+catch(const SwapchainResized&) {
+    swapchain.recreate(window.extent());
+    // MUST BE INSIDE PIPELINE BIND
+    pipeline.set_viewport(cmd_buffer, create_viewport(win_extent));
+    render_pass.recreate_framebuffers(swapchain);
+}
 ```

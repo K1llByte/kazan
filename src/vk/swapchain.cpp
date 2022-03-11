@@ -1,6 +1,7 @@
 #include "vk/swapchain.hpp"
 
 #include "vk/utils.hpp"
+#include "vk/error.hpp"
 
 namespace kzn::vk
 {
@@ -18,7 +19,7 @@ namespace kzn::vk
 
     uint32_t Swapchain::acquire_next(VkSemaphore img_available_semaphore) noexcept
     {
-        vkAcquireNextImageKHR(
+        auto result = vkAcquireNextImageKHR(
             device->vk_device(),
             vkswapchain,
             UINT64_MAX,
@@ -26,7 +27,102 @@ namespace kzn::vk
             VK_NULL_HANDLE,
             &current_image_idx
         );
+        if(result == VK_ERROR_OUT_OF_DATE_KHR)
+        {
+            throw SwapchainResized();
+        }
+        else if(result != VK_SUCCESS && result != VK_SUBOPTIMAL_KHR)
+        {
+            throw AcquireImageError();
+        }
         return current_image_idx;
+    }
+
+    void Swapchain::recreate(VkExtent2D new_extent)
+    {
+        // 1. Wait until device is idle //
+        device->wait_idle();
+
+        // 2. Cleanup old swapchain //
+        // Destroy ImageViews
+        for (size_t i = 0; i < swapchain_image_views.size(); i++)
+        {
+            vkDestroyImageView(device->vk_device(), swapchain_image_views[i], nullptr);
+        }
+        // Destroy Swapchain
+        vkDestroySwapchainKHR(device->vk_device(), vkswapchain, nullptr);
+
+        // 3.1 Create new swapchain //
+        auto image_count = static_cast<uint32_t>(swapchain_images.size());
+
+        VkSwapchainCreateInfoKHR create_info{};
+        create_info.sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR;
+        create_info.surface = surface;
+
+        create_info.minImageCount = image_count;
+        create_info.imageFormat = surface_format.format;
+        create_info.imageColorSpace = surface_format.colorSpace;
+        create_info.imageExtent = new_extent;
+        create_info.imageArrayLayers = 1;
+        create_info.imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
+        
+        auto indices = device->queue_families();
+        uint32_t queue_family_indices[] = {
+            indices.graphics_family.value(),
+            indices.present_family.value()
+        };
+
+        if (indices.graphics_family != indices.present_family)
+        {
+            create_info.imageSharingMode = VK_SHARING_MODE_CONCURRENT;
+            create_info.queueFamilyIndexCount = 2;
+            create_info.pQueueFamilyIndices = queue_family_indices;
+        }
+        else
+        {
+            create_info.imageSharingMode = VK_SHARING_MODE_EXCLUSIVE;
+            create_info.queueFamilyIndexCount = 0; // Optional
+            create_info.pQueueFamilyIndices = nullptr; // Optional
+        }
+
+        create_info.preTransform = device->swapchain_support_details().capabilities.currentTransform;
+        // NOTE: if we want window to be transparent
+        // this needs to change
+        create_info.compositeAlpha = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR;
+        create_info.presentMode = present_mode;
+        create_info.clipped = VK_TRUE;
+        create_info.oldSwapchain = VK_NULL_HANDLE;
+
+        auto result = vkCreateSwapchainKHR(device->vk_device(), &create_info, nullptr, &vkswapchain);
+        VK_CHECK_MSG(result, "Failed to create swap chain!");
+
+        // Not sure if i need to retrieve image_count
+        // FIXME: Might be a problem here
+        // vkGetSwapchainImagesKHR(device->vk_device(), vkswapchain, &image_count, nullptr);
+        // m_swap_chain_images.resize(image_count);
+        vkGetSwapchainImagesKHR(device->vk_device(), vkswapchain, &image_count, swapchain_images.data());
+
+        // 3.2 Create new ImageViews //
+        for(std::size_t i = 0; i < swapchain_images.size(); ++i)
+        {
+            VkImageViewCreateInfo create_info{};
+            create_info.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
+            create_info.image = swapchain_images[i];
+            create_info.viewType = VK_IMAGE_VIEW_TYPE_2D;
+            create_info.format = surface_format.format;
+            create_info.components.r = VK_COMPONENT_SWIZZLE_IDENTITY;
+            create_info.components.g = VK_COMPONENT_SWIZZLE_IDENTITY;
+            create_info.components.b = VK_COMPONENT_SWIZZLE_IDENTITY;
+            create_info.components.a = VK_COMPONENT_SWIZZLE_IDENTITY;
+            create_info.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+            create_info.subresourceRange.baseMipLevel = 0;
+            create_info.subresourceRange.levelCount = 1;
+            create_info.subresourceRange.baseArrayLayer = 0;
+            create_info.subresourceRange.layerCount = 1;
+
+            auto result = vkCreateImageView(device->vk_device(), &create_info, nullptr, &swapchain_image_views[i]);
+            VK_CHECK_MSG(result, "Failed to create image views!");
+        }
     }
 
     SwapchainBuilder::SwapchainBuilder(Device* device, VkSurfaceKHR surface, VkExtent2D extent)
@@ -111,6 +207,7 @@ namespace kzn::vk
 
         swapchain.vkswapchain = vkswapchain;
         swapchain.device = device;
+        swapchain.surface = surface;
 
         // 2. Retrieve VkImage handles //
         // we only specified a minimum number of images in the swap chain, so the

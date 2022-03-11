@@ -119,7 +119,7 @@ namespace kzn::vk
 
         // config.dynamic_state_enables = { VK_DYNAMIC_STATE_VIEWPORT, VK_DYNAMIC_STATE_SCISSOR };
         // TODO: Setters to configure dynamic states
-        config.dynamic_state_enables = { VK_DYNAMIC_STATE_VIEWPORT, VK_DYNAMIC_STATE_LINE_WIDTH };
+        config.dynamic_state_enables = { VK_DYNAMIC_STATE_VIEWPORT };
         config.dynamic_state_info.sType = VK_STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO;
         config.dynamic_state_info.pDynamicStates = config.dynamic_state_enables.data();
         config.dynamic_state_info.dynamicStateCount =
@@ -129,20 +129,6 @@ namespace kzn::vk
         config.pipeline_layout = layout;
         config.render_pass = render_pass.vk_render_pass();
     }
-
-    PipelineConfigBuilder& PipelineConfigBuilder::set_layout(VkPipelineLayout layout)
-    {
-        config.pipeline_layout = layout;
-        return *this;
-    }
-
-
-    PipelineConfigBuilder& PipelineConfigBuilder::set_render_pass(VkRenderPass render_pass)
-    {
-        config.render_pass = render_pass;
-        return *this;
-    }
-
 
     PipelineConfigBuilder& PipelineConfigBuilder::set_topology(VkPrimitiveTopology topology)
     {
@@ -283,6 +269,16 @@ namespace kzn::vk
         vkDestroyPipelineLayout(device->vk_device(), pipeline_layout, nullptr);
         vkDestroyPipeline(device->vk_device(), graphics_pipeline, nullptr);
         Log::debug("Pipeline destroyed");
+    }
+
+    void Pipeline::set_viewport(CommandBuffer& cmd_buffer, VkViewport viewport)
+    {
+        vkCmdSetViewport(
+            cmd_buffer.vk_command_buffer(),
+            0,
+            1,
+            &viewport
+        );
     }
 
     void Pipeline::bind(CommandBuffer cmd_buffer)
