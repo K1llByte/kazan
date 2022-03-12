@@ -43,16 +43,7 @@ namespace kzn::vk
         // 1. Wait until device is idle //
         device->wait_idle();
 
-        // 2. Cleanup old swapchain //
-        // Destroy ImageViews
-        for (size_t i = 0; i < swapchain_image_views.size(); i++)
-        {
-            vkDestroyImageView(device->vk_device(), swapchain_image_views[i], nullptr);
-        }
-        // Destroy Swapchain
-        vkDestroySwapchainKHR(device->vk_device(), vkswapchain, nullptr);
-
-        // 3.1 Create new swapchain //
+        // 2.1 Create new swapchain //
         auto swapchain_support = device->query_swapchain_support(surface);
         
         surface_format = swapchain_support.select_format();
@@ -91,13 +82,15 @@ namespace kzn::vk
             create_info.pQueueFamilyIndices = nullptr; // Optional
         }
 
+        VkSwapchainKHR old_vkswapchain = vkswapchain;
+        auto old_swapchain_image_views = swapchain_image_views;
         create_info.preTransform = swapchain_support.capabilities.currentTransform;
         // NOTE: if we want window to be transparent
         // this needs to change
         create_info.compositeAlpha = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR;
         create_info.presentMode = present_mode;
         create_info.clipped = VK_TRUE;
-        create_info.oldSwapchain = VK_NULL_HANDLE;
+        create_info.oldSwapchain = old_vkswapchain;
 
         auto result = vkCreateSwapchainKHR(device->vk_device(), &create_info, nullptr, &vkswapchain);
         VK_CHECK_MSG(result, "Failed to create swap chain!");
@@ -108,7 +101,7 @@ namespace kzn::vk
         // swapchain_images.resize(image_count);
         vkGetSwapchainImagesKHR(device->vk_device(), vkswapchain, &image_count, swapchain_images.data());
 
-        // 3.2 Create new ImageViews //
+        // 2.2 Create new ImageViews //
         for(std::size_t i = 0; i < swapchain_image_views.size(); ++i)
         {
             VkImageViewCreateInfo create_info{};
@@ -129,6 +122,15 @@ namespace kzn::vk
             auto result = vkCreateImageView(device->vk_device(), &create_info, nullptr, &swapchain_image_views[i]);
             VK_CHECK_MSG(result, "Failed to create image views!");
         }
+
+        // 3. Cleanup old swapchain image views //
+        // Destroy ImageViews
+        for (size_t i = 0; i < old_swapchain_image_views.size(); i++)
+        {
+            vkDestroyImageView(device->vk_device(), old_swapchain_image_views[i], nullptr);
+        }
+        // Destroy Swapchain
+        vkDestroySwapchainKHR(device->vk_device(), old_vkswapchain, nullptr);
     }
 
     SwapchainBuilder::SwapchainBuilder(Device* device, VkSurfaceKHR surface, VkExtent2D extent)

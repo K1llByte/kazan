@@ -48,7 +48,7 @@ private:
     inline static vk::Device* device = nullptr;
 };
 
-int main()
+int main() try
 {
     auto window = Window("Hello World!", 800, 600);
     auto instance = vk::InstanceBuilder()
@@ -130,13 +130,14 @@ int main()
         try {
             image_idx = swapchain.acquire_next(img_available);
         }
-        catch(const vk::SwapchainResized&) {//const vk::SwapchainResized& e) {
+        catch(const vk::SwapchainResized&) {
             Log::warning("SwapchainResized on acquire_next");
             auto win_extent = window.extent();
             swapchain.recreate(win_extent);
             viewport = vk::create_viewport(win_extent);
             scissor = vk::create_scissor(win_extent);
             render_pass.recreate_framebuffers(swapchain);
+            // image_fences.resize(swapchain.num_images(), VK_NULL_HANDLE);
             continue;
         }
         
@@ -176,6 +177,7 @@ int main()
             viewport = vk::create_viewport(win_extent);
             scissor = vk::create_scissor(win_extent);
             render_pass.recreate_framebuffers(swapchain);
+            // image_fences.resize(swapchain.num_images(), VK_NULL_HANDLE);
         }
 
         // Frame time end //
@@ -192,4 +194,8 @@ int main()
     // auto available_gpus = vk::Device::available_devices(instance);
     // Create default device
     // auto device = vk::Device::default();
+}
+catch(const vk::ResultError& re)
+{
+    Log::error("ResultError: {}", re.raw());
 }

@@ -122,28 +122,22 @@ namespace kzn::vk
     VkExtent2D SwapChainSupport::select_extent(VkExtent2D extent) const noexcept
     {
         // Window managers set currentExtent width and height when ...
-        // 
         if(capabilities.currentExtent.width != std::numeric_limits<uint32_t>::max())
         {
             return capabilities.currentExtent;
         }
         else
         {
-            // Move this to window and pass it as argument
-            int width, height;
-            // glfwGetFramebufferSize(window, &width, &height);
-            VkExtent2D extent = {
-                static_cast<uint32_t>(width),
-                static_cast<uint32_t>(height)
-            };
             extent.width = std::clamp(
                 extent.width,
                 capabilities.minImageExtent.width,
-                capabilities.maxImageExtent.width);
+                capabilities.maxImageExtent.width
+            );
             extent.height = std::clamp(
                 extent.height,
                 capabilities.minImageExtent.height,
-                capabilities.maxImageExtent.height);
+                capabilities.maxImageExtent.height
+            );
             return extent;
         }
     }
@@ -157,8 +151,7 @@ namespace kzn::vk
 
     const SwapChainSupport& Device::query_swapchain_support(VkSurfaceKHR surface) noexcept
     {
-        swapchain_support_details = get_swapchain_support(physical_device, surface);
-        return swapchain_support_details;
+        return (swapchain_support_details = get_swapchain_support(physical_device, surface));
     }
 
     void Device::graphics_queue_submit(
