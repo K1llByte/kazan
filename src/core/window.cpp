@@ -3,13 +3,16 @@
 #include "core/log.hpp"
 #include "vk/utils.hpp"
 
-static void framebuffer_resized(GLFWwindow* window, int width, int height) {
-    auto app = reinterpret_cast<kzn::Window*>(glfwGetWindowUserPointer(window));
-    app->has_resized = true;
-}
-
 namespace kzn
 {
+    void framebuffer_resized(GLFWwindow* window, int width, int height)
+    {
+        auto app = reinterpret_cast<kzn::Window*>(glfwGetWindowUserPointer(window));
+        app->has_resized = true;
+        app->width = width;
+        app->height = height;
+    }
+
     Window::Window(const std::string_view& name, int width, int height)
     {
         // Initialize glfw
@@ -73,9 +76,8 @@ namespace kzn
             glfw_extensions + glfw_extension_count);
     }
 
-    VkExtent2D Window::extent() const noexcept
+    VkExtent2D Window::extent() noexcept
     {
-        int width, height;
         glfwGetFramebufferSize(glfw_window, &width, &height);
         // Special case for minimized window
         while (width == 0 || height == 0)
@@ -83,6 +85,7 @@ namespace kzn
             glfwGetFramebufferSize(glfw_window, &width, &height);
             glfwWaitEvents();
         }
+        Log::warning("Window::extent() ({},{})", width, height);
         return VkExtent2D {
             static_cast<uint32_t>(width),
             static_cast<uint32_t>(height)

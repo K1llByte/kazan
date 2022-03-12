@@ -52,17 +52,15 @@ namespace kzn::vk
     // TODO: Consider moving this to device method
     // or wrapper handler with destructor
     VkSemaphore create_semaphore(Device& device);
-
     // TODO: Consider moving this to device method
     // or wrapper handler with destructor
     // NOTE: Fence starts signaled
     VkFence create_fence(Device& device);
-
     void destroy_semaphore(Device& device, VkSemaphore semaphore) noexcept;
-
     void destroy_fence(Device& device, VkFence fence) noexcept;
 
     VkViewport create_viewport(VkExtent2D extent);
+    VkRect2D create_scissor(VkExtent2D extent);
 }
 
 #endif // KZN_VK_UTILS_HPP

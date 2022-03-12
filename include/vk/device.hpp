@@ -46,24 +46,26 @@ namespace kzn::vk
         ~Device();
 
         VkDevice vk_device() noexcept { return vkdevice; }
-        const SwapChainSupport& swapchain_support_details() const noexcept { return swapchain_support; }
+        const SwapChainSupport& swapchain_support() const noexcept { return swapchain_support_details; }
         const QueueFamilyIndices& queue_families() const noexcept { return queue_family_indices; }
 
+        const SwapChainSupport& query_swapchain_support(VkSurfaceKHR surface) noexcept;
         // TODO: Consider making individual queue handles
         void graphics_queue_submit(
             CommandBuffer& cmd_buffer,
             VkSemaphore wait_semaphore,
             VkSemaphore signal_semaphore,
             VkFence fence);
-        void present_queue_present(Swapchain& swapchain, VkSemaphore wait_semaphore) noexcept;
+        void present_queue_present(Swapchain& swapchain, VkSemaphore wait_semaphore);
         void wait_idle() noexcept;
 
     private:
         Device() = default;
 
     private:
+        VkPhysicalDevice   physical_device;
         VkDevice           vkdevice;
-        SwapChainSupport   swapchain_support;
+        SwapChainSupport   swapchain_support_details;
         QueueFamilyIndices queue_family_indices;
         // FIXME: If there's support for multiple cmd pools then the 
         // create_command_pool method returns VkCommandPool and theres no

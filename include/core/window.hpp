@@ -12,6 +12,7 @@ namespace kzn
 {
     class Window
     {
+        friend void framebuffer_resized(GLFWwindow* , int, int);
     public:
         Window(const std::string_view& name, int width, int height);
         ~Window();
@@ -26,7 +27,7 @@ namespace kzn
 
         std::vector<const char*> required_extensions();
         // TODO: make const
-        VkExtent2D extent() const noexcept;
+        VkExtent2D extent() noexcept;
         
     public:
         bool         has_resized = false;
@@ -37,6 +38,8 @@ namespace kzn
 
         VkSurfaceKHR surface = VK_NULL_HANDLE;
     };
+
+    void framebuffer_resized(GLFWwindow* window, int width, int height);
 }
 
 #endif // KZN_WINDOW_HPP

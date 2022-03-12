@@ -242,7 +242,7 @@ namespace kzn::vk
         pipeline_info.pMultisampleState = &config.multisample_info;
         pipeline_info.pColorBlendState = &config.color_blend_info;
         pipeline_info.pDepthStencilState = nullptr; //&config.depth_stencil_info;
-        pipeline_info.pDynamicState = nullptr; //&config.dynamic_state_info;
+        pipeline_info.pDynamicState = &config.dynamic_state_info;
 
         pipeline_info.layout = config.pipeline_layout;
         pipeline_info.renderPass = config.render_pass;
@@ -278,6 +278,16 @@ namespace kzn::vk
             0,
             1,
             &viewport
+        );
+    }
+
+    void Pipeline::set_scissor(CommandBuffer& cmd_buffer, VkRect2D scissor)
+    {
+        vkCmdSetScissor(
+            cmd_buffer.vk_command_buffer(),
+            0,
+            1,
+            &scissor
         );
     }
 

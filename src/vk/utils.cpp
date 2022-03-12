@@ -46,4 +46,12 @@ namespace kzn::vk
             .maxDepth = 1.0,
         };
     }
+
+    VkRect2D create_scissor(VkExtent2D extent)
+    {
+        return VkRect2D{
+            {0, 0},
+            extent
+        };
+    }
 }

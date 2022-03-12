@@ -155,6 +155,12 @@ namespace kzn::vk
         Log::debug("Device destroyed");
     }
 
+    const SwapChainSupport& Device::query_swapchain_support(VkSurfaceKHR surface) noexcept
+    {
+        swapchain_support_details = get_swapchain_support(physical_device, surface);
+        return swapchain_support_details;
+    }
+
     void Device::graphics_queue_submit(
         CommandBuffer& cmd_buffer,
         VkSemaphore wait_semaphore,
@@ -181,7 +187,7 @@ namespace kzn::vk
         VK_CHECK_MSG(result, "Failed to submit draw command buffer!");
     }
 
-    void Device::present_queue_present(Swapchain& swapchain, VkSemaphore wait_semaphore) noexcept
+    void Device::present_queue_present(Swapchain& swapchain, VkSemaphore wait_semaphore)
     {
         VkPresentInfoKHR present_info{};
         present_info.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
@@ -193,7 +199,15 @@ namespace kzn::vk
         uint32_t indices[] = { swapchain.current_index() };
         present_info.pImageIndices = indices;
         present_info.pResults = nullptr; // Optional
-        vkQueuePresentKHR(present_queue, &present_info);
+        auto result = vkQueuePresentKHR(present_queue, &present_info);
+        if(result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR)
+        {
+            throw SwapchainResized();
+        }
+        else
+        {
+            VK_CHECK_MSG(result, "Failed to present swap chain image!");
+        }
     }
 
     void Device::wait_idle() noexcept
@@ -354,7 +368,8 @@ namespace kzn::vk
         vkGetDeviceQueue(vkdevice, indices.present_family.value(), 0, &device.present_queue);
 
         device.vkdevice = vkdevice;
-        device.swapchain_support = std::move(swapchain_support);
+        device.physical_device = vkphysical_device;
+        device.swapchain_support_details = std::move(swapchain_support);
         device.queue_family_indices = std::move(indices);
         return device;
     }

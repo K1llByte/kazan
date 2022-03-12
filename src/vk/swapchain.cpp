@@ -53,6 +53,12 @@ namespace kzn::vk
         vkDestroySwapchainKHR(device->vk_device(), vkswapchain, nullptr);
 
         // 3.1 Create new swapchain //
+        auto swapchain_support = device->query_swapchain_support(surface);
+        
+        surface_format = swapchain_support.select_format();
+        // swapchain.present_mode = swapchain_support.select_present_mode(present_mode);
+        extent = swapchain_support.select_extent(new_extent);
+
         auto image_count = static_cast<uint32_t>(swapchain_images.size());
 
         VkSwapchainCreateInfoKHR create_info{};
@@ -62,10 +68,10 @@ namespace kzn::vk
         create_info.minImageCount = image_count;
         create_info.imageFormat = surface_format.format;
         create_info.imageColorSpace = surface_format.colorSpace;
-        create_info.imageExtent = new_extent;
+        create_info.imageExtent = extent;
         create_info.imageArrayLayers = 1;
         create_info.imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
-        
+        Log::warning("Create Swapchain: ({},{})", create_info.imageExtent.width, create_info.imageExtent.height);
         auto indices = device->queue_families();
         uint32_t queue_family_indices[] = {
             indices.graphics_family.value(),
@@ -85,7 +91,7 @@ namespace kzn::vk
             create_info.pQueueFamilyIndices = nullptr; // Optional
         }
 
-        create_info.preTransform = device->swapchain_support_details().capabilities.currentTransform;
+        create_info.preTransform = swapchain_support.capabilities.currentTransform;
         // NOTE: if we want window to be transparent
         // this needs to change
         create_info.compositeAlpha = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR;
@@ -99,11 +105,11 @@ namespace kzn::vk
         // Not sure if i need to retrieve image_count
         // FIXME: Might be a problem here
         // vkGetSwapchainImagesKHR(device->vk_device(), vkswapchain, &image_count, nullptr);
-        // m_swap_chain_images.resize(image_count);
+        // swapchain_images.resize(image_count);
         vkGetSwapchainImagesKHR(device->vk_device(), vkswapchain, &image_count, swapchain_images.data());
 
         // 3.2 Create new ImageViews //
-        for(std::size_t i = 0; i < swapchain_images.size(); ++i)
+        for(std::size_t i = 0; i < swapchain_image_views.size(); ++i)
         {
             VkImageViewCreateInfo create_info{};
             create_info.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
@@ -138,7 +144,7 @@ namespace kzn::vk
     {
         auto swapchain = Swapchain();
 
-        auto swapchain_support = device->swapchain_support_details();
+        auto swapchain_support = device->swapchain_support();
         auto indices = device->queue_families();
 
         // 1. Create Swapchain.
