@@ -92,7 +92,10 @@ int main()
     // Create all data per frame in flight
     // Initialize command buffers
     // Initialize sync primitives
+    // 2x In Flight Frame Data
     std::vector<PerFrameData> per_frame_data;
+    // 3x Image Fences
+    std::vector<VkFence> image_fences(swapchain.num_images());
     per_frame_data.reserve(PerFrameData::MAX_FRAMES_IN_FLIGHT);
     for(std::size_t i = 0; i < PerFrameData::MAX_FRAMES_IN_FLIGHT; ++i)
     {
@@ -123,10 +126,12 @@ int main()
 
         // Log::warning("Begin try");
         vkWaitForFences(device.vk_device(), 1, &in_flight_fence, VK_TRUE, UINT64_MAX);
+        uint32_t image_idx;
         try {
-            swapchain.acquire_next(img_available);
+            image_idx = swapchain.acquire_next(img_available);
         }
-        catch(...) {//const vk::SwapchainResized& e) {
+        catch(const vk::SwapchainResized&) {//const vk::SwapchainResized& e) {
+            Log::warning("SwapchainResized on acquire_next");
             auto win_extent = window.extent();
             swapchain.recreate(win_extent);
             viewport = vk::create_viewport(win_extent);
@@ -135,7 +140,7 @@ int main()
             continue;
         }
         
-        vkResetFences(device.vk_device(), 1, &in_flight_fence);
+        // vkResetFences(device.vk_device(), 1, &in_flight_fence);
         // Log::warning("End try");
 
         cmd_buffer.reset();
@@ -150,11 +155,18 @@ int main()
         render_pass.end(cmd_buffer);
         cmd_buffer.end(); // throws ResultError if it fails to record command buffer
 
+        if(image_fences[image_idx] != VK_NULL_HANDLE)
+        {
+            vkWaitForFences(device.vk_device(), 1, &image_fences[image_idx], VK_TRUE, UINT64_MAX);
+        }
+        image_fences[image_idx] = in_flight_fence;
+        vkResetFences(device.vk_device(), 1, &in_flight_fence);
         device.graphics_queue_submit(cmd_buffer, img_available, finished_render, in_flight_fence);
         try {
             device.present_queue_present(swapchain, finished_render);
         }
         catch(const vk::SwapchainResized&) {
+            Log::warning("SwapchainResized on present_queue_present");
             window.set_resized(true);
         }
         if(window.was_resized())

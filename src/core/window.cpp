@@ -9,8 +9,8 @@ namespace kzn
     {
         auto app = reinterpret_cast<kzn::Window*>(glfwGetWindowUserPointer(window));
         app->has_resized = true;
-        app->width = width;
-        app->height = height;
+        // app->width = width;
+        // app->height = height;
     }
 
     Window::Window(const std::string_view& name, int width, int height)
@@ -24,7 +24,8 @@ namespace kzn
         // Initialize window
         glfw_window = glfwCreateWindow(width, height, name.data(), nullptr, nullptr);
         glfwSetWindowUserPointer(glfw_window, this);
-        glfwSetInputMode(glfw_window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
+        // Hide mouse cursor
+        // glfwSetInputMode(glfw_window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
         // On framebuffer resize callback
         glfwSetFramebufferSizeCallback(glfw_window, framebuffer_resized);
         Log::debug("Window created");

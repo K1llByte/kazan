@@ -33,7 +33,7 @@
 namespace kzn::vk
 {
     // FIXME: Make this class extend std::exception and
-    // implement what()
+    // implement what() with vk spec error msg
     class ResultError
     {
     public:
