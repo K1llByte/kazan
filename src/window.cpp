@@ -18,7 +18,7 @@ Window::Window(const std::string& name, int win_width, int win_height)
     glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
     
     // Turn off resizable window
-    glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
+    // glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
     
     // Initialize window
     _window = glfwCreateWindow(width, height, name.c_str(), nullptr, nullptr);

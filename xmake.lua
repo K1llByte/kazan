@@ -57,8 +57,8 @@ target("kazan")
     add_includedirs("include/lib/imgui")
     add_includedirs("include/lib/pegtl")
     add_includedirs("include/lib/tiny_obj_loader")
-    -- Library
-    set_kind("static")
+    -- Binary
+    set_kind("binary")
     add_files("src/**.cpp")
     remove_files("src/gui/**.cpp")
     -- Dependencies
@@ -68,24 +68,24 @@ target("kazan")
 
 -------------------- Kazan GUI -------------------
 
--- Target Demo using Kazan Lib
-target("demo")
-    -- Compiler Options
-    set_languages("cxx20") -- -std=c++20
-    set_warnings("allextra") -- -Wall -Wextra
-    set_optimize("fastest") -- -O3
-    set_targetdir("bin/")
-    add_cxxflags("-Wshadow", "-Wfatal-errors", "-Wpedantic")
-    add_includedirs("include") -- Only kazan.hpp is allowed to be included
-    -- add_includedirs("include/gui")
-    -- add_includedirs("include/lib/stb")
-    -- add_includedirs("include/lib/imgui")
-    -- add_includedirs("include/lib/tiny_obj_loader")
-    -- Dependencies
-    add_deps("kazan")
-    -- add_packages("glm")
-    add_packages("fmt")
-    -- Library
-    set_kind("binary")
-    add_files("src/gui/*.cpp")
-    -- add_files("src/gui/**/*.cpp")
+-- -- Target Demo using Kazan Lib
+-- target("demo")
+--     -- Compiler Options
+--     set_languages("cxx20") -- -std=c++20
+--     set_warnings("allextra") -- -Wall -Wextra
+--     set_optimize("fastest") -- -O3
+--     set_targetdir("bin/")
+--     add_cxxflags("-Wshadow", "-Wfatal-errors", "-Wpedantic")
+--     add_includedirs("include") -- Only kazan.hpp is allowed to be included
+--     -- add_includedirs("include/gui")
+--     -- add_includedirs("include/lib/stb")
+--     -- add_includedirs("include/lib/imgui")
+--     -- add_includedirs("include/lib/tiny_obj_loader")
+--     -- Dependencies
+--     add_deps("kazan")
+--     -- add_packages("glm")
+--     add_packages("fmt")
+--     -- Library
+--     set_kind("binary")
+--     add_files("src/gui/*.cpp")
+--     -- add_files("src/gui/**/*.cpp")
