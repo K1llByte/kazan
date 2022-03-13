@@ -86,7 +86,6 @@ namespace kzn
         //     glfwGetFramebufferSize(glfw_window, &width, &height);
         //     glfwWaitEvents();
         // }
-        Log::warning("Window::extent() ({},{})", width, height);
         return VkExtent2D {
             static_cast<uint32_t>(width),
             static_cast<uint32_t>(height)

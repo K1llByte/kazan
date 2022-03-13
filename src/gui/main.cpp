@@ -131,7 +131,6 @@ int main() try
             image_idx = swapchain.acquire_next(img_available);
         }
         catch(const vk::SwapchainResized&) {
-            Log::warning("SwapchainResized on acquire_next");
             auto win_extent = window.extent();
             swapchain.recreate(win_extent);
             viewport = vk::create_viewport(win_extent);
@@ -167,7 +166,6 @@ int main() try
             device.present_queue_present(swapchain, finished_render);
         }
         catch(const vk::SwapchainResized&) {
-            Log::warning("SwapchainResized on present_queue_present");
             window.set_resized(true);
         }
         if(window.was_resized())

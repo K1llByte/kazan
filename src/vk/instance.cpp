@@ -26,7 +26,7 @@ VkResult CreateDebugUtilsMessengerEXT(
     auto func = reinterpret_cast<PFN_vkCreateDebugUtilsMessengerEXT>(
         vkGetInstanceProcAddr(instance, "vkCreateDebugUtilsMessengerEXT")
     );
-    if (func != nullptr)
+    if(func != nullptr)
     {
         return func(instance, p_create_info, p_allocator, p_debug_messenger);
     }

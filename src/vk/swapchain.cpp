@@ -62,7 +62,6 @@ namespace kzn::vk
         create_info.imageExtent = extent;
         create_info.imageArrayLayers = 1;
         create_info.imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
-        Log::warning("Create Swapchain: ({},{})", create_info.imageExtent.width, create_info.imageExtent.height);
         auto indices = device->queue_families();
         uint32_t queue_family_indices[] = {
             indices.graphics_family.value(),
