@@ -39,6 +39,7 @@ namespace kzn::vk
 
         // Rasterization Stage
         PipelineConfigBuilder& set_polygon_mode(VkPolygonMode polygon_mode);
+        PipelineConfigBuilder& set_line_width(float line_width);
 
         PipelineConfig build();
 

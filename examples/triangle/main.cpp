@@ -74,6 +74,9 @@ int main() try
     auto pipeline_layout = vk::PipelineLayoutBuilder(&device)
                                .build();
     auto pipeline_config = vk::PipelineConfigBuilder(pipeline_layout, render_pass, swapchain.get_extent())
+                               .set_topology(VK_PRIMITIVE_TOPOLOGY_LINE_LIST) // Optional
+                               .set_polygon_mode(VK_POLYGON_MODE_FILL)            // Optional
+                               .set_line_width(1.f)
                                .build();
     auto pipeline = vk::Pipeline(
         &device,
@@ -118,8 +121,6 @@ int main() try
         auto img_available = per_frame_data[frame_idx].img_available;
         auto finished_render = per_frame_data[frame_idx].finished_render;
         auto in_flight_fence = per_frame_data[frame_idx].in_flight_fence;
-
-        
 
         // Log::warning("Begin try");
         vkWaitForFences(device.vk_device(), 1, &in_flight_fence, VK_TRUE, UINT64_MAX);

@@ -136,6 +136,12 @@ namespace kzn::vk
         return *this;
     }
 
+    PipelineConfigBuilder& PipelineConfigBuilder::set_line_width(float line_width)
+    {
+        config.rasterization_info.lineWidth = line_width;
+        return *this;
+    }
+
     PipelineConfigBuilder& PipelineConfigBuilder::set_polygon_mode(VkPolygonMode polygon_mode)
     {
         config.rasterization_info.polygonMode = polygon_mode;

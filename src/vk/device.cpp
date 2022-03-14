@@ -94,13 +94,15 @@ namespace kzn::vk
     {
         for(const auto& format : formats)
         {
-            if(format.format == VK_FORMAT_B8G8R8A8_SRGB
+            // if(format.format == VK_FORMAT_B8G8R8A8_SRGB
+            //     && format.colorSpace == VK_COLOR_SPACE_SRGB_NONLINEAR_KHR)
+            if(format.format == VK_FORMAT_R8G8B8A8_UNORM
                 && format.colorSpace == VK_COLOR_SPACE_SRGB_NONLINEAR_KHR)
             {
                 return format;
             }
         }
-        // Possible seg fault (not if its garanteed that the
+        // TODO: Possible seg fault (not if its garanteed that the
         // formats list has at least one value)
         return formats[0];
     }

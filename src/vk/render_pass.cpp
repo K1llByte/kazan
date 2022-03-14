@@ -153,8 +153,9 @@ namespace kzn::vk
         begin_info.renderArea.offset = {0, 0};
         begin_info.renderArea.extent = swapchain.get_extent();
 
-        VkClearValue clear_color = {{{0.008f, 0.008f, 0.008f, 1.0f}}};
-        // VkClearValue clear_color = {{{0.f, 0.f, 0.f, 0.0f}}};
+        // VkClearValue clear_color = {{{0.008f, 0.008f, 0.008f, 1.0f}}};
+        // VkClearValue clear_color = {{{0.0f, 0.0f, 0.0f, 0.0f}}};
+        VkClearValue clear_color = {{{0.160f, 0.156f, 0.156f, 1.0f}}};
         begin_info.clearValueCount = 1;
         begin_info.pClearValues = &clear_color;
 

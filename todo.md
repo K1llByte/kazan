@@ -6,7 +6,16 @@ USE noexcept (maybe?)
 USE const 
 kazan.hpp include with all public API includes
 
+## In Progress
+- Move `include/lib/:dep:` and `src/lib/:dep:` to `lib/:dep:/include` and `lib/:dep:/src`
+- Work on FIXME's and TODO's
+## Todo
+- Descriptor Sets and pools
+- Vertex Buffers
+- ImGUI Docking test (with example)
+## Done
 
+<!--
 ## In Progress
 
 - Textures
@@ -23,12 +32,10 @@ kazan.hpp include with all public API includes
     - Make Renderer render to a render target (ImGUI Viewport)
 - Entt setup
 
-<!-- Today -->
 - Lightning
     - PBR (no material hardcoded values)
 - Generate Mipmaps
 - Multisampling (MXAA)
-<!----------->
 
 - Make a check if Swapchain extension(s) are loaded in Swapchain 
 
@@ -66,6 +73,7 @@ kazan.hpp include with all public API includes
     - Make a manual to know the effects of each shader
     pairs and the inputs it requires (maybe provide a
     screenshot too)
+-->
 
 ## Arquived
 

@@ -28,15 +28,12 @@ rule("glsl")
         end, {files = sourcefile})
     end)
 
-
 -- Target Shaders Compilation
 target("shaders")
     set_kind("object")
-
     -- make the test target support the construction rules of the spir-v files
     add_rules("glsl")
     set_targetdir("./")
-
     -- adding shader files to build
     add_files("assets/shaders/**.vert")
     add_files("assets/shaders/**.frag")
@@ -45,19 +42,23 @@ target("shaders")
 
 -- Target Kazan Static Library
 target("kazan")
-    -- Compiler Options
+    -- Common Compiler Options
     set_languages("cxx20") -- -std=c++20
-    set_warnings("allextra") -- -Wall -Wextra
+    set_warnings("allextra") -- -Wall -Wextra -Wfatal-errors
     set_optimize("fastest") -- -O3
-    set_targetdir("bin/")
-    add_links("pthread") -- -lpthread
     -- FIXME: Not working
     add_cxxflags("-Wshadow", "-Wfatal-errors", "-Wpedantic")
+    -- Compiler Options
+    add_options("kb22")
+    if is_plat("linux", "macosx") then
+        add_links("pthread") --, "m", "dl")
+    end
     add_includedirs("include")
-    add_includedirs("include/lib/stb")
+    -- add_includedirs("include/lib/stb")
     add_includedirs("include/lib/imgui")
-    add_includedirs("include/lib/pegtl")
-    add_includedirs("include/lib/tiny_obj_loader")
+    -- add_includedirs("include/lib/imgui_docking")
+    -- add_includedirs("include/lib/tiny_obj_loader")
+    set_targetdir("bin/")
     -- Library
     set_kind("static")
     add_files("src/**.cpp")
@@ -73,22 +74,39 @@ target("kazan")
 
 -- Target Demo using Kazan Lib
 target("demo")
-    -- Compiler Options
+    -- Common Compiler Options
     set_languages("cxx20") -- -std=c++20
     set_warnings("allextra", "error") -- -Wall -Wextra -Wfatal-errors
     set_optimize("fastest") -- -O3
-    set_targetdir("bin/")
     -- FIXME: Not working
     add_cxxflags("-Wshadow", "-Wfatal-errors", "-Wpedantic")
-    add_includedirs("include") -- Only kazan.hpp is allowed to be included
+    -- Compiler Options
+    add_options("kb22")
+    add_includedirs("include")
     -- add_includedirs("include/gui")
-    -- add_includedirs("include/lib/stb")
-    -- add_includedirs("include/lib/imgui")
-    -- add_includedirs("include/lib/tiny_obj_loader")
     -- Dependencies
     add_deps("kazan")
-    -- add_packages("glm")
     add_packages("fmt")
-    -- Library
+    set_targetdir("bin/")
+    -- Binary
     set_kind("binary")
     add_files("src/gui/*.cpp")
+
+------------------ Kazan Examples ----------------
+
+target("example1")
+    -- Common Compiler Options
+    set_languages("cxx20") -- -std=c++20
+    set_warnings("allextra", "error") -- -Wall -Wextra -Wfatal-errors
+    set_optimize("fastest") -- -O3
+    -- FIXME: Not working
+    add_cxxflags("-Wshadow", "-Wfatal-errors", "-Wpedantic")
+    -- Compiler Options
+    add_options("kb22")
+    add_includedirs("include")
+    add_deps("kazan")
+    add_packages("fmt")
+    set_targetdir("bin/")
+    -- Binary
+    set_kind("binary")
+    add_files("examples/triangle/main.cpp")
