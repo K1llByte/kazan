@@ -7,13 +7,14 @@ USE const
 kazan.hpp include with all public API includes
 
 ## In Progress
-- Move `include/lib/:dep:` and `src/lib/:dep:` to `lib/:dep:/include` and `lib/:dep:/src`
-- Work on FIXME's and TODO's
+- Work on FIXME's and TODO's:
+    - 
 ## Todo
-- Descriptor Sets and pools
 - Vertex Buffers
+- Descriptor Sets and pools
 - ImGUI Docking test (with example)
 ## Done
+- Move `include/lib/:dep:` and `src/lib/:dep:` to `lib/:dep:/include` and `lib/:dep:/src`
 
 <!--
 ## In Progress

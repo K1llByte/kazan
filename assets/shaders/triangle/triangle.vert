@@ -10,11 +10,19 @@ const vec2 position[3] = vec2[] (
 );
 
 // Triangle colors
+// RGB
+// const vec3 colors[3] = vec3[](
+//     vec3(1.0, 0.0, 0.0),
+//     vec3(0.0, 1.0, 0.0),
+//     vec3(0.0, 0.0, 1.0)
+// );
+// Gruvbox RGB
 const vec3 colors[3] = vec3[](
-    vec3(1.0, 0.0, 0.0),
-    vec3(0.0, 1.0, 0.0),
-    vec3(0.0, 0.0, 1.0)
+    vec3(0.984, 0.286, 0.203),
+    vec3(0.556, 0.752, 0.486),
+    vec3(0.513, 0.647, 0.596)
 );
+
 
 void main()
 {

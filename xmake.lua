@@ -40,14 +40,19 @@ target("shaders")
 
 -------------------- Kazan Lib -------------------
 
+-- target("foo")
+--     set_kind("headeronly")
+--     add_headerfiles("src/foo.h")
+
 -- Target Kazan Static Library
 target("kazan")
     -- Common Compiler Options
     set_languages("cxx20") -- -std=c++20
-    set_warnings("allextra") -- -Wall -Wextra -Wfatal-errors
+    set_warnings("allextra") -- -Wall -Wextra -Wfatal-errors (if error enabled)
     set_optimize("fastest") -- -O3
     -- FIXME: Not working
-    add_cxxflags("-Wshadow", "-Wfatal-errors", "-Wpedantic")
+    add_cxxflags("-Wshadow", "-Wpedantic")
+    set_targetdir("bin/")
     -- Compiler Options
     add_options("kb22")
     if is_plat("linux", "macosx") then
@@ -55,10 +60,9 @@ target("kazan")
     end
     add_includedirs("include")
     -- add_includedirs("include/lib/stb")
-    add_includedirs("include/lib/imgui")
+    -- add_includedirs("lib/include/imgui")
     -- add_includedirs("include/lib/imgui_docking")
     -- add_includedirs("include/lib/tiny_obj_loader")
-    set_targetdir("bin/")
     -- Library
     set_kind("static")
     add_files("src/**.cpp")
@@ -72,22 +76,29 @@ target("kazan")
 
 -------------------- Kazan GUI -------------------
 
+target("imgui")
+    set_kind("object")
+    add_includedirs("lib/imgui/include")
+    -- add_headerfiles("lib/imgui/include/*.h")
+    add_files("lib/imgui/src/**.cpp")
+
 -- Target Demo using Kazan Lib
 target("kazui")
     -- Common Compiler Options
     set_languages("cxx20") -- -std=c++20
     set_warnings("allextra", "error") -- -Wall -Wextra -Wfatal-errors
     set_optimize("fastest") -- -O3
+    set_targetdir("bin/")
     -- FIXME: Not working
-    add_cxxflags("-Wshadow", "-Wfatal-errors", "-Wpedantic")
+    add_cxxflags("-Wshadow", "-Wpedantic")
     -- Compiler Options
     add_options("kb22")
     add_includedirs("include")
-    -- add_includedirs("include/gui")
+    add_includedirs("lib/imgui/include")
     -- Dependencies
+    add_deps("imgui")
     add_deps("kazan")
     add_packages("fmt")
-    set_targetdir("bin/")
     -- Binary
     set_kind("binary")
     add_files("src/gui/*.cpp")
@@ -100,9 +111,8 @@ target("example1")
     set_warnings("allextra", "error") -- -Wall -Wextra -Wfatal-errors
     set_optimize("fastest") -- -O3
     -- FIXME: Not working
-    add_cxxflags("-Wshadow", "-Wfatal-errors", "-Wpedantic")
+    add_cxxflags("-Wshadow", "-Wpedantic")
     -- Compiler Options
-    add_options("kb22")
     add_includedirs("include")
     add_deps("kazan")
     add_packages("fmt")

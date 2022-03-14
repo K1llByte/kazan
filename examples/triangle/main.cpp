@@ -74,9 +74,6 @@ int main() try
     auto pipeline_layout = vk::PipelineLayoutBuilder(&device)
                                .build();
     auto pipeline_config = vk::PipelineConfigBuilder(pipeline_layout, render_pass, swapchain.get_extent())
-                               .set_topology(VK_PRIMITIVE_TOPOLOGY_LINE_LIST) // Optional
-                               .set_polygon_mode(VK_POLYGON_MODE_FILL)            // Optional
-                               .set_line_width(1.f)
                                .build();
     auto pipeline = vk::Pipeline(
         &device,
