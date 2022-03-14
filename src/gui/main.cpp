@@ -100,7 +100,7 @@ int main() try
         per_frame_data.emplace_back(&device, cmd_pool);
     }
 
-    auto window_extent = window.extent();
+    const auto window_extent = window.extent();
     auto viewport = vk::create_viewport(window_extent);
     auto scissor = vk::create_scissor(window_extent);
     while (!window.should_close())
