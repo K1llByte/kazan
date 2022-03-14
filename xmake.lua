@@ -73,7 +73,7 @@ target("kazan")
 -------------------- Kazan GUI -------------------
 
 -- Target Demo using Kazan Lib
-target("demo")
+target("kazui")
     -- Common Compiler Options
     set_languages("cxx20") -- -std=c++20
     set_warnings("allextra", "error") -- -Wall -Wextra -Wfatal-errors
