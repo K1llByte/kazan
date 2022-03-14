@@ -13,7 +13,7 @@
 
 namespace kzn::vk
 {
-    QueueFamilyIndices get_queue_families(VkPhysicalDevice physical_device, VkSurfaceKHR surface)
+    QueueFamilies get_queue_families(VkPhysicalDevice physical_device, VkSurfaceKHR surface)
     {
 
         // Logic to find queue family indices to populate struct with
@@ -22,7 +22,7 @@ namespace kzn::vk
         std::vector<VkQueueFamilyProperties> queue_families(queue_family_count);
         vkGetPhysicalDeviceQueueFamilyProperties(physical_device, &queue_family_count, queue_families.data());
 
-        QueueFamilyIndices indices;
+        QueueFamilies indices;
         for(size_t i = 0 ; i < queue_families.size() ; ++i)
         {
             if(queue_families[i].queueFlags & VK_QUEUE_GRAPHICS_BIT)
@@ -227,7 +227,7 @@ namespace kzn::vk
         validation_layers = instance.get_validation_layers();
     }
 
-    DeviceBuilder& DeviceBuilder::set_surface(VkSurfaceKHR surface)
+    DeviceBuilder& DeviceBuilder::set_surface(VkSurfaceKHR surface) noexcept
     {
         // NOTE: Device creation with Present Queue requires
         // surface handle before creation
@@ -245,6 +245,12 @@ namespace kzn::vk
         return *this;
     }
 
+    DeviceBuilder& DeviceBuilder::set_features(const VkPhysicalDeviceFeatures& features) noexcept
+    {
+        device_features = features;
+        return *this;
+    }
+
     Device DeviceBuilder::build()
     {
         // 1. Select physical device.
@@ -255,7 +261,7 @@ namespace kzn::vk
         // 1. Select physical device //
         // For each available device check if is suitable.
         VkPhysicalDevice vkphysical_device = VK_NULL_HANDLE;
-        QueueFamilyIndices indices;
+        QueueFamilies indices;
         SwapChainSupport swapchain_support;
         for(const auto& iter_device : available_devices)
         {
@@ -307,7 +313,7 @@ namespace kzn::vk
         // 2. Create device //
         // TODO: Refactor this, there's no need to create
         // an auxiliar structure, elaborate the
-        // QueueFamilyIndices class to provide an iterator 
+        // QueueFamilies class to provide an iterator 
         std::unordered_set<uint32_t> unique_queue_families{
             indices.graphics_family.value(),
             indices.present_family.value()
@@ -327,9 +333,6 @@ namespace kzn::vk
             ++i;
         }
 
-        // TODO: Setter for all device features
-        // one setter to rule them all
-        VkPhysicalDeviceFeatures device_features{};
         device_features.samplerAnisotropy = VK_TRUE;
 
         // TODO: Fetch this from Instance instead of hardcoded 

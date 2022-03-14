@@ -2,7 +2,6 @@
 #define KZN_VK_DEVICE_HPP
 
 #include "vk/instance.hpp"
-#include "core/log.hpp" // TODO: Delete after debug
 
 #include <optional>
 #include <exception>
@@ -14,8 +13,7 @@ namespace kzn::vk
     class Swapchain;
     
     // TODO: Make this struct private within Device
-    // Rename QueueFamilies
-    struct QueueFamilyIndices
+    struct QueueFamilies
     {
         std::optional<uint32_t> graphics_family;
         std::optional<uint32_t> present_family;
@@ -46,8 +44,9 @@ namespace kzn::vk
         ~Device();
 
         VkDevice vk_device() noexcept { return vkdevice; }
+        // Get cached SwapChainSupport
         const SwapChainSupport& swapchain_support() const noexcept { return swapchain_support_details; }
-        const QueueFamilyIndices& queue_families() const noexcept { return queue_family_indices; }
+        const QueueFamilies& queue_families() const noexcept { return queue_family_indices; }
 
         const SwapChainSupport& query_swapchain_support(VkSurfaceKHR surface) noexcept;
         // TODO: Consider making individual queue handles
@@ -66,10 +65,7 @@ namespace kzn::vk
         VkPhysicalDevice   physical_device;
         VkDevice           vkdevice;
         SwapChainSupport   swapchain_support_details;
-        QueueFamilyIndices queue_family_indices;
-        // FIXME: If there's support for multiple cmd pools then the 
-        // create_command_pool method returns VkCommandPool and theres no
-        // member with the cmd pool variable (must be given on cmd buffer creation)
+        QueueFamilies      queue_family_indices;
         VkQueue            graphics_queue = VK_NULL_HANDLE;
         VkQueue            present_queue = VK_NULL_HANDLE;
     };
@@ -80,8 +76,9 @@ namespace kzn::vk
         DeviceBuilder(Instance& instance);
         ~DeviceBuilder() = default;
 
-        DeviceBuilder& set_surface(VkSurfaceKHR);
+        DeviceBuilder& set_surface(VkSurfaceKHR) noexcept;
         DeviceBuilder& set_extensions(const std::vector<const char*>& extensions);
+        DeviceBuilder& set_features(const VkPhysicalDeviceFeatures& features) noexcept;
 
         Device build();
 
@@ -89,6 +86,7 @@ namespace kzn::vk
         std::vector<VkPhysicalDevice> available_devices;
         std::vector<const char*>      validation_layers;
         std::vector<const char*>      device_extensions;
+        VkPhysicalDeviceFeatures      device_features;
         VkPhysicalDevice              vkphysical_device = VK_NULL_HANDLE;
         VkSurfaceKHR                  surface = VK_NULL_HANDLE;
     };

@@ -7,8 +7,12 @@ USE const
 kazan.hpp include with all public API includes
 
 ## In Progress
+- Arquive device_features.hpp
 - Work on FIXME's and TODO's:
     - 
+    - Enhace QueueFamilyIndices struct
+        - [x] Rename to QueueFamilies
+    - Enable device features
 ## Todo
 - Vertex Buffers
 - Descriptor Sets and pools

@@ -8,8 +8,6 @@
 
 using namespace kzn;
 
-// TODO: New todo list and priority rearrangement
-
 class PerFrameData
 {
 public:

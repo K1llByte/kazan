@@ -61,6 +61,7 @@ int main() try
                       // NOTE: IF THIS EXTENSION ISN'T LOADED THEN THE SwapchainBuilder
                       // will give a seg fault
                       .set_extensions({VK_KHR_SWAPCHAIN_EXTENSION_NAME})
+                      .set_features(vk::as_vk_device_features({vk::DeviceFeature::SamplerAnisotropy}))
                       .build();
 
     auto swapchain = vk::SwapchainBuilder(&device, surface, window.extent())
@@ -121,7 +122,6 @@ int main() try
 
         
 
-        // Log::warning("Begin try");
         vkWaitForFences(device.vk_device(), 1, &in_flight_fence, VK_TRUE, UINT64_MAX);
         uint32_t image_idx;
         try {

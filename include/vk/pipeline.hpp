@@ -5,6 +5,8 @@
 #include "vk/render_pass.hpp"
 #include "vk/cmd_buffers.hpp"
 
+#include <string_view>
+
 namespace kzn::vk
 {
     struct PipelineConfig
