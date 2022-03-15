@@ -7,12 +7,12 @@ USE const
 kazan.hpp include with all public API includes
 
 ## In Progress
-- Enhace QueueFamilyIndices struct
-    - Allow to create queues selectively
 ## Todo
 - Vertex Buffers
-- Descriptor Sets and pools
+- Descriptor Pools
 - ImGUI Docking test (with example)
+- Descriptor Sets 
+- Allow QueueFamilyIndices to create queues selectively
 ## Done
 - Work on FIXME's and TODO's:
 - Move `include/lib/:dep:` and `src/lib/:dep:` to `lib/:dep:/include` and `lib/:dep:/src`
