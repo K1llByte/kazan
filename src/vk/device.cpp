@@ -333,17 +333,11 @@ namespace kzn::vk
             ++i;
         }
 
-        device_features.samplerAnisotropy = VK_TRUE;
-
-        // TODO: Fetch this from Instance instead of hardcoded 
-        // std::vector<const char*> validation_layers{"VK_LAYER_KHRONOS_validation"};
         Log::debug("Device Validation Layers:");
         for(const auto& vl : validation_layers)
         {
             Log::debug("- {}", vl);
         }
-        // TODO: Setters for device extensions
-        // std::vector<const char*> device_extensions{}; // {VK_KHR_SWAPCHAIN_EXTENSION_NAME};
         VkDeviceCreateInfo create_info{};
         create_info.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
         create_info.pQueueCreateInfos = queue_create_infos.data();

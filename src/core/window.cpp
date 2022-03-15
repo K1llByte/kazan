@@ -81,11 +81,11 @@ namespace kzn
     {
         // glfwGetFramebufferSize(glfw_window, &width, &height);
         // // Special case for minimized window
-        // while (width == 0 || height == 0)
-        // {
-        //     glfwGetFramebufferSize(glfw_window, &width, &height);
-        //     glfwWaitEvents();
-        // }
+        while (width == 0 || height == 0)
+        {
+            glfwGetFramebufferSize(glfw_window, &width, &height);
+            glfwWaitEvents();
+        }
         return VkExtent2D {
             static_cast<uint32_t>(width),
             static_cast<uint32_t>(height)

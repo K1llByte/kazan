@@ -8,8 +8,6 @@
 
 using namespace kzn;
 
-// TODO: New todo list and priority rearrangement
-
 class PerFrameData
 {
 public:
@@ -65,7 +63,7 @@ int main() try
                       .build();
 
     auto swapchain = vk::SwapchainBuilder(&device, surface, window.extent())
-                         .set_present_mode(VK_PRESENT_MODE_FIFO_KHR)
+                        //  .set_present_mode(VK_PRESENT_MODE_FIFO_KHR)
                          .build();
 
     auto render_pass = vk::RenderPassBuilder(&device)
@@ -75,6 +73,7 @@ int main() try
     auto pipeline_layout = vk::PipelineLayoutBuilder(&device)
                                .build();
     auto pipeline_config = vk::PipelineConfigBuilder(pipeline_layout, render_pass, swapchain.get_extent())
+                               .set_dynamic_states({VK_DYNAMIC_STATE_VIEWPORT}) // Optional
                                .build();
     auto pipeline = vk::Pipeline(
         &device,

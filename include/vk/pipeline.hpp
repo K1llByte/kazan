@@ -43,6 +43,9 @@ namespace kzn::vk
         PipelineConfigBuilder& set_polygon_mode(VkPolygonMode polygon_mode);
         PipelineConfigBuilder& set_line_width(float line_width);
 
+        // Dynamic State Enables
+        PipelineConfigBuilder& set_dynamic_states(const std::vector<VkDynamicState>& enables);
+
         PipelineConfig build();
 
     private:
@@ -69,7 +72,8 @@ namespace kzn::vk
     class Pipeline
     {
     public:
-        // TODO: Make a Builder for Pipeline too
+        // TODO: Make a Builder for Pipeline too when
+        // more shaders are used
         Pipeline(
             Device* device,
             const std::string_view& vert_shader_path,

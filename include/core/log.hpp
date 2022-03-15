@@ -66,8 +66,6 @@ namespace kzn
         static Log instance;
     };
 
-    // Implementation // TODO: Get some way to format format_string
-    // otherwise there will be too many print calls
     template<typename... Args>
     void Log::info(fmt::format_string<Args...> in, Args&& ...args)
     {
@@ -102,8 +100,6 @@ namespace kzn
         fmt::print("\n");
     }
 
-    // Implementation // TODO: Get some way to format format_string
-    // otherwise there will be too many print calls
     template<kzn::StringLiteral Str, typename... Args>
     void Log::info(fmt::format_string<Args...> in, Args&& ...args)
     {

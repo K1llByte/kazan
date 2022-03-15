@@ -12,7 +12,6 @@ namespace kzn::vk
     class CommandBuffer;
     class Swapchain;
     
-    // TODO: Make this struct private within Device
     struct QueueFamilies
     {
         std::optional<uint32_t> graphics_family;
@@ -25,7 +24,6 @@ namespace kzn::vk
         }
     };
 
-    // TODO: Move this to swapchain file
     struct SwapChainSupport
     {
         VkSurfaceCapabilitiesKHR        capabilities;
@@ -48,6 +46,7 @@ namespace kzn::vk
         const SwapChainSupport& swapchain_support() const noexcept { return swapchain_support_details; }
         const QueueFamilies& queue_families() const noexcept { return queue_family_indices; }
 
+        // Fetch SwapChainSupport for specific surface (updates cached one)
         const SwapChainSupport& query_swapchain_support(VkSurfaceKHR surface) noexcept;
         // TODO: Consider making individual queue handles
         void graphics_queue_submit(

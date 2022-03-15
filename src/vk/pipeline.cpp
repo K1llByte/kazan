@@ -117,9 +117,9 @@ namespace kzn::vk
         config.depth_stencil_info.front = {};  // Optional
         config.depth_stencil_info.back = {};   // Optional
 
-        // config.dynamic_state_enables = { VK_DYNAMIC_STATE_VIEWPORT, VK_DYNAMIC_STATE_SCISSOR };
-        // TODO: Setters to configure dynamic states
+        // By default VK_DYNAMIC_STATE_VIEWPORT is enabled
         config.dynamic_state_enables = { VK_DYNAMIC_STATE_VIEWPORT };
+        // config.dynamic_state_enables = { VK_DYNAMIC_STATE_VIEWPORT, VK_DYNAMIC_STATE_SCISSOR };
         config.dynamic_state_info.sType = VK_STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO;
         config.dynamic_state_info.pDynamicStates = config.dynamic_state_enables.data();
         config.dynamic_state_info.dynamicStateCount =
@@ -139,6 +139,15 @@ namespace kzn::vk
     PipelineConfigBuilder& PipelineConfigBuilder::set_line_width(float line_width)
     {
         config.rasterization_info.lineWidth = line_width;
+        return *this;
+    }
+
+    PipelineConfigBuilder& PipelineConfigBuilder::set_dynamic_states(const std::vector<VkDynamicState>& enables)
+    {
+        config.dynamic_state_enables = enables;
+        config.dynamic_state_info.pDynamicStates = enables.data();
+        config.dynamic_state_info.dynamicStateCount = 
+            static_cast<uint32_t>(config.dynamic_state_enables.size());
         return *this;
     }
 
@@ -190,16 +199,6 @@ namespace kzn::vk
         const PipelineConfig& config)
         : device{device}
     {
-        // if(config.pipeline_layout == VK_NULL_HANDLE)
-        // {
-        //     throw std::runtime_error("Cannot create graphics pipeline: no 'pipeline_layout' provided in PipelineConfig");
-        // }
-
-        // if(config.render_pass == VK_NULL_HANDLE)
-        // {
-        //     throw std::runtime_error("Cannot create graphics pipeline: no 'render_pass' provided in PipelineConfig");
-        // }
-
         vert_shader_module = create_shader_module(*device, vert_shader_path);
         frag_shader_module = create_shader_module(*device, frag_shader_path);
         pipeline_layout = config.pipeline_layout;

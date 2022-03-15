@@ -8,8 +8,6 @@
 
 namespace kzn::vk
 {
-    // TODO: InstanceError, an exception for errors from
-    // the instance or instance creations
     class Instance
     {
         friend class InstanceBuilder;

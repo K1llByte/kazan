@@ -7,18 +7,17 @@ USE const
 kazan.hpp include with all public API includes
 
 ## In Progress
-- Arquive device_features.hpp
-- Work on FIXME's and TODO's:
-    - 
-    - Enhace QueueFamilyIndices struct
-        - [x] Rename to QueueFamilies
-    - Enable device features
+- Enhace QueueFamilyIndices struct
+    - Allow to create queues selectively
 ## Todo
 - Vertex Buffers
 - Descriptor Sets and pools
 - ImGUI Docking test (with example)
 ## Done
+- Work on FIXME's and TODO's:
 - Move `include/lib/:dep:` and `src/lib/:dep:` to `lib/:dep:/include` and `lib/:dep:/src`
+- Rename to QueueFamilies
+- Enable device features
 
 <!--
 ## In Progress

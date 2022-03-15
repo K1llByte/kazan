@@ -26,7 +26,6 @@ namespace kzn
         GLFWwindow* ptr() noexcept { return glfw_window; }
 
         std::vector<const char*> required_extensions();
-        // TODO: make const
         VkExtent2D extent() noexcept;
         
     public:
@@ -38,8 +37,6 @@ namespace kzn
 
         VkSurfaceKHR surface = VK_NULL_HANDLE;
     };
-
-    void framebuffer_resized(GLFWwindow* window, int width, int height);
 }
 
 #endif // KZN_WINDOW_HPP

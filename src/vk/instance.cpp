@@ -22,7 +22,6 @@ VkResult CreateDebugUtilsMessengerEXT(
     const VkAllocationCallbacks* p_allocator,
     VkDebugUtilsMessengerEXT* p_debug_messenger)
 {
-    // TODO: Change to static_cast
     auto func = reinterpret_cast<PFN_vkCreateDebugUtilsMessengerEXT>(
         vkGetInstanceProcAddr(instance, "vkCreateDebugUtilsMessengerEXT")
     );
@@ -111,7 +110,6 @@ namespace kzn::vk
         {
             uint32_t layer_count;
             vkEnumerateInstanceLayerProperties(&layer_count, nullptr);
-            // TODO: Change std::vector to custom vector without used variable
             std::vector<VkLayerProperties> available_layers(layer_count);
             vkEnumerateInstanceLayerProperties(&layer_count, available_layers.data());
 
@@ -152,8 +150,6 @@ namespace kzn::vk
         // 2. Enable extensions //
         uint32_t extension_count = 0;
         vkEnumerateInstanceExtensionProperties(nullptr, &extension_count, nullptr);
-        // TODO: Change std::vector to custom vector without used variable
-        // (ocupies less space)
         std::vector<VkExtensionProperties> available_extensions(extension_count);
         vkEnumerateInstanceExtensionProperties(nullptr, &extension_count, available_extensions.data());
 
