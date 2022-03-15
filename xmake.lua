@@ -99,6 +99,7 @@ target("kazui")
     add_deps("imgui")
     add_deps("kazan")
     add_packages("fmt")
+    add_packages("glm")
     -- Binary
     set_kind("binary")
     add_files("src/gui/*.cpp")

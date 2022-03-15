@@ -1,6 +1,7 @@
 #include "vk/render_pass.hpp"
 
 #include "vk/utils.hpp"
+#include "core/log.hpp"
 
 
 void destroy_framebuffers(kzn::vk::Device* device, const std::vector<VkFramebuffer>& framebuffers)
@@ -77,7 +78,7 @@ namespace kzn::vk
         render_pass.vkrender_pass = vkrender_pass;
         return render_pass;
     }
-    
+
     RenderPass::~RenderPass()
     {
         // Destroy Framebuffers
@@ -123,6 +124,7 @@ namespace kzn::vk
         // Create new VkFramebuffers
         auto& image_views = swapchain.image_views();
         auto extent = swapchain.get_extent();
+        Log::warning("recreate_framebuffers: {} {}", extent.width, extent.height);
         for(std::size_t i = 0; i < num_images; ++i)
         {
             auto attachments = std::array{
@@ -151,7 +153,10 @@ namespace kzn::vk
         begin_info.renderPass = vkrender_pass;
         begin_info.framebuffer = framebuffers[swapchain.current_index()];
         begin_info.renderArea.offset = {0, 0};
-        begin_info.renderArea.extent = swapchain.get_extent();
+        auto ext = swapchain.get_extent();
+        Log::warning("RenderPass::begin: {} {}", ext.width, ext.height);
+
+        begin_info.renderArea.extent = ext;
 
         // VkClearValue clear_color = {{{0.008f, 0.008f, 0.008f, 1.0f}}};
         // VkClearValue clear_color = {{{0.0f, 0.0f, 0.0f, 0.0f}}};

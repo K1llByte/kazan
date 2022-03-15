@@ -63,7 +63,7 @@ int main() try
                       .build();
 
     auto swapchain = vk::SwapchainBuilder(&device, surface, window.extent())
-                        //  .set_present_mode(VK_PRESENT_MODE_FIFO_KHR)
+                         .set_present_mode(VK_PRESENT_MODE_FIFO_KHR)
                          .build();
 
     auto render_pass = vk::RenderPassBuilder(&device)
@@ -108,6 +108,7 @@ int main() try
         window.poll_events();
 
         ////////// Draw Section //////////
+        Log::info("Begin Draw");
         // Frame time begin //
         auto begin = std::chrono::high_resolution_clock::now();
         //////////////////////
@@ -127,6 +128,7 @@ int main() try
             image_idx = swapchain.acquire_next(img_available);
         }
         catch(const vk::SwapchainResized&) {
+            // Swapchain recreation
             auto win_extent = window.extent();
             swapchain.recreate(win_extent);
             viewport = vk::create_viewport(win_extent);
@@ -166,6 +168,7 @@ int main() try
         }
         if(window.was_resized())
         {
+            // Swapchain recreation
             auto win_extent = window.extent();
             swapchain.recreate(win_extent);
             viewport = vk::create_viewport(win_extent);
@@ -173,7 +176,10 @@ int main() try
             render_pass.recreate_framebuffers(swapchain);
             // image_fences.resize(swapchain.num_images(), VK_NULL_HANDLE);
         }
+        Log::warning("viewport: {} {}", viewport.width, viewport.height);
+        Log::warning("scissor: {} {}", scissor.extent.width, scissor.extent.height);
 
+        Log::info("End Draw");
         // Frame time end //
         auto end = std::chrono::high_resolution_clock::now();
         auto seconds = duration_cast<std::chrono::duration<double>>(end - begin).count();

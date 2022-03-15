@@ -80,7 +80,7 @@ namespace kzn
     VkExtent2D Window::extent() noexcept
     {
         // glfwGetFramebufferSize(glfw_window, &width, &height);
-        // // Special case for minimized window
+        // Special case for minimized window
         while (width == 0 || height == 0)
         {
             glfwGetFramebufferSize(glfw_window, &width, &height);
