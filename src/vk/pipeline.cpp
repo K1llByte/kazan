@@ -145,7 +145,7 @@ namespace kzn::vk
     PipelineConfigBuilder& PipelineConfigBuilder::set_dynamic_states(const std::vector<VkDynamicState>& enables)
     {
         config.dynamic_state_enables = enables;
-        config.dynamic_state_info.pDynamicStates = enables.data();
+        config.dynamic_state_info.pDynamicStates = config.dynamic_state_enables.data();
         config.dynamic_state_info.dynamicStateCount = 
             static_cast<uint32_t>(config.dynamic_state_enables.size());
         return *this;

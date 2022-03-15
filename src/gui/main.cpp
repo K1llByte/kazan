@@ -47,7 +47,7 @@ private:
 
 int main() try
 {
-    auto window = Window("Hello World!", 800, 600);
+    auto window = Window("Kazan", 800, 600);
     auto instance = vk::InstanceBuilder()
                         .enable_validation_layers()
                         .set_extensions(window.required_extensions())
@@ -77,8 +77,8 @@ int main() try
                                .build();
     auto pipeline = vk::Pipeline(
         &device,
-        "assets/shaders/triangle/triangle.vert.spv",
-        "assets/shaders/triangle/triangle.frag.spv",
+        "assets/shaders/quad/quad.vert.spv",
+        "assets/shaders/quad/quad.frag.spv",
         pipeline_config);
 
     render_pass.create_framebuffers(swapchain);
@@ -147,7 +147,7 @@ int main() try
         pipeline.set_scissor(cmd_buffer, scissor);
         pipeline.bind(cmd_buffer);
         // Log::info("Drawed");
-        vkCmdDraw(cmd_buffer.vk_command_buffer(), 3, 1, 0, 0);
+        vkCmdDraw(cmd_buffer.vk_command_buffer(), 6, 1, 0, 0);
         render_pass.end(cmd_buffer);
         cmd_buffer.end(); // throws ResultError if it fails to record command buffer
 

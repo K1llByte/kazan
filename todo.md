@@ -7,6 +7,7 @@ USE const
 kazan.hpp include with all public API includes
 
 ## In Progress
+- Fix resize width cap 
 ## Todo
 - Vertex Buffers
 - Descriptor Pools

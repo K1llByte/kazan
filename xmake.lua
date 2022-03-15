@@ -119,4 +119,4 @@ target("example1")
     set_targetdir("bin/")
     -- Binary
     set_kind("binary")
-    add_files("examples/triangle/main.cpp")
+    add_files("examples/triangle/triangle.cpp")
