@@ -7,7 +7,7 @@ USE const
 kazan.hpp include with all public API includes
 
 ## In Progress
-- Fix resize width cap 
+- Remove `VkExtent2D viewport_extent` arg from pipeline.cpp
 ## Todo
 - Vertex Buffers
 - Descriptor Pools
@@ -15,6 +15,7 @@ kazan.hpp include with all public API includes
 - Descriptor Sets 
 - Allow QueueFamilyIndices to create queues selectively
 ## Done
+- Fix resize width cap 
 - Work on FIXME's and TODO's:
 - Move `include/lib/:dep:` and `src/lib/:dep:` to `lib/:dep:/include` and `lib/:dep:/src`
 - Rename to QueueFamilies

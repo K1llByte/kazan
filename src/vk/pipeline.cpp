@@ -45,24 +45,29 @@ namespace kzn::vk
         config.input_assembly_info.topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;
         config.input_assembly_info.primitiveRestartEnable = VK_FALSE;
 
-        VkViewport viewport{};
-        viewport.x = 0.0f;
-        viewport.y = 0.0f;
-        viewport.width = (float) viewport_extent.width;
-        viewport.height = (float) viewport_extent.height;
-        viewport.minDepth = 0.0f;
-        viewport.maxDepth = 1.0f;
-        config.viewports.push_back(viewport);        
-        VkRect2D scissor{};
-        scissor.offset = {0, 0};
-        scissor.extent = viewport_extent;
-        config.scissors.push_back(scissor);
+        // VkViewport viewport{};
+        // viewport.x = 0.0f;
+        // viewport.y = 0.0f;
+        // viewport.width = (float) viewport_extent.width;
+        // viewport.height = (float) viewport_extent.height;
+        // viewport.minDepth = 0.0f;
+        // viewport.maxDepth = 1.0f;
+        // config.viewports.push_back(viewport);        
+        // VkRect2D scissor{};
+        // scissor.offset = {0, 0};
+        // scissor.extent = viewport_extent;
+        // config.scissors.push_back(scissor);
         
+        // 
         config.viewport_info.sType = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO;
-        config.viewport_info.viewportCount = config.viewports.size();
-        config.viewport_info.pViewports = config.viewports.data();
-        config.viewport_info.scissorCount = config.scissors.size();
-        config.viewport_info.pScissors = config.scissors.data();
+        // config.viewport_info.viewportCount = config.viewports.size();
+        // config.viewport_info.pViewports = config.viewports.data();
+        config.viewport_info.viewportCount = 0;
+        config.viewport_info.pViewports = nullptr;
+        // config.viewport_info.scissorCount = config.scissors.size();
+        // config.viewport_info.pScissors = config.scissors.data();
+        config.viewport_info.scissorCount = 0;
+        config.viewport_info.pScissors = nullptr;
 
         config.rasterization_info.sType = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO;
         config.rasterization_info.depthClampEnable = VK_FALSE;
