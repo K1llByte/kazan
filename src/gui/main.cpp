@@ -55,14 +55,6 @@ struct Vertex
 
 int main() try
 {
-
-    // auto input_desc = vk::VertexInputDescription {
-    //     .bindings = { vtx_binding<Vertex>(0) },
-    //     attributes = {
-    //         vtx_atribute(0, 0, AttributeFormat::Vec2, offsetof(Vertex, position)),
-    //         vtx_atribute(0, 2, AttributeFormat::Vec3, offsetof(Vertex, color)),
-    //     }
-    // }
     auto window = Window("Kazan", 800, 600);
     auto instance = vk::InstanceBuilder()
                         .enable_validation_layers()
@@ -123,8 +115,11 @@ int main() try
         { glm::vec2{ 0.5,  0.5}, glm::vec3{0.556, 0.752, 0.486} },
         { glm::vec2{-0.5,  0.5}, glm::vec3{0.513, 0.647, 0.596} }
     };
+    std::vector<uint32_t> indices{0, 1, 2};
     auto vbo = vk::VertexBuffer(&device, vertices.size() * sizeof(Vertex));
     vbo.upload(reinterpret_cast<float*>(vertices.data()));
+    auto ibo = vk::IndexBuffer(&device, vertices.size() * sizeof(uint32_t));
+    ibo.upload(indices.data());
 
     const auto window_extent = window.extent();
     auto viewport = vk::create_viewport(window_extent);
@@ -172,9 +167,12 @@ int main() try
         pipeline.set_scissor(cmd_buffer, scissor);
         pipeline.bind(cmd_buffer);
         // Log::info("Drawed");
+        static float inc = 0.001;
+        vertices[0].position.y += inc;
+        vbo.upload(reinterpret_cast<float*>(vertices.data()));
         vbo.bind(cmd_buffer);
-        vkCmdDraw(cmd_buffer.vk_command_buffer(), vertices.size(), 1, 0, 0);
-        // vkCmdDraw(cmd_buffer.vk_command_buffer(), 6, 1, 0, 0);
+        ibo.bind(cmd_buffer);
+        vkCmdDrawIndexed(cmd_buffer.vk_command_buffer(), vertices.size(), 1, 0, 0, 0);
         render_pass.end(cmd_buffer);
         cmd_buffer.end(); // throws ResultError if it fails to record command buffer
 

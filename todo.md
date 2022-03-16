@@ -7,10 +7,9 @@ USE const
 kazan.hpp include with all public API includes
 
 ## In Progress
-- Vertex Input Description
 ## Todo
 - Vertex Buffers
-    - Index Buffer
+- Index Buffers
 - Loading models
 - Depth buffering
 - Uniform Buffers
@@ -350,5 +349,6 @@ catch(const SwapchainResized&) {
 ```c++
 auto vbo = vk::VertexBuffer(&device, buffer_size);
 vbo.upload(float*);
+vbo.bind(cmd_buffer);
 
 ```

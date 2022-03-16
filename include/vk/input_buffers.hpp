@@ -1,5 +1,5 @@
-#ifndef KZN_VK_VERTEX_BUFFER_HPP
-#define KZN_VK_VERTEX_BUFFER_HPP
+#ifndef KZN_VK_INPUT_BUFFER_HPP
+#define KZN_VK_INPUT_BUFFER_HPP
 
 #include "vk/device.hpp"
 #include "vk/cmd_buffers.hpp"
@@ -23,6 +23,22 @@ namespace kzn::vk
         std::size_t   buffer_size;
         VmaAllocation allocation;
     };
+
+    class IndexBuffer
+    {
+    public:
+        IndexBuffer(Device* device, VkDeviceSize buffer_size);
+        ~IndexBuffer();
+
+        void upload(const uint32_t* indices);
+        void bind(CommandBuffer& cmd_buffer);
+        
+    private:
+        Device*       device;
+        VkBuffer      buffer;
+        std::size_t   buffer_size;
+        VmaAllocation allocation;
+    };
 } // namespace kzn::vk
 
-#endif // KZN_VK_VERTEX_BUFFER_HPP
+#endif // KZN_VK_INPUT_BUFFER_HPP
