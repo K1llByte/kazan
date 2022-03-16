@@ -47,6 +47,14 @@ private:
 
 int main() try
 {
+    
+    // auto input_desc = vk::VertexInputDescription {
+    //     .bindings = { vtx_binding<Vertex>(0) },
+    //     attributes = {
+    //         vtx_atribute(0, 0, AttributeFormat::Vec2, offsetof(Vertex, position)),
+    //         vtx_atribute(0, 2, AttributeFormat::Vec3, offsetof(Vertex, color)),
+    //     }
+    // }
     auto window = Window("Kazan", 800, 600);
     auto instance = vk::InstanceBuilder()
                         .enable_validation_layers()
@@ -104,11 +112,9 @@ int main() try
     auto scissor = vk::create_scissor(window_extent);
     while (!window.should_close())
     {
-        // Log::info("New Loop");
         window.poll_events();
 
         ////////// Draw Section //////////
-        Log::info("Begin Draw");
         // Frame time begin //
         auto begin = std::chrono::high_resolution_clock::now();
         //////////////////////
@@ -176,10 +182,7 @@ int main() try
             render_pass.recreate_framebuffers(swapchain);
             // image_fences.resize(swapchain.num_images(), VK_NULL_HANDLE);
         }
-        Log::warning("viewport: {} {}", viewport.width, viewport.height);
-        Log::warning("scissor: {} {}", scissor.extent.width, scissor.extent.height);
 
-        Log::info("End Draw");
         // Frame time end //
         auto end = std::chrono::high_resolution_clock::now();
         auto seconds = duration_cast<std::chrono::duration<double>>(end - begin).count();

@@ -7,14 +7,32 @@ USE const
 kazan.hpp include with all public API includes
 
 ## In Progress
-- Remove `VkExtent2D viewport_extent` arg from pipeline.cpp
 ## Todo
 - Vertex Buffers
-- Descriptor Pools
+- Vertex Buffers
+    - Index Buffer
+- Loading models
+- Depth buffering
+- Uniform Buffers
+    - Descriptor Pools
+    - Descriptor Sets 
+- Texture mapping
+- Generating Mipmaps
 - ImGUI Docking test (with example)
-- Descriptor Sets 
+- Multisampling
 - Allow QueueFamilyIndices to create queues selectively
+
+<!-- Future -->
+- Push constants
+- Instanced rendering
+- Dynamic uniforms
+- Separate images and sampler descriptors
+- Pipeline cache
+- Multi-threaded command buffer generation
+- Multiple subpasses
+- Compute shaders
 ## Done
+- Remove `VkExtent2D viewport_extent` arg from pipeline.cpp
 - Fix resize width cap 
 - Work on FIXME's and TODO's:
 - Move `include/lib/:dep:` and `src/lib/:dep:` to `lib/:dep:/include` and `lib/:dep:/src`

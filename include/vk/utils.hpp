@@ -61,6 +61,39 @@ namespace kzn::vk
 
     VkViewport create_viewport(VkExtent2D extent);
     VkRect2D create_scissor(VkExtent2D extent);
+
+    // Vertex Input utilities
+    struct VertexInputDescription
+    {
+        std::vector<VkVertexInputBindingDescription>   bindings;
+        std::vector<VkVertexInputAttributeDescription> attributes;
+    };
+
+    template<typename T>
+    constexpr VkVertexInputBindingDescription vtx_binding(
+        uint32_t binding,
+        VkVertexInputRate rate = VK_VERTEX_INPUT_RATE_VERTEX) noexcept
+    {
+        return VkVertexInputBindingDescription{
+            .binding = binding,
+            .stride = sizeof(T),
+            .inputRate = rate,
+        };
+    }
+
+    constexpr VkVertexInputAttributeDescription vtx_attribute(
+        uint32_t binding,
+        uint32_t location,
+        VkFormat format,
+        uint32_t offset) noexcept
+    {
+        return VkVertexInputAttributeDescription{
+            .location = location,
+            .binding = binding,
+            .format = format,
+            .offset = offset,
+        };
+    }
 }
 
 #endif // KZN_VK_UTILS_HPP
