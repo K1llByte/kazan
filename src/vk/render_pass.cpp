@@ -124,7 +124,6 @@ namespace kzn::vk
         // Create new VkFramebuffers
         auto& image_views = swapchain.image_views();
         auto extent = swapchain.get_extent();
-        Log::warning("recreate_framebuffers: {} {}", extent.width, extent.height);
         for(std::size_t i = 0; i < num_images; ++i)
         {
             auto attachments = std::array{
@@ -154,7 +153,6 @@ namespace kzn::vk
         begin_info.framebuffer = framebuffers[swapchain.current_index()];
         begin_info.renderArea.offset = {0, 0};
         auto ext = swapchain.get_extent();
-        Log::warning("RenderPass::begin: {} {}", ext.width, ext.height);
 
         begin_info.renderArea.extent = ext;
 

@@ -85,7 +85,7 @@ namespace kzn::vk
         std::vector<VkPhysicalDevice> available_devices;
         std::vector<const char*>      validation_layers;
         std::vector<const char*>      device_extensions;
-        VkPhysicalDeviceFeatures      device_features;
+        VkPhysicalDeviceFeatures      device_features{};
         VkPhysicalDevice              vkphysical_device = VK_NULL_HANDLE;
         VkSurfaceKHR                  surface = VK_NULL_HANDLE;
     };

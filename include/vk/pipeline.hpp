@@ -32,8 +32,7 @@ namespace kzn::vk
     public:
         PipelineConfigBuilder(
             VkPipelineLayout layout,
-            RenderPass& render_pass,
-            VkExtent2D viewport_extent);
+            RenderPass& render_pass);
         ~PipelineConfigBuilder() = default;
 
         // Input Assemply

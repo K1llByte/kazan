@@ -37,8 +37,7 @@ namespace kzn::vk
 
     PipelineConfigBuilder::PipelineConfigBuilder(
         VkPipelineLayout layout,
-        RenderPass& render_pass,
-        VkExtent2D viewport_extent)
+        RenderPass& render_pass)
         : config{}
     {
         config.input_assembly_info.sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;

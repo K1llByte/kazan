@@ -72,7 +72,7 @@ int main() try
 
     auto pipeline_layout = vk::PipelineLayoutBuilder(&device)
                                .build();
-    auto pipeline_config = vk::PipelineConfigBuilder(pipeline_layout, render_pass, swapchain.get_extent())
+    auto pipeline_config = vk::PipelineConfigBuilder(pipeline_layout, render_pass)
                                .set_dynamic_states({VK_DYNAMIC_STATE_VIEWPORT}) // Optional
                                .build();
     auto pipeline = vk::Pipeline(
