@@ -3,6 +3,8 @@
 
 #include "vk/instance.hpp"
 
+#include "vk_mem_alloc.h"
+
 #include <optional>
 #include <exception>
 
@@ -42,6 +44,7 @@ namespace kzn::vk
         ~Device();
 
         VkDevice vk_device() noexcept { return vkdevice; }
+        VmaAllocator allocator() noexcept { return vma_allocator; }
         // Get cached SwapChainSupport
         const SwapChainSupport& swapchain_support() const noexcept { return swapchain_support_details; }
         const QueueFamilies& queue_families() const noexcept { return queue_family_indices; }
@@ -67,6 +70,7 @@ namespace kzn::vk
         QueueFamilies      queue_family_indices;
         VkQueue            graphics_queue = VK_NULL_HANDLE;
         VkQueue            present_queue = VK_NULL_HANDLE;
+        VmaAllocator       vma_allocator;
     };
 
     class DeviceBuilder
@@ -88,6 +92,8 @@ namespace kzn::vk
         VkPhysicalDeviceFeatures      device_features{};
         VkPhysicalDevice              vkphysical_device = VK_NULL_HANDLE;
         VkSurfaceKHR                  surface = VK_NULL_HANDLE;
+        // Only used for VmaAllocator creation
+        VkInstance                    vkinstance;
     };
 } // namespace kzn::vk
 

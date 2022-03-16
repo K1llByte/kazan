@@ -146,6 +146,8 @@ namespace kzn::vk
 
     Device::~Device()
     {
+        // Destroy Vma Allocator
+        vmaDestroyAllocator(vma_allocator);
         // Destroy logical device instance
         vkDestroyDevice(vkdevice, nullptr);
         Log::debug("Device destroyed");
@@ -213,7 +215,7 @@ namespace kzn::vk
 
     DeviceBuilder::DeviceBuilder(Instance& instance)
     {
-        auto vkinstance = instance.vk_instance();
+        vkinstance = instance.vk_instance();
         uint32_t device_count = 0;
         vkEnumeratePhysicalDevices(vkinstance, &device_count, nullptr);
         if(device_count == 0)
@@ -358,6 +360,14 @@ namespace kzn::vk
         // 2.1. Create device queues //
         vkGetDeviceQueue(vkdevice, indices.graphics_family.value(), 0, &device.graphics_queue);
         vkGetDeviceQueue(vkdevice, indices.present_family.value(), 0, &device.present_queue);
+
+        // 3. Create Vma Allocator //
+        VmaAllocatorCreateInfo allocator_info{};
+        allocator_info.physicalDevice = vkphysical_device;
+        allocator_info.device = vkdevice;
+        allocator_info.instance = vkinstance;
+        result = vmaCreateAllocator(&allocator_info, &device.vma_allocator);
+        VK_CHECK_MSG(result, "Failed to create Vma allocator");
 
         device.vkdevice = vkdevice;
         device.physical_device = vkphysical_device;

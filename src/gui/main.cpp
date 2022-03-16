@@ -6,6 +6,8 @@
 #include <string_view>
 #include <chrono>
 
+#include <glm/glm.hpp>
+
 using namespace kzn;
 
 class PerFrameData
@@ -45,9 +47,15 @@ private:
     inline static vk::Device* device = nullptr;
 };
 
+struct Vertex
+{
+    glm::vec2 position;
+    glm::vec3 color;
+};
+
 int main() try
 {
-    
+
     // auto input_desc = vk::VertexInputDescription {
     //     .bindings = { vtx_binding<Vertex>(0) },
     //     attributes = {
@@ -67,7 +75,9 @@ int main() try
                       // NOTE: IF THIS EXTENSION ISN'T LOADED THEN THE SwapchainBuilder
                       // will give a seg fault
                       .set_extensions({VK_KHR_SWAPCHAIN_EXTENSION_NAME})
-                      .set_features(vk::as_vk_device_features({vk::DeviceFeature::SamplerAnisotropy}))
+                      .set_features(vk::as_vk_device_features({
+                          vk::DeviceFeature::SamplerAnisotropy
+                      }))
                       .build();
 
     auto swapchain = vk::SwapchainBuilder(&device, surface, window.extent())
@@ -81,12 +91,13 @@ int main() try
     auto pipeline_layout = vk::PipelineLayoutBuilder(&device)
                                .build();
     auto pipeline_config = vk::PipelineConfigBuilder(pipeline_layout, render_pass)
-                               .set_dynamic_states({VK_DYNAMIC_STATE_VIEWPORT}) // Optional
+                               .set_dynamic_states({VK_DYNAMIC_STATE_VIEWPORT, VK_DYNAMIC_STATE_SCISSOR}) // Optional
+                               .set_vtx_input<glm::vec2, glm::vec3>()
                                .build();
     auto pipeline = vk::Pipeline(
         &device,
-        "assets/shaders/quad/quad.vert.spv",
-        "assets/shaders/quad/quad.frag.spv",
+        "assets/shaders/triangle_input/triangle.vert.spv",
+        "assets/shaders/triangle_input/triangle.frag.spv",
         pipeline_config);
 
     render_pass.create_framebuffers(swapchain);
@@ -107,6 +118,14 @@ int main() try
         per_frame_data.emplace_back(&device, cmd_pool);
     }
 
+    std::vector<Vertex> vertices{
+        { glm::vec2{ 0.0, -0.5}, glm::vec3{0.984, 0.286, 0.203} },
+        { glm::vec2{ 0.5,  0.5}, glm::vec3{0.556, 0.752, 0.486} },
+        { glm::vec2{-0.5,  0.5}, glm::vec3{0.513, 0.647, 0.596} }
+    };
+    auto vbo = vk::VertexBuffer(&device, vertices.size() * sizeof(Vertex));
+    vbo.upload(reinterpret_cast<float*>(vertices.data()));
+
     const auto window_extent = window.extent();
     auto viewport = vk::create_viewport(window_extent);
     auto scissor = vk::create_scissor(window_extent);
@@ -125,8 +144,6 @@ int main() try
         auto img_available = per_frame_data[frame_idx].img_available;
         auto finished_render = per_frame_data[frame_idx].finished_render;
         auto in_flight_fence = per_frame_data[frame_idx].in_flight_fence;
-
-        
 
         vkWaitForFences(device.vk_device(), 1, &in_flight_fence, VK_TRUE, UINT64_MAX);
         uint32_t image_idx;
@@ -155,7 +172,9 @@ int main() try
         pipeline.set_scissor(cmd_buffer, scissor);
         pipeline.bind(cmd_buffer);
         // Log::info("Drawed");
-        vkCmdDraw(cmd_buffer.vk_command_buffer(), 6, 1, 0, 0);
+        vbo.bind(cmd_buffer);
+        vkCmdDraw(cmd_buffer.vk_command_buffer(), vertices.size(), 1, 0, 0);
+        // vkCmdDraw(cmd_buffer.vk_command_buffer(), 6, 1, 0, 0);
         render_pass.end(cmd_buffer);
         cmd_buffer.end(); // throws ResultError if it fails to record command buffer
 

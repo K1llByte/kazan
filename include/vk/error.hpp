@@ -29,6 +29,7 @@ namespace kzn::vk
 
     // Pipeline
     KZN_VK_IMPL_ERROR(ShaderModError, "Failed to create shader module!")
+    KZN_VK_IMPL_ERROR(InvalidAttributeType, "Invalid vertex input attribute type!")
 
     // TODO: Maybe put this into core/error.hpp
     // IO

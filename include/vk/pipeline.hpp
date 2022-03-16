@@ -4,6 +4,7 @@
 #include "vk/device.hpp"
 #include "vk/render_pass.hpp"
 #include "vk/cmd_buffers.hpp"
+#include "vk/utils.hpp"
 
 #include <string_view>
 
@@ -11,20 +12,22 @@ namespace kzn::vk
 {
     struct PipelineConfig
     {
-        VkPipelineViewportStateCreateInfo      viewport_info;
-        std::vector<VkViewport>                viewports;
-        std::vector<VkRect2D>                  scissors;
-        VkPipelineInputAssemblyStateCreateInfo input_assembly_info;
-        VkPipelineRasterizationStateCreateInfo rasterization_info;
-        VkPipelineMultisampleStateCreateInfo   multisample_info;
-        VkPipelineColorBlendAttachmentState    color_blend_attachment;
-        VkPipelineColorBlendStateCreateInfo    color_blend_info;
-        VkPipelineDepthStencilStateCreateInfo  depth_stencil_info;
-        std::vector<VkDynamicState>            dynamic_state_enables;
-        VkPipelineDynamicStateCreateInfo       dynamic_state_info;
-        VkPipelineLayout                       pipeline_layout = VK_NULL_HANDLE;
-        VkRenderPass                           render_pass = VK_NULL_HANDLE;
-        uint32_t                               subpass = 0;
+        VkPipelineViewportStateCreateInfo              viewport_info;
+        std::vector<VkViewport>                        viewports;
+        std::vector<VkRect2D>                          scissors;
+        std::vector<VkVertexInputBindingDescription>   vtx_bindings;
+        std::vector<VkVertexInputAttributeDescription> vtx_attributes;
+        VkPipelineInputAssemblyStateCreateInfo         input_assembly_info;
+        VkPipelineRasterizationStateCreateInfo         rasterization_info;
+        VkPipelineMultisampleStateCreateInfo           multisample_info;
+        VkPipelineColorBlendAttachmentState            color_blend_attachment;
+        VkPipelineColorBlendStateCreateInfo            color_blend_info;
+        VkPipelineDepthStencilStateCreateInfo          depth_stencil_info;
+        std::vector<VkDynamicState>                    dynamic_state_enables;
+        VkPipelineDynamicStateCreateInfo               dynamic_state_info;
+        VkPipelineLayout                               pipeline_layout = VK_NULL_HANDLE;
+        VkRenderPass                                   render_pass = VK_NULL_HANDLE;
+        uint32_t                                       subpass = 0;
     };
 
     class PipelineConfigBuilder
@@ -35,15 +38,21 @@ namespace kzn::vk
             RenderPass& render_pass);
         ~PipelineConfigBuilder() = default;
 
+        // VertexInput
+        template<typename ...Ts>
+        PipelineConfigBuilder& set_vtx_input() noexcept;
+        // TODO: Non compile time version of this function
+        // PipelineConfigBuilder& set_vtx_input(VertexInputDescription description) noexcept;
+
         // Input Assemply
-        PipelineConfigBuilder& set_topology(VkPrimitiveTopology topology);
+        PipelineConfigBuilder& set_topology(VkPrimitiveTopology topology) noexcept;
 
         // Rasterization Stage
-        PipelineConfigBuilder& set_polygon_mode(VkPolygonMode polygon_mode);
-        PipelineConfigBuilder& set_line_width(float line_width);
+        PipelineConfigBuilder& set_polygon_mode(VkPolygonMode polygon_mode) noexcept;
+        PipelineConfigBuilder& set_line_width(float line_width) noexcept;
 
         // Dynamic State Enables
-        PipelineConfigBuilder& set_dynamic_states(const std::vector<VkDynamicState>& enables);
+        PipelineConfigBuilder& set_dynamic_states(const std::vector<VkDynamicState>& enables) noexcept;
 
         PipelineConfig build();
 
@@ -92,6 +101,18 @@ namespace kzn::vk
         VkShaderModule   frag_shader_module;
         VkViewport       viewport;
     };
+
+
+    template<typename ...Ts>
+    PipelineConfigBuilder& PipelineConfigBuilder::set_vtx_input() noexcept
+    {
+        uint32_t stride = (sizeof(Ts) + ...);
+        config.vtx_bindings = std::vector{vtx_binding(stride,/*binding*/ 0)};
+        auto attribs = vtx_attributes<Ts...>(/*binding*/ 0);
+        config.vtx_attributes = std::vector(attribs.begin(), attribs.end());
+        return *this;
+    }
 } // namespace kzn::vk
+
 
 #endif // KZN_VK_PIPELINE_HPP

@@ -61,11 +61,11 @@ namespace kzn::vk
         config.viewport_info.sType = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO;
         // config.viewport_info.viewportCount = config.viewports.size();
         // config.viewport_info.pViewports = config.viewports.data();
-        config.viewport_info.viewportCount = 0;
+        config.viewport_info.viewportCount = 1;
         config.viewport_info.pViewports = nullptr;
         // config.viewport_info.scissorCount = config.scissors.size();
         // config.viewport_info.pScissors = config.scissors.data();
-        config.viewport_info.scissorCount = 0;
+        config.viewport_info.scissorCount = 1;
         config.viewport_info.pScissors = nullptr;
 
         config.rasterization_info.sType = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO;
@@ -134,19 +134,19 @@ namespace kzn::vk
         config.render_pass = render_pass.vk_render_pass();
     }
 
-    PipelineConfigBuilder& PipelineConfigBuilder::set_topology(VkPrimitiveTopology topology)
+    PipelineConfigBuilder& PipelineConfigBuilder::set_topology(VkPrimitiveTopology topology) noexcept
     {
         config.input_assembly_info.topology = topology;
         return *this;
     }
 
-    PipelineConfigBuilder& PipelineConfigBuilder::set_line_width(float line_width)
+    PipelineConfigBuilder& PipelineConfigBuilder::set_line_width(float line_width) noexcept
     {
         config.rasterization_info.lineWidth = line_width;
         return *this;
     }
 
-    PipelineConfigBuilder& PipelineConfigBuilder::set_dynamic_states(const std::vector<VkDynamicState>& enables)
+    PipelineConfigBuilder& PipelineConfigBuilder::set_dynamic_states(const std::vector<VkDynamicState>& enables) noexcept
     {
         config.dynamic_state_enables = enables;
         config.dynamic_state_info.pDynamicStates = config.dynamic_state_enables.data();
@@ -155,7 +155,7 @@ namespace kzn::vk
         return *this;
     }
 
-    PipelineConfigBuilder& PipelineConfigBuilder::set_polygon_mode(VkPolygonMode polygon_mode)
+    PipelineConfigBuilder& PipelineConfigBuilder::set_polygon_mode(VkPolygonMode polygon_mode) noexcept
     {
         config.rasterization_info.polygonMode = polygon_mode;
         return *this;
@@ -225,20 +225,13 @@ namespace kzn::vk
         shader_stages[1].pNext = nullptr;
         shader_stages[1].pSpecializationInfo = nullptr;
 
-        // Setup this vertex description
-        // auto descriptions = Model::Vertex::get_vertex_description();
-        // auto& binding_descriptions = descriptions.bindings;
-        // auto& attribute_descriptions = descriptions.attributes;
+        // Setup vertex input description
         VkPipelineVertexInputStateCreateInfo vertex_input_info{};
         vertex_input_info.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
-        // vertex_input_info.vertexAttributeDescriptionCount = static_cast<uint32_t>(attribute_descriptions.size());
-        // vertex_input_info.vertexBindingDescriptionCount = static_cast<uint32_t>(binding_descriptions.size());
-        // vertex_input_info.pVertexAttributeDescriptions = attribute_descriptions.data();
-        // vertex_input_info.pVertexBindingDescriptions = binding_descriptions.data();
-        vertex_input_info.vertexAttributeDescriptionCount = 0;
-        vertex_input_info.vertexBindingDescriptionCount = 0;
-        vertex_input_info.pVertexAttributeDescriptions = nullptr;
-        vertex_input_info.pVertexBindingDescriptions = nullptr;
+        vertex_input_info.vertexAttributeDescriptionCount = static_cast<uint32_t>(config.vtx_attributes.size());
+        vertex_input_info.vertexBindingDescriptionCount = static_cast<uint32_t>(config.vtx_bindings.size());
+        vertex_input_info.pVertexAttributeDescriptions = config.vtx_attributes.data();
+        vertex_input_info.pVertexBindingDescriptions = config.vtx_bindings.data();
 
         VkGraphicsPipelineCreateInfo pipeline_info{};
         pipeline_info.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;

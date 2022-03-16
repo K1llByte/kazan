@@ -11,6 +11,7 @@
 #include "vk/pipeline.hpp"
 #include "vk/render_pass.hpp"
 #include "vk/cmd_buffers.hpp"
+#include "vk/vertex_buffer.hpp"
 #include "vk/device_features.hpp"
 #include "vk/utils.hpp"
 #include "vk/error.hpp"

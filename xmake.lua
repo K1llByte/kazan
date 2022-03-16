@@ -59,20 +59,21 @@ target("kazan")
         add_links("pthread") --, "m", "dl")
     end
     add_includedirs("include")
-    -- add_includedirs("include/lib/stb")
     -- add_includedirs("lib/include/imgui")
-    -- add_includedirs("include/lib/imgui_docking")
-    -- add_includedirs("include/lib/tiny_obj_loader")
-    -- Library
-    set_kind("static")
-    add_files("src/**.cpp")
-    remove_files("src/gui/**.cpp")
-    remove_files("src/main.cpp")
+    -- add_includedirs("lib/imgui_docking/include")
+    -- add_includedirs("lib/stb/include")
+    -- add_includedirs("lib/tiny_obj_loader/include")
+    add_includedirs("lib/vma/include")
     -- Dependencies
     add_packages("vulkan-headers", {links = "vulkan"})
     add_packages("glfw")
     add_packages("glm")
     add_packages("fmt")
+    -- Library
+    set_kind("static")
+    add_files("src/**.cpp")
+    remove_files("src/gui/**.cpp")
+    remove_files("src/main.cpp")
 
 -------------------- Kazan GUI -------------------
 
@@ -95,6 +96,7 @@ target("kazui")
     add_options("kb22")
     add_includedirs("include")
     add_includedirs("lib/imgui/include")
+    add_includedirs("lib/vma/include")
     -- Dependencies
     add_deps("imgui")
     add_deps("kazan")
