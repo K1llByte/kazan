@@ -50,7 +50,7 @@ namespace kzn
     
     Renderer::~Renderer()
     {
-        device.wait_idle();
+        
     }
 
     void Renderer::add_render_pass(vk::RenderPass& render_pass)
