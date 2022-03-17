@@ -170,9 +170,9 @@ while(!window.should_close())
     auto begin = Time::now();
     // Begin and End frame
     renderer.render_frame([&](){
-        model_renderer.draw(model1);
-        model_renderer.draw(model2);
-        model_renderer.draw(model3);
+        model_renderer.bind();
+        model_renderer.draw();
+        model_renderer.unbind();
     });
 
 

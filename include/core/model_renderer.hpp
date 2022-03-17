@@ -12,6 +12,8 @@ namespace kzn
         ModelRenderer(Renderer* renderer);
         ~ModelRenderer();
 
+        void bind();
+        void unbind();
         void draw(/* Model& model */);
 
     private:

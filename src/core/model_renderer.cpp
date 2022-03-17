@@ -25,12 +25,23 @@ namespace kzn
         
     }
 
+    void ModelRenderer::bind()
+    {
+        auto& cmd_buffer = renderer->current_cmd_buffer();
+        render_pass.begin(cmd_buffer, renderer->swapchain);
+    }
+
+    void ModelRenderer::unbind()
+    {
+        auto& cmd_buffer = renderer->current_cmd_buffer();
+        render_pass.end(cmd_buffer);
+    }
+
     void ModelRenderer::draw()
     {
         auto& cmd_buffer = renderer->current_cmd_buffer();
         auto& viewport = renderer->current_viewport();
         auto& scissor = renderer->current_scissor();
-        render_pass.begin(cmd_buffer, renderer->swapchain);
         pipeline.set_viewport(cmd_buffer, viewport);
         pipeline.set_scissor(cmd_buffer, scissor);
         pipeline.bind(cmd_buffer);

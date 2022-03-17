@@ -229,7 +229,9 @@ int main()
         window.poll_events();
         // Begin and End frame
         renderer.render_frame([&](){
-            model_renderer.draw();
+            model_renderer.bind();
+                model_renderer.draw();
+            model_renderer.unbind();
         });
     }
 }
