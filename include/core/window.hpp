@@ -23,7 +23,7 @@ namespace kzn
         void set_resized(bool resized) noexcept;
         
         bool was_resized() noexcept;
-        GLFWwindow* ptr() noexcept { return glfw_window; }
+        GLFWwindow* glfw_ptr() noexcept { return glfw_window; }
 
         std::vector<const char*> required_extensions();
         VkExtent2D extent() noexcept;

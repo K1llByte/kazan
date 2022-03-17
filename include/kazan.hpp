@@ -4,6 +4,8 @@
 #include "core/log.hpp"
 #include "core/utils.hpp"
 #include "core/window.hpp"
+#include "core/renderer.hpp"
+#include "core/model_renderer.hpp"
 
 #include "vk/instance.hpp"
 #include "vk/device.hpp"

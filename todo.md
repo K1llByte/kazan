@@ -8,8 +8,6 @@ kazan.hpp include with all public API includes
 
 ## In Progress
 ## Todo
-- Vertex Buffers
-- Index Buffers
 - Loading models
 - Depth buffering
 - Uniform Buffers
@@ -20,7 +18,6 @@ kazan.hpp include with all public API includes
 - ImGUI Docking test (with example)
 - Multisampling
 - Allow QueueFamilyIndices to create queues selectively
-
 <!-- Future -->
 - Push constants
 - Instanced rendering
@@ -30,6 +27,7 @@ kazan.hpp include with all public API includes
 - Multi-threaded command buffer generation
 - Multiple subpasses
 - Compute shaders
+
 ## Done
 - Remove `VkExtent2D viewport_extent` arg from pipeline.cpp
 - Fix resize width cap 
@@ -146,19 +144,47 @@ Renderer:
 
 ## Engine usage
 ```c++
-auto window = Window(1700, 800, "Name")
-auto renderer = Renderer()
-auto device = renderer.device();
-renderer.render_to(window);
+// Implicit Context class as a singleton is initialized by the Renderer
+auto window = Window("Window Name", 1700, 800)
+// This will initialize Instance, Surface, Device, Swapchain, and everything else
+auto renderer = Renderer(&window);
 
 // Load Assets and scene
-auto model_1 = Model::load("model.obj")
-auto scene = Scene {
+auto model_1 = Model::load("model.obj");
+model_1.set_transform(
+    Transform::position(1.0, 0.0, 0.0)
+);
+auto camera = Camera();
+auto scene = Scene { model_1 };
 
-};
+// Initialize default Render pass and pipeline
+// If Context is singleton then theres no need
+// to have &renderer as argument
+auto model_renderer = ModelRenderer(&renderer);
+
+while(!window.should_close())
+{
+    // Poll events
+    window.poll_events();
+    // Register 
+    auto begin = Time::now();
+    // Begin and End frame
+    renderer.render_frame([&](){
+        model_renderer.draw(model1);
+        model_renderer.draw(model2);
+        model_renderer.draw(model3);
+    });
+
+
+    auto end = Time::now();
+    // Put FPS in window title
+    window.set_title(fmt::format("FPS: {:.0f}", 1 / seconds));
+}
 ```
 
-Alternative window render targer API
+
+
+Alternative window render target API
 ```c++
 auto window = Window(...);
 WindowTarget win_target = window.render_target();
@@ -166,7 +192,6 @@ renderer.render_to(win_target);
 ```
 
 ## Scene Hierarchy
-
 
 Node<T> {
     Array<T>
