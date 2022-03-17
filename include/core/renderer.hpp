@@ -67,6 +67,8 @@ namespace kzn
         // window is resized
         void add_render_pass(vk::RenderPass& render_pass);
 
+        void wait_idle() { device.wait_idle() }
+
         void render_frame(std::function<void(void)>);
     
     private:

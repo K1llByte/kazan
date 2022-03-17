@@ -234,4 +234,5 @@ int main()
             model_renderer.unbind();
         });
     }
+    renderer.wait_idle();
 }
