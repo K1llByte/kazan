@@ -14,6 +14,17 @@ namespace kzn
                 std::chrono::system_clock::now().time_since_epoch()
             ).count();
         }
+
+        // Gives delta time since last call in milliseconds
+        static inline double delta()
+        {
+            static auto begin = std::chrono::high_resolution_clock::now();
+            auto end = std::chrono::high_resolution_clock::now();
+            auto seconds = std::chrono::duration_cast<std::chrono::duration<double>>(
+                end - begin
+            ).count();
+            return seconds;
+        }
     };
 } // namespace kzn
 

@@ -227,7 +227,7 @@ int main()
         // Poll events
         window.poll_events();
 
-        auto begin = Time::now();
+        Time::delta();
 
         // Begin and End frame
         renderer.render_frame([&]
@@ -243,8 +243,7 @@ int main()
             model_renderer.unbind();
         });
 
-        auto end = Time::now();
-        window.set_title(fmt::format("FPS: {:.0f}", 1.f / ((end - begin) / 1000.0)));
+        window.set_title(fmt::format("FPS: {:.0f}", 1.f / Time::delta()));
     }
     renderer.wait_idle();
 }
