@@ -1,6 +1,8 @@
 #ifndef KZN_VK_INSTANCE_HPP
 #define KZN_VK_INSTANCE_HPP
 
+#include "core/window.hpp"
+
 #define GLFW_INCLUDE_VULKAN
 #include <GLFW/glfw3.h>
 
@@ -17,7 +19,7 @@ namespace kzn::vk
         VkInstance vk_instance() noexcept { return vkinstance; }
         const std::vector<const char*>& get_validation_layers() const noexcept;
 
-        VkSurfaceKHR create_surface(GLFWwindow* glfw_window);
+        VkSurfaceKHR create_surface(Window& window);
 
     
     private:

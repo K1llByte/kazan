@@ -1,8 +1,6 @@
 #ifndef KZN_WINDOW_HPP
 #define KZN_WINDOW_HPP
 
-#include "vk/instance.hpp"
-
 #include <string_view>
 
 #define GLFW_INCLUDE_VULKAN

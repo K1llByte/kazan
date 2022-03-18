@@ -60,7 +60,7 @@ using namespace kzn;
 //                         .enable_validation_layers()
 //                         .set_extensions(window.required_extensions())
 //                         .build();
-//     auto surface = instance.create_surface(window.glfw_ptr());
+//     auto surface = instance.create_surface(window);
 
 //     auto device = vk::DeviceBuilder(instance)
 //                       .set_surface(surface)

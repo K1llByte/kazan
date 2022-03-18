@@ -70,10 +70,10 @@ namespace kzn::vk
     }
 
     // TODO: Change to Window
-    VkSurfaceKHR Instance::create_surface(GLFWwindow* glfw_window)
+    VkSurfaceKHR Instance::create_surface(Window& window)
     {
         // Create surface
-        auto result = glfwCreateWindowSurface(vkinstance, glfw_window, nullptr, &surface);
+        auto result = glfwCreateWindowSurface(vkinstance, window.glfw_ptr(), nullptr, &surface);
         VK_CHECK_MSG(result, "Failed to create window surface!");
         Log::debug("Surface created");
         return surface;

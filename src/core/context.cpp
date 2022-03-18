@@ -21,7 +21,7 @@ namespace kzn
             .enable_validation_layers()
             .set_extensions(window->required_extensions())
             .build()),
-        surface(_instance.create_surface(window->glfw_ptr())),
+        surface(_instance.create_surface(*window)),
         // Create Device
         _device(vk::DeviceBuilder(_instance)
             .set_surface(surface)
