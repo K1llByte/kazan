@@ -2,6 +2,7 @@
 #define KZN_WINDOW_HPP
 
 #include <string_view>
+#include <vector>
 
 #define GLFW_INCLUDE_VULKAN
 #include <GLFW/glfw3.h>

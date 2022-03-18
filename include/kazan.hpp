@@ -18,4 +18,6 @@
 #include "vk/utils.hpp"
 #include "vk/error.hpp"
 
+#include "utils/time.hpp"
+
 #endif // KAZAN_HPP
