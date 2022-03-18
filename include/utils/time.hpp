@@ -23,6 +23,7 @@ namespace kzn
             auto seconds = std::chrono::duration_cast<std::chrono::duration<double>>(
                 end - begin
             ).count();
+            begin = end;
             return seconds;
         }
     };

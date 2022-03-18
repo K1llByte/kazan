@@ -222,12 +222,11 @@ int main()
     auto renderer = Renderer(&window);
 
     auto model_renderer = ModelRenderer(&renderer);
+    double until_second = 0.;
     while(!window.should_close())
     {
         // Poll events
         window.poll_events();
-
-        Time::delta();
 
         // Begin and End frame
         renderer.render_frame([&]
@@ -243,7 +242,14 @@ int main()
             model_renderer.unbind();
         });
 
-        window.set_title(fmt::format("FPS: {:.0f}", 1.f / Time::delta()));
+        // Show FPS each second
+        auto delta_time = Time::delta();
+        until_second += delta_time;
+        if(until_second > 1.)
+        {
+            window.set_title(fmt::format("FPS: {:.0f}", (1. / delta_time)));
+            until_second = 0.;
+        }
     }
     renderer.wait_idle();
 }
