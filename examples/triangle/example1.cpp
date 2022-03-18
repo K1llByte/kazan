@@ -8,41 +8,50 @@
 
 using namespace kzn;
 
-class PerFrameData
+//////////////////////// Example 1 ////////////////////////
+// This example uses the kazan vulkan wrapper to render a
+// triangle without using vertex input with triangle data
+// hardcoded in the shaders.
+///////////////////////////////////////////////////////////
+
+namespace ex
 {
-public:
-    PerFrameData(vk::Device* _device, vk::CommandPool& cmd_pool)
-        : cmd_buffer(cmd_pool.allocate())
+    class PerFrameData
     {
-        PerFrameData::device = _device;
-        img_available = vk::create_semaphore(*device);
-        finished_render = vk::create_semaphore(*device);
-        in_flight_fence = vk::create_fence(*device);
-        Log::debug("PerFrameData created");
-    }
+    public:
+        PerFrameData(vk::Device* _device, vk::CommandPool& cmd_pool)
+            : cmd_buffer(cmd_pool.allocate())
+        {
+            PerFrameData::device = _device;
+            img_available = vk::create_semaphore(*device);
+            finished_render = vk::create_semaphore(*device);
+            in_flight_fence = vk::create_fence(*device);
+            Log::debug("PerFrameData created");
+        }
 
-    ~PerFrameData()
-    {
-        vk::destroy_semaphore(*device, img_available);
-        vk::destroy_semaphore(*device, finished_render);
-        vk::destroy_fence(*device, in_flight_fence);
-        Log::debug("PerFrameData destroyed");
-    }
+        ~PerFrameData()
+        {
+            vk::destroy_semaphore(*device, img_available);
+            vk::destroy_semaphore(*device, finished_render);
+            vk::destroy_fence(*device, in_flight_fence);
+            Log::debug("PerFrameData destroyed");
+        }
 
-    // static std::size_t current() noexcept { return PerFrameData::next_idx; }
-    static std::size_t next() noexcept { return (++PerFrameData::next_idx) % MAX_FRAMES_IN_FLIGHT; }
+        // static std::size_t current() noexcept { return PerFrameData::next_idx; }
+        static std::size_t next() noexcept { return (++PerFrameData::next_idx) % MAX_FRAMES_IN_FLIGHT; }
 
-public:
-    static constexpr std::size_t MAX_FRAMES_IN_FLIGHT = 2;
+    public:
+        static constexpr std::size_t MAX_FRAMES_IN_FLIGHT = 2;
 
-    vk::CommandBuffer cmd_buffer;
-    VkSemaphore       img_available;
-    VkSemaphore       finished_render;
-    VkFence           in_flight_fence;
+        vk::CommandBuffer cmd_buffer;
+        VkSemaphore       img_available;
+        VkSemaphore       finished_render;
+        VkFence           in_flight_fence;
 
-private:
-    inline static std::size_t next_idx = 0;
-    inline static vk::Device* device = nullptr;
+    private:
+        inline static std::size_t next_idx = 0;
+        inline static vk::Device* device = nullptr;
+    };
 };
 
 int main() try
@@ -72,7 +81,7 @@ int main() try
     auto pipeline_layout = vk::PipelineLayoutBuilder(&device)
                                .build();
     auto pipeline_config = vk::PipelineConfigBuilder(pipeline_layout, render_pass)
-                               .set_dynamic_states({VK_DYNAMIC_STATE_VIEWPORT}) // Optional
+                               .set_dynamic_states({VK_DYNAMIC_STATE_VIEWPORT, VK_DYNAMIC_STATE_SCISSOR})
                                .build();
     auto pipeline = vk::Pipeline(
         &device,
@@ -89,11 +98,11 @@ int main() try
     // Initialize command buffers
     // Initialize sync primitives
     // 2x In Flight Frame Data
-    std::vector<PerFrameData> per_frame_data;
+    std::vector<ex::PerFrameData> per_frame_data;
     // 3x Image Fences
     std::vector<VkFence> image_fences(swapchain.num_images());
-    per_frame_data.reserve(PerFrameData::MAX_FRAMES_IN_FLIGHT);
-    for(std::size_t i = 0; i < PerFrameData::MAX_FRAMES_IN_FLIGHT; ++i)
+    per_frame_data.reserve(ex::PerFrameData::MAX_FRAMES_IN_FLIGHT);
+    for(std::size_t i = 0; i < ex::PerFrameData::MAX_FRAMES_IN_FLIGHT; ++i)
     {
         per_frame_data.emplace_back(&device, cmd_pool);
     }
@@ -112,7 +121,7 @@ int main() try
         //////////////////////
 
         // Fetch current frame sync structures and cmd buffer
-        auto frame_idx = PerFrameData::next();
+        auto frame_idx = ex::PerFrameData::next();
         auto cmd_buffer = per_frame_data[frame_idx].cmd_buffer;
         auto img_available = per_frame_data[frame_idx].img_available;
         auto finished_render = per_frame_data[frame_idx].finished_render;

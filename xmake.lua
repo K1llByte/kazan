@@ -117,9 +117,29 @@ target("example1")
     add_cxxflags("-Wshadow", "-Wpedantic")
     -- Compiler Options
     add_includedirs("include")
+    add_includedirs("lib/vma/include")
     add_deps("kazan")
     add_packages("fmt")
+    add_packages("glm")
     set_targetdir("bin/")
     -- Binary
     set_kind("binary")
-    add_files("examples/triangle/triangle.cpp")
+    add_files("examples/triangle/example1.cpp")
+
+target("example2")
+    -- Common Compiler Options
+    set_languages("cxx20") -- -std=c++20
+    set_warnings("allextra", "error") -- -Wall -Wextra -Wfatal-errors
+    set_optimize("fastest") -- -O3
+    -- FIXME: Not working
+    add_cxxflags("-Wshadow", "-Wpedantic")
+    -- Compiler Options
+    add_includedirs("include")
+    add_includedirs("lib/vma/include")
+    add_deps("kazan")
+    add_packages("fmt")
+    add_packages("glm")
+    set_targetdir("bin/")
+    -- Binary
+    set_kind("binary")
+    add_files("examples/triangle/example2.cpp")

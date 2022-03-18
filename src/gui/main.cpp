@@ -222,7 +222,6 @@ int main()
     auto renderer = Renderer(&window);
 
     auto model_renderer = ModelRenderer(&renderer);
-    double until_second = 0.;
     while(!window.should_close())
     {
         // Poll events
@@ -244,6 +243,7 @@ int main()
 
         // Show FPS each second
         auto delta_time = Time::delta();
+        static double until_second = 0.;
         until_second += delta_time;
         if(until_second > 1.)
         {
