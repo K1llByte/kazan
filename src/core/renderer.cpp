@@ -11,27 +11,9 @@ namespace kzn
         : window(window),
         // Initialize Context
         context(Context::create(window)),
-        // // Create Vulkan Instance
-        // instance(vk::InstanceBuilder()
-        //     .enable_validation_layers()
-        //     .set_extensions(window->required_extensions())
-        //     .build()),
-        // // Get Surface
-        // surface(instance.create_surface(window->glfw_ptr())),
-        // // Create device
-        // device(vk::DeviceBuilder(instance)
-        //     .set_surface(surface)
-        //     // NOTE: IF THIS EXTENSION ISN'T LOADED THEN THE
-        //     // SwapchainBuilder will seg fault
-        //     .set_extensions({VK_KHR_SWAPCHAIN_EXTENSION_NAME})
-        //     .set_features(vk::as_vk_device_features({
-        //         vk::DeviceFeature::SamplerAnisotropy
-        //     }))
-        //     .build()),
-        // // Create Swapchain
-        // swapchain(vk::SwapchainBuilder(&device, surface, window->extent())
-        //     .set_present_mode(VK_PRESENT_MODE_FIFO_KHR)
-        //     .build()),
+        // Create Vulkan Instance
+        // Create device
+        // Create Swapchain
         // Create command pool and buffers
         cmd_pool(&Context::device())
     {
@@ -54,7 +36,7 @@ namespace kzn
     
     Renderer::~Renderer()
     {
-        
+        // Context::destroy();
     }
 
     void Renderer::add_render_pass(vk::RenderPass& render_pass)

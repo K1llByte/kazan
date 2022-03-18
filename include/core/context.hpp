@@ -30,6 +30,8 @@ namespace kzn
             return Context::get()->_swapchain;
         }
 
+        ~Context() = default;
+
     private:
         Context(Window* window);
         Context(const Context&) = delete;

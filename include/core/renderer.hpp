@@ -9,6 +9,7 @@
 #include "vk/utils.hpp"
 
 #include <functional>
+#include <memory>
 
 namespace kzn
 {
@@ -73,9 +74,9 @@ namespace kzn
         void render_frame(std::function<void(void)>);
     
     private:
-        Window*         window = nullptr;
-        Context*        context;
-        vk::CommandPool cmd_pool;
+        Window*                  window = nullptr;
+        std::unique_ptr<Context> context;
+        vk::CommandPool          cmd_pool;
 
         std::vector<PerFrameData> per_frame_data;
         std::vector<VkFence>      image_fences;

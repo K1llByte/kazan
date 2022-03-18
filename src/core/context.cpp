@@ -16,11 +16,13 @@ namespace kzn
     }
 
     Context::Context(Window* window)
+        // Create Vulkan Instance
         : _instance(vk::InstanceBuilder()
             .enable_validation_layers()
             .set_extensions(window->required_extensions())
             .build()),
         surface(_instance.create_surface(window->glfw_ptr())),
+        // Create Device
         _device(vk::DeviceBuilder(_instance)
             .set_surface(surface)
             // NOTE: IF THIS EXTENSION ISN'T LOADED THEN THE
@@ -30,10 +32,8 @@ namespace kzn
                 vk::DeviceFeature::SamplerAnisotropy
             }))
             .build()),
+        // Create swapchain
         _swapchain(vk::SwapchainBuilder(&_device, surface, window->extent())
             .set_present_mode(VK_PRESENT_MODE_FIFO_KHR)
-            .build())
-    {
-
-    }
+            .build()) {}
 } // namespace kzn

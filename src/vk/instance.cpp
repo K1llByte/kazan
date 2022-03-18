@@ -69,6 +69,7 @@ namespace kzn::vk
         return validation_layers; 
     }
 
+    // TODO: Change to Window
     VkSurfaceKHR Instance::create_surface(GLFWwindow* glfw_window)
     {
         // Create surface
