@@ -1,46 +1,50 @@
 #include "core/renderer.hpp"
 
+#include "core/context.hpp"
 #include "vk/device_features.hpp"
 #include "vk/utils.hpp"
+
 
 namespace kzn
 {
     Renderer::Renderer(Window* window)
         : window(window),
-        // Create Vulkan Instance
-        instance(vk::InstanceBuilder()
-            .enable_validation_layers()
-            .set_extensions(window->required_extensions())
-            .build()),
-        // Get Surface
-        surface(instance.create_surface(window->glfw_ptr())),
-        // Create device
-        device(vk::DeviceBuilder(instance)
-            .set_surface(surface)
-            // NOTE: IF THIS EXTENSION ISN'T LOADED THEN THE
-            // SwapchainBuilder will seg fault
-            .set_extensions({VK_KHR_SWAPCHAIN_EXTENSION_NAME})
-            .set_features(vk::as_vk_device_features({
-                vk::DeviceFeature::SamplerAnisotropy
-            }))
-            .build()),
-        // Create Swapchain
-        swapchain(vk::SwapchainBuilder(&device, surface, window->extent())
-            .set_present_mode(VK_PRESENT_MODE_FIFO_KHR)
-            .build()),
+        // Initialize Context
+        context(Context::create(window)),
+        // // Create Vulkan Instance
+        // instance(vk::InstanceBuilder()
+        //     .enable_validation_layers()
+        //     .set_extensions(window->required_extensions())
+        //     .build()),
+        // // Get Surface
+        // surface(instance.create_surface(window->glfw_ptr())),
+        // // Create device
+        // device(vk::DeviceBuilder(instance)
+        //     .set_surface(surface)
+        //     // NOTE: IF THIS EXTENSION ISN'T LOADED THEN THE
+        //     // SwapchainBuilder will seg fault
+        //     .set_extensions({VK_KHR_SWAPCHAIN_EXTENSION_NAME})
+        //     .set_features(vk::as_vk_device_features({
+        //         vk::DeviceFeature::SamplerAnisotropy
+        //     }))
+        //     .build()),
+        // // Create Swapchain
+        // swapchain(vk::SwapchainBuilder(&device, surface, window->extent())
+        //     .set_present_mode(VK_PRESENT_MODE_FIFO_KHR)
+        //     .build()),
         // Create command pool and buffers
-        cmd_pool(&device)
+        cmd_pool(&Context::device())
     {
         // Create all data per frame in flight
         // Initialize command buffers
         // Initialize sync primitives
         // 2x In Flight Frame Data
         // 3x Image Fences
-        image_fences.resize(swapchain.num_images());
+        image_fences.resize(Context::swapchain().num_images());
         per_frame_data.reserve(PerFrameData::MAX_FRAMES_IN_FLIGHT);
         for(std::size_t i = 0; i < PerFrameData::MAX_FRAMES_IN_FLIGHT; ++i)
         {
-            per_frame_data.emplace_back(&device, cmd_pool);
+            per_frame_data.emplace_back(&Context::device(), cmd_pool);
         }
 
         const auto window_extent = window->extent();
@@ -72,21 +76,21 @@ namespace kzn
         auto finished_render = per_frame_data[frame_idx].finished_render;
         auto in_flight_fence = per_frame_data[frame_idx].in_flight_fence;
         
-        vkWaitForFences(device.vk_device(), 1, &in_flight_fence, VK_TRUE, UINT64_MAX);
+        vkWaitForFences(Context::device().vk_device(), 1, &in_flight_fence, VK_TRUE, UINT64_MAX);
         uint32_t image_idx;
         try {
-            image_idx = swapchain.acquire_next(img_available);
+            image_idx = Context::swapchain().acquire_next(img_available);
         }
         catch(const vk::SwapchainResized&) {
             // Swapchain recreation
             auto win_extent = window->extent();
-            swapchain.recreate(win_extent);
+            Context::swapchain().recreate(win_extent);
             viewport = vk::create_viewport(win_extent);
             scissor = vk::create_scissor(win_extent);
             // TODO: Research more about this Framebuffer recreation
             for(auto render_pass : render_passes)
             {
-                render_pass->recreate_framebuffers(swapchain);
+                render_pass->recreate_framebuffers(Context::swapchain());
             }
             return;
         }
@@ -99,16 +103,6 @@ namespace kzn
         /////////////////
 
         draw_func();
-
-        // RenderSystem commands
-        // auto& cmd_buffer = renderer.current_cmd_buffer();
-        // auto& viewport = renderer.current_viewport();
-        // auto& scissor = renderer.current_scissor();
-
-        // render_pass.begin(cmd_buffer, renderer.swapchain());
-        // pipeline.set_viewport(cmd_buffer, viewport);
-        // pipeline.set_scissor(cmd_buffer, scissor);
-        // pipeline.bind(cmd_buffer);
 
         // Model draw commands
         // vbo.bind(cmd_buffer);
@@ -124,13 +118,13 @@ namespace kzn
 
         if(image_fences[image_idx] != VK_NULL_HANDLE)
         {
-            vkWaitForFences(device.vk_device(), 1, &image_fences[image_idx], VK_TRUE, UINT64_MAX);
+            vkWaitForFences(Context::device().vk_device(), 1, &image_fences[image_idx], VK_TRUE, UINT64_MAX);
         }
         image_fences[image_idx] = in_flight_fence;
-        vkResetFences(device.vk_device(), 1, &in_flight_fence);
-        device.graphics_queue_submit(cmd_buffer, img_available, finished_render, in_flight_fence);
+        vkResetFences(Context::device().vk_device(), 1, &in_flight_fence);
+        Context::device().graphics_queue_submit(cmd_buffer, img_available, finished_render, in_flight_fence);
         try {
-            device.present_queue_present(swapchain, finished_render);
+            Context::device().present_queue_present(Context::swapchain(), finished_render);
         }
         catch(const vk::SwapchainResized&) {
             window->set_resized(true);
@@ -139,13 +133,13 @@ namespace kzn
         {
             // Swapchain recreation
             auto win_extent = window->extent();
-            swapchain.recreate(win_extent);
+            Context::swapchain().recreate(win_extent);
             viewport = vk::create_viewport(win_extent);
             scissor = vk::create_scissor(win_extent);
             // TODO: Research more about this Framebuffer recreation
             for(auto render_pass : render_passes)
             {
-                render_pass->recreate_framebuffers(swapchain);
+                render_pass->recreate_framebuffers(Context::swapchain());
             }
         }
 

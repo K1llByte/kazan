@@ -9,7 +9,7 @@ namespace kzn
     class ModelRenderer
     {
     public:
-        ModelRenderer(Renderer* renderer);
+        ModelRenderer(Renderer* _renderer);
         ~ModelRenderer();
 
         void bind();

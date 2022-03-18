@@ -7,8 +7,15 @@ USE const
 kazan.hpp include with all public API includes
 
 ## In Progress
+- Model class
+    - with VertexBuffer
+    - with IndexBuffer
+- Context singleton
 ## Todo
+
 - Loading models
+- Study RendererBackend + RendererFrontend architechture
+    and change the singleton Context model i have now
 - Depth buffering
 - Uniform Buffers
     - Descriptor Pools

@@ -214,21 +214,27 @@ using namespace kzn;
 //     Log::error("ResultError: {}", re.raw());
 // }
 
+////////////////////////////////////////////////////
+
 int main()
 {
     auto window = Window("Kazan", 1700, 800);
     auto renderer = Renderer(&window);
 
-    // Initialize default Render pass and pipeline
-    // If Context is singleton then theres no need
-    // to have &renderer as argument
     auto model_renderer = ModelRenderer(&renderer);
     while(!window.should_close())
     {
         // Poll events
         window.poll_events();
         // Begin and End frame
-        renderer.render_frame([&](){
+        renderer.render_frame([&]
+        {
+            // inputless_renderer.render();
+            // // Functions as a render pass begin
+            // model_renderer.render([&]{
+            //     mode.draw();
+            // });
+
             model_renderer.bind();
                 model_renderer.draw();
             model_renderer.unbind();

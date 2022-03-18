@@ -4,19 +4,19 @@ namespace kzn
 {
     ModelRenderer::ModelRenderer(Renderer* _renderer)
         : renderer(_renderer),
-        render_pass(vk::RenderPassBuilder(&renderer->device)
-            .set_format(renderer->swapchain.get_surface_format().format)
+        render_pass(vk::RenderPassBuilder(&Context::device())
+            .set_format(Context::swapchain().get_surface_format().format)
             .build()),
         pipeline(vk::Pipeline(
-            &renderer->device,
+            &Context::device(),
             "assets/shaders/triangle/triangle.vert.spv",
             "assets/shaders/triangle/triangle.frag.spv",
-            vk::PipelineConfigBuilder(vk::PipelineLayoutBuilder(&renderer->device).build(), render_pass)
+            vk::PipelineConfigBuilder(vk::PipelineLayoutBuilder(&Context::device()).build(), render_pass)
                 .set_dynamic_states({VK_DYNAMIC_STATE_VIEWPORT, VK_DYNAMIC_STATE_SCISSOR})
                 // .set_vtx_input<glm::vec2, glm::vec3>()
                 .build()))
     {
-        render_pass.create_framebuffers(renderer->swapchain);
+        render_pass.create_framebuffers(Context::swapchain());
         renderer->add_render_pass(render_pass);
     }
 
@@ -28,7 +28,7 @@ namespace kzn
     void ModelRenderer::bind()
     {
         auto& cmd_buffer = renderer->current_cmd_buffer();
-        render_pass.begin(cmd_buffer, renderer->swapchain);
+        render_pass.begin(cmd_buffer, Context::swapchain());
     }
 
     void ModelRenderer::unbind()

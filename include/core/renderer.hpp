@@ -2,6 +2,7 @@
 #define KZN_RENDERER_HPP
 
 #include "core/window.hpp"
+#include "core/context.hpp"
 #include "vk/device.hpp"
 #include "vk/cmd_buffers.hpp"
 #include "vk/render_pass.hpp"
@@ -53,7 +54,7 @@ namespace kzn
 
     class Renderer
     {
-        friend class ModelRenderer;
+        // friend class ModelRenderer;
     public:
         Renderer(Window* window);
         ~Renderer();
@@ -67,16 +68,13 @@ namespace kzn
         // window is resized
         void add_render_pass(vk::RenderPass& render_pass);
 
-        void wait_idle() { device.wait_idle(); }
+        void wait_idle() { Context::device().wait_idle(); }
 
         void render_frame(std::function<void(void)>);
     
     private:
         Window*         window = nullptr;
-        vk::Instance    instance;
-        VkSurfaceKHR    surface;
-        vk::Device      device;
-        vk::Swapchain   swapchain;
+        Context*        context;
         vk::CommandPool cmd_pool;
 
         std::vector<PerFrameData> per_frame_data;

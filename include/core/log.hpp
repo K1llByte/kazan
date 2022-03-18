@@ -19,7 +19,6 @@ namespace kzn
     class Log
     {
     public:
-
         static Log& get()
         {
             return instance;
