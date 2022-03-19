@@ -35,5 +35,5 @@ void main()
 
     vec3 transformed_normal = normalize(mat3(pvm.model) * v_normal);
     float light_intensity = max(dot(v_normal, DIR_TO_LIGHT), 0) + AMBIENT_LIGHT;
-    out_color = v_color * 1.0 /* light_intensity */;
+    out_color = v_color * light_intensity;
 }
