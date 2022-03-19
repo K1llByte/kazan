@@ -19,7 +19,8 @@ namespace kzn
         ~ModelRenderer() = default;
 
         void bind(vk::CommandBuffer& cmd_buffer);
-        void push(vk::CommandBuffer& cmd_buffer, PVM& pvm);
+        template<typename T>
+        void push(vk::CommandBuffer& cmd_buffer, const T& data);
         void unbind(vk::CommandBuffer& cmd_buffer);
         void draw(vk::CommandBuffer& cmd_buffer);
 
@@ -28,6 +29,19 @@ namespace kzn
         vk::RenderPass render_pass;
         vk::Pipeline   pipeline;
     };
+
+    template<typename T>
+    void ModelRenderer::push(vk::CommandBuffer& cmd_buffer, const T& data)
+    {
+        vkCmdPushConstants(
+            cmd_buffer.vk_command_buffer(),
+            pipeline.layout(),
+            VK_SHADER_STAGE_ALL_GRAPHICS,
+            0,
+            sizeof(T),
+            &data
+        );
+    }
 } // namespace kzn
 
 #endif // KZN_MODEL_RENDERER_HPPModelRenderer

@@ -39,18 +39,6 @@ namespace kzn
         pipeline.bind(cmd_buffer);
     }
 
-    void ModelRenderer::push(vk::CommandBuffer& cmd_buffer, PVM& pvm)
-    {
-        vkCmdPushConstants(
-            cmd_buffer.vk_command_buffer(),
-            pipeline.layout(),
-            VK_SHADER_STAGE_ALL_GRAPHICS,
-            0,
-            sizeof(PVM),
-            &pvm
-        );
-    }
-
     void ModelRenderer::unbind(vk::CommandBuffer& cmd_buffer)
     {
         // auto& cmd_buffer = renderer->current_cmd_buffer();

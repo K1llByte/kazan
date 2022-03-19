@@ -239,19 +239,15 @@ int main() try
         window.poll_events();
 
         // Update
+        camera.set_prespective(glm::radians(50.f), window.aspect_ratio(), 0.1f, 100.f);
 
         // Begin and End frame
         renderer.render_frame([&](auto& cmd_buffer)
         {
-            // inputless_renderer.render();
-            // // Functions as a render pass begin
-            // model_renderer.render([&]{
-            //     model.draw();
-            // });
-
-            PVM pvm;
-            pvm.proj_view = camera.projection() * camera.view();
-            pvm.model = glm::mat4{1.f};
+            PVM pvm {
+                camera.projection() * camera.view(),
+                glm::mat4{1.f}
+            };
             model_renderer.bind(cmd_buffer);
                 model_renderer.push(cmd_buffer, pvm);
                 model.draw(cmd_buffer);

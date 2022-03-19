@@ -21,7 +21,7 @@ namespace kzn
         void set_title(const std::string_view& name) noexcept;
         void set_resized(bool resized) noexcept;
 
-        constexpr float aspect_ratio() const noexcept { return width / height; }
+        constexpr float aspect_ratio() const noexcept { return static_cast<float>(width) / static_cast<float>(height); }
         bool was_resized() noexcept;
         GLFWwindow* glfw_ptr() noexcept { return glfw_window; }
 
