@@ -25,26 +25,33 @@ namespace kzn
         
     }
 
-    void ModelRenderer::bind()
+    void ModelRenderer::bind(vk::CommandBuffer& cmd_buffer)
     {
-        auto& cmd_buffer = renderer->current_cmd_buffer();
+        // auto& cmd_buffer = renderer->current_cmd_buffer();
         render_pass.begin(cmd_buffer, Context::swapchain());
-    }
 
-    void ModelRenderer::unbind()
-    {
-        auto& cmd_buffer = renderer->current_cmd_buffer();
-        render_pass.end(cmd_buffer);
-    }
-
-    void ModelRenderer::draw()
-    {
-        auto& cmd_buffer = renderer->current_cmd_buffer();
+        // auto& cmd_buffer = renderer->current_cmd_buffer();
         auto& viewport = renderer->current_viewport();
         auto& scissor = renderer->current_scissor();
         pipeline.set_viewport(cmd_buffer, viewport);
         pipeline.set_scissor(cmd_buffer, scissor);
         pipeline.bind(cmd_buffer);
+    }
+
+    void ModelRenderer::unbind(vk::CommandBuffer& cmd_buffer)
+    {
+        // auto& cmd_buffer = renderer->current_cmd_buffer();
+        render_pass.end(cmd_buffer);
+    }
+
+    void ModelRenderer::draw(vk::CommandBuffer& cmd_buffer)
+    {
+        // auto& cmd_buffer = renderer->current_cmd_buffer();
+        // auto& viewport = renderer->current_viewport();
+        // auto& scissor = renderer->current_scissor();
+        // pipeline.set_viewport(cmd_buffer, viewport);
+        // pipeline.set_scissor(cmd_buffer, scissor);
+        // pipeline.bind(cmd_buffer);
 
         // Model draw commands
         // vbo.bind(cmd_buffer);

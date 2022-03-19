@@ -60,7 +60,7 @@ namespace kzn
         Renderer(Window* window);
         ~Renderer();
 
-        // NOTE: Only used within RenderSystem context 
+        // NOTE: Only used within RenderSystem context
         vk::CommandBuffer& current_cmd_buffer() { return *current_command_buffer; }
         VkViewport& current_viewport() { return viewport; }
         VkRect2D& current_scissor() { return scissor; }
@@ -71,8 +71,8 @@ namespace kzn
 
         void wait_idle() { Context::device().wait_idle(); }
 
-        void render_frame(std::function<void(void)>);
-    
+        void render_frame(std::function<void(vk::CommandBuffer&)>);
+
     private:
         Window*                  window = nullptr;
         std::unique_ptr<Context> context;

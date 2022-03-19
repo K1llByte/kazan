@@ -12,9 +12,9 @@ namespace kzn
         ModelRenderer(Renderer* _renderer);
         ~ModelRenderer();
 
-        void bind();
-        void unbind();
-        void draw(/* Model& model */);
+        void bind(vk::CommandBuffer& cmd_buffer);
+        void unbind(vk::CommandBuffer& cmd_buffer);
+        void draw(vk::CommandBuffer& cmd_buffer);
 
     private:
         Renderer*      renderer;

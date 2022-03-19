@@ -44,7 +44,7 @@ namespace kzn
         render_passes.push_back(&render_pass);
     }
 
-    void Renderer::render_frame(std::function<void(void)> draw_func)
+    void Renderer::render_frame(std::function<void(vk::CommandBuffer&)> draw_func)
     {
         /////////////////
         // Begin Frame //
@@ -84,7 +84,7 @@ namespace kzn
         //    Draw     //
         /////////////////
 
-        draw_func();
+        draw_func(cmd_buffer);
 
         // Model draw commands
         // vbo.bind(cmd_buffer);

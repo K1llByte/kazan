@@ -20,11 +20,11 @@ int main()
         window.poll_events();
 
         // Begin and End frame
-        renderer.render_frame([&]
+        renderer.render_frame([&](auto& cmd_buffer)
         {
-            model_renderer.bind();
-                model_renderer.draw();
-            model_renderer.unbind();
+            model_renderer.bind(cmd_buffer);
+                model_renderer.draw(cmd_buffer);
+            model_renderer.unbind(cmd_buffer);
         });
 
         // Show FPS

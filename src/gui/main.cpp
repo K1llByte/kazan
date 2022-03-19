@@ -216,19 +216,25 @@ using namespace kzn;
 
 ////////////////////////////////////////////////////
 
-int main()
+int main() try
 {
     auto window = Window("Kazan", 1700, 800);
     auto renderer = Renderer(&window);
 
     auto model_renderer = ModelRenderer(&renderer);
+    auto model = Model({
+        {{ 0.0, -0.5}, {0.984, 0.286, 0.203}},
+        {{ 0.5,  0.5}, {0.556, 0.752, 0.486}},
+        {{-0.5,  0.5}, {0.513, 0.647, 0.596}}
+    });
+
     while(!window.should_close())
     {
         // Poll events
         window.poll_events();
 
         // Begin and End frame
-        renderer.render_frame([&]
+        renderer.render_frame([&](auto& cmd_buffer)
         {
             // inputless_renderer.render();
             // // Functions as a render pass begin
@@ -236,9 +242,9 @@ int main()
             //     mode.draw();
             // });
 
-            model_renderer.bind();
-                model_renderer.draw();
-            model_renderer.unbind();
+            model_renderer.bind(cmd_buffer);
+                model.draw(cmd_buffer);
+            model_renderer.unbind(cmd_buffer);
         });
 
         // Show FPS each second
@@ -252,4 +258,8 @@ int main()
         }
     }
     renderer.wait_idle();
+}
+catch(const vk::ResultError& re)
+{
+    Log::error("Code: {}", re.raw());
 }
