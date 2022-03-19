@@ -233,6 +233,8 @@ int main() try
         // Poll events
         window.poll_events();
 
+        // Update
+
         // Begin and End frame
         renderer.render_frame([&](auto& cmd_buffer)
         {
