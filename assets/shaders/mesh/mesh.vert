@@ -23,7 +23,7 @@ layout(push_constant) uniform PVM
 // Output
 layout(location = 0) out vec3 out_color;
 
-const vec3 DIR_TO_LIGHT = normalize(vec3(1.0, -3.0, -1.0));
+const vec3 DIR_TO_LIGHT = normalize(vec3(1.0, -3.0, 10.0));
 const float AMBIENT_LIGHT = 0.02;
 
 //////////////////////////////////////////////////////////
@@ -35,5 +35,5 @@ void main()
 
     vec3 transformed_normal = normalize(mat3(pvm.model) * v_normal);
     float light_intensity = max(dot(v_normal, DIR_TO_LIGHT), 0) + AMBIENT_LIGHT;
-    out_color = v_color * light_intensity;
+    out_color = v_color * 1.0 /* light_intensity */;
 }

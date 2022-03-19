@@ -7,6 +7,7 @@
 #include "core/renderer.hpp"
 #include "core/model_renderer.hpp"
 #include "core/model.hpp"
+#include "core/camera.hpp"
 
 #include "vk/instance.hpp"
 #include "vk/device.hpp"

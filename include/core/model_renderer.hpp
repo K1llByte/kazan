@@ -6,13 +6,20 @@
 
 namespace kzn
 {
+    struct PVM
+    {
+        glm::mat4 proj_view;
+        glm::mat4 model;
+    };
+
     class ModelRenderer
     {
     public:
         ModelRenderer(Renderer* _renderer);
-        ~ModelRenderer();
+        ~ModelRenderer() = default;
 
         void bind(vk::CommandBuffer& cmd_buffer);
+        void push(vk::CommandBuffer& cmd_buffer, PVM& pvm);
         void unbind(vk::CommandBuffer& cmd_buffer);
         void draw(vk::CommandBuffer& cmd_buffer);
 

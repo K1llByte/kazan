@@ -66,15 +66,14 @@ namespace kzn::vk
         PipelineLayoutBuilder(Device* device);
 
         // PipelineLayoutBuilder& add_descriptor_set(const DescriptorSet& set);
-        // template<typename T>
-        // PipelineLayoutBuilder& add_push_constant(const PushConstant<T>& push);
+        PipelineLayoutBuilder& add_push_constant(uint32_t size, VkShaderStageFlags stages = VK_SHADER_STAGE_ALL_GRAPHICS);
 
         VkPipelineLayout build() noexcept;
 
     private:
-        Device* device = nullptr;
+        Device*                            device = nullptr;
         // std::vector<VkDescriptorSetLayout> set_layouts;
-        // std::vector<VkPushConstantRange>   push_ranges;
+        std::vector<VkPushConstantRange>   push_ranges;
     };
 
     class Pipeline
@@ -88,6 +87,8 @@ namespace kzn::vk
             const std::string_view& frag_shader_path,
             const PipelineConfig& config_info);
         ~Pipeline();
+
+        constexpr VkPipelineLayout layout() { return pipeline_layout; }
 
         void set_viewport(CommandBuffer& cmd_buffer, VkViewport viewport);
         void set_scissor(CommandBuffer& cmd_buffer, VkRect2D scissor);

@@ -223,10 +223,15 @@ int main() try
 
     auto model_renderer = ModelRenderer(&renderer);
     auto model = Model({
-        {{ 0.0, -0.5}, {0.984, 0.286, 0.203}},
-        {{ 0.5,  0.5}, {0.556, 0.752, 0.486}},
-        {{-0.5,  0.5}, {0.513, 0.647, 0.596}}
+        // position         normal           color                  tex coords
+        {{ 0.0, -0.5, 0.0}, {0.0, 0.0, 1.0}, {0.984, 0.286, 0.203}, {0.0, 0.0}},
+        {{ 0.5,  0.5, 0.0}, {0.0, 0.0, 1.0}, {0.556, 0.752, 0.486}, {0.0, 0.0}},
+        {{-0.5,  0.5, 0.0}, {0.0, 0.0, 1.0}, {0.513, 0.647, 0.596}, {0.0, 0.0}}
     });
+    Camera camera;
+    camera.lookat_target(glm::vec3(0.f, 0.f, 2.f), glm::vec3(0.f, 0.f, 0.f));
+    camera.set_prespective(glm::radians(50.f), window.aspect_ratio(), 0.1f, 100.f);
+
 
     while(!window.should_close())
     {
@@ -241,10 +246,14 @@ int main() try
             // inputless_renderer.render();
             // // Functions as a render pass begin
             // model_renderer.render([&]{
-            //     mode.draw();
+            //     model.draw();
             // });
 
+            PVM pvm;
+            pvm.proj_view = camera.projection() * camera.view();
+            pvm.model = glm::mat4{1.f};
             model_renderer.bind(cmd_buffer);
+                model_renderer.push(cmd_buffer, pvm);
                 model.draw(cmd_buffer);
             model_renderer.unbind(cmd_buffer);
         });

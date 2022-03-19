@@ -176,19 +176,23 @@ namespace kzn::vk
     PipelineLayoutBuilder::PipelineLayoutBuilder(Device* device)
         : device(device) {}
 
+    PipelineLayoutBuilder& PipelineLayoutBuilder::add_push_constant(uint32_t size, VkShaderStageFlags stages)
+    {
+        push_ranges.emplace_back(stages, 0, size);
+        return *this;
+    }
+
     VkPipelineLayout PipelineLayoutBuilder::build() noexcept
     {
         VkPipelineLayoutCreateInfo pipeline_layout_info{};
         pipeline_layout_info.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
         // pipeline_layout_info.setLayoutCount = static_cast<uint32_t>(set_layouts.size());
         // pipeline_layout_info.pSetLayouts = set_layouts.data();
-        // pipeline_layout_info.pushConstantRangeCount = static_cast<uint32_t>(push_ranges.size());
-        // pipeline_layout_info.pPushConstantRanges = push_ranges.data();
 
         pipeline_layout_info.setLayoutCount = 0;
         pipeline_layout_info.pSetLayouts = nullptr;
-        pipeline_layout_info.pushConstantRangeCount = 0;
-        pipeline_layout_info.pPushConstantRanges = nullptr;
+        pipeline_layout_info.pushConstantRangeCount = static_cast<uint32_t>(push_ranges.size());
+        pipeline_layout_info.pPushConstantRanges = push_ranges.data();
 
         VkPipelineLayout pipeline_layout;
         auto result = vkCreatePipelineLayout(device->vk_device(), &pipeline_layout_info, nullptr, &pipeline_layout);

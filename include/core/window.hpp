@@ -20,7 +20,8 @@ namespace kzn
         void poll_events() const noexcept;
         void set_title(const std::string_view& name) noexcept;
         void set_resized(bool resized) noexcept;
-        
+
+        constexpr float aspect_ratio() const noexcept { return width / height; }
         bool was_resized() noexcept;
         GLFWwindow* glfw_ptr() noexcept { return glfw_window; }
 
