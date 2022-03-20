@@ -233,30 +233,32 @@ int main() try
     // );
     auto model = Model::load("assets/models/monkey.obj");
     Camera camera;
-    // camera.lookat_target(glm::vec3(5.f, 0.f, 5.f), glm::vec3(0.f, 0.f, 0.f));
+    camera.lookat_target(glm::vec3(0.f, 0.f, 5.f), glm::vec3(0.f, 0.f, 0.f));
     // camera.lookat_target(glm::vec3(1.f, 0.f, 5.f), glm::vec3(0.f, 0.f, 0.f));
     // camera.set_perspective(glm::radians(50.f), window.aspect_ratio(), 0.1f, 100.f);
 
-    static uint32_t counter = 0;
+    static float counter = 0;
     while(!window.should_close())
     {
         // Poll events
         window.poll_events();
 
         // Update
-        const float cam_distance = 8.f;
-        const float rotation_speed = 0.01f;
-        camera.lookat_target(
-            glm::vec3(cam_distance * glm::sin(counter * rotation_speed), 0.f, cam_distance * glm::cos(counter * rotation_speed)),
-            glm::vec3(0.f, 0.f, 0.f));
+        // const float cam_distance = 8.f;
+        // const float rotation_speed = 0.01f;
+        // camera.lookat_target(
+        //     glm::vec3(cam_distance * glm::sin(counter * rotation_speed), 0.f, cam_distance * glm::cos(counter * rotation_speed)),
+        //     glm::vec3(0.f, 0.f, 0.f));
         camera.set_perspective(glm::radians(50.f), window.aspect_ratio(), 0.1f, 100.f);
+
+        model.transform.rotation = glm::vec3{0.f, glm::radians(counter), 0.f};
 
         // Begin and End frame
         renderer.render_frame([&](auto& cmd_buffer)
         {
             PVM pvm {
                 camera.projection() * camera.view(),
-                glm::mat4{1.f}
+                model.transform.mat4()
             };
             model_renderer.bind(cmd_buffer);
                 model_renderer.push(cmd_buffer, pvm);

@@ -1,6 +1,7 @@
 #ifndef KZN_CORE_MODEL_HPP
 #define KZN_CORE_MODEL_HPP
 
+#include "core/transform.hpp"
 #include "vk/input_buffers.hpp"
 
 #include <glm/glm.hpp>
@@ -25,6 +26,9 @@ namespace kzn
         static Model load(const std::string_view& file_path);
 
         void draw(vk::CommandBuffer& cmd_buffer);
+
+    public:
+        TransformComponent transform{};
 
     private:
         std::vector<Vertex>            vertices;
