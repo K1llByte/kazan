@@ -65,6 +65,7 @@ namespace kzn::vk
         subpass.pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS;
         subpass.colorAttachmentCount = 1;
         subpass.pColorAttachments = &color_attachment_ref;
+        subpass.pDepthStencilAttachment = &depth_attachment_ref;
 
         VkRenderPass vkrender_pass;
         VkRenderPassCreateInfo render_pass_info{};
