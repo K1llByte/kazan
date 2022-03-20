@@ -22,7 +22,7 @@ namespace kzn
         Model(std::vector<Vertex>&& _vertices, std::vector<uint32_t>&& _indices);
         ~Model() = default;
 
-        static Model load();
+        static Model load(const std::string_view& file_path);
 
         void draw(vk::CommandBuffer& cmd_buffer);
 
