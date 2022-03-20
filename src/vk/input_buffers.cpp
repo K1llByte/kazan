@@ -77,12 +77,12 @@ namespace kzn::vk
         vmaDestroyBuffer(device->allocator(), buffer, allocation);
     }
 
-    void IndexBuffer::upload(const uint32_t* vertices)
+    void IndexBuffer::upload(const uint32_t* indices)
     {
         // Copy vertex data to GPU
         void* data;
         vmaMapMemory(device->allocator(), allocation, &data);
-        memcpy(data, vertices, buffer_size);
+        memcpy(data, indices, buffer_size);
         vmaUnmapMemory(device->allocator(), allocation);
     }
 

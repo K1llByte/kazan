@@ -223,11 +223,13 @@ int main() try
 
     auto model_renderer = ModelRenderer(&renderer);
     auto model = Model({
-        // position         normal           color                  tex coords
-        {{ 0.0, -0.5, 0.0}, {0.0, 0.0, 1.0}, {0.984, 0.286, 0.203}, {0.0, 0.0}},
-        {{ 0.5,  0.5, 0.0}, {0.0, 0.0, 1.0}, {0.556, 0.752, 0.486}, {0.0, 0.0}},
-        {{-0.5,  0.5, 0.0}, {0.0, 0.0, 1.0}, {0.513, 0.647, 0.596}, {0.0, 0.0}}
-    });
+            // position         normal           color                  tex coords
+            {{ 0.0, -0.5, 0.0}, {0.0, 0.0, 1.0}, {0.984, 0.286, 0.203}, {0.0, 0.0}},
+            {{ 0.5,  0.5, 0.0}, {0.0, 0.0, 1.0}, {0.556, 0.752, 0.486}, {0.0, 0.0}},
+            {{-0.5,  0.5, 0.0}, {0.0, 0.0, 1.0}, {0.513, 0.647, 0.596}, {0.0, 0.0}}
+        }
+        // ,{ 0, 1, 2 }
+    );
     Camera camera;
     camera.lookat_target(glm::vec3(0.f, 0.f, 2.f), glm::vec3(0.f, 0.f, 0.f));
     camera.set_prespective(glm::radians(50.f), window.aspect_ratio(), 0.1f, 100.f);

@@ -19,14 +19,18 @@ namespace kzn
     {
     public:
         Model(std::vector<Vertex>&& _vertices);
+        Model(std::vector<Vertex>&& _vertices, std::vector<uint32_t>&& _indices);
         ~Model() = default;
+
+        static Model load();
 
         void draw(vk::CommandBuffer& cmd_buffer);
 
     private:
-        std::vector<Vertex>   vertices;
-        vk::VertexBuffer      vbo;
-        // vk::IndexBuffer       ibo;
+        std::vector<Vertex>            vertices;
+        std::vector<uint32_t>          indices;
+        vk::VertexBuffer               vbo;
+        std::optional<vk::IndexBuffer> ibo;
     };
 } // namespace kzn
 

@@ -8,6 +8,7 @@
 
 namespace kzn::vk
 {
+
     class VertexBuffer
     {
     public:
@@ -32,7 +33,7 @@ namespace kzn::vk
 
         void upload(const uint32_t* indices);
         void bind(CommandBuffer& cmd_buffer);
-        
+    
     private:
         Device*       device;
         VkBuffer      buffer;

@@ -7,10 +7,7 @@ USE const
 kazan.hpp include with all public API includes
 
 ## In Progress
-- Model class
-    - with VertexBuffer
-    - with IndexBuffer
-- Context singleton
+
 ## Todo
 
 - Loading models
@@ -26,7 +23,6 @@ kazan.hpp include with all public API includes
 - Multisampling
 - Allow QueueFamilyIndices to create queues selectively
 <!-- Future -->
-- Push constants
 - Instanced rendering
 - Dynamic uniforms
 - Separate images and sampler descriptors
@@ -36,6 +32,11 @@ kazan.hpp include with all public API includes
 - Compute shaders
 
 ## Done
+- Push constants
+- Model class
+    - with VertexBuffer
+    - with IndexBuffer
+- Context singleton
 - Remove `VkExtent2D viewport_extent` arg from pipeline.cpp
 - Fix resize width cap 
 - Work on FIXME's and TODO's:
