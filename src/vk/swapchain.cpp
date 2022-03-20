@@ -93,6 +93,9 @@ namespace kzn::vk
 
         VkSwapchainKHR old_vkswapchain = vkswapchain;
         auto old_swapchain_image_views = swapchain_image_views;
+        auto old_swapchain_depth_views = swapchain_depth_views;
+        auto old_swapchain_depths = swapchain_depths;
+        auto old_depth_allocation = depth_allocation;
         create_info.preTransform = swapchain_support.capabilities.currentTransform;
         // NOTE: if we want window to be transparent
         // this needs to change
@@ -132,7 +135,65 @@ namespace kzn::vk
             VK_CHECK_MSG(result, "Failed to create image views!");
         }
 
-        // 3. Cleanup old swapchain image views //
+        // 3. Create Depth Resources //
+        for(size_t i = 0; i < image_count; ++i)
+        {
+            VkImageCreateInfo image_info{};
+            image_info.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
+            image_info.pNext = nullptr;
+            image_info.imageType = VK_IMAGE_TYPE_2D;
+            image_info.format = VK_FORMAT_D32_SFLOAT;
+            image_info.extent = VkExtent3D{
+                extent.width,
+                extent.height,
+                1
+            };
+            image_info.mipLevels = 1;
+            image_info.arrayLayers = 1;
+            image_info.samples = VK_SAMPLE_COUNT_1_BIT;
+            image_info.tiling = VK_IMAGE_TILING_OPTIMAL;
+            image_info.usage = VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT;
+            
+            //for the depth image, we want to allocate it from GPU local memory
+            VmaAllocationCreateInfo depth_img_alloc_info{};
+            depth_img_alloc_info.usage = VMA_MEMORY_USAGE_GPU_ONLY;
+            depth_img_alloc_info.requiredFlags = VkMemoryPropertyFlags(VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
+            result = vmaCreateImage(device->allocator(), &image_info, &depth_img_alloc_info, &swapchain_depths[i], &depth_allocation[i], nullptr);
+            VK_CHECK_MSG(result, "Failed to create depth images!");
+
+            // Build an ImageView for the depth image to use for rendering
+	        VkImageViewCreateInfo image_view_info{};
+            image_view_info.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
+            image_view_info.image = swapchain_depths[i];
+            image_view_info.viewType = VK_IMAGE_VIEW_TYPE_2D;
+            image_view_info.format = VK_FORMAT_D32_SFLOAT;
+            image_view_info.components.r = VK_COMPONENT_SWIZZLE_IDENTITY;
+            image_view_info.components.g = VK_COMPONENT_SWIZZLE_IDENTITY;
+            image_view_info.components.b = VK_COMPONENT_SWIZZLE_IDENTITY;
+            image_view_info.components.a = VK_COMPONENT_SWIZZLE_IDENTITY;
+            image_view_info.subresourceRange.aspectMask = VK_IMAGE_ASPECT_DEPTH_BIT;
+            image_view_info.subresourceRange.baseMipLevel = 0;
+            image_view_info.subresourceRange.levelCount = 1;
+            image_view_info.subresourceRange.baseArrayLayer = 0;
+            image_view_info.subresourceRange.layerCount = 1;
+            // vkinit::imageview_create_info(_depthFormat, _depthImage._image, VK_IMAGE_ASPECT_DEPTH_BIT);
+            result = vkCreateImageView(device->vk_device(), &image_view_info, nullptr, &swapchain_depth_views[i]);
+	        VK_CHECK_MSG(result, "Failed to create depth image views!");
+        }
+
+        // 4. Cleanup old swapchain image views //
+        
+        // Destroy Swapchain Depth Image Views
+        for(auto old_depth_view : old_swapchain_depth_views)
+        {
+            vkDestroyImageView(device->vk_device(), old_depth_view, nullptr);
+        }
+        // Destroy Swapchain Depth Images
+        for(std::size_t i = 0; i < old_swapchain_depths.size(); ++i)
+        {
+		    vmaDestroyImage(device->allocator(), old_swapchain_depths[i], old_depth_allocation[i]);
+        }
+
         // Destroy ImageViews
         for (size_t i = 0; i < old_swapchain_image_views.size(); i++)
         {
