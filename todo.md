@@ -9,11 +9,10 @@ kazan.hpp include with all public API includes
 ## In Progress
 
 ## Todo
-
-- Loading models
+- Auto convert models with just vertices to vertices + indices
+- Depth buffering
 - Study RendererBackend + RendererFrontend architechture
     and change the singleton Context model i have now
-- Depth buffering
 - Uniform Buffers
     - Descriptor Pools
     - Descriptor Sets 
@@ -32,6 +31,7 @@ kazan.hpp include with all public API includes
 - Compute shaders
 
 ## Done
+- Loading models
 - Push constants
 - Model class
     - with VertexBuffer

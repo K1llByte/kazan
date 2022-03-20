@@ -5,6 +5,9 @@
 
 #include <optional>
 
+#define TINYOBJLOADER_IMPLEMENTATION
+#include "tiny_obj_loader.h"
+
 namespace kzn
 {
     Model::Model(std::vector<Vertex>&& _vertices)
@@ -51,6 +54,7 @@ namespace kzn
 
         if(!tinyobj::LoadObj(&attrib, &shapes, &materials, &warn, &err, file_path.data()))
         {
+            // TODO: Change to custom kazan exception
             throw std::runtime_error(warn + err);
         }
 
@@ -88,7 +92,7 @@ namespace kzn
 
                 if(index.texcoord_index >= 0)
                 {
-                    vtx.uv = {
+                    vtx.tex_coords = {
                         attrib.texcoords[2 * index.texcoord_index],     // u
                         1. - attrib.texcoords[2 * index.texcoord_index + 1], // v
                     };
@@ -111,10 +115,11 @@ namespace kzn
             }
         }
 
+        Log::info("Loaded model '{}'", file_path.data());
         Log::info("Vertex count: {}", vertices.size());
         // std::cout << "indices count: " << indices.size() << "\n";
         // std::cout << "total: " << vertices.size() * sizeof(Vertex) + indices.size() * sizeof(uint32_t) << " bytes\n";
 
-        return new Model(std::move(vertices), std::move(indices));
+        return Model(std::move(vertices)); // , std::move(indices)
     }
 } // namespace kzn

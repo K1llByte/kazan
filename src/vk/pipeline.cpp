@@ -73,8 +73,8 @@ namespace kzn::vk
         config.rasterization_info.rasterizerDiscardEnable = VK_FALSE;
         config.rasterization_info.polygonMode = VK_POLYGON_MODE_FILL;
         config.rasterization_info.lineWidth = 1.0f;
-        config.rasterization_info.cullMode = VK_CULL_MODE_BACK_BIT; //VK_CULL_MODE_NONE;
-        config.rasterization_info.frontFace = VK_FRONT_FACE_CLOCKWISE; //VK_FRONT_FACE_COUNTER_CLOCKWISE; ;
+        config.rasterization_info.cullMode = VK_CULL_MODE_BACK_BIT; // VK_CULL_MODE_NONE;
+        config.rasterization_info.frontFace = VK_FRONT_FACE_COUNTER_CLOCKWISE; // VK_FRONT_FACE_CLOCKWISE; ;
         config.rasterization_info.depthBiasEnable = VK_FALSE;
         config.rasterization_info.depthBiasConstantFactor = 0.0f;  // Optional
         config.rasterization_info.depthBiasClamp = 0.0f;           // Optional

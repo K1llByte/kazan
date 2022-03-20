@@ -24,7 +24,7 @@ layout(push_constant) uniform PVM
 layout(location = 0) out vec3 out_color;
 
 const vec3 DIR_TO_LIGHT = normalize(vec3(1.0, -3.0, 10.0));
-const float AMBIENT_LIGHT = 0.02;
+const float AMBIENT_LIGHT = 0.2;
 
 //////////////////////////////////////////////////////////
 
