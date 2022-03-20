@@ -11,7 +11,7 @@ namespace kzn
     {
     public:
         void set_orthographic(float left, float right, float top, float bottom, float near, float far);
-        void set_prespective(float fov_y, float aspect, float near, float far);
+        void set_perspective(float fov_y, float aspect, float near, float far);
 
         void lookat_direction(glm::vec3 position, glm::vec3 direction, glm::vec3 up = glm::vec3{0.f, -1.f, 0.f});
         void lookat_target(glm::vec3 position, glm::vec3 target, glm::vec3 up = glm::vec3{0.f, -1.f, 0.f});

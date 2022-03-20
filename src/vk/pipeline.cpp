@@ -74,7 +74,7 @@ namespace kzn::vk
         config.rasterization_info.polygonMode = VK_POLYGON_MODE_FILL;
         config.rasterization_info.lineWidth = 1.0f;
         config.rasterization_info.cullMode = VK_CULL_MODE_BACK_BIT; // VK_CULL_MODE_NONE;
-        config.rasterization_info.frontFace = VK_FRONT_FACE_COUNTER_CLOCKWISE; // VK_FRONT_FACE_CLOCKWISE; ;
+        config.rasterization_info.frontFace = VK_FRONT_FACE_COUNTER_CLOCKWISE; //VK_FRONT_FACE_CLOCKWISE; ;
         config.rasterization_info.depthBiasEnable = VK_FALSE;
         config.rasterization_info.depthBiasConstantFactor = 0.0f;  // Optional
         config.rasterization_info.depthBiasClamp = 0.0f;           // Optional
@@ -247,7 +247,7 @@ namespace kzn::vk
         pipeline_info.pRasterizationState = &config.rasterization_info;
         pipeline_info.pMultisampleState = &config.multisample_info;
         pipeline_info.pColorBlendState = &config.color_blend_info;
-        pipeline_info.pDepthStencilState = nullptr; //&config.depth_stencil_info;
+        pipeline_info.pDepthStencilState = &config.depth_stencil_info;
         pipeline_info.pDynamicState = &config.dynamic_state_info;
 
         pipeline_info.layout = config.pipeline_layout;

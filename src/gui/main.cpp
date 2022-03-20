@@ -232,17 +232,19 @@ int main() try
     // );
     auto model = Model::load("assets/models/monkey.obj");
     Camera camera;
-    camera.lookat_target(glm::vec3(5.f, 0.f, 5.f), glm::vec3(0.f, 0.f, 0.f));
-    camera.set_prespective(glm::radians(50.f), window.aspect_ratio(), 0.1f, 100.f);
+    // camera.lookat_target(glm::vec3(5.f, 0.f, 5.f), glm::vec3(0.f, 0.f, 0.f));
+    // camera.lookat_target(glm::vec3(1.f, 0.f, 5.f), glm::vec3(0.f, 0.f, 0.f));
+    // camera.set_perspective(glm::radians(50.f), window.aspect_ratio(), 0.1f, 100.f);
 
-
+    static uint32_t counter = 0;
     while(!window.should_close())
     {
         // Poll events
         window.poll_events();
 
         // Update
-        camera.set_prespective(glm::radians(50.f), window.aspect_ratio(), 0.1f, 100.f);
+        camera.lookat_target(glm::vec3(5.f * glm::sin(counter * 0.01f), 0.f, 5.f * glm::cos(counter * 0.01f)), glm::vec3(0.f, 0.f, 0.f));
+        camera.set_perspective(glm::radians(50.f), window.aspect_ratio(), 0.1f, 100.f);
 
         // Begin and End frame
         renderer.render_frame([&](auto& cmd_buffer)
@@ -266,6 +268,7 @@ int main() try
             window.set_title(fmt::format("FPS: {:.0f}", (1. / delta_time)));
             until_second = 0.;
         }
+        ++counter;
     }
     renderer.wait_idle();
 }

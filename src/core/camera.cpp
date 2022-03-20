@@ -17,7 +17,7 @@ void Camera::set_orthographic(float left, float right, float top, float bottom, 
 }
 
 
-void Camera::set_prespective(float fov_y, float aspect, float near, float far)
+void Camera::set_perspective(float fov_y, float aspect, float near, float far)
 {
     if(glm::abs(aspect - std::numeric_limits<float>::epsilon()) <= 0.0f)
     {

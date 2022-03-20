@@ -36,6 +36,16 @@ namespace kzn::vk
         color_attachment.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
         color_attachment.finalLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
 
+        VkAttachmentDescription depth_attachment{};
+        depth_attachment.format = VK_FORMAT_D32_SFLOAT;
+        depth_attachment.samples = VK_SAMPLE_COUNT_1_BIT;
+        depth_attachment.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
+        depth_attachment.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
+        depth_attachment.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
+        depth_attachment.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
+        depth_attachment.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+        depth_attachment.finalLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
+
 
         // TODO: For now this subpass is hardcoded, but
         // in the future this builder must have methods to add
@@ -43,6 +53,13 @@ namespace kzn::vk
         VkAttachmentReference color_attachment_ref{};
         color_attachment_ref.attachment = 0;
         color_attachment_ref.layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+
+        VkAttachmentReference depth_attachment_ref = {};
+        depth_attachment_ref.attachment = 1;
+        depth_attachment_ref.layout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
+
+        // Subpasses descriptions //
+        auto attachments = std::array{color_attachment, depth_attachment};
 
         VkSubpassDescription subpass{};
         subpass.pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS;
@@ -52,10 +69,11 @@ namespace kzn::vk
         VkRenderPass vkrender_pass;
         VkRenderPassCreateInfo render_pass_info{};
         render_pass_info.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
-        render_pass_info.attachmentCount = 1;
-        render_pass_info.pAttachments = &color_attachment;
+        render_pass_info.attachmentCount = static_cast<uint32_t>(attachments.size());
+        render_pass_info.pAttachments = attachments.data();
         render_pass_info.subpassCount = 1;
         render_pass_info.pSubpasses = &subpass;
+
         // Subpass dependencies
         VkSubpassDependency dependency{};
         dependency.srcSubpass = VK_SUBPASS_EXTERNAL;
@@ -65,8 +83,19 @@ namespace kzn::vk
         dependency.dstStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
         dependency.dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
 
-        render_pass_info.dependencyCount = 1;
-        render_pass_info.pDependencies = &dependency;
+        // TODO: Learn more about this
+        VkSubpassDependency depth_dependency{};
+        depth_dependency.srcSubpass = VK_SUBPASS_EXTERNAL;
+        depth_dependency.dstSubpass = 0;
+        depth_dependency.srcStageMask = VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT | VK_PIPELINE_STAGE_LATE_FRAGMENT_TESTS_BIT;
+        depth_dependency.srcAccessMask = 0;
+        depth_dependency.dstStageMask = VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT | VK_PIPELINE_STAGE_LATE_FRAGMENT_TESTS_BIT;
+        depth_dependency.dstAccessMask = VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT;
+
+        auto dependencies = std::array{ dependency, depth_dependency };
+
+        render_pass_info.dependencyCount = static_cast<uint32_t>(dependencies.size());
+        render_pass_info.pDependencies = dependencies.data();
         
 
         auto result = vkCreateRenderPass(device->vk_device(), &render_pass_info, nullptr, &vkrender_pass);
@@ -94,11 +123,14 @@ namespace kzn::vk
         const auto num_images = swapchain.num_images();
         framebuffers.resize(num_images);
         auto& image_views = swapchain.image_views();
+        auto& depth_image_views = swapchain.depth_image_views();
         auto extent = swapchain.get_extent();
         for(std::size_t i = 0; i < num_images; ++i)
         {
+            // TODO: Change from multiple depth buffers to only 1
             auto attachments = std::array{
-                image_views[i]
+                image_views[i],
+                depth_image_views[i]
             };
 
             VkFramebufferCreateInfo create_info{};
@@ -123,11 +155,13 @@ namespace kzn::vk
         destroy_framebuffers(device, framebuffers);
         // Create new VkFramebuffers
         auto& image_views = swapchain.image_views();
+        auto& depth_image_views = swapchain.depth_image_views();
         auto extent = swapchain.get_extent();
         for(std::size_t i = 0; i < num_images; ++i)
         {
             auto attachments = std::array{
-                image_views[i]
+                image_views[i],
+                depth_image_views[i]
             };
 
             VkFramebufferCreateInfo create_info{};
@@ -156,11 +190,16 @@ namespace kzn::vk
 
         begin_info.renderArea.extent = ext;
 
-        // VkClearValue clear_color = {{{0.008f, 0.008f, 0.008f, 1.0f}}};
-        // VkClearValue clear_color = {{{0.0f, 0.0f, 0.0f, 0.0f}}};
-        VkClearValue clear_color = {{{0.160f, 0.156f, 0.156f, 1.0f}}};
-        begin_info.clearValueCount = 1;
-        begin_info.pClearValues = &clear_color;
+        VkClearValue depth_clear;
+	    depth_clear.depthStencil.depth = 1.f;
+        auto clear_values = std::array{
+            /* clear_color */
+            VkClearValue{{{0.160f, 0.156f, 0.156f, 1.0f}}},
+            depth_clear
+            // VkClearValue{{1.f, 0.f}}
+        };
+        begin_info.clearValueCount = static_cast<uint32_t>(clear_values.size());
+        begin_info.pClearValues = clear_values.data();
 
         // VK_SUBPASS_CONTENTS_INLINE: The render pass commands
         // will be embedded in the primary command buffer itself and
