@@ -4,9 +4,6 @@
 #include "core/log.hpp"
 #include "vk/error.hpp"
 
-#ifndef GLFW_INCLUDE_VULKAN
-#   include <vulkan/vulkan.h>
-#endif
 #include <glm/glm.hpp>
 
 #include <type_traits>
@@ -15,43 +12,8 @@
 // NOTE: If this file won't have more things besides VK_CHECK's
 // then consider moving everything from error.hpp to here
 
-#define VK_CHECK(res)                         \
-        {                                     \
-            if(res != VK_SUCCESS)             \
-            {                                 \
-                Log::error("(VkResult = {})", \
-                    res);                     \
-                throw ResultError(res);       \
-            }                                 \
-        }
-
-#define VK_CHECK_MSG(res, msg, ...)           \
-        {                                     \
-            if(res != VK_SUCCESS)             \
-            {                                 \
-                Log::error(msg __VA_OPT__(,)  \
-                     __VA_ARGS__);            \
-                throw ResultError(res);       \
-            }                                 \
-        }
-
 namespace kzn::vk
 {
-    // FIXME: Make this class extend std::exception and
-    // implement what() with vk spec error msg
-    class ResultError
-    {
-    public:
-        ResultError(VkResult res)
-            : result(res) {}
-        ~ResultError() = default;
-
-        VkResult raw() const { return result; }
-
-    private:
-        VkResult result;
-    };
-
     class Device;
 
     // TODO: Consider moving this to device method

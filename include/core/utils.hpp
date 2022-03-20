@@ -1,8 +1,17 @@
 #ifndef KZN_UTILS_HPP
 #define KZN_UTILS_HPP
 
-// #include <cstdint>
 #include <algorithm>
+
+#define KZN_IMPL_ERROR(name, msg)             \
+    class name: public std::exception         \
+    {                                         \
+    public:                                   \
+        name() = default;                     \
+        ~name() = default;                    \
+        const char* what() const noexcept     \
+        { return msg; }                       \
+    };
 
 namespace kzn
 {

@@ -9,6 +9,8 @@ kazan.hpp include with all public API includes
 ## In Progress
 
 ## Todo
+- Camera Controller
+- Model Transform
 - Auto convert models with just vertices to vertices + indices
 - Study RendererBackend + RendererFrontend architechture
     and change the singleton Context model i have now
