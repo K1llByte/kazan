@@ -7,10 +7,9 @@ USE const
 kazan.hpp include with all public API includes
 
 ## In Progress
-
+- Shape generator
 ## Todo
 - Camera Controller
-- Model Transform
 - Auto convert models with just vertices to vertices + indices
 - Study RendererBackend + RendererFrontend architechture
     and change the singleton Context model i have now
@@ -32,6 +31,7 @@ kazan.hpp include with all public API includes
 - Compute shaders
 
 ## Done
+- Model Transform
 - Depth buffering
 - Loading models
 - Push constants

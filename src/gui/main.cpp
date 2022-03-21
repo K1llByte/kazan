@@ -231,13 +231,17 @@ int main() try
     //     }
     //     ,{ 0, 1, 2 }
     // );
-    auto model = Model::load("assets/models/monkey.obj");
+    auto model = Shape::sphere(1.f, 20, 20);
+    // auto model2 = Shape::box(1.f, 1.f, 1.f, 0);
+    // model2.transform.position = glm::vec3{0.f, 0.f, -3.f};
+    // auto model3 = Model::load("assets/models/monkey.obj");
+    // model3.transform.position = glm::vec3{0.f, 0.f, 3.f};
     Camera camera;
-    camera.lookat_target(glm::vec3(0.f, 0.f, 5.f), glm::vec3(0.f, 0.f, 0.f));
+    camera.lookat_target(glm::vec3(5.f, 0.f, -2.f), glm::vec3(0.f, 0.f, 0.f));
     // camera.lookat_target(glm::vec3(1.f, 0.f, 5.f), glm::vec3(0.f, 0.f, 0.f));
     // camera.set_perspective(glm::radians(50.f), window.aspect_ratio(), 0.1f, 100.f);
 
-    static float counter = 0;
+    float counter = 0;
     while(!window.should_close())
     {
         // Poll events
@@ -251,7 +255,7 @@ int main() try
         //     glm::vec3(0.f, 0.f, 0.f));
         camera.set_perspective(glm::radians(50.f), window.aspect_ratio(), 0.1f, 100.f);
 
-        model.transform.rotation = glm::vec3{0.f, glm::radians(counter), 0.f};
+        // model.transform.rotation = glm::vec3{0.f, glm::radians(counter), 0.f};
 
         // Begin and End frame
         renderer.render_frame([&](auto& cmd_buffer)
@@ -260,9 +264,22 @@ int main() try
                 camera.projection() * camera.view(),
                 model.transform.mat4()
             };
+
             model_renderer.bind(cmd_buffer);
+                // Draw model 1
+                pvm.model = model.transform.mat4();
                 model_renderer.push(cmd_buffer, pvm);
                 model.draw(cmd_buffer);
+
+                // // Draw model 2
+                // pvm.model = model2.transform.mat4();
+                // model_renderer.push(cmd_buffer, pvm);
+                // model2.draw(cmd_buffer);
+
+                // // Draw model 3
+                // pvm.model = model3.transform.mat4();
+                // model_renderer.push(cmd_buffer, pvm);
+                // model3.draw(cmd_buffer);
             model_renderer.unbind(cmd_buffer);
         });
 

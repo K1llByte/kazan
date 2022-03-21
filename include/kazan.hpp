@@ -8,6 +8,7 @@
 #include "core/model_renderer.hpp"
 #include "core/model.hpp"
 #include "core/camera.hpp"
+#include "core/shapes.hpp"
 
 #include "vk/instance.hpp"
 #include "vk/device.hpp"
@@ -21,5 +22,8 @@
 #include "vk/error.hpp"
 
 #include "utils/time.hpp"
+
+#include "math/constants.hpp"
+#include "math/coordinates.hpp"
 
 #endif // KAZAN_HPP
