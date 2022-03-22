@@ -26,8 +26,8 @@ namespace kzn
                 .build())),
         wireframe_pipeline(vk::Pipeline(
             &Context::device(),
-            "assets/shaders/mesh/mesh.vert.spv",
-            "assets/shaders/mesh/mesh.frag.spv",
+            "assets/shaders/mesh/mesh_no_light.vert.spv",
+            "assets/shaders/mesh/mesh_no_light.frag.spv",
             vk::PipelineConfigBuilder(
                     vk::PipelineLayoutBuilder(&Context::device())
                         .add_push_constant(sizeof(PVM), VK_SHADER_STAGE_ALL_GRAPHICS)

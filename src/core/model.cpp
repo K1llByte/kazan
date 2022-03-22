@@ -4,9 +4,33 @@
 #include "core/log.hpp"
 
 #include <optional>
+#include <unordered_map>
 
 #define TINYOBJLOADER_IMPLEMENTATION
 #include "tiny_obj_loader.h"
+
+#define GLM_ENABLE_EXPERIMENTAL
+#include <glm/gtx/hash.hpp>
+
+#include <concepts>
+
+namespace std
+{
+    // Template specialization of Vertex for std::hash
+    template<>
+    struct hash<kzn::Vertex>
+    {
+        size_t operator()(const kzn::Vertex& vtx) const
+        {
+            return kzn::multiple_hash(
+                0, 
+                vtx.position,
+                vtx.color,
+                vtx.normal,
+                vtx.tex_coords);
+        }
+    };
+} // namespace std
 
 namespace kzn
 {
@@ -15,6 +39,7 @@ namespace kzn
         , vbo(&Context::device(), vertices.size() * sizeof(Vertex))
         , ibo(std::nullopt)
     {
+        Log::info("Vertex count: {}", vertices.size());
         vbo.upload(reinterpret_cast<float*>(vertices.data()));
     }
 
@@ -24,10 +49,32 @@ namespace kzn
         , vbo(&Context::device(), vertices.size() * sizeof(Vertex))
         , ibo(std::in_place, &Context::device(), indices.size() * sizeof(uint32_t))
     {
+        Log::info("Vertex count: {}", vertices.size());
+        Log::info("Index count: {}", indices.size());
         vbo.upload(reinterpret_cast<float*>(vertices.data()));
         ibo.value().upload(reinterpret_cast<uint32_t*>(indices.data()));
     }
-    
+
+    Model Model::with_computed_indices(const std::vector<Vertex>& in_vertices)
+    {
+        std::vector<Vertex> computed_vertices;
+        std::vector<uint32_t> computed_indices;
+        computed_indices.reserve(in_vertices.size());
+        
+        std::unordered_map<Vertex, uint32_t> unique_vertices{};
+        for(const auto& vtx : in_vertices)
+        {
+            if(unique_vertices.count(vtx) == 0)
+            {
+                unique_vertices[vtx] = static_cast<uint32_t>(unique_vertices.size());
+                computed_vertices.push_back(vtx);
+            }
+            computed_indices.push_back(unique_vertices[vtx]);
+        }
+
+        return Model(std::move(computed_vertices), std::move(computed_indices));
+    }
+
     void Model::draw(vk::CommandBuffer& cmd_buffer)
     {
         vbo.bind(cmd_buffer);
@@ -57,9 +104,6 @@ namespace kzn
             // TODO: Change to custom kazan exception
             throw std::runtime_error(warn + err);
         }
-
-        // const bool compute_indices = true;
-        // std::unordered_map<Vertex, uint32_t> unique_vertices{};
 
         for(const auto& shape : shapes)
         {
@@ -99,27 +143,14 @@ namespace kzn
                     
                 }
 
-                // if(compute_indices)
-                // {
-                //     if(unique_vertices.count(vtx) == 0)
-                //     {
-                //         unique_vertices[vtx] = static_cast<uint32_t>(unique_vertices.size());
-                //         vertices.push_back(vtx);
-                //     }
-                //     indices.push_back(unique_vertices[vtx]);
-                // }
-                // else
-                // {
                 vertices.push_back(std::move(vtx));
-                // }
             }
         }
 
         Log::info("Loaded model '{}'", file_path.data());
-        Log::info("Vertex count: {}", vertices.size());
         // std::cout << "indices count: " << indices.size() << "\n";
         // std::cout << "total: " << vertices.size() * sizeof(Vertex) + indices.size() * sizeof(uint32_t) << " bytes\n";
 
-        return Model(std::move(vertices)); // , std::move(indices)
+        return Model::with_computed_indices(std::move(vertices));
     }
 } // namespace kzn

@@ -385,5 +385,21 @@ catch(const SwapchainResized&) {
 auto vbo = vk::VertexBuffer(&device, buffer_size);
 vbo.upload(float*);
 vbo.bind(cmd_buffer);
+```
 
+## Compute indices of vertices
+```c++
+// Option 1
+auto model = shapes::sphere(1.f, 20, 20);
+// NOTE: May require exception throwing if
+// model is already an indexed model
+model.compute_indices();
+
+// Option 2
+auto vbo = vk::VertexBuffer({ /*...*/ });
+auto model = Model::with_computed_indices(vbo);
+
+// Option 3
+auto vbo = vk::VertexBuffer({ /*...*/ });
+auto model = Model(vbo, true);
 ```
