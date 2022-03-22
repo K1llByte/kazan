@@ -3,6 +3,7 @@ add_requires("vulkan-headers")
 add_requires("glm")
 add_requires("glfw")
 add_requires("fmt")
+add_requires("boost")
 
 -------------------- Shaders ---------------------
 
@@ -69,6 +70,7 @@ target("kazan")
     add_packages("glfw")
     add_packages("glm")
     add_packages("fmt")
+    add_packages("boost")
     -- Library
     set_kind("static")
     add_files("src/**.cpp")
@@ -103,6 +105,7 @@ target("kazui")
     add_deps("kazan")
     add_packages("fmt")
     add_packages("glm")
+    add_packages("boost")
     -- Binary
     set_kind("binary")
     add_files("src/gui/*.cpp")

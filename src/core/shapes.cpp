@@ -10,7 +10,7 @@ using kzn::math::cylindrical_to_cartesian;
 
 namespace kzn
 {
-    Model Shape::sphere(const float radius, const uint slices, const uint stacks)
+    Model sphere(const float radius, const uint slices, const uint stacks)
     {
         if(radius <= 0 || slices < 3 || stacks < 2)
         {
@@ -19,8 +19,7 @@ namespace kzn
 
         const size_t NUM_VTX = (6*stacks-6)*slices;
         std::vector<Vertex> vertex_list(NUM_VTX);
-        
-        
+
         const float pi_f = PI;
         const float stack_angle = PI / stacks;
         const float slices_angle = 2*PI / slices;
@@ -132,7 +131,7 @@ namespace kzn
     }
 
 
-    Model Shape::cylinder(const float radius, const float height, const uint slices)
+    Model cylinder(const float radius, const float height, const uint slices)
     {
         if(radius <= 0 || slices < 3)
         {
@@ -248,7 +247,7 @@ namespace kzn
     }
 
 
-    Model Shape::box(const float width_x, const float width_y, const float width_z, const uint divisions)
+    Model box(const float width_x, const float width_y, const float width_z, const uint divisions)
     {
         if(width_x <= 0 || width_y <= 0 || width_z <= 0)
         {
@@ -549,7 +548,7 @@ namespace kzn
     }
 
 
-    Model Shape::cone(const float radius, const float height, const uint slices, const uint stacks)
+    Model cone(const float radius, const float height, const uint slices, const uint stacks)
     {
         if(radius <= 0 || height < 0 || slices < 3 || stacks < 1)
         {
@@ -666,7 +665,7 @@ namespace kzn
     }
 
 
-    Model Shape::plane(const float width)
+    Model plane(const float width)
     {
         if(width <= 0)
         {
@@ -717,7 +716,7 @@ namespace kzn
     }
 
 
-    Model Shape::torus(const float radius, const float cyl_radius, const uint slices, const uint cyl_slices)
+    Model torus(const float radius, const float cyl_radius, const uint slices, const uint cyl_slices)
     {
         if(radius <= 0 || cyl_radius <= 0 || cyl_radius >= radius || slices < 3 || cyl_slices < 3)
         {

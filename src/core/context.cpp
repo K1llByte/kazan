@@ -29,7 +29,8 @@ namespace kzn
             // SwapchainBuilder will seg fault
             .set_extensions({VK_KHR_SWAPCHAIN_EXTENSION_NAME})
             .set_features(vk::as_vk_device_features({
-                vk::DeviceFeature::SamplerAnisotropy
+                vk::DeviceFeature::SamplerAnisotropy,
+                vk::DeviceFeature::FillModeNonSolid
             }))
             .build()),
         // Create swapchain

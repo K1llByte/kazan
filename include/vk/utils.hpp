@@ -5,6 +5,7 @@
 #include "vk/error.hpp"
 
 #include <glm/glm.hpp>
+#include <boost/pfr.hpp>
 
 #include <type_traits>
 #include <array>

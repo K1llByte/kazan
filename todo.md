@@ -7,7 +7,6 @@ USE const
 kazan.hpp include with all public API includes
 
 ## In Progress
-- Shape generator
 ## Todo
 - Camera Controller
 - Auto convert models with just vertices to vertices + indices
@@ -31,6 +30,7 @@ kazan.hpp include with all public API includes
 - Compute shaders
 
 ## Done
+- Shape generator
 - Model Transform
 - Depth buffering
 - Loading models

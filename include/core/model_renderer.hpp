@@ -18,7 +18,7 @@ namespace kzn
         ModelRenderer(Renderer* _renderer);
         ~ModelRenderer() = default;
 
-        void bind(vk::CommandBuffer& cmd_buffer);
+        void bind(vk::CommandBuffer& cmd_buffer, bool render_wireframe = false);
         template<typename T>
         void push(vk::CommandBuffer& cmd_buffer, const T& data);
         void unbind(vk::CommandBuffer& cmd_buffer);
@@ -28,6 +28,7 @@ namespace kzn
         Renderer*      renderer;
         vk::RenderPass render_pass;
         vk::Pipeline   pipeline;
+        vk::Pipeline   wireframe_pipeline;
     };
 
     template<typename T>

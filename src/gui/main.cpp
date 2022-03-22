@@ -231,31 +231,37 @@ int main() try
     //     }
     //     ,{ 0, 1, 2 }
     // );
-    auto model = Shape::sphere(1.f, 20, 20);
-    // auto model2 = Shape::box(1.f, 1.f, 1.f, 0);
-    // model2.transform.position = glm::vec3{0.f, 0.f, -3.f};
-    // auto model3 = Model::load("assets/models/monkey.obj");
-    // model3.transform.position = glm::vec3{0.f, 0.f, 3.f};
+    // auto model = Model::load("assets/models/monkey.obj");
+    auto model = sphere(1.f, 20, 20);
+    // model.transform.position = glm::vec3{0.f, 0.f, 3.f};
     Camera camera;
-    camera.lookat_target(glm::vec3(5.f, 0.f, -2.f), glm::vec3(0.f, 0.f, 0.f));
-    // camera.lookat_target(glm::vec3(1.f, 0.f, 5.f), glm::vec3(0.f, 0.f, 0.f));
-    // camera.set_perspective(glm::radians(50.f), window.aspect_ratio(), 0.1f, 100.f);
+    camera.lookat_target(glm::vec3(5.f, 2.f, -2.f), glm::vec3(0.f, 0.f, 0.f));
 
     float counter = 0;
+    bool render_wireframe_begin_state = false;
+    bool render_wireframe = false;
     while(!window.should_close())
     {
         // Poll events
         window.poll_events();
 
         // Update
-        // const float cam_distance = 8.f;
-        // const float rotation_speed = 0.01f;
-        // camera.lookat_target(
-        //     glm::vec3(cam_distance * glm::sin(counter * rotation_speed), 0.f, cam_distance * glm::cos(counter * rotation_speed)),
-        //     glm::vec3(0.f, 0.f, 0.f));
         camera.set_perspective(glm::radians(50.f), window.aspect_ratio(), 0.1f, 100.f);
 
-        // model.transform.rotation = glm::vec3{0.f, glm::radians(counter), 0.f};
+        // Model rotation
+        model.transform.rotation = glm::vec3{0.f, glm::radians(counter), 0.f};
+
+        switch (glfwGetKey(window.glfw_ptr(), GLFW_KEY_SPACE))
+        {
+            case GLFW_PRESS:
+                render_wireframe_begin_state = true;
+                break;
+            case GLFW_RELEASE:
+                if(render_wireframe_begin_state)
+                    render_wireframe = !render_wireframe;
+                render_wireframe_begin_state = false;
+                break;
+        }
 
         // Begin and End frame
         renderer.render_frame([&](auto& cmd_buffer)
@@ -265,7 +271,7 @@ int main() try
                 model.transform.mat4()
             };
 
-            model_renderer.bind(cmd_buffer);
+            model_renderer.bind(cmd_buffer, render_wireframe);
                 // Draw model 1
                 pvm.model = model.transform.mat4();
                 model_renderer.push(cmd_buffer, pvm);
@@ -300,3 +306,33 @@ catch(const vk::ResultError& re)
 {
     Log::error("Code: {}", re.raw());
 }
+
+////////////////////////////////////////////////////
+
+// #include <boost/pfr.hpp>
+
+// #include <type_traits>
+// #define KZN_SAME_T(data, T) std::is_same_v<typename std::decay<decltype(data)>::type, T>
+
+// constexpr void f()
+// {
+//     struct {
+//         uint32_t    fw_version = 0;
+//         uint16_t    sector_0_version = 1;
+//         std::string id = "Hello";
+//     } data;
+    
+//     boost::pfr::for_each_field(std::forward<decltype(data)>(data), []<typename T>(T&& val) {
+//         if constexpr (std::is_same_v<std::decay_t<T>, uint32_t>)
+//             std::cout << "uint32_t: " << val << "\n";
+
+//         else if constexpr (std::is_same_v<std::decay_t<T>, uint16_t>)
+//             std::cout << "uint16_t: " << val << "\n";
+
+//         else if constexpr (std::is_same_v<std::decay_t<T>, std::string>)
+//             std::cout << "std::string: " << val << "\n";
+
+//         else
+//             throw "Unmatched type";
+//     });
+// }

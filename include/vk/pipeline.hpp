@@ -41,6 +41,8 @@ namespace kzn::vk
         // VertexInput
         template<typename ...Ts>
         PipelineConfigBuilder& set_vtx_input() noexcept;
+        template<typename T>
+        PipelineConfigBuilder& set_type_vtx_input() noexcept;
         // TODO: Non compile time version of this function
         // PipelineConfigBuilder& set_vtx_input(VertexInputDescription description) noexcept;
 
@@ -111,6 +113,38 @@ namespace kzn::vk
         config.vtx_bindings = std::vector{vtx_binding(stride,/*binding*/ 0)};
         auto attribs = vtx_attributes<Ts...>(/*binding*/ 0);
         config.vtx_attributes = std::vector(attribs.begin(), attribs.end());
+        return *this;
+    }
+
+    template<typename VertexType>
+    PipelineConfigBuilder& PipelineConfigBuilder::set_type_vtx_input() noexcept
+    {
+        std::vector<VkVertexInputAttributeDescription> vertex_attributes;
+        uint32_t i = 0;
+        uint32_t offset = 0;
+        boost::pfr::for_each_field(std::forward<VertexType>(VertexType{}), [&]<typename T>(T& val) {
+
+            VkFormat format;
+            if(std::is_same_v<T, float>)
+                format = VK_FORMAT_R32_SFLOAT;
+            else if(std::is_same_v<T, glm::vec2>)
+                format = VK_FORMAT_R32G32_SFLOAT;
+            else if(std::is_same_v<T, glm::vec3>)
+                format = VK_FORMAT_R32G32B32_SFLOAT;
+            else if(std::is_same_v<T, glm::vec4>)
+                format = VK_FORMAT_R32G32B32A32_SFLOAT;
+            else if(std::is_same_v<T, glm::ivec2>)
+                format = VK_FORMAT_R64_SFLOAT;
+            else
+                throw "Invalid vertex input attribute";
+
+            vertex_attributes.push_back(vtx_attribute(0, i, format, offset));
+            offset += sizeof(T);
+            ++i;
+        });
+
+        config.vtx_bindings = std::vector{vtx_binding(sizeof(VertexType), 0)};
+        config.vtx_attributes = std::move(vertex_attributes);
         return *this;
     }
 } // namespace kzn::vk
