@@ -7,15 +7,16 @@ USE const
 kazan.hpp include with all public API includes
 
 ## In Progress
+- Input system
 ## Todo
-- Camera Controller
-- Auto convert models with just vertices to vertices + indices
+- Update Camera Controller with new  Input System
 - Study RendererBackend + RendererFrontend architechture
     and change the singleton Context model i have now
 - Uniform Buffers
     - Descriptor Pools
     - Descriptor Sets 
 - Texture mapping
+- Work on FIXME's and TODO's
 - Generating Mipmaps
 - ImGUI Docking test (with example)
 - Multisampling
@@ -30,6 +31,8 @@ kazan.hpp include with all public API includes
 - Compute shaders
 
 ## Done
+- Camera Controller
+- Auto convert models with just vertices to vertices + indices
 - Shape generator
 - Model Transform
 - Depth buffering

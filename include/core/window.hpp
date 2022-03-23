@@ -27,6 +27,10 @@ namespace kzn
 
         std::vector<const char*> required_extensions();
         VkExtent2D extent() noexcept;
+
+        // Input related
+        // TODO: Make an appropriate event system
+        int get_key(int code);
         
     public:
         bool         has_resized = false;

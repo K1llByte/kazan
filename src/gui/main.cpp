@@ -1,5 +1,8 @@
 #include "kazan.hpp"
 
+// Kazui headers
+#include "gui/camera_controller.hpp"
+
 #include <thread>
 #include <functional>
 #include <iostream>
@@ -236,17 +239,19 @@ int main() try
     // model.transform.position = glm::vec3{0.f, 0.f, 3.f};
     Camera camera;
     camera.lookat_target(glm::vec3(5.f, 2.f, -2.f), glm::vec3(0.f, 0.f, 0.f));
-
+    CameraController camera_controller(&window, &camera);
     float counter = 0;
     bool render_wireframe_begin_state = false;
     bool render_wireframe = false;
     while(!window.should_close())
     {
+        auto delta_time = Time::delta();
         // Poll events
         window.poll_events();
 
         // Update
         camera.set_perspective(glm::radians(50.f), window.aspect_ratio(), 0.1f, 100.f);
+        camera_controller.update(delta_time);
 
         // Model rotation
         model.transform.rotation = glm::vec3{0.f, glm::radians(counter), 0.f};
@@ -290,7 +295,7 @@ int main() try
         });
 
         // Show FPS each second
-        auto delta_time = Time::delta();
+        // auto delta_time = Time::delta();
         static double until_second = 0.;
         until_second += delta_time;
         if(until_second > 1.)
