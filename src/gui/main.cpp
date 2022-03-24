@@ -234,8 +234,12 @@ int main() try
     //     }
     //     ,{ 0, 1, 2 }
     // );
-    auto model = Model::load("assets/models/monkey.obj");
-    // auto model = kzn::cylinder(1.f, 2.f, 20);
+    // auto model = Model::load("assets/models/monkey.obj");
+    // auto model = kzn::icosahedron(std::array{
+    //     glm::vec3{  0.0, -1.0, 0.0},
+    //     glm::vec3{  1.0,  1.0, 0.0},
+    //     glm::vec3{ -1.0,  1.0, 0.0}
+    // }, 10);
     // model.transform.position = glm::vec3{0.f, 0.f, 3.f};
     Camera camera;
     camera.lookat_target(glm::vec3(5.f, 2.f, -2.f), glm::vec3(0.f, 0.f, 0.f));
@@ -254,7 +258,7 @@ int main() try
         camera_controller.update(delta_time);
 
         // Model rotation
-        model.transform.rotation = glm::vec3{0.f, glm::radians(counter), 0.f};
+        // model.transform.rotation = glm::vec3{0.f, glm::radians(counter), 0.f};
 
         switch (glfwGetKey(window.glfw_ptr(), GLFW_KEY_SPACE))
         {

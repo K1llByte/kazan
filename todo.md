@@ -7,8 +7,9 @@ USE const
 kazan.hpp include with all public API includes
 
 ## In Progress
-- Input system
+- Icosahedron sphere
 ## Todo
+- Input system
 - Update Camera Controller with new  Input System
 - Study RendererBackend + RendererFrontend architechture
     and change the singleton Context model i have now

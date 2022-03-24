@@ -789,4 +789,95 @@ namespace kzn
 
         return Model(std::move(vertex_list));
     }
+
+    Model icosahedron(const std::array<glm::vec3, 3>& triangle, const uint divisions)
+    {
+        if(divisions < 1)
+        {
+            throw std::runtime_error("invalid shape arguments");
+        }
+
+        const size_t NUM_VTX = divisions*divisions*3;
+        const float divisions_f = static_cast<float>(divisions);
+
+        std::vector<Vertex> vertex_list(NUM_VTX);
+        const auto p1 = triangle[0];
+        const auto p2 = triangle[1];
+        const auto p3 = triangle[2];
+        const glm::vec3 vector_p1 = (p1 - p2) / divisions_f;
+        const glm::vec3 vector_p3 = (p3 - p2) / divisions_f;
+
+        // TODO: get a better name for this iterator variable
+        uint iter_divisions = divisions;
+        uint it = 0;
+        uint it_n = 0;
+        uint it_t = 0;
+
+        for(std::size_t i = 0; i < divisions; ++i)
+        {
+            const auto base_pos_i = p2 + static_cast<float>(i)*vector_p1;
+            // Vertices
+            vertex_list[it++].position = base_pos_i;
+            vertex_list[it++].position = base_pos_i + vector_p3;
+            vertex_list[it++].position = base_pos_i + vector_p1;
+
+            // Normals
+            vertex_list[it_n++].normal = { 0.f, 1.f, 0.f};
+            vertex_list[it_n++].normal = { 0.f, 1.f, 0.f};
+            vertex_list[it_n++].normal = { 0.f, 1.f, 0.f};
+
+            // Texture Coords
+            vertex_list[it_t++].tex_coords = { 0.f, 0.f};
+            vertex_list[it_t++].tex_coords = { 0.f, 0.f};
+            vertex_list[it_t++].tex_coords = { 0.f, 0.f};
+
+            // Color 
+            vertex_list[it_t-3].color = { 0.8f, 0.8f, 0.8f };
+            vertex_list[it_t-2].color = { 0.8f, 0.8f, 0.8f };
+            vertex_list[it_t-1].color = { 0.8f, 0.8f, 0.8f };
+            
+            for(std::size_t j = 1; j < iter_divisions; ++j)
+            {
+                const auto base_pos_j = p2 + static_cast<float>(i)*vector_p1 + static_cast<float>(j)*vector_p3;
+                // Vertices
+                vertex_list[it++].position = base_pos_j;
+                vertex_list[it++].position = base_pos_j + vector_p1;
+                vertex_list[it++].position = base_pos_j + vector_p1 - vector_p3;
+                
+                vertex_list[it++].position = base_pos_j;
+                vertex_list[it++].position = base_pos_j + vector_p3;
+                vertex_list[it++].position = base_pos_j + vector_p1;
+
+                // Normals
+                vertex_list[it_n++].normal = { 0.f, 1.f, 0.f};
+                vertex_list[it_n++].normal = { 0.f, 1.f, 0.f};
+                vertex_list[it_n++].normal = { 0.f, 1.f, 0.f};
+
+                vertex_list[it_n++].normal = { 0.f, 1.f, 0.f};
+                vertex_list[it_n++].normal = { 0.f, 1.f, 0.f};
+                vertex_list[it_n++].normal = { 0.f, 1.f, 0.f};
+
+                // Texture Coords
+                vertex_list[it_t++].tex_coords = { 0.f, 0.f};
+                vertex_list[it_t++].tex_coords = { 0.f, 0.f};
+                vertex_list[it_t++].tex_coords = { 0.f, 0.f};
+
+                vertex_list[it_t++].tex_coords = { 0.f, 0.f};
+                vertex_list[it_t++].tex_coords = { 0.f, 0.f};
+                vertex_list[it_t++].tex_coords = { 0.f, 0.f};
+
+                // Color 
+                vertex_list[it_t-6].color = { 0.8f, 0.8f, 0.8f };
+                vertex_list[it_t-5].color = { 0.8f, 0.8f, 0.8f };
+                vertex_list[it_t-4].color = { 0.8f, 0.8f, 0.8f };
+
+                vertex_list[it_t-3].color = { 0.8f, 0.8f, 0.8f };
+                vertex_list[it_t-2].color = { 0.8f, 0.8f, 0.8f };
+                vertex_list[it_t-1].color = { 0.8f, 0.8f, 0.8f };
+            }
+            --iter_divisions;
+        }
+
+        return Model(std::move(vertex_list));
+    }
 } // namespace kzn

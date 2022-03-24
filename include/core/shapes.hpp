@@ -3,10 +3,13 @@
 
 #include "core/model.hpp"
 
+#include <array>
+
 namespace kzn
 {
     // NOTE: Possible shape generator options:
     // - [ ] Clockwise or Counter Clockwise face
+    // - [ ] Color
     Model sphere(const float radius, const uint slices, const uint stacks);
 
     Model cylinder(const float radius, const float height, const uint slices);
@@ -18,6 +21,8 @@ namespace kzn
     Model plane(const float width);
 
     Model torus(const float radius, const float cyl_radius, const uint slices, const uint cyl_slices);
+
+    Model icosahedron(const std::array<glm::vec3, 3>& triangle, const uint divisions);
 }
 
 #endif // GENERATOR_H
