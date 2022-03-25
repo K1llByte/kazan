@@ -13,7 +13,7 @@ int main()
     auto window = Window("Kazan", 1700, 800);
     auto renderer = Renderer(&window);
 
-    auto model_renderer = ModelRenderer(&renderer);
+    auto model_renderer = TriangleRenderer(&renderer);
     while(!window.should_close())
     {
         // Poll events

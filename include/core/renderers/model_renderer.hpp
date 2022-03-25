@@ -6,12 +6,6 @@
 
 namespace kzn
 {
-    struct PVM
-    {
-        glm::mat4 proj_view;
-        glm::mat4 model;
-    };
-
     class ModelRenderer
     {
     public:
@@ -28,7 +22,6 @@ namespace kzn
         Renderer*      renderer;
         vk::RenderPass render_pass;
         vk::Pipeline   pipeline;
-        vk::Pipeline   wireframe_pipeline;
     };
 
     template<typename T>
@@ -45,4 +38,4 @@ namespace kzn
     }
 } // namespace kzn
 
-#endif // KZN_MODEL_RENDERER_HPPModelRenderer
+#endif // KZN_MODEL_RENDERER_HPP

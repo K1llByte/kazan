@@ -7,10 +7,10 @@ USE const
 kazan.hpp include with all public API includes
 
 ## In Progress
-- Find & Replace PI macro to pi constant in shape.cpp
-- make a shapes folder with all shape files implementations
 ## Todo
 - Input system
+- Find & Replace PI macro to pi constant in shape.cpp
+- make a shapes folder with all shape files implementations
 - Update Camera Controller with new  Input System
 - Study RendererBackend + RendererFrontend architechture
     and change the singleton Context model i have now
