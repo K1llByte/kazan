@@ -7,7 +7,8 @@ USE const
 kazan.hpp include with all public API includes
 
 ## In Progress
-- Icosahedron sphere
+- Find & Replace PI macro to pi constant in shape.cpp
+- make a shapes folder with all shape files implementations
 ## Todo
 - Input system
 - Update Camera Controller with new  Input System
@@ -32,6 +33,7 @@ kazan.hpp include with all public API includes
 - Compute shaders
 
 ## Done
+- Icosahedron sphere
 - Camera Controller
 - Auto convert models with just vertices to vertices + indices
 - Shape generator

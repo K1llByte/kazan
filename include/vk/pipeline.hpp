@@ -51,6 +51,7 @@ namespace kzn::vk
 
         // Rasterization Stage
         PipelineConfigBuilder& set_polygon_mode(VkPolygonMode polygon_mode) noexcept;
+        PipelineConfigBuilder& set_front_face(VkFrontFace font_face) noexcept;
         PipelineConfigBuilder& set_line_width(float line_width) noexcept;
 
         // Dynamic State Enables

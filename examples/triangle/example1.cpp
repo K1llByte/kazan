@@ -82,6 +82,7 @@ int main() try
                                .build();
     auto pipeline_config = vk::PipelineConfigBuilder(pipeline_layout, render_pass)
                                .set_dynamic_states({VK_DYNAMIC_STATE_VIEWPORT, VK_DYNAMIC_STATE_SCISSOR})
+                               .set_front_face(VK_FRONT_FACE_CLOCKWISE)
                                .build();
     auto pipeline = vk::Pipeline(
         &device,
