@@ -1,4 +1,4 @@
-#include "core/model_renderer.hpp"
+#include "core/renderers/model_renderer.hpp"
 
 #include "core/camera.hpp"
 #include "core/model.hpp"

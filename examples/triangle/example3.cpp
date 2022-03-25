@@ -13,7 +13,7 @@ int main()
     auto window = Window("Kazan", 1700, 800);
     auto renderer = Renderer(&window);
 
-    auto model_renderer = TriangleRenderer(&renderer);
+    auto triangle_renderer = TriangleRenderer(&renderer);
     while(!window.should_close())
     {
         // Poll events
@@ -22,9 +22,9 @@ int main()
         // Begin and End frame
         renderer.render_frame([&](auto& cmd_buffer)
         {
-            model_renderer.bind(cmd_buffer);
-                model_renderer.draw(cmd_buffer);
-            model_renderer.unbind(cmd_buffer);
+            triangle_renderer.bind(cmd_buffer);
+                triangle_renderer.draw(cmd_buffer);
+            triangle_renderer.unbind(cmd_buffer);
         });
 
         // Show FPS

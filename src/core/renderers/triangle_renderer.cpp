@@ -20,22 +20,23 @@ namespace kzn
                     render_pass)
                 .set_polygon_mode(VK_POLYGON_MODE_FILL)
                 .set_dynamic_states({VK_DYNAMIC_STATE_VIEWPORT, VK_DYNAMIC_STATE_SCISSOR})
+                .set_front_face(VK_FRONT_FACE_CLOCKWISE)
                 .build()))
     {
         render_pass.create_framebuffers(Context::swapchain());
         renderer->add_render_pass(render_pass);
     }
 
-    void TriangleRenderer::bind(vk::CommandBuffer& cmd_buffer, bool render_wireframe)
+    void TriangleRenderer::bind(vk::CommandBuffer& cmd_buffer)
     {
         render_pass.begin(cmd_buffer, Context::swapchain());
 
         auto& viewport = renderer->current_viewport();
         auto& scissor = renderer->current_scissor();
         
-        pipeline->set_viewport(cmd_buffer, viewport);
-        pipeline->set_scissor(cmd_buffer, scissor);
-        pipeline->bind(cmd_buffer);
+        pipeline.set_viewport(cmd_buffer, viewport);
+        pipeline.set_scissor(cmd_buffer, scissor);
+        pipeline.bind(cmd_buffer);
     }
 
     void TriangleRenderer::unbind(vk::CommandBuffer& cmd_buffer)
