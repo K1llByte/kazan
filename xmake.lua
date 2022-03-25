@@ -171,3 +171,22 @@ target("example3")
     -- Binary
     set_kind("binary")
     add_files("examples/triangle/example3.cpp")
+
+target("example4")
+    -- Common Compiler Options
+    set_languages("cxx20") -- -std=c++20
+    set_warnings("allextra", "error") -- -Wall -Wextra -Wfatal-errors
+    set_optimize("fastest") -- -O3
+    -- FIXME: Not working
+    add_cxxflags("-Wshadow", "-Wpedantic")
+    -- Compiler Options
+    add_includedirs("include")
+    add_includedirs("lib/vma/include")
+    add_deps("kazan")
+    add_packages("fmt")
+    add_packages("glm")
+    add_packages("boost")
+    set_targetdir("bin/")
+    -- Binary
+    set_kind("binary")
+    add_files("examples/model_render/example4.cpp")

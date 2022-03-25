@@ -1,15 +1,14 @@
 #include "kazan.hpp"
 
-// Kazui headers
-#include "gui/camera_controller.hpp"
+using namespace kzn;
 
-#include <thread>
-#include <functional>
-#include <iostream>
-#include <string_view>
-#include <chrono>
-
-#include <glm/glm.hpp>
+//////////////////////// Example 4 ////////////////////////
+// This example uses the kazan higher level API to generate
+// and render a sphere with a hardcoded directional light
+// in the shader. An alternative pipeline is bound when the
+// space key is pressed where only the wireframe is
+// rendered.
+///////////////////////////////////////////////////////////
 
 int main() try
 {
@@ -18,33 +17,24 @@ int main() try
 
     auto model_renderer = ModelRenderer(&renderer);
 
-    // auto model = Model::load("assets/models/monkey.obj");
-    auto model = kzn::icosahedron(0.8f, 5, true);
-    model.transform.position += glm::vec3{0.f, 0.f, 1.f};
-    auto model2 = kzn::sphere(0.8f, 17, 16);
-    model2.transform.position += glm::vec3{0.f, 0.f, -1.f};
+    auto model = kzn::sphere(1.f, 20, 20);
 
     Camera camera;
     camera.lookat_target(glm::vec3(5.f, 2.f, -2.f), glm::vec3(0.f, 0.f, 0.f));
-    CameraController camera_controller(&window, &camera);
-
-
 
     float counter = 0;
     bool render_wireframe_begin_state = false;
     bool render_wireframe = false;
     while(!window.should_close())
     {
-        auto delta_time = Time::delta();
         // Poll events
         window.poll_events();
 
         // Update
         camera.set_perspective(glm::radians(50.f), window.aspect_ratio(), 0.1f, 100.f);
-        camera_controller.update(delta_time);
 
         // Model rotation
-        // model.transform.rotation = glm::vec3{0.f, glm::radians(counter), 0.f};
+        model.transform.rotation = glm::vec3{0.f, glm::radians(counter), 0.f};
 
         switch (glfwGetKey(window.glfw_ptr(), GLFW_KEY_SPACE))
         {
@@ -67,33 +57,17 @@ int main() try
             };
 
             model_renderer.bind(cmd_buffer, render_wireframe);
-                // Draw model 1
+                // Draw model
                 pvm.model = model.transform.mat4();
                 model_renderer.push(cmd_buffer, pvm);
                 model.draw(cmd_buffer);
-
-                // Draw model 2
-                pvm.model = model2.transform.mat4();
-                model_renderer.push(cmd_buffer, pvm);
-                model2.draw(cmd_buffer);
-
-                // // Draw model 3
-                // pvm.model = model3.transform.mat4();
-                // model_renderer.push(cmd_buffer, pvm);
-                // model3.draw(cmd_buffer);
             model_renderer.unbind(cmd_buffer);
         });
 
-        // Show FPS each second
-        // auto delta_time = Time::delta();
-        static double until_second = 0.;
-        until_second += delta_time;
-        if(until_second > 1.)
-        {
-            window.set_title(fmt::format("FPS: {:.0f}", (1. / delta_time)));
-            until_second = 0.;
-        }
         ++counter;
+
+        // Show FPS
+        window.set_title(fmt::format("FPS: {:.0f}", (1. / Time::delta())));
     }
     renderer.wait_idle();
 }
