@@ -828,9 +828,9 @@ namespace kzn
                 vertex_list[it++].position = base_pos_i + vector_p1;
 
                 // Normals
-                vertex_list[it_n++].normal = { 0.f, 1.f, 0.f};
-                vertex_list[it_n++].normal = { 0.f, 1.f, 0.f};
-                vertex_list[it_n++].normal = { 0.f, 1.f, 0.f};
+                vertex_list[it_n++].normal = glm::normalize(base_pos_i);
+                vertex_list[it_n++].normal = glm::normalize(base_pos_i + vector_p3);
+                vertex_list[it_n++].normal = glm::normalize(base_pos_i + vector_p1);
 
                 // Texture Coords
                 vertex_list[it_t++].tex_coords = { 0.f, 0.f};
@@ -855,13 +855,13 @@ namespace kzn
                     vertex_list[it++].position = base_pos_j + vector_p1;
 
                     // Normals
-                    vertex_list[it_n++].normal = { 0.f, 1.f, 0.f};
-                    vertex_list[it_n++].normal = { 0.f, 1.f, 0.f};
-                    vertex_list[it_n++].normal = { 0.f, 1.f, 0.f};
+                    vertex_list[it_n++].normal = glm::normalize(base_pos_j);
+                    vertex_list[it_n++].normal = glm::normalize(base_pos_j + vector_p1);
+                    vertex_list[it_n++].normal = glm::normalize(base_pos_j + vector_p1 - vector_p3);
 
-                    vertex_list[it_n++].normal = { 0.f, 1.f, 0.f};
-                    vertex_list[it_n++].normal = { 0.f, 1.f, 0.f};
-                    vertex_list[it_n++].normal = { 0.f, 1.f, 0.f};
+                    vertex_list[it_n++].normal = glm::normalize(base_pos_j);
+                    vertex_list[it_n++].normal = glm::normalize(base_pos_j + vector_p3);
+                    vertex_list[it_n++].normal = glm::normalize(base_pos_j + vector_p1);
 
                     // Texture Coords
                     vertex_list[it_t++].tex_coords = { 0.f, 0.f};

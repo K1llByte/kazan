@@ -229,7 +229,7 @@ int main() try
     // auto model = Model::load("assets/models/monkey.obj");
     auto model = kzn::icosahedron(0.8f, 5, true);
     model.transform.position += glm::vec3{0.f, 0.f, 1.f};
-    auto model2 = kzn::sphere(0.8f, 17, 17);
+    auto model2 = kzn::sphere(0.8f, 17, 16);
     model2.transform.position += glm::vec3{0.f, 0.f, -1.f};
 
     Camera camera;

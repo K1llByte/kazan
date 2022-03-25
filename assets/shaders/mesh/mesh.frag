@@ -9,7 +9,7 @@ layout(location = 2) in vec3 frag_normal;
 layout(location = 0) out vec4 out_color;
 
 // Constants
-const vec3 DIR_TO_LIGHT = normalize(vec3(1.0, 6.0, -10.0));
+const vec3 DIR_TO_LIGHT = normalize(vec3(0.0, 6.0, -10.0));
 const float AMBIENT_LIGHT = 0.2;
 
 //////////////////////////////////////////////////////////
