@@ -226,24 +226,18 @@ int main() try
 
     auto model_renderer = ModelRenderer(&renderer);
 
-    // auto model = Model({
-    //         // position         normal           color                  tex coords
-    //         {{ 0.0, -0.5, 0.0}, {0.0, 0.0, 1.0}, {0.984, 0.286, 0.203}, {0.0, 0.0}},
-    //         {{ 0.5,  0.5, 0.0}, {0.0, 0.0, 1.0}, {0.556, 0.752, 0.486}, {0.0, 0.0}},
-    //         {{-0.5,  0.5, 0.0}, {0.0, 0.0, 1.0}, {0.513, 0.647, 0.596}, {0.0, 0.0}}
-    //     }
-    //     ,{ 0, 1, 2 }
-    // );
     // auto model = Model::load("assets/models/monkey.obj");
-    // auto model = kzn::icosahedron(std::array{
-    //     glm::vec3{  0.0, -1.0, 0.0},
-    //     glm::vec3{  1.0,  1.0, 0.0},
-    //     glm::vec3{ -1.0,  1.0, 0.0}
-    // }, 10);
-    // model.transform.position = glm::vec3{0.f, 0.f, 3.f};
+    auto model = kzn::icosahedron(0.8f, 5, true);
+    model.transform.position += glm::vec3{0.f, 0.f, 1.f};
+    auto model2 = kzn::sphere(0.8f, 17, 17);
+    model2.transform.position += glm::vec3{0.f, 0.f, -1.f};
+
     Camera camera;
     camera.lookat_target(glm::vec3(5.f, 2.f, -2.f), glm::vec3(0.f, 0.f, 0.f));
     CameraController camera_controller(&window, &camera);
+
+
+
     float counter = 0;
     bool render_wireframe_begin_state = false;
     bool render_wireframe = false;
@@ -286,10 +280,10 @@ int main() try
                 model_renderer.push(cmd_buffer, pvm);
                 model.draw(cmd_buffer);
 
-                // // Draw model 2
-                // pvm.model = model2.transform.mat4();
-                // model_renderer.push(cmd_buffer, pvm);
-                // model2.draw(cmd_buffer);
+                // Draw model 2
+                pvm.model = model2.transform.mat4();
+                model_renderer.push(cmd_buffer, pvm);
+                model2.draw(cmd_buffer);
 
                 // // Draw model 3
                 // pvm.model = model3.transform.mat4();

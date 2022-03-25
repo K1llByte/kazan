@@ -22,7 +22,7 @@ namespace kzn
 
     Model torus(const float radius, const float cyl_radius, const uint slices, const uint cyl_slices);
 
-    Model icosahedron(const std::array<glm::vec3, 3>& triangle, const uint divisions);
+    Model icosahedron(const float radius, const uint divisions, bool to_sphere = false);
 }
 
 #endif // GENERATOR_H
