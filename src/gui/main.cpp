@@ -11,6 +11,8 @@
 
 #include <glm/glm.hpp>
 
+using namespace kzn;
+
 int main() try
 {
     auto window = Window("Kazan", 1700, 800);

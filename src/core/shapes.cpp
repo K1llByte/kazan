@@ -20,9 +20,9 @@ namespace kzn
         const size_t NUM_VTX = (6*stacks-6)*slices;
         std::vector<Vertex> vertex_list(NUM_VTX);
 
-        const float pi_f = PI;
-        const float stack_angle = PI / stacks;
-        const float slices_angle = 2*PI / slices;
+        const float pi_f = math::pi;
+        const float stack_angle = math::pi / stacks;
+        const float slices_angle = 2*math::pi / slices;
 
         const float tex_slice = (1.f / slices);
         const float tex_stacks = (1.f / stacks);
@@ -140,7 +140,7 @@ namespace kzn
         
         const size_t NUM_VTX = 12*slices;
         std::vector<Vertex> vertex_list(NUM_VTX);
-        const float angle = 2*PI / static_cast<float>(slices);
+        const float angle = 2*math::pi / static_cast<float>(slices);
         const float half_height = height / 2;
 
         const float tex_div_width = 1.0f / static_cast<float>(slices);
@@ -557,11 +557,11 @@ namespace kzn
 
         const size_t NUM_VTX = 6*slices*stacks;
         std::vector<Vertex> vertex_list(NUM_VTX);
-        const float angle = 2*PI / slices;
+        const float angle = 2*math::pi / slices;
         const float stack_height = height / stacks;
         const float stack_radius = radius / stacks;
 
-        const float tex_div_slice = 2*PI / slices;
+        const float tex_div_slice = 2*math::pi / slices;
         
 
         uint it = 0;
@@ -726,8 +726,8 @@ namespace kzn
         const size_t NUM_VTX = 6*slices*cyl_slices;
 
         std::vector<Vertex> vertex_list(NUM_VTX);
-        const float angle = 2*PI / slices;
-        const float cyl_angle = 2*PI / cyl_slices;
+        const float angle = 2*math::pi / slices;
+        const float cyl_angle = 2*math::pi / cyl_slices;
         const float cyl_distance = radius - cyl_radius;
 
         const float tex_div_slice = 1.0f / slices;
@@ -798,7 +798,7 @@ namespace kzn
             throw std::runtime_error("invalid shape arguments");
         }
 
-        const size_t NUM_VTX = 20*divisions*divisions*3;
+        const size_t NUM_VTX = 60*divisions*divisions;
 
         std::vector<Vertex> vertex_list(NUM_VTX);
 
@@ -806,7 +806,7 @@ namespace kzn
         uint it_n = 0;
         uint it_t = 0;
 
-        const float cos_30 = cos(PI/6);
+        const float cos_30 = cos(math::pi/6);
 
         auto compute_emit_tesselation = [&](
             const glm::vec3& p1,
@@ -889,10 +889,10 @@ namespace kzn
         {
             // Points of the connection of the top and the bottom
             // to the body of the icosahedron
-            const auto top_1 = cylindrical_to_cartesian({ cos_30*radius, 0.5*radius,     i*(2*PI/5)});
-            const auto top_2 = cylindrical_to_cartesian({ cos_30*radius, 0.5*radius, (i+1)*(2*PI/5)});
-            const auto bottom_1 = cylindrical_to_cartesian({ cos_30*radius, -0.5*radius,     i*(2*PI/5)+(2*PI/5)/2});
-            const auto bottom_2 = cylindrical_to_cartesian({ cos_30*radius, -0.5*radius, (i+1)*(2*PI/5)+(2*PI/5)/2});
+            const auto top_1 = cylindrical_to_cartesian({ cos_30*radius, 0.5*radius,     i*(2*math::pi/5)});
+            const auto top_2 = cylindrical_to_cartesian({ cos_30*radius, 0.5*radius, (i+1)*(2*math::pi/5)});
+            const auto bottom_1 = cylindrical_to_cartesian({ cos_30*radius, -0.5*radius,     i*(2*math::pi/5)+(2*math::pi/5)/2});
+            const auto bottom_2 = cylindrical_to_cartesian({ cos_30*radius, -0.5*radius, (i+1)*(2*math::pi/5)+(2*math::pi/5)/2});
 
             // Vertices
             compute_emit_tesselation({ 0.f, radius, 0.f}, top_2, top_1);
