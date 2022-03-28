@@ -7,17 +7,15 @@ USE const
 kazan.hpp include with all public API includes
 
 ## In Progress
-## Todo
 - Input system
-- Find & Replace PI macro to pi constant in shape.cpp
-- make a shapes folder with all shape files implementations
+## Todo
 - Update Camera Controller with new  Input System
-- Study RendererBackend + RendererFrontend architechture
-    and change the singleton Context model i have now
 - Uniform Buffers
     - Descriptor Pools
     - Descriptor Sets 
 - Texture mapping
+- Study RendererBackend + RendererFrontend architechture
+    and change the singleton Context model i have now
 - Work on FIXME's and TODO's
 - Generating Mipmaps
 - ImGUI Docking test (with example)
@@ -33,6 +31,7 @@ kazan.hpp include with all public API includes
 - Compute shaders
 
 ## Done
+- Find & Replace PI macro to pi constant in shape.cpp
 - Icosahedron sphere
 - Camera Controller
 - Auto convert models with just vertices to vertices + indices

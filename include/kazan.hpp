@@ -4,6 +4,7 @@
 #include "core/log.hpp"
 #include "core/utils.hpp"
 #include "core/window.hpp"
+#include "core/input.hpp"
 #include "core/renderer.hpp"
 #include "core/renderers/model_renderer.hpp"
 #include "core/renderers/triangle_renderer.hpp"
