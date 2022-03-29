@@ -7,9 +7,8 @@ USE const
 kazan.hpp include with all public API includes
 
 ## In Progress
-- Input system
 ## Todo
-- Update Camera Controller with new  Input System
+- Update Camera Controller with new Input System
 - Uniform Buffers
     - Descriptor Pools
     - Descriptor Sets 
@@ -22,6 +21,8 @@ kazan.hpp include with all public API includes
 - Multisampling
 - Allow QueueFamilyIndices to create queues selectively
 <!-- Future -->
+- Input Keyboard and GamePad enum wrappers to replace
+  GLFW's int values in Input class
 - Instanced rendering
 - Dynamic uniforms
 - Separate images and sampler descriptors
@@ -31,6 +32,7 @@ kazan.hpp include with all public API includes
 - Compute shaders
 
 ## Done
+- Input system
 - Find & Replace PI macro to pi constant in shape.cpp
 - Icosahedron sphere
 - Camera Controller

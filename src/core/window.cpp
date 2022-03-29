@@ -91,9 +91,4 @@ namespace kzn
             static_cast<uint32_t>(height)
         };
     }
-
-    int Window::get_key(int code)
-    {
-        return glfwGetKey(glfw_window, code);
-    }
 }

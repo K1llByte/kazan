@@ -8,7 +8,7 @@ using namespace kzn;
 int main() try
 {
     auto window = Window("Kazan", 1700, 800);
-    auto input = Input(&window);
+    auto input = window.input_handler();
     auto renderer = Renderer(&window);
 
     auto model_renderer = ModelRenderer(&renderer);

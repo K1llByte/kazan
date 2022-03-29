@@ -1,7 +1,8 @@
 #ifndef KZN_INPUT_HPP
 #define KZN_INPUT_HPP
 
-#include "core/window.hpp"
+#define GLFW_INCLUDE_VULKAN
+#include <GLFW/glfw3.h>
 
 namespace kzn
 {
@@ -14,7 +15,7 @@ namespace kzn
     class Input
     {
     public:
-        Input(Window* window);
+        Input(GLFWwindow* glfw_window);
         ~Input() = default;
 
         // Keyboard
@@ -25,7 +26,7 @@ namespace kzn
         CursorPos get_cursor_pos(int key_code) const;
 
     private:
-        Window* window;
+        GLFWwindow* glfw_window;
     };
 } // namespace kzn
 

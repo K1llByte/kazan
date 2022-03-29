@@ -18,29 +18,29 @@ namespace kzn
         glm::vec3 right = glm::normalize(glm::cross(dir, up));
 
         // Positional movement
-        if(window->get_key(key_maps.move_front) == GLFW_PRESS)
+        if(input.is_key_pressed(key_maps.move_front))
             pos += move_speed * dt * dir;
-        if(window->get_key(key_maps.move_back) == GLFW_PRESS)
+        if(input.is_key_pressed(key_maps.move_back))
             pos -= move_speed * dt * dir;
-        if(window->get_key(key_maps.move_right) == GLFW_PRESS)
+        if(input.is_key_pressed(key_maps.move_right))
             pos += move_speed * dt * right;
-        if(window->get_key(key_maps.move_left) == GLFW_PRESS)
+        if(input.is_key_pressed(key_maps.move_left))
             pos -= move_speed * dt * right;
-        if(window->get_key(key_maps.move_up) == GLFW_PRESS)
+        if(input.is_key_pressed(key_maps.move_up))
             pos += move_speed * dt * up;
-        if(window->get_key(key_maps.move_down) == GLFW_PRESS)
+        if(input.is_key_pressed(key_maps.move_down))
             pos -= move_speed * dt * up;
 
         glm::vec2 rotation{0.f};
 
         // Direction rotation: Keys
-        if(window->get_key(key_maps.look_right) == GLFW_PRESS)
+        if(input.is_key_pressed(key_maps.look_right))
             rotation.y += look_speed * dt;
-        if(window->get_key(key_maps.look_left) == GLFW_PRESS)
+        if(input.is_key_pressed(key_maps.look_left))
             rotation.y -= look_speed * dt;
-        if(window->get_key(key_maps.look_up) == GLFW_PRESS)
+        if(input.is_key_pressed(key_maps.look_up))
             rotation.x += look_speed * dt;
-        if(window->get_key(key_maps.look_down) == GLFW_PRESS)
+        if(input.is_key_pressed(key_maps.look_down))
             rotation.x -= look_speed * dt;
 
         // Aux data
@@ -53,11 +53,11 @@ namespace kzn
         // Disable mouse (unique press)
         // static bool use_mouse = false;
         // static bool disable_mouse_press = false;
-        // if(window->get_key(key_maps.disable_mouse) == GLFW_PRESS)
+        // if(input.is_key_pressed(key_maps.disable_mouse))
         // {
         //     disable_mouse_press = true;
         // }
-        // if(disable_mouse_press && window->get_key(key_maps.disable_mouse) == GLFW_RELEASE)
+        // if(disable_mouse_press && input.is_key_pressed(key_maps.disable_mouse) == GLFW_RELEASE)
         // {
         //     use_mouse = !use_mouse;
         //     disable_mouse_press = !disable_mouse_press;

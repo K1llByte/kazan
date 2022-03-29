@@ -9,6 +9,7 @@ namespace kzn
 {
     class Camera
     {
+        friend class Window;
     public:
         void set_orthographic(float left, float right, float top, float bottom, float near, float far);
         void set_perspective(float fov_y, float aspect, float near, float far);

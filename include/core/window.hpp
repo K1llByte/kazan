@@ -1,14 +1,19 @@
 #ifndef KZN_WINDOW_HPP
 #define KZN_WINDOW_HPP
 
+#include "core/input.hpp"
+
 #include <string_view>
 #include <vector>
 
+// FIXME: Useless
 #define GLFW_INCLUDE_VULKAN
 #include <GLFW/glfw3.h>
 
 namespace kzn
 {
+    class Input;
+
     class Window
     {
         friend void framebuffer_resized(GLFWwindow* , int, int);
@@ -24,13 +29,13 @@ namespace kzn
         constexpr float aspect_ratio() const noexcept { return static_cast<float>(width) / static_cast<float>(height); }
         bool was_resized() noexcept;
         GLFWwindow* glfw_ptr() noexcept { return glfw_window; }
+        Input input_handler() { return Input(glfw_window); }
 
         std::vector<const char*> required_extensions();
         VkExtent2D extent() noexcept;
 
         // Input related
         // TODO: Make an appropriate event system
-        int get_key(int code);
         
     public:
         bool         has_resized = false;
