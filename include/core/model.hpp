@@ -2,7 +2,7 @@
 #define KZN_CORE_MODEL_HPP
 
 #include "core/transform.hpp"
-#include "vk/input_buffers.hpp"
+#include "vk/buffers.hpp"
 
 #include <glm/glm.hpp>
 

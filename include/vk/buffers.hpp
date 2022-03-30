@@ -40,6 +40,22 @@ namespace kzn::vk
         std::size_t   buffer_size;
         VmaAllocation allocation;
     };
+
+    class UniformBuffer
+    {
+    public:
+        UniformBuffer(Device* device, VkDeviceSize buffer_size);
+        ~UniformBuffer();
+
+        // TODO: Change float to T type of the uniform buffer
+        void upload(const float* data);
+    
+    private:
+        Device*       device;
+        VkBuffer      buffer;
+        std::size_t   buffer_size;
+        VmaAllocation allocation;
+    };
 } // namespace kzn::vk
 
 #endif // KZN_VK_INPUT_BUFFER_HPP

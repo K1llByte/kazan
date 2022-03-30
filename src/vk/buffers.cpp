@@ -1,4 +1,4 @@
-#include "vk/input_buffers.hpp"
+#include "vk/buffers.hpp"
 
 #include "vk/utils.hpp"
 
@@ -90,5 +90,41 @@ namespace kzn::vk
     {
         // Bind Index Buffer
         vkCmdBindIndexBuffer(cmd_buffer.vk_command_buffer(), buffer, 0, VK_INDEX_TYPE_UINT32);
+    }
+
+    UniformBuffer::UniformBuffer(Device* _device, VkDeviceSize _buffer_size)
+        : device(_device), buffer_size(_buffer_size)
+    {
+        VkBufferCreateInfo buffer_info{};
+        buffer_info.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
+        buffer_info.size = buffer_size;
+        buffer_info.usage = VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT;
+
+        VmaAllocationCreateInfo vma_alloc_info{};
+	    vma_alloc_info.usage = VMA_MEMORY_USAGE_AUTO; // VMA_MEMORY_USAGE_CPU_TO_GPU;
+
+        auto result = vmaCreateBuffer(
+            device->allocator(),
+            &buffer_info,
+            &vma_alloc_info,
+            &buffer,
+            &allocation,
+            nullptr
+        );
+        VK_CHECK_MSG(result, "Failed to create Uniform Buffer");
+    }
+
+    UniformBuffer::~UniformBuffer()
+    {
+        vmaDestroyBuffer(device->allocator(), buffer, allocation);
+    }
+
+    void UniformBuffer::upload(const float* new_data)
+    {
+        // Copy vertex data to GPU
+        void* data;
+        vmaMapMemory(device->allocator(), allocation, &data);
+        memcpy(data, new_data, buffer_size);
+        vmaUnmapMemory(device->allocator(), allocation);
     }
 } // namespace kzn::vk
