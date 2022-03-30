@@ -18,6 +18,7 @@
 #include "vk/pipeline.hpp"
 #include "vk/render_pass.hpp"
 #include "vk/cmd_buffers.hpp"
+#include "vk/descriptor_set.hpp"
 #include "vk/input_buffers.hpp"
 #include "vk/device_features.hpp"
 #include "vk/utils.hpp"

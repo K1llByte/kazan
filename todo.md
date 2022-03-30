@@ -7,11 +7,11 @@ USE const
 kazan.hpp include with all public API includes
 
 ## In Progress
-## Todo
-- Update Camera Controller with new Input System
 - Uniform Buffers
+    - Descriptor Set Layout
     - Descriptor Pools
     - Descriptor Sets 
+## Todo
 - Texture mapping
 - Study RendererBackend + RendererFrontend architechture
     and change the singleton Context model i have now
@@ -32,6 +32,7 @@ kazan.hpp include with all public API includes
 - Compute shaders
 
 ## Done
+- Update Camera Controller with new Input System
 - Input system
 - Find & Replace PI macro to pi constant in shape.cpp
 - Icosahedron sphere
