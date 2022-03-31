@@ -11,6 +11,8 @@ namespace kzn::vk
     public:
         ~DescriptorSetLayout();
 
+        VkDescriptorSetLayout vk_descriptor_set_layout() { return vkset_layout; };
+
     private:
         DescriptorSetLayout() = default;
     private:
@@ -35,6 +37,39 @@ namespace kzn::vk
     private:
         Device*                                   device;
         std::vector<VkDescriptorSetLayoutBinding> bindings;
+    };
+
+    class DescriptorSet
+    {
+        friend class DescriptorPool;
+    public:
+        ~DescriptorSet() = default;
+
+        VkDescriptorSet vk_descriptor_set() noexcept { return vkdescriptor_set; }
+
+        void bind(CommandBuffer& cmd_buffer, VkPipelineLayout vkpipeline_layout);
+
+    private:
+        DescriptorSet() = default;
+
+    private:
+        VkDescriptorSet vkdescriptor_set;
+    };
+
+    class DescriptorPool
+    {
+    public:
+        DescriptorPool(Device* device);
+        ~DescriptorPool();
+
+        VkDescriptorPool vk_descriptor_pool() noexcept { return vkdescriptor_pool; }
+
+        DescriptorSet allocate(DescriptorSetLayout& descriptor_set_layout);
+        // TODO: allocate multiple sets at a time
+
+    private:
+        Device*          device;
+        VkDescriptorPool vkdescriptor_pool;
     };
 } // namespace kzn::vk
 

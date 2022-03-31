@@ -303,7 +303,7 @@ namespace kzn::vk
         );
     }
 
-    void Pipeline::bind(CommandBuffer cmd_buffer)
+    void Pipeline::bind(CommandBuffer& cmd_buffer)
     {
         vkCmdBindPipeline(
             cmd_buffer.vk_command_buffer(),

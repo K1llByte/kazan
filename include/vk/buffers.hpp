@@ -47,8 +47,8 @@ namespace kzn::vk
         UniformBuffer(Device* device, VkDeviceSize buffer_size);
         ~UniformBuffer();
 
-        // TODO: Change float to T type of the uniform buffer
-        void upload(const float* data);
+        template<typename T>
+        void upload(const T* data);
     
     private:
         Device*       device;
@@ -56,6 +56,16 @@ namespace kzn::vk
         std::size_t   buffer_size;
         VmaAllocation allocation;
     };
+
+    template<typename T>
+    void UniformBuffer::upload(const T* new_data)
+    {
+        // Copy vertex data to GPU
+        void* data;
+        vmaMapMemory(device->allocator(), allocation, &data);
+        memcpy(data, new_data, buffer_size);
+        vmaUnmapMemory(device->allocator(), allocation);
+    }
 } // namespace kzn::vk
 
 #endif // KZN_VK_INPUT_BUFFER_HPP

@@ -18,7 +18,7 @@ namespace kzn::vk
         CommandBuffer allocate();
 
     private:
-        Device* device;
+        Device*       device;
         VkCommandPool vkcommand_pool;
     };
 

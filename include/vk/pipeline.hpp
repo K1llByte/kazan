@@ -95,7 +95,7 @@ namespace kzn::vk
 
         void set_viewport(CommandBuffer& cmd_buffer, VkViewport viewport);
         void set_scissor(CommandBuffer& cmd_buffer, VkRect2D scissor);
-        void bind(CommandBuffer cmd_buffer);
+        void bind(CommandBuffer& cmd_buffer);
 
     private:
         Device*          device = nullptr;

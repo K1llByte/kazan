@@ -69,7 +69,7 @@ namespace kzn::vk
             &allocation,
             nullptr
         );
-        VK_CHECK_MSG(result, "Failed to create Vertex Buffer");
+        VK_CHECK_MSG(result, "Failed to create Index Buffer");
     }
 
     IndexBuffer::~IndexBuffer()
@@ -117,14 +117,5 @@ namespace kzn::vk
     UniformBuffer::~UniformBuffer()
     {
         vmaDestroyBuffer(device->allocator(), buffer, allocation);
-    }
-
-    void UniformBuffer::upload(const float* new_data)
-    {
-        // Copy vertex data to GPU
-        void* data;
-        vmaMapMemory(device->allocator(), allocation, &data);
-        memcpy(data, new_data, buffer_size);
-        vmaUnmapMemory(device->allocator(), allocation);
     }
 } // namespace kzn::vk
