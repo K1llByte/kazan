@@ -184,6 +184,12 @@ int main() try
         .add_binding(0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 1, VK_SHADER_STAGE_VERTEX_BIT)
         .build();
 
+    /* 
+    DescriptorSetLayout({
+        { 0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 1, VK_SHADER_STAGE_VERTEX_BIT }
+    })
+     */
+
     auto pipeline_layout = kzn::vk::PipelineLayoutBuilder(&device)
                                .build();
     auto pipeline_config = kzn::vk::PipelineConfigBuilder(pipeline_layout, render_pass)
