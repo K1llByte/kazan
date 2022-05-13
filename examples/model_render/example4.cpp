@@ -18,7 +18,7 @@ int main() try
     auto model_renderer = ModelRenderer(&renderer);
 
     // auto model = kzn::sphere(1.f, 20, 20);
-    auto model = Model::load("");
+    auto model = Model::load("../../Other/models/demon/Sword.obj");
 
     Camera camera;
     camera.lookat_target(glm::vec3(5.f, 2.f, -2.f), glm::vec3(0.f, 0.f, 0.f));
@@ -35,7 +35,7 @@ int main() try
         camera.set_perspective(glm::radians(50.f), window.aspect_ratio(), 0.1f, 100.f);
 
         // Model rotation
-        model.transform.rotation = glm::vec3{0.f, glm::radians(counter), 0.f};
+        // model.transform.rotation = glm::vec3{0.f, glm::radians(counter), 0.f};
 
         switch (glfwGetKey(window.glfw_ptr(), GLFW_KEY_SPACE))
         {
