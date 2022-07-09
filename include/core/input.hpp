@@ -8,8 +8,7 @@ namespace kzn
 {
     struct CursorPos
     {
-        float x;
-        float y;
+        float x, y;
     };
 
     class Input
@@ -21,6 +20,7 @@ namespace kzn
         // Keyboard
         int get_key(int key_code) const;
         bool is_key_pressed(int key_code) const;
+        bool is_key_released(int key_code) const;
         // Mouse
         int get_mouse_button(int button) const;
         CursorPos get_cursor_pos(int key_code) const;

@@ -10,7 +10,7 @@
 #include "core/renderers/triangle_renderer.hpp"
 #include "core/model.hpp"
 #include "core/camera.hpp"
-#include "core/shapes.hpp"
+//#include "core/shapes.hpp"
 
 #include "vk/instance.hpp"
 #include "vk/device.hpp"

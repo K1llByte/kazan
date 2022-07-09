@@ -15,6 +15,11 @@ namespace kzn
         return this->get_key(key_code) == GLFW_PRESS;
     }
 
+    bool Input::is_key_released(int key_code) const
+    {
+        return this->get_key(key_code) == GLFW_RELEASE;
+    }
+
     int Input::get_mouse_button(int button) const
     {
         return glfwGetMouseButton(glfw_window, GLFW_MOUSE_BUTTON_LEFT);

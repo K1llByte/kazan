@@ -40,8 +40,8 @@ namespace kzn::vk
         return VkViewport{
             .x = 0,
             .y = 0,
-            .width = extent.width,
-            .height = extent.height,
+            .width = static_cast<float>(extent.width),
+            .height = static_cast<float>(extent.height),
             .minDepth = 0.0,
             .maxDepth = 1.0,
         };

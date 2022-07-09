@@ -3,13 +3,15 @@ add_requires("vulkan-headers")
 add_requires("glm")
 add_requires("glfw")
 add_requires("fmt")
-add_requires("boost")
+add_requires("glslang", {configs = {binaryonly = true}})
+
+add_requires("vcpkg::boost-pfr", {alias = "boost"})
 
 -------------------- Shaders ---------------------
 
 -- Custom shader compilation rule
 rule("glsl")
-    set_extensions(".vert", ".frag")
+    set_extensions(".vert", ".comp", ".frag")
     on_build_file(function (target, sourcefile, opt)
         import("core.project.depend")
         import("utils.progress") -- it only for v2.5.9, we need use print to show progress below v2.5.8
@@ -59,6 +61,7 @@ target("kazan")
     if is_plat("linux", "macosx") then
         add_links("pthread") --, "m", "dl")
     end
+    add_cxxflags("/Zc:preprocessor")
     add_includedirs("include")
     -- add_includedirs("lib/include/imgui")
     -- add_includedirs("lib/imgui_docking/include")
@@ -66,7 +69,7 @@ target("kazan")
     add_includedirs("lib/tiny_obj_loader/include")
     add_includedirs("lib/vma/include")
     -- Dependencies
-    add_packages("vulkan-headers", {links = "vulkan"})
+    add_packages("vulkan-headers")
     add_packages("glfw")
     add_packages("glm")
     add_packages("fmt")
@@ -76,12 +79,16 @@ target("kazan")
     add_files("src/**.cpp")
     remove_files("src/gui/**.cpp")
     remove_files("src/main.cpp")
+    remove_files("src/core/shapes.*pp")
 
 -------------------- Kazan GUI -------------------
 
 target("imgui")
     set_kind("object")
     add_includedirs("lib/imgui/include")
+    add_packages("glfw")
+    add_packages("vulkan-headers")
+    add_links("vulkan")
     -- add_headerfiles("lib/imgui/include/*.h")
     add_files("lib/imgui/src/**.cpp")
 
@@ -92,8 +99,12 @@ target("kazui")
     set_warnings("allextra", "error") -- -Wall -Wextra -Wfatal-errors
     set_optimize("fastest") -- -O3
     set_targetdir("bin/")
-    -- FIXME: Not working
+    -- GCC flags
     add_cxxflags("-Wshadow", "-Wpedantic")
+    -- MSVC flags
+    --if is_plat("windows") then 
+    add_cxxflags("/Zc:preprocessor")
+    --end
     -- Compiler Options
     add_options("kb22")
     add_includedirs("include")
@@ -106,6 +117,9 @@ target("kazui")
     add_packages("fmt")
     add_packages("glm")
     add_packages("boost")
+    add_packages("glfw")
+    add_linkdirs("C:\\VulkanSDK\\1.3.216.0\\Lib")
+    add_packages("vulkan-headers", {links = "vulkan-1"})
     -- Binary
     set_kind("binary")
     add_files("src/gui/*.cpp")

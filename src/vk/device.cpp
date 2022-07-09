@@ -130,12 +130,12 @@ namespace kzn::vk
         }
         else
         {
-            extent.width = std::clamp(
+            extent.width = glm::clamp(
                 extent.width,
                 capabilities.minImageExtent.width,
                 capabilities.maxImageExtent.width
             );
-            extent.height = std::clamp(
+            extent.height = glm::clamp(
                 extent.height,
                 capabilities.minImageExtent.height,
                 capabilities.maxImageExtent.height

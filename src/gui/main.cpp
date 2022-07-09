@@ -16,8 +16,8 @@ int main() try
     // auto model = kzn::icosahedron(0.8f, 30, true);
     // model.transform.position += glm::vec3{0.f, 0.f, 1.f};
     // auto model2 = kzn::sphere(0.8f, 17, 16);
-    auto model2 = Model::load("../../Other/models/banana.obj");
-    model2.transform.position += glm::vec3{0.f, 0.f, -1.f};
+    //auto model2 = Model::load("../../Other/models/banana.obj");
+    //model2.transform.position += glm::vec3{0.f, 0.f, -1.f};
 
     Camera camera;
     camera.lookat_target(glm::vec3{5.f, 2.f, 0.f}, glm::vec3{0.f, 0.f, 0.f});
@@ -34,13 +34,20 @@ int main() try
 
         // Update
         camera.set_perspective(glm::radians(50.f), window.aspect_ratio(), 0.1f, 100.f);
-        camera_controller.update(delta_time);
+        camera_controller.update(static_cast<float>(delta_time));
 
         // Model rotation
         // model.transform.rotation = glm::vec3{0.f, glm::radians(counter), 0.f};
 
         static bool render_wireframe_begin_state = false;
         static bool render_wireframe = false;
+
+        //if(input.is_key_pressed(GLFW_KEY_SPACE) && !render_wireframe_begin_state)
+        //    render_wireframe = !render_wireframe;
+        //if(input.is_key_released(GLFW_KEY_SPACE))
+        //    render_wireframe_begin_state = false;
+        
+        
         switch (input.get_key(GLFW_KEY_SPACE))
         {
             case GLFW_PRESS:
@@ -78,9 +85,9 @@ int main() try
                 model.draw(cmd_buffer);
 
                 // Draw model 2
-                pvm.model = model2.transform.mat4();
-                model_renderer.push(cmd_buffer, pvm);
-                model2.draw(cmd_buffer);
+                //pvm.model = model2.transform.mat4();
+                //model_renderer.push(cmd_buffer, pvm);
+                //model2.draw(cmd_buffer);
 
                 // // Draw model 3
                 // pvm.model = model3.transform.mat4();

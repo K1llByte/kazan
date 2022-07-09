@@ -78,8 +78,8 @@ namespace kzn
 
         const float clamp_error = 0.000001f;
         dir = math::cartesian_to_spherical(dir);
-        dir.y = std::clamp<float>(dir.y + rotation.y, -math::pi, math::pi);
-        dir.z = std::clamp<float>(dir.z + rotation.x, 0, math::pi - clamp_error);
+        dir.y = glm::clamp<float>(dir.y + rotation.y, -math::pi, math::pi);
+        dir.z = glm::clamp<float>(dir.z + rotation.x, 0, math::pi - clamp_error);
         dir = math::spherical_to_cartesian(dir);
 
         // right = to_spherical(right);
