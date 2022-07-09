@@ -188,7 +188,7 @@ namespace kzn::vk
         return *this;
     }
 
-    VkPipelineLayout PipelineLayoutBuilder::build() noexcept
+    VkPipelineLayout PipelineLayoutBuilder::build()
     {
         VkPipelineLayoutCreateInfo pipeline_layout_info{};
         pipeline_layout_info.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
@@ -283,13 +283,13 @@ namespace kzn::vk
         Log::debug("Pipeline destroyed");
     }
 
-    void Pipeline::set_viewport(CommandBuffer& cmd_buffer, VkViewport viewport)
+    void Pipeline::set_viewport(CommandBuffer& cmd_buffer, VkViewport _viewport)
     {
         vkCmdSetViewport(
             cmd_buffer.vk_command_buffer(),
             0,
             1,
-            &viewport
+            &_viewport
         );
     }
 

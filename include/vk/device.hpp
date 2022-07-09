@@ -90,7 +90,6 @@ namespace kzn::vk
         std::vector<const char*>      validation_layers;
         std::vector<const char*>      device_extensions;
         VkPhysicalDeviceFeatures      device_features{};
-        VkPhysicalDevice              vkphysical_device = VK_NULL_HANDLE;
         VkSurfaceKHR                  surface = VK_NULL_HANDLE;
         // Only used for VmaAllocator creation
         VkInstance                    vkinstance;

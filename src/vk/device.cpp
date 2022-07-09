@@ -33,7 +33,7 @@ namespace kzn::vk
             // because there could be a queue_family with support for both
             // Graphics and Present
             VkBool32 present_support = false;
-            vkGetPhysicalDeviceSurfaceSupportKHR(physical_device, i, surface, &present_support);
+            vkGetPhysicalDeviceSurfaceSupportKHR(physical_device, static_cast<uint32_t>(i), surface, &present_support);
             if(present_support)
                 indices.present_family = i;
             if(indices.is_complete())
@@ -193,7 +193,7 @@ namespace kzn::vk
         present_info.swapchainCount = 1;
         VkSwapchainKHR swapchains[] = { swapchain.vk_swapchain() };
         present_info.pSwapchains = swapchains;
-        uint32_t indices[] = { swapchain.current_index() };
+        uint32_t indices[] = { static_cast<uint32_t>(swapchain.current_index()) };
         present_info.pImageIndices = indices;
         present_info.pResults = nullptr; // Optional
         auto result = vkQueuePresentKHR(present_queue, &present_info);
@@ -229,11 +229,11 @@ namespace kzn::vk
         validation_layers = instance.get_validation_layers();
     }
 
-    DeviceBuilder& DeviceBuilder::set_surface(VkSurfaceKHR surface) noexcept
+    DeviceBuilder& DeviceBuilder::set_surface(VkSurfaceKHR _surface) noexcept
     {
         // NOTE: Device creation with Present Queue requires
         // surface handle before creation
-        this->surface = surface;
+        this->surface = _surface;
         return *this;
     }
 
@@ -270,8 +270,8 @@ namespace kzn::vk
             // Loop body to check if its a suitable device
             VkPhysicalDeviceProperties device_properties;
             vkGetPhysicalDeviceProperties(iter_device, &device_properties);
-            VkPhysicalDeviceFeatures device_features;
-            vkGetPhysicalDeviceFeatures(iter_device, &device_features);
+            VkPhysicalDeviceFeatures this_device_features;
+            vkGetPhysicalDeviceFeatures(iter_device, &this_device_features);
 
             // TODO: This if statements are going too diagonal, maybe make it more vertical
             // Fix: if(!condition) { continue; }

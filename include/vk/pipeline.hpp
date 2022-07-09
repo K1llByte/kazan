@@ -71,7 +71,7 @@ namespace kzn::vk
         // PipelineLayoutBuilder& add_descriptor_set(const DescriptorSet& set);
         PipelineLayoutBuilder& add_push_constant(uint32_t size, VkShaderStageFlags stages = VK_SHADER_STAGE_ALL_GRAPHICS);
 
-        VkPipelineLayout build() noexcept;
+        VkPipelineLayout build();
 
     private:
         Device*                            device = nullptr;
@@ -123,7 +123,7 @@ namespace kzn::vk
         std::vector<VkVertexInputAttributeDescription> vertex_attributes;
         uint32_t i = 0;
         uint32_t offset = 0;
-        boost::pfr::for_each_field(std::forward<VertexType>(VertexType{}), [&]<typename T>(T& val) {
+        boost::pfr::for_each_field(std::forward<VertexType>(VertexType{}), [&]<typename T>(T&) {
 
             VkFormat format;
             if(std::is_same_v<T, float>)

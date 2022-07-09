@@ -22,10 +22,10 @@ namespace kzn
 
     int Input::get_mouse_button(int button) const
     {
-        return glfwGetMouseButton(glfw_window, GLFW_MOUSE_BUTTON_LEFT);
+        return glfwGetMouseButton(glfw_window, button);
     }
 
-    CursorPos Input::get_cursor_pos(int key_code) const
+    CursorPos Input::get_cursor_pos(int /*key_code*/) const
     {
         double x;
         double y;

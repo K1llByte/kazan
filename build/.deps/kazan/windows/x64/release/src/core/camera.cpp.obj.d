@@ -1,7 +1,4 @@
 {
-    files = {
-        [[src\core\camera.cpp]]
-    },
     depfiles_cl_json = "{\
     \"Version\": \"1.1\",\
     \"Data\": {\
@@ -254,6 +251,9 @@
         \"ImportedHeaderUnits\": []\
     }\
 }",
+    files = {
+        [[src\core\camera.cpp]]
+    },
     values = {
         [[C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.31.31103\bin\HostX64\x64\cl.exe]],
         {

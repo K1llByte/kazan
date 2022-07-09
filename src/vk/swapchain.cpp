@@ -116,22 +116,22 @@ namespace kzn::vk
         // 2.2 Create new ImageViews //
         for(std::size_t i = 0; i < swapchain_image_views.size(); ++i)
         {
-            VkImageViewCreateInfo create_info{};
-            create_info.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
-            create_info.image = swapchain_images[i];
-            create_info.viewType = VK_IMAGE_VIEW_TYPE_2D;
-            create_info.format = surface_format.format;
-            create_info.components.r = VK_COMPONENT_SWIZZLE_IDENTITY;
-            create_info.components.g = VK_COMPONENT_SWIZZLE_IDENTITY;
-            create_info.components.b = VK_COMPONENT_SWIZZLE_IDENTITY;
-            create_info.components.a = VK_COMPONENT_SWIZZLE_IDENTITY;
-            create_info.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
-            create_info.subresourceRange.baseMipLevel = 0;
-            create_info.subresourceRange.levelCount = 1;
-            create_info.subresourceRange.baseArrayLayer = 0;
-            create_info.subresourceRange.layerCount = 1;
+            VkImageViewCreateInfo img_view_create_info{};
+            img_view_create_info.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
+            img_view_create_info.image = swapchain_images[i];
+            img_view_create_info.viewType = VK_IMAGE_VIEW_TYPE_2D;
+            img_view_create_info.format = surface_format.format;
+            img_view_create_info.components.r = VK_COMPONENT_SWIZZLE_IDENTITY;
+            img_view_create_info.components.g = VK_COMPONENT_SWIZZLE_IDENTITY;
+            img_view_create_info.components.b = VK_COMPONENT_SWIZZLE_IDENTITY;
+            img_view_create_info.components.a = VK_COMPONENT_SWIZZLE_IDENTITY;
+            img_view_create_info.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+            img_view_create_info.subresourceRange.baseMipLevel = 0;
+            img_view_create_info.subresourceRange.levelCount = 1;
+            img_view_create_info.subresourceRange.baseArrayLayer = 0;
+            img_view_create_info.subresourceRange.layerCount = 1;
 
-            auto result = vkCreateImageView(device->vk_device(), &create_info, nullptr, &swapchain_image_views[i]);
+            result = vkCreateImageView(device->vk_device(), &img_view_create_info, nullptr, &swapchain_image_views[i]);
             VK_CHECK_MSG(result, "Failed to create image views!");
         }
 
@@ -299,21 +299,21 @@ namespace kzn::vk
         swapchain.swapchain_image_views.resize(image_count);
         for(size_t i = 0; i < image_count; ++i)
         {
-            VkImageViewCreateInfo create_info{};
-            create_info.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
-            create_info.image = swapchain.swapchain_images[i];
-            create_info.viewType = VK_IMAGE_VIEW_TYPE_2D;
-            create_info.format = swapchain.surface_format.format;
-            create_info.components.r = VK_COMPONENT_SWIZZLE_IDENTITY;
-            create_info.components.g = VK_COMPONENT_SWIZZLE_IDENTITY;
-            create_info.components.b = VK_COMPONENT_SWIZZLE_IDENTITY;
-            create_info.components.a = VK_COMPONENT_SWIZZLE_IDENTITY;
-            create_info.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
-            create_info.subresourceRange.baseMipLevel = 0;
-            create_info.subresourceRange.levelCount = 1;
-            create_info.subresourceRange.baseArrayLayer = 0;
-            create_info.subresourceRange.layerCount = 1;
-            auto result = vkCreateImageView(device->vk_device(), &create_info, nullptr, &swapchain.swapchain_image_views[i]);
+            VkImageViewCreateInfo img_view_create_info{};
+            img_view_create_info.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
+            img_view_create_info.image = swapchain.swapchain_images[i];
+            img_view_create_info.viewType = VK_IMAGE_VIEW_TYPE_2D;
+            img_view_create_info.format = swapchain.surface_format.format;
+            img_view_create_info.components.r = VK_COMPONENT_SWIZZLE_IDENTITY;
+            img_view_create_info.components.g = VK_COMPONENT_SWIZZLE_IDENTITY;
+            img_view_create_info.components.b = VK_COMPONENT_SWIZZLE_IDENTITY;
+            img_view_create_info.components.a = VK_COMPONENT_SWIZZLE_IDENTITY;
+            img_view_create_info.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+            img_view_create_info.subresourceRange.baseMipLevel = 0;
+            img_view_create_info.subresourceRange.levelCount = 1;
+            img_view_create_info.subresourceRange.baseArrayLayer = 0;
+            img_view_create_info.subresourceRange.layerCount = 1;
+            result = vkCreateImageView(device->vk_device(), &img_view_create_info, nullptr, &swapchain.swapchain_image_views[i]);
             VK_CHECK_MSG(result, "Failed to create image views!");
         }
 

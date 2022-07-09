@@ -80,12 +80,12 @@ namespace kzn
         vbo.bind(cmd_buffer);
         if(indices.empty())
         {
-            vkCmdDraw(cmd_buffer.vk_command_buffer(), vertices.size(), 1, 0, 0);
+            vkCmdDraw(cmd_buffer.vk_command_buffer(), static_cast<uint32_t>(vertices.size()), 1, 0, 0);
         }
         else
         {
             ibo.value().bind(cmd_buffer);
-            vkCmdDrawIndexed(cmd_buffer.vk_command_buffer(), indices.size(), 1, 0, 0, 0);
+            vkCmdDrawIndexed(cmd_buffer.vk_command_buffer(), static_cast<uint32_t>(indices.size()), 1, 0, 0, 0);
         }
     }
 

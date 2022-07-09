@@ -53,8 +53,9 @@ target("kazan")
     set_languages("cxx20") -- -std=c++20
     set_warnings("allextra") -- -Wall -Wextra -Wfatal-errors (if error enabled)
     set_optimize("fastest") -- -O3
-    -- FIXME: Not working
-    add_cxxflags("-Wshadow", "-Wpedantic")
+    if is_plat("linux", "macosx") then
+        add_cxxflags("-Wshadow", "-Wpedantic")
+    end
     set_targetdir("bin/")
     -- Compiler Options
     add_options("kb22")
@@ -100,7 +101,9 @@ target("kazui")
     set_optimize("fastest") -- -O3
     set_targetdir("bin/")
     -- GCC flags
-    add_cxxflags("-Wshadow", "-Wpedantic")
+    if is_plat("linux", "macosx") then
+        add_cxxflags("-Wshadow", "-Wpedantic")
+    end
     -- MSVC flags
     --if is_plat("windows") then 
     add_cxxflags("/Zc:preprocessor")

@@ -1,4 +1,30 @@
 {
+    depfiles_cl_json = "{\
+    \"Version\": \"1.1\",\
+    \"Data\": {\
+        \"Source\": \"c:\\\\users\\\\killbyte\\\\desktop\\\\documents\\\\kazan\\\\src\\\\core\\\\input.cpp\",\
+        \"ProvidedModule\": \"\",\
+        \"Includes\": [\
+            \"c:\\\\users\\\\killbyte\\\\desktop\\\\documents\\\\kazan\\\\include\\\\core\\\\input.hpp\",\
+            \"c:\\\\users\\\\killbyte\\\\appdata\\\\local\\\\.xmake\\\\packages\\\\g\\\\glfw\\\\3.3.6\\\\0f1d7b80c6f84759bc07798549faa20b\\\\include\\\\glfw\\\\glfw3.h\",\
+            \"c:\\\\program files (x86)\\\\windows kits\\\\10\\\\include\\\\10.0.19041.0\\\\ucrt\\\\stddef.h\",\
+            \"c:\\\\program files (x86)\\\\windows kits\\\\10\\\\include\\\\10.0.19041.0\\\\ucrt\\\\corecrt.h\",\
+            \"c:\\\\program files (x86)\\\\microsoft visual studio\\\\2022\\\\buildtools\\\\vc\\\\tools\\\\msvc\\\\14.31.31103\\\\include\\\\vcruntime.h\",\
+            \"c:\\\\program files (x86)\\\\microsoft visual studio\\\\2022\\\\buildtools\\\\vc\\\\tools\\\\msvc\\\\14.31.31103\\\\include\\\\sal.h\",\
+            \"c:\\\\program files (x86)\\\\microsoft visual studio\\\\2022\\\\buildtools\\\\vc\\\\tools\\\\msvc\\\\14.31.31103\\\\include\\\\concurrencysal.h\",\
+            \"c:\\\\program files (x86)\\\\microsoft visual studio\\\\2022\\\\buildtools\\\\vc\\\\tools\\\\msvc\\\\14.31.31103\\\\include\\\\vadefs.h\",\
+            \"c:\\\\program files (x86)\\\\microsoft visual studio\\\\2022\\\\buildtools\\\\vc\\\\tools\\\\msvc\\\\14.31.31103\\\\include\\\\stdint.h\",\
+            \"c:\\\\users\\\\killbyte\\\\appdata\\\\local\\\\.xmake\\\\packages\\\\v\\\\vulkan-headers\\\\1.2.198+0\\\\06123fbd318a4a08a4b63d4c12e153b5\\\\include\\\\vulkan\\\\vulkan.h\",\
+            \"c:\\\\users\\\\killbyte\\\\appdata\\\\local\\\\.xmake\\\\packages\\\\v\\\\vulkan-headers\\\\1.2.198+0\\\\06123fbd318a4a08a4b63d4c12e153b5\\\\include\\\\vulkan\\\\vk_platform.h\",\
+            \"c:\\\\users\\\\killbyte\\\\appdata\\\\local\\\\.xmake\\\\packages\\\\v\\\\vulkan-headers\\\\1.2.198+0\\\\06123fbd318a4a08a4b63d4c12e153b5\\\\include\\\\vulkan\\\\vulkan_core.h\"\
+        ],\
+        \"ImportedModules\": [],\
+        \"ImportedHeaderUnits\": []\
+    }\
+}",
+    files = {
+        [[src\core\input.cpp]]
+    },
     values = {
         [[C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.31.31103\bin\HostX64\x64\cl.exe]],
         {
@@ -24,31 +50,5 @@
             [[-external:IC:\Users\KillByte\Desktop\Documents\cmake_test\vcpkg\installed\x64-windows-static\include]],
             "/Zc:preprocessor"
         }
-    },
-    files = {
-        [[src\core\input.cpp]]
-    },
-    depfiles_cl_json = "{\
-    \"Version\": \"1.1\",\
-    \"Data\": {\
-        \"Source\": \"c:\\\\users\\\\killbyte\\\\desktop\\\\documents\\\\kazan\\\\src\\\\core\\\\input.cpp\",\
-        \"ProvidedModule\": \"\",\
-        \"Includes\": [\
-            \"c:\\\\users\\\\killbyte\\\\desktop\\\\documents\\\\kazan\\\\include\\\\core\\\\input.hpp\",\
-            \"c:\\\\users\\\\killbyte\\\\appdata\\\\local\\\\.xmake\\\\packages\\\\g\\\\glfw\\\\3.3.6\\\\0f1d7b80c6f84759bc07798549faa20b\\\\include\\\\glfw\\\\glfw3.h\",\
-            \"c:\\\\program files (x86)\\\\windows kits\\\\10\\\\include\\\\10.0.19041.0\\\\ucrt\\\\stddef.h\",\
-            \"c:\\\\program files (x86)\\\\windows kits\\\\10\\\\include\\\\10.0.19041.0\\\\ucrt\\\\corecrt.h\",\
-            \"c:\\\\program files (x86)\\\\microsoft visual studio\\\\2022\\\\buildtools\\\\vc\\\\tools\\\\msvc\\\\14.31.31103\\\\include\\\\vcruntime.h\",\
-            \"c:\\\\program files (x86)\\\\microsoft visual studio\\\\2022\\\\buildtools\\\\vc\\\\tools\\\\msvc\\\\14.31.31103\\\\include\\\\sal.h\",\
-            \"c:\\\\program files (x86)\\\\microsoft visual studio\\\\2022\\\\buildtools\\\\vc\\\\tools\\\\msvc\\\\14.31.31103\\\\include\\\\concurrencysal.h\",\
-            \"c:\\\\program files (x86)\\\\microsoft visual studio\\\\2022\\\\buildtools\\\\vc\\\\tools\\\\msvc\\\\14.31.31103\\\\include\\\\vadefs.h\",\
-            \"c:\\\\program files (x86)\\\\microsoft visual studio\\\\2022\\\\buildtools\\\\vc\\\\tools\\\\msvc\\\\14.31.31103\\\\include\\\\stdint.h\",\
-            \"c:\\\\users\\\\killbyte\\\\appdata\\\\local\\\\.xmake\\\\packages\\\\v\\\\vulkan-headers\\\\1.2.198+0\\\\06123fbd318a4a08a4b63d4c12e153b5\\\\include\\\\vulkan\\\\vulkan.h\",\
-            \"c:\\\\users\\\\killbyte\\\\appdata\\\\local\\\\.xmake\\\\packages\\\\v\\\\vulkan-headers\\\\1.2.198+0\\\\06123fbd318a4a08a4b63d4c12e153b5\\\\include\\\\vulkan\\\\vk_platform.h\",\
-            \"c:\\\\users\\\\killbyte\\\\appdata\\\\local\\\\.xmake\\\\packages\\\\v\\\\vulkan-headers\\\\1.2.198+0\\\\06123fbd318a4a08a4b63d4c12e153b5\\\\include\\\\vulkan\\\\vulkan_core.h\"\
-        ],\
-        \"ImportedModules\": [],\
-        \"ImportedHeaderUnits\": []\
-    }\
-}"
+    }
 }

@@ -7,10 +7,10 @@
 #include <array>
 
 static VKAPI_ATTR VkBool32 VKAPI_CALL debug_callback(
-    VkDebugUtilsMessageSeverityFlagBitsEXT message_severity,
-    VkDebugUtilsMessageTypeFlagsEXT message_type,
+    VkDebugUtilsMessageSeverityFlagBitsEXT      /*message_severity*/,
+    VkDebugUtilsMessageTypeFlagsEXT             /*message_type*/,
     const VkDebugUtilsMessengerCallbackDataEXT* p_callback_data,
-    void* p_user_data)
+    void*                                       /*p_user_data*/)
 {
     kzn::Log::warning(p_callback_data->pMessage);
     return VK_FALSE;

@@ -1,4 +1,16 @@
 {
+    files = {
+        [[build\.objs\kazui\windows\x64\release\src\gui\camera_controller.cpp.obj]],
+        [[build\.objs\kazui\windows\x64\release\src\gui\main.cpp.obj]],
+        [[build\.objs\imgui\windows\x64\release\lib\imgui\src\imgui.cpp.obj]],
+        [[build\.objs\imgui\windows\x64\release\lib\imgui\src\imgui_demo.cpp.obj]],
+        [[build\.objs\imgui\windows\x64\release\lib\imgui\src\imgui_draw.cpp.obj]],
+        [[build\.objs\imgui\windows\x64\release\lib\imgui\src\imgui_impl_glfw.cpp.obj]],
+        [[build\.objs\imgui\windows\x64\release\lib\imgui\src\imgui_impl_vulkan.cpp.obj]],
+        [[build\.objs\imgui\windows\x64\release\lib\imgui\src\imgui_tables.cpp.obj]],
+        [[build\.objs\imgui\windows\x64\release\lib\imgui\src\imgui_widgets.cpp.obj]],
+        [[bin\kazan.lib]]
+    },
     values = {
         [[C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Tools\MSVC\14.31.31103\bin\HostX64\x64\link.exe]],
         {
@@ -19,17 +31,5 @@
             "shell32.lib",
             "gdi32.lib"
         }
-    },
-    files = {
-        [[build\.objs\kazui\windows\x64\release\src\gui\camera_controller.cpp.obj]],
-        [[build\.objs\kazui\windows\x64\release\src\gui\main.cpp.obj]],
-        [[build\.objs\imgui\windows\x64\release\lib\imgui\src\imgui.cpp.obj]],
-        [[build\.objs\imgui\windows\x64\release\lib\imgui\src\imgui_demo.cpp.obj]],
-        [[build\.objs\imgui\windows\x64\release\lib\imgui\src\imgui_draw.cpp.obj]],
-        [[build\.objs\imgui\windows\x64\release\lib\imgui\src\imgui_impl_glfw.cpp.obj]],
-        [[build\.objs\imgui\windows\x64\release\lib\imgui\src\imgui_impl_vulkan.cpp.obj]],
-        [[build\.objs\imgui\windows\x64\release\lib\imgui\src\imgui_tables.cpp.obj]],
-        [[build\.objs\imgui\windows\x64\release\lib\imgui\src\imgui_widgets.cpp.obj]],
-        [[bin\kazan.lib]]
     }
 }
