@@ -1,5 +1,5 @@
 .vscode/
 .xmake/
-.bin/
-.build/
-.models/**.obj
+bin/
+build/
+models/**.obj
