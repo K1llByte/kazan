@@ -12,7 +12,9 @@ int main() try
 
     auto model_renderer = ModelRenderer(&renderer);
 
-    auto model = Model::load("assets/models/monkey.obj");
+    Log::error("Debug\n");
+    auto model = Model::load("assets/models/suzanne_monkey.obj");
+    Log::error("Debug\n");
     // auto model = kzn::icosahedron(0.8f, 30, true);
     // model.transform.position += glm::vec3{0.f, 0.f, 1.f};
     // auto model2 = kzn::sphere(0.8f, 17, 16);
