@@ -18,7 +18,7 @@ int main() try
     auto model_renderer = ModelRenderer(&renderer);
 
     // auto model = kzn::sphere(1.f, 20, 20);
-    auto model = Model::load("../../Other/models/demon/Sword.obj");
+    auto model = Model::load("assets/models/monkey.obj");
 
     Camera camera;
     camera.lookat_target(glm::vec3(5.f, 2.f, -2.f), glm::vec3(0.f, 0.f, 0.f));
