@@ -6,15 +6,15 @@
 using namespace kzn;
 int main() try
 {
+    size_t a = 1;
+    bool b = a < 1; 
     auto window = Window("Kazan", 1700, 800);
     auto input = window.input_handler();
     auto renderer = Renderer(&window);
 
     auto model_renderer = ModelRenderer(&renderer);
 
-    Log::error("Debug\n");
     auto model = Model::load("assets/models/suzanne_monkey.obj");
-    Log::error("Debug\n");
     // auto model = kzn::icosahedron(0.8f, 30, true);
     // model.transform.position += glm::vec3{0.f, 0.f, 1.f};
     // auto model2 = kzn::sphere(0.8f, 17, 16);
@@ -41,26 +41,17 @@ int main() try
         // Model rotation
         // model.transform.rotation = glm::vec3{0.f, glm::radians(counter), 0.f};
 
+        // Input control flow to render wireframe or opaque mesh
         static bool render_wireframe_begin_state = false;
         static bool render_wireframe = false;
-
-        //if(input.is_key_pressed(GLFW_KEY_SPACE) && !render_wireframe_begin_state)
-        //    render_wireframe = !render_wireframe;
-        //if(input.is_key_released(GLFW_KEY_SPACE))
-        //    render_wireframe_begin_state = false;
-        
-        
-        switch (input.get_key(GLFW_KEY_SPACE))
-        {
-            case GLFW_PRESS:
-                if(!render_wireframe_begin_state)
-                    render_wireframe = !render_wireframe;
-                render_wireframe_begin_state = true;
-                break;
-            case GLFW_RELEASE:
-                render_wireframe_begin_state = false;
-                break;
+        if(input.is_key_pressed(GLFW_KEY_SPACE)) {
+            if(!render_wireframe_begin_state)
+                render_wireframe = !render_wireframe;
+            render_wireframe_begin_state = true;
         }
+        else if(input.is_key_released(GLFW_KEY_SPACE))
+            render_wireframe_begin_state = false;
+
 
         constexpr float MOVE_SPEED = 0.01;
         if(input.is_key_pressed(GLFW_KEY_L))

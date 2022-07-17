@@ -1,4 +1,4 @@
-#include "cvar.hpp"
+#include "core/cvar.hpp"
 
 namespace kzn
 {

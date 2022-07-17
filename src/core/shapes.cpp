@@ -10,7 +10,7 @@ using kzn::math::cylindrical_to_cartesian;
 
 namespace kzn
 {
-    Model sphere(const float radius, const uint slices, const uint stacks)
+    Model sphere(const float radius, const uint32_t slices, const uint32_t stacks)
     {
         if(radius <= 0 || slices < 3 || stacks < 2)
         {
@@ -27,9 +27,9 @@ namespace kzn
         const float tex_slice = (1.f / slices);
         const float tex_stacks = (1.f / stacks);
 
-        uint it = 0;
-        uint it_n = 0;
-        uint it_t = 0;
+        uint32_t it = 0;
+        uint32_t it_n = 0;
+        uint32_t it_t = 0;
 
 
         for(size_t i = 0 ; i < slices ; ++i)
@@ -83,7 +83,7 @@ namespace kzn
             vertex_list[it_t-1].color = { 0.8f, 0.8f, 0.8f };
 
             // Body Squares
-            for(uint j = 1 ; j < stacks-1 ; ++j)
+            for(uint32_t j = 1 ; j < stacks-1 ; ++j)
             {
                 // Vertices //////////////////////////////////////////////////////
 
@@ -131,7 +131,7 @@ namespace kzn
     }
 
 
-    Model cylinder(const float radius, const float height, const uint slices)
+    Model cylinder(const float radius, const float height, const uint32_t slices)
     {
         if(radius <= 0 || slices < 3)
         {
@@ -146,9 +146,9 @@ namespace kzn
         const float tex_div_width = 1.0f / static_cast<float>(slices);
         //std::cout << tex_div_width << "\n";
 
-        uint it = 0;
-        uint it_n = 0;
-        uint it_t = 0;
+        uint32_t it = 0;
+        uint32_t it_n = 0;
+        uint32_t it_t = 0;
 
         for(size_t i = 0 ; i < slices ; ++i)
         {
@@ -247,7 +247,7 @@ namespace kzn
     }
 
 
-    Model box(const float width_x, const float width_y, const float width_z, const uint divisions)
+    Model box(const float width_x, const float width_y, const float width_z, const uint32_t divisions)
     {
         if(width_x <= 0 || width_y <= 0 || width_z <= 0)
         {
@@ -270,13 +270,13 @@ namespace kzn
         const float tex_div_width_x = tex_width_x / (divisions+1);
         const float tex_div_width_y = tex_width_y / (divisions+1);
         
-        uint it = 0;
-        uint it_n = 0;
-        uint it_t = 0;
+        uint32_t it = 0;
+        uint32_t it_n = 0;
+        uint32_t it_t = 0;
 
         for(size_t i = 0 ; i < divisions+1 ; ++i)
         {
-            for(uint j = 0 ; j < divisions+1 ; ++j)
+            for(uint32_t j = 0 ; j < divisions+1 ; ++j)
             {	
                 // Width X
                 const float wx1 = half_width_z - div_width_z*i;
@@ -548,7 +548,7 @@ namespace kzn
     }
 
 
-    Model cone(const float radius, const float height, const uint slices, const uint stacks)
+    Model cone(const float radius, const float height, const uint32_t slices, const uint32_t stacks)
     {
         if(radius <= 0 || height < 0 || slices < 3 || stacks < 1)
         {
@@ -564,9 +564,9 @@ namespace kzn
         const float tex_div_slice = 2*math::pi / slices;
         
 
-        uint it = 0;
-        uint it_n = 0;
-        uint it_t = 0;
+        uint32_t it = 0;
+        uint32_t it_n = 0;
+        uint32_t it_t = 0;
 
         for(size_t i = 0 ; i < slices ; ++i)
         {
@@ -596,7 +596,7 @@ namespace kzn
             vertex_list[it_t-2].color = { 0.8f, 0.8f, 0.8f };
 
             // Cone Body
-            for(uint j = 0 ; j < stacks-1 ; ++j)
+            for(uint32_t j = 0 ; j < stacks-1 ; ++j)
             {
                 // Ensure the calculation is done only once
                 const float r1 = radius - j*stack_radius;
@@ -716,7 +716,7 @@ namespace kzn
     }
 
 
-    Model torus(const float radius, const float cyl_radius, const uint slices, const uint cyl_slices)
+    Model torus(const float radius, const float cyl_radius, const uint32_t slices, const uint32_t cyl_slices)
     {
         if(radius <= 0 || cyl_radius <= 0 || cyl_radius >= radius || slices < 3 || cyl_slices < 3)
         {
@@ -734,9 +734,9 @@ namespace kzn
         const float tex_div_cyl_slice = 1.0f / cyl_slices;
 
         
-        uint it = 0;
-        uint it_n = 0;
-        uint it_t = 0;
+        uint32_t it = 0;
+        uint32_t it_n = 0;
+        uint32_t it_t = 0;
 
         for(size_t i = 0 ; i < slices ; ++i)
         {
@@ -744,7 +744,7 @@ namespace kzn
             const float a1 = i*angle;
             const float a2 = (i+1)*angle;
 
-            for(uint j = 0 ; j < cyl_slices ; ++j)
+            for(uint32_t j = 0 ; j < cyl_slices ; ++j)
             {
                 const float ca1 = j*cyl_angle;
                 const float ca2 = (j+1)*cyl_angle;
@@ -791,7 +791,7 @@ namespace kzn
     }
 
     
-    Model icosahedron(const float radius, const uint divisions, bool to_sphere)
+    Model icosahedron(const float radius, const uint32_t divisions, bool to_sphere)
     {
         if(divisions < 1)
         {
@@ -802,9 +802,9 @@ namespace kzn
 
         std::vector<Vertex> vertex_list(NUM_VTX);
 
-        uint it = 0;
-        uint it_n = 0;
-        uint it_t = 0;
+        uint32_t it = 0;
+        uint32_t it_n = 0;
+        uint32_t it_t = 0;
 
         const float cos_30 = cos(math::pi/6);
 
@@ -817,7 +817,7 @@ namespace kzn
             const glm::vec3 vector_p1 = (p1 - p2) / divisions_f;
             const glm::vec3 vector_p3 = (p3 - p2) / divisions_f;
 
-            uint iter_divisions = divisions;
+            uint32_t iter_divisions = divisions;
 
             for(std::size_t i = 0; i < divisions; ++i)
             {

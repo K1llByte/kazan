@@ -31,7 +31,8 @@ end
 function compilation_settings()
     -- Common Compiler Options
     set_languages("cxx20") -- -std=c++20
-    set_policy("build.warning", true) -- Allways show warnings
+    -- (xmake 2.6.8)
+    --set_policy("build.warning", true) -- Allways show warnings
     set_warnings("allextra") -- -Wall -Wextra -Wfatal-errors (if error enabled)
     set_optimize("fastest") -- -O3
     -- GCC flags
@@ -48,8 +49,8 @@ function compilation_settings()
         add_cxxflags("/Zc:preprocessor")
     end
     set_targetdir("bin/")
-    -- LTO
-    set_policy("build.optimization.lto")
+    -- LTO (xmake 2.6.9)
+    --set_policy("build.optimization.lto")
     -- Include dirs
     add_includedirs("include")
     -- add_includedirs("lib/stb/include")
@@ -102,7 +103,7 @@ target("kazan")
     add_files("src/**.cpp")
     remove_files("src/gui/**.cpp")
     remove_files("src/main.cpp")
-    remove_files("src/core/shapes.*pp")
+    --remove_files("src/core/shapes.*pp")
 
 -------------------- Kazan GUI -------------------
 
