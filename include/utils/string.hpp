@@ -6,18 +6,9 @@
 
 namespace kzn {
 
-    //template<typename T>
-    //struct StaticVec {
-    //    size_t size;
-    //    T*     data;
-//
-    //    StaticVec(size_t _size)
-    //        : data(new T[_size]), size(_size) {}
-//
-    //    //~StaticVec() { delete data; }
-    //};
-    
-    std::vector<std::string_view> split(const std::string& cmd, char separator = ' ');
+    // FIXME: This should be string_view but for some
+    // reason doesn't work properly
+    std::vector<std::string> split(const std::string& cmd, char separator = ' ');
 }
 
 #endif // KZN_UTILS_STRING_HPP

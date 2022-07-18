@@ -1,8 +1,8 @@
 #include "utils/string.hpp"
-#include <fmt/core.h>
+//#include <boost/algorithm/string.hpp>
 
 namespace kzn {
-	std::vector<std::string_view> kzn::split(const std::string& cmd, const char separator)
+	std::vector<std::string> kzn::split(const std::string& cmd, const char separator)
 	{
 		size_t num_sparator = 0;
 		for(size_t i = 0 ; i < cmd.length() ; ++i)
@@ -11,7 +11,7 @@ namespace kzn {
 				++num_sparator;
 			}
 
-		std::vector<std::string_view> res(num_sparator);
+		std::vector<std::string> res(num_sparator);
 		size_t idx = 0;
 		size_t begin = 0;
 		size_t end = 0;
@@ -23,7 +23,8 @@ namespace kzn {
 				{ 
 					std::string_view tmp(cmd.c_str(), end);
 					tmp.remove_prefix(begin);
-					res[idx++] = tmp;
+					
+					res[idx++] = std::string(tmp);
 				}
 				begin = ++end;
 			}
@@ -36,9 +37,15 @@ namespace kzn {
 		tmp.remove_prefix(begin);
 
 		if(!tmp.empty())
-			res[idx] = tmp;
+			res[idx] = std::string(tmp);
 
-		return std::move(res);
+		return res;
 	}
 
+	//std::vector<std::string> kzn::split(const std::string& cmd, const char separator)
+	//{
+    //	std::vector<std::string> result;
+    //	boost::split(result, cmd, boost::is_any_of(" "));
+	//	return result;
+	//}
 }
