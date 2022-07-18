@@ -147,7 +147,6 @@ namespace kzn::console {
                                         }
                                         else {
                                             pass_args[i] = parsed;
-                                            fmt::print("Converted {} to float\n", parsed);
                                         }
                                         break;
                                     }
@@ -160,13 +159,14 @@ namespace kzn::console {
                                         }
                                         else {
                                             pass_args[i] = parsed;
-                                            fmt::print("Converted {} to int\n", parsed);
                                         }
                                         break;
                                     }
                                     case Arg::STRING: {
                                         // Copy str_view to char*
-
+                                        char* parsed = new char[arg.size()];
+                                        std::copy(arg.data(), arg.data()+arg.size(), parsed);
+                                        pass_args[i] = parsed;
                                         break;
                                     }
                                     }
