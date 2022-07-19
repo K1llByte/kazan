@@ -1,5 +1,6 @@
 #include "gui/console.hpp"
-#include "utils/variant.hpp"
+
+#include <fmt/core.h>
 
 #include "utils/string.hpp"
 
@@ -9,23 +10,21 @@ int main() {
 
     Commands commands_tree;
 
+    int global_coiso = 0;
     {
         using kzn::console::Int;
         using kzn::console::Float;
         using kzn::console::String;
         commands_tree.add_command(
             {"create", "sphere"},
-            {Float("radius"), Int("slices"), String("stacks")},
-            [](Arg::Any* args) {
-                try {
-                    int radius = std::get<float>(args[0]);
-                    float slices = std::get<int>(args[1]);
-                    char* stacks = std::get<char*>(args[2]);
-                    fmt::print("called create sphere {} {} {}\n", radius, slices, stacks);
-                }
-                catch(std::bad_variant_access e) {
-                    fmt::print("ERROR: Bad variant access\n");
-                }
+            {Float("radius"), Int("slices"), Int("stacks")},
+            [&global_coiso](Arg::Any* args) {
+                //auto [r,sl,st] = args;
+                int radius = std::get<float>(args[0]);
+                int slices = std::get<int>(args[1]);
+                int stacks = std::get<int>(args[2]);
+                fmt::print("called create sphere {} {} {}\n", radius, slices, stacks);
+                ++global_coiso;
             }
         );
         commands_tree.add_command(
@@ -36,6 +35,9 @@ int main() {
         );
     }
 
-    commands_tree.execute("create sphere 1 20 ola");
-    commands_tree.execute("debug");
+    auto err = commands_tree.execute("create sphere 1 20 20");
+    fmt::print("{}\n", kzn::console::error_message(err));
+
+    //err = commands_tree.execute("debug");
+    //fmt::print("{}\n", err_msgs[err]);
 }

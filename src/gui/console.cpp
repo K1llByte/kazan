@@ -1,15 +1,15 @@
 #include "gui/console.hpp"
 
+#include <fmt/core.h>
 #include <stdexcept>
 #include <algorithm>
 #include <cstring>
 #include <charconv>
 
-#include "utils/variant.hpp"
 #include "utils/string.hpp"
 
 namespace kzn::console {
-    void Commands::add_command(
+    CommandError Commands::add_command(
         std::initializer_list<const char*> cmd_path,
         std::initializer_list<Arg> arguments,
         std::function<void(Arg::Any*)>&& action_function)
@@ -20,17 +20,19 @@ namespace kzn::console {
             try {
                 auto& tmp = current_tree->at(key);
 
+                CommandError error = NONE;
                 std::visit( overloaded {
                         [&current_tree](Commands& val) {
                             current_tree = &val.command_tree;
                         },
-                        [&key](Action&) {
-                            // TODO: Handle this to error/exception
-                            fmt::print("Command {} already exists", key);
+                        [&key,&error](Action&) {
+                            error = CMD_EXISTS;
                         }
                     },
                     tmp
                 );
+                if(error != NONE)
+                    return error;
             }
             // else create a new one
             catch(std::out_of_range) {
@@ -108,7 +110,7 @@ namespace kzn::console {
         fmt::print("}}\n");
     }
 
-    void Commands::execute(const char* cmd) const {
+    CommandError Commands::execute(const char* cmd) const {
         auto splited_str = kzn::split(cmd);
         const CmdTree* current_tree = &command_tree;
         for(auto it = splited_str.begin(); it < splited_str.end(); ++it) {
@@ -117,49 +119,46 @@ namespace kzn::console {
             try {
                 auto& value = current_tree->at(std::string(str));
                 bool break_loop = false;
+                CommandError error = NONE;
                 std::visit( overloaded {
                         [&current_tree](const Commands& val) {
                             current_tree = &val.command_tree;
                         },
-                        [&break_loop, &it, &splited_str](const Action& action) {
+                        [&break_loop, &it, &splited_str, &error](const Action& action) {
                             // Get number of arguments provided
                             size_t num_of_args = 0;
                             for(auto tmp_it = it+1; tmp_it < splited_str.end(); ++tmp_it)
                                 ++num_of_args;
                             
                             if(num_of_args != action.num_args) {
-                                fmt::print("ERROR: Invalid number of arguments\n");
+                                error = INVALID_NUM_ARGS;
                             }
                             else {
                                 // TODO: Execute command
                                 Arg::Any* pass_args = new Arg::Any[num_of_args];
                                 it += 1;
                                 for(size_t i = 0; (it+i) < splited_str.end(); ++i) {
-                                    auto arg = *(it+i);
+                                    const auto arg = *(it+i);
                                     switch (action.args[i].type)
                                     {
                                     case Arg::INT: {
                                         // Convert str_view to int
                                         int parsed;
                                         auto res = std::from_chars(arg.data(), arg.data()+arg.size(), parsed);
-                                        if(res.ec == std::errc::invalid_argument) {
-                                            fmt::print("ERROR: Could not convert\n");
-                                        }
-                                        else {
+                                        if(res.ec == std::errc::invalid_argument) 
+                                            error = ARG_CONVERSION_ERROR;
+                                        else 
                                             pass_args[i] = parsed;
-                                        }
                                         break;
                                     }
                                     case Arg::FLOAT: {
                                         // Convert str_view to float
                                         float parsed;
                                         auto res = std::from_chars(arg.data(), arg.data()+arg.size(), parsed);
-                                        if(res.ec == std::errc::invalid_argument) {
-                                            fmt::print("ERROR: Could not convert\n");
-                                        }
-                                        else {
+                                        if(res.ec == std::errc::invalid_argument) 
+                                            error = ARG_CONVERSION_ERROR;
+                                        else 
                                             pass_args[i] = parsed;
-                                        }
                                         break;
                                     }
                                     case Arg::STRING: {
@@ -171,23 +170,30 @@ namespace kzn::console {
                                     }
                                     }
                                 }
-
-                                action.action(pass_args);
-                                fmt::print("Executed command with {} arguments\n", num_of_args);
+                                if(!error)
+                                    action.action(pass_args);
                             }
                             break_loop = true;
                         }
                     },
                     value
                 );
+                if(error != NONE)
+                    return error;
                 if(break_loop)
                     break;
             }
             // Command doesn't exist
             catch(std::out_of_range) {
-                fmt::print("ERROR: Command doesn't exist\n");
+                return CMD_DOESNT_EXISTS;
+                break;
+            }
+            // Action call has bad argument variant access
+            catch(std::bad_variant_access) {
+                return INVALID_ARG_ACCESS;
                 break;
             }
         }
+        return NONE;
     }
 } // namespace kzn::console
