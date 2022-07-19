@@ -62,8 +62,11 @@ namespace kzn
 
         // NOTE: Only used within RenderSystem context
         vk::CommandBuffer& current_cmd_buffer() { return *current_command_buffer; }
+        vk::CommandPool& get_cmd_pool() { return cmd_pool; }
         VkViewport& current_viewport() { return viewport; }
         VkRect2D& current_scissor() { return scissor; }
+        // FIXME: This is temporary
+        vk::RenderPass* main_render_pass() { return render_passes[0]; }
 
         // NOTE: Only used to recreate RenderPass Framebuffers when
         // window is resized

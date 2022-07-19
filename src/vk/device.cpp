@@ -184,6 +184,20 @@ namespace kzn::vk
         VK_CHECK_MSG(result, "Failed to submit draw command buffer!");
     }
 
+    void Device::graphics_queue_submit(
+        CommandBuffer& cmd_buffer)
+    {
+        VkCommandBuffer cmd_buffers[] = {cmd_buffer.vk_command_buffer()};
+
+        VkSubmitInfo submit_info{};
+        submit_info.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+        submit_info.commandBufferCount = 1;
+        submit_info.pCommandBuffers = cmd_buffers;
+
+        auto result = vkQueueSubmit(graphics_queue, 1, &submit_info, VK_NULL_HANDLE);
+        VK_CHECK_MSG(result, "Failed to submit draw command buffer!");
+    }
+
     void Device::present_queue_present(Swapchain& swapchain, VkSemaphore wait_semaphore)
     {
         VkPresentInfoKHR present_info{};

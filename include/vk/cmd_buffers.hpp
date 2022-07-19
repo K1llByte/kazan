@@ -30,7 +30,7 @@ namespace kzn::vk
 
         VkCommandBuffer vk_command_buffer() noexcept { return vkcommand_buffer; }
 
-        void begin() /* const noexcept */;
+        void begin(VkCommandBufferUsageFlags flags = 0) /* const noexcept */;
         void end() /* const noexcept */;
         void reset() noexcept;
 

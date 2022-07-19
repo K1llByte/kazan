@@ -7,6 +7,7 @@
 #include <charconv>
 
 #include "utils/string.hpp"
+#include "utils/variant.hpp"
 
 namespace kzn::console {
     CommandError Commands::add_command(

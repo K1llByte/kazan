@@ -35,7 +35,7 @@ int main() try
         camera.set_perspective(glm::radians(50.f), window.aspect_ratio(), 0.1f, 100.f);
 
         // Model rotation
-        // model.transform.rotation = glm::vec3{0.f, glm::radians(counter), 0.f};
+        model.transform.rotation.y = glm::radians(counter);
 
         switch (glfwGetKey(window.glfw_ptr(), GLFW_KEY_SPACE))
         {

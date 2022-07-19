@@ -126,17 +126,18 @@ namespace kzn::vk
         boost::pfr::for_each_field(std::forward<VertexType>(VertexType{}), [&]<typename T>(T&) {
 
             VkFormat format;
-            if(std::is_same_v<T, float>)
+            if constexpr (std::is_same_v<T, float>)
                 format = VK_FORMAT_R32_SFLOAT;
-            else if(std::is_same_v<T, glm::vec2>)
+            else if constexpr (std::is_same_v<T, glm::vec2>)
                 format = VK_FORMAT_R32G32_SFLOAT;
-            else if(std::is_same_v<T, glm::vec3>)
+            else if constexpr (std::is_same_v<T, glm::vec3>)
                 format = VK_FORMAT_R32G32B32_SFLOAT;
-            else if(std::is_same_v<T, glm::vec4>)
+            else if constexpr (std::is_same_v<T, glm::vec4>)
                 format = VK_FORMAT_R32G32B32A32_SFLOAT;
-            else if(std::is_same_v<T, glm::ivec2>)
+            else if constexpr (std::is_same_v<T, glm::ivec2>)
                 format = VK_FORMAT_R64_SFLOAT;
             else
+                // FIXME:
                 throw "Invalid vertex input attribute";
 
             vertex_attributes.push_back(vtx_attribute(0, i, format, offset));

@@ -42,7 +42,7 @@ namespace kzn::vk
         return cmd_buffer;
     }
 
-    void CommandBuffer::begin()
+    void CommandBuffer::begin(VkCommandBufferUsageFlags flags)
     {
         VkCommandBufferBeginInfo begin_info{};
         begin_info.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
@@ -52,7 +52,7 @@ namespace kzn::vk
         // command buffer that will be entirely within a single render pass.
         // VK_COMMAND_BUFFER_USAGE_SIMULTANEOUS_USE_BIT: The command buffer can
         // be resubmitted while it is also already pending execution.
-        begin_info.flags = 0; // Optional
+        begin_info.flags = flags;
         begin_info.pInheritanceInfo = nullptr; // Optional
         auto result = vkBeginCommandBuffer(vkcommand_buffer, &begin_info);
         VK_CHECK_MSG(result, "Failed to begin recording command buffer!")

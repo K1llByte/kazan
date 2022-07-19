@@ -44,19 +44,25 @@ namespace kzn::vk
         ~Device();
 
         VkDevice vk_device() noexcept { return vkdevice; }
+        VkPhysicalDevice vk_physical_device() noexcept { return physical_device; }
         VmaAllocator allocator() noexcept { return vma_allocator; }
+        // TODO: vk::Queue wrapper for better API here
+        VkQueue vk_graphics_queue() noexcept { return graphics_queue; }
+        VkQueue vk_present_queue() noexcept { return present_queue; }
         // Get cached SwapChainSupport
         const SwapChainSupport& swapchain_support() const noexcept { return swapchain_support_details; }
         const QueueFamilies& queue_families() const noexcept { return queue_family_indices; }
 
         // Fetch SwapChainSupport for specific surface (updates cached one)
         const SwapChainSupport& query_swapchain_support(VkSurfaceKHR surface) noexcept;
-        // TODO: Consider making individual queue handles
+        // TODO: Make individual queue handles
         void graphics_queue_submit(
             CommandBuffer& cmd_buffer,
             VkSemaphore wait_semaphore,
             VkSemaphore signal_semaphore,
             VkFence fence);
+        void graphics_queue_submit(
+            CommandBuffer& cmd_buffer);
         void present_queue_present(Swapchain& swapchain, VkSemaphore wait_semaphore);
         void wait_idle() noexcept;
 
