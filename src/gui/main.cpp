@@ -15,6 +15,8 @@ int main() try
     auto gui = Interface(&renderer, window);
 
     auto model = Model::load("assets/models/suzanne_monkey.obj");
+    auto model2 = Model::load("assets/models/suzanne_monkey.obj");
+    model2.transform.position.z = 3.f;
     // auto model = kzn::icosahedron(0.8f, 30, true);
     // model.transform.position += glm::vec3{0.f, 0.f, 1.f};
     // auto model2 = kzn::sphere(0.8f, 17, 16);
@@ -80,6 +82,10 @@ int main() try
                 pvm.model = model.transform.mat4();
                 model_renderer.push(cmd_buffer, pvm);
                 model.draw(cmd_buffer);
+
+                pvm.model = model2.transform.mat4();
+                model_renderer.push(cmd_buffer, pvm);
+                model2.draw(cmd_buffer);
 
                 // Draw model 2
                 //pvm.model = model2.transform.mat4();

@@ -41,7 +41,7 @@ namespace kzn::vk
         depth_attachment.samples = VK_SAMPLE_COUNT_1_BIT;
         depth_attachment.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
         depth_attachment.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
-        depth_attachment.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
+        depth_attachment.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_CLEAR; // VK_ATTACHMENT_LOAD_OP_DONT_CARE works too (i think)
         depth_attachment.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
         depth_attachment.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
         depth_attachment.finalLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
@@ -97,7 +97,7 @@ namespace kzn::vk
 
         render_pass_info.dependencyCount = static_cast<uint32_t>(dependencies.size());
         render_pass_info.pDependencies = dependencies.data();
-        
+
 
         auto result = vkCreateRenderPass(device->vk_device(), &render_pass_info, nullptr, &vkrender_pass);
         VK_CHECK_MSG(result, "Failed to create render pass!");
