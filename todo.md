@@ -12,13 +12,21 @@ kazan.hpp include with all public API includes
     - Descriptor Pools
     - Descriptor Sets 
 ## Todo
+-  RenderPassesManager
+    - Usage:
+        - auto& gui_render_pass = rp_manager[RP_GUI]
+    - Since the renderer owns this structure all render passes are destroyed when they should
+    - 
+    
+
+- Make builders constexpr until build()
+- Context singleton doesn't have a proper lifetime (might cause problems)
 - Texture mapping
 - Study RendererBackend + RendererFrontend architechture
     and change the singleton Context model i have now
 - Work on FIXME's and TODO's
-- Generating Mipmaps
-- ImGUI Docking test (with example)
 - Multisampling
+- Generating Mipmaps
 - Allow QueueFamilyIndices to create queues selectively
 <!-- Future -->
 - Input Keyboard and GamePad enum wrappers to replace
@@ -31,7 +39,10 @@ kazan.hpp include with all public API includes
 - Multiple subpasses
 - Compute shaders
 
+<!-- =================================== -->
+
 ## Done
+- ImGUI Docking test (with example)
 - Update Camera Controller with new Input System
 - Input system
 - Find & Replace PI macro to pi constant in shape.cpp
@@ -180,7 +191,7 @@ auto scene = Scene { model_1 };
 // to have &renderer as argument
 auto model_renderer = ModelRenderer(&renderer);
 
-while(!window.should_close())
+while(!window.is_closed())
 {
     // Poll events
     window.poll_events();

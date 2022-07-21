@@ -7,9 +7,9 @@ namespace kzn
 {
     ModelRenderer::ModelRenderer(Renderer* _renderer)
         : renderer(_renderer),
-        render_pass(vk::RenderPassBuilder(&Context::device())
-            .set_format(Context::swapchain().get_surface_format().format)
-            .build()),
+        render_pass(kzn::vk::simple_depth_render_pass(
+            Context::device(),
+            Context::swapchain().get_surface_format().format)),
         pipeline(vk::Pipeline(
             &Context::device(),
             "assets/shaders/mesh/mesh.vert.spv",

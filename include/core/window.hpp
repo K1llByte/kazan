@@ -10,6 +10,8 @@
 #define GLFW_INCLUDE_VULKAN
 #include <GLFW/glfw3.h>
 
+// TODO: Implement Cheshire Cat window abstraction
+
 namespace kzn
 {
     class Input;
