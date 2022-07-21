@@ -62,6 +62,7 @@ namespace kzn::console {
                 }
             }
         }
+        return NONE;
     }
 
     void Commands::print(int identation) const {

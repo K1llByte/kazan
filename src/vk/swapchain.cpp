@@ -319,7 +319,7 @@ namespace kzn::vk
 
         // 4. Create Depth Resources //
         // 4.1 Create Depth Images  //
-        swapchain.swapchain_depths.resize(image_count);
+        swapchain.swapchain_depths.resize(1);
         swapchain.depth_allocation.resize(image_count);
         swapchain.swapchain_depth_views.resize(image_count);
         for(size_t i = 0; i < image_count; ++i)

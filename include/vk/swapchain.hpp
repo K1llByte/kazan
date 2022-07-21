@@ -51,6 +51,7 @@ namespace kzn::vk
         SwapchainBuilder(Device* device, VkSurfaceKHR surface, VkExtent2D extent);
         ~SwapchainBuilder() = default;
 
+        // TODO: Improve configurability
         SwapchainBuilder& set_present_mode(VkPresentModeKHR _present_mode) noexcept;
 
         Swapchain build();

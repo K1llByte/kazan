@@ -63,6 +63,10 @@ namespace kzn::vk
     KZN_IMPL_ERROR(InvalidAttributeType, "Invalid vertex input attribute type!")
     KZN_IMPL_ERROR(FileError, "Failed to open file!")
 
+    // RenderPass
+    KZN_IMPL_ERROR(InvalidAttachmentIndex, "Attachment index provided isn't within available attachments!")
+    KZN_IMPL_ERROR(ColorAndResolveNotSameSize, "Color and Resolve attachments are not que same size!")
+
     // IO
     // KZN_IMPL_ERROR(FileError, "Failed to open file!")
 }

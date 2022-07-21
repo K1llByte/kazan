@@ -21,13 +21,15 @@ namespace kzn::vk
         constexpr AttachmentDesc& set_final_layout(VkImageLayout);
     };
 
+
     struct SubpassDesc {
         VkSubpassDescriptionFlags flags = 0;
         VkPipelineBindPoint       bind_point;
         std::vector<size_t>       input_attachments;
         std::vector<size_t>       color_attachments;
         std::vector<size_t>       resolve_attachments; // Same size as color_attachmemnts
-        size_t                    depth_stencil_attachment;
+        // If its "-1" then there's no depth buffer
+        size_t                    depth_stencil_attachment = size_t(-1);
         std::vector<uint32_t>     preserve_attachments;
 
         constexpr SubpassDesc(VkPipelineBindPoint _bind_point);
@@ -43,7 +45,8 @@ namespace kzn::vk
     class RenderPass
     {
         friend class RenderPassBuilder;
-    public:
+
+        public:
         ~RenderPass();
     
         VkRenderPass vk_render_pass() noexcept { return vkrender_pass; }
@@ -53,10 +56,10 @@ namespace kzn::vk
         void begin(CommandBuffer& cmd_buffer, const Swapchain& swapchain);
         void end(CommandBuffer& cmd_buffer);
 
-    private:
-        RenderPass() = default;
+        private:
+        RenderPass(Device* _device, VkRenderPass _render_pass);
 
-    private:
+        private:
         VkRenderPass               vkrender_pass;
         Device*                    device;
         std::vector<VkFramebuffer> framebuffers;
@@ -65,12 +68,8 @@ namespace kzn::vk
 
     class RenderPassBuilder
     {
-    public:
+        public:
         constexpr RenderPassBuilder(Device* device);
-
-        // TODO: Change this to a configurable way to setup
-        // many attachments and subpasses 
-        //RenderPassBuilder& set_format(VkFormat format) noexcept;
 
         constexpr RenderPassBuilder& add_attachment(const vk::AttachmentDesc&, VkImageLayout ref_layout = VK_IMAGE_LAYOUT_UNDEFINED) noexcept;
         constexpr RenderPassBuilder& add_subpass(const vk::SubpassDesc&) noexcept;
@@ -78,11 +77,11 @@ namespace kzn::vk
 
         RenderPass build();
 
-    private:
+        private:
         Device*                            device;
         VkFormat                           color_format;
-        size_t                             attachment_index;
-        // TODO: Hint vector sizes in RenderPassBuilder ctor
+        size_t                             attachment_index = 0;
+
         std::vector<VkAttachmentDescription> attachments_descriptions;
         std::vector<VkAttachmentReference>   attachment_refs;
         std::vector<vk::SubpassDesc>         subpasses_descriptions;
@@ -90,7 +89,7 @@ namespace kzn::vk
     };
 }
 
-// Implementation
+////////////////////// Implementation //////////////////////
 
 namespace kzn::vk {
     // Attachement Description
@@ -183,21 +182,28 @@ namespace kzn::vk {
     
     // RenderPassBuilder
     constexpr RenderPassBuilder::RenderPassBuilder(Device* device)
-        : device(device) {}
+        : device(device)
+    {
+        attachments_descriptions.reserve(3);
+        attachment_refs.reserve(3);
+        subpasses_descriptions.reserve(3);
+        subpasses_dependencies.reserve(3);
+    }
     
     constexpr RenderPassBuilder& RenderPassBuilder::add_attachment(const vk::AttachmentDesc& attachment_description, VkImageLayout ref_layout) noexcept {
         attachments_descriptions.push_back(attachment_description.data);
         // VUID-VkAttachmentReference-layout-03077
         // If an attachment is unused, it doesn't need to have a reference
-        if(ref_layout != VK_IMAGE_LAYOUT_UNDEFINED) {
-            attachment_refs.emplace_back(
-                attachment_index,
-                ref_layout
-            );
-        }
+        // if(ref_layout != VK_IMAGE_LAYOUT_UNDEFINED) {
+        attachment_refs.emplace_back(
+            static_cast<uint32_t>(attachment_index),
+            ref_layout
+        );
+        // }
         ++attachment_index;
         return *this;
     }
+
 
     constexpr RenderPassBuilder& RenderPassBuilder::add_subpass(const vk::SubpassDesc& subpass_description) noexcept {
         subpasses_descriptions.push_back(subpass_description);
@@ -209,9 +215,9 @@ namespace kzn::vk {
         return *this;
     }   
     
-    //////////////////////// FIXME: TEMPORARY ///////////////////////////////
+    //////////////////////// FIXME: TEMPORARY ////////////////////////
 
-    RenderPass simple_depth_render_pass(vk::Device& device, VkFormat surface_format);
+    RenderPass simple_depth_render_pass(Device& device, VkFormat surface_format);
 }
 
 #endif // KZN_VK_RENDER_PASS_HPP
