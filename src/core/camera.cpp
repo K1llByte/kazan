@@ -5,6 +5,20 @@
 namespace kzn
 {
 
+Camera Camera::orthographic(float left, float right, float top, float bottom, float near, float far) {
+    auto cam = Camera();
+    cam.set_orthographic(left, right, top, bottom, near, far);
+    return cam;
+}
+
+
+Camera Camera::perspective(float fov_y, float aspect, float near, float far) {
+    auto cam = Camera();
+    cam.set_perspective(fov_y, aspect, near, far);
+    return cam;
+}
+
+
 void Camera::set_orthographic(float left, float right, float top, float bottom, float near, float far)
 {
     _projection_matrix = glm::mat4{1.0f};
@@ -24,7 +38,7 @@ void Camera::set_perspective(float fov_y, float aspect, float near, float far)
         throw std::runtime_error("Invalid 'aspect'");
     }
     
-    const float tan_half_fovy = tan(fov_y / 2.f);
+    const float tan_half_fovy = tan(glm::radians(fov_y) / 2.f);
     _projection_matrix = glm::mat4{0.0f};
     _projection_matrix[0][0] = 1.f / (aspect * tan_half_fovy);
     _projection_matrix[1][1] = 1.f / (tan_half_fovy);
@@ -95,40 +109,4 @@ void Camera::lookat_target(glm::vec3 position, glm::vec3 target, glm::vec3 up)
 //     _view_matrix[3][1] = -glm::dot(v, position);
 //     _view_matrix[3][2] = -glm::dot(w, position);
 // }
-
-
-const glm::mat4& Camera::projection() const
-{
-    return _projection_matrix;
-}
-
-
-const glm::mat4& Camera::view() const
-{
-    return _view_matrix;
-}
-
-
-const glm::vec3& Camera::position() const
-{
-    return _position;
-}
-
-
-const glm::vec3& Camera::direction() const
-{
-    return _direction;
-}
-
-
-const glm::vec3& Camera::up() const
-{
-    return _up;
-}
-
-const glm::vec3& Camera::right() const
-{
-    return _right;
-}
-
 }

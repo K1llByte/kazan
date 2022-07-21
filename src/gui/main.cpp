@@ -24,10 +24,9 @@ int main() try
     //auto model2 = Model::load("../../Other/models/banana.obj");
     //model2.transform.position += glm::vec3{0.f, 0.f, -1.f};
 
-    // auto camera = Camera::perspective(50.f, window.aspect_ratio(), 0.1f, 100.f);
-    Camera camera;
+    auto camera = Camera::perspective(50.f, window.aspect_ratio(), 0.1f, 100.f);
     camera.lookat_target({5.f, 2.f, 0.f}, {0.f, 0.f, 0.f});
-    auto camera_controller = CameraController(&window, &camera);
+    CameraController camera_controller(&window, &camera);
 
     float counter = 0;
     while(!window.should_close())

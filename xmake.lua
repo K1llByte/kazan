@@ -35,6 +35,11 @@ function compilation_settings()
     --set_policy("build.warning", true) -- Allways show warnings
     set_warnings("allextra") -- -Wall -Wextra -Wfatal-errors (if error enabled)
     set_optimize("fastest") -- -O3
+
+    --add_rules("mode.asan")
+    -- add_rules("mode.lsan")
+    -- add_rules("mode.ubsan")
+    
     -- GCC flags
     if is_plat("linux", "macosx") then
         add_cxxflags("-Wshadow", "-Wpedantic")

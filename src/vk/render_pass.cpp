@@ -15,18 +15,20 @@ namespace kzn::vk
 {
     RenderPass RenderPassBuilder::build() {
         // Build all VkSubpassDescription's
+        Log::error("before build");
         std::vector<VkSubpassDescription> real_subpass_descriptions;
         real_subpass_descriptions.reserve(subpasses_descriptions.size());
         // NOTE: The RenderPassBuilder will be limited to only 32 attachments in total
-        // for all subpasse (this way, there's only 1 dynamic allocation for the conversion)
+        // for all subpasses (this way, there's only 1 dynamic allocation for the conversion)
         std::vector<VkAttachmentReference> tmp_attachment_desc_storage;
         tmp_attachment_desc_storage.reserve(32);
 
+        Log::error("before loop");
         for(const auto& desc : subpasses_descriptions) {
             // Convert input_attachments into vector
             // of VkAttachmentReference's
-            const auto* real_input_attachments =
-                tmp_attachment_desc_storage.data() + tmp_attachment_desc_storage.size();
+            const auto real_input_attachments_pos =
+                tmp_attachment_desc_storage.size();
             for(size_t i = 0; i < desc.input_attachments.size(); ++i) {
                 if(desc.input_attachments[i] > attachment_refs.size()-1)
                     throw InvalidAttachmentIndex();
@@ -36,8 +38,8 @@ namespace kzn::vk
 
             // Convert color_attachments into dyn array
             // of VkAttachmentReference's
-            const auto* real_color_attachments =
-                tmp_attachment_desc_storage.data() + tmp_attachment_desc_storage.size();
+            const auto real_color_attachments_pos =
+                tmp_attachment_desc_storage.size();
             for(size_t i = 0; i < desc.color_attachments.size(); ++i) {
                 if(desc.color_attachments[i] > attachment_refs.size()-1)
                     throw InvalidAttachmentIndex();
@@ -51,10 +53,10 @@ namespace kzn::vk
 
             // Convert resolve_attachments into dyn array
             // of VkAttachmentReference's
-            const auto* real_resolve_attachments =
-                desc.resolve_attachments.size()
-                    ? tmp_attachment_desc_storage.data() + tmp_attachment_desc_storage.size()
-                    : nullptr;
+            const auto real_resolve_attachments_pos = tmp_attachment_desc_storage.size();
+                // desc.resolve_attachments.size()
+                //     ? tmp_attachment_desc_storage.data() + tmp_attachment_desc_storage.size()
+                //     : nullptr;
 
             for(size_t i = 0; i < desc.resolve_attachments.size(); ++i) {
                 if(desc.resolve_attachments[i] > attachment_refs.size()-1)
@@ -68,10 +70,12 @@ namespace kzn::vk
                     .flags = desc.flags,
                     .pipelineBindPoint = desc.bind_point,
                     .inputAttachmentCount = static_cast<uint32_t>(desc.input_attachments.size()),
-                    .pInputAttachments = real_input_attachments,
+                    .pInputAttachments = tmp_attachment_desc_storage.data() + real_input_attachments_pos,
                     .colorAttachmentCount = static_cast<uint32_t>(desc.color_attachments.size()),
-                    .pColorAttachments = real_color_attachments,
-                    .pResolveAttachments = real_resolve_attachments,
+                    .pColorAttachments = tmp_attachment_desc_storage.data() + real_color_attachments_pos,
+                    .pResolveAttachments = desc.resolve_attachments.size()
+                        ? tmp_attachment_desc_storage.data() + real_resolve_attachments_pos
+                        : nullptr,
                     .pDepthStencilAttachment = (desc.depth_stencil_attachment == size_t(-1))
                         ? nullptr
                         : &attachment_refs[desc.depth_stencil_attachment],
@@ -93,6 +97,7 @@ namespace kzn::vk
             .pDependencies = subpasses_dependencies.data(),
         };
 
+        Log::error("before vkCreateRenderPass");
         VkRenderPass vkrender_pass;
         auto result = vkCreateRenderPass(device->vk_device(), &render_pass_create_info, nullptr, &vkrender_pass);
         VK_CHECK_MSG(result, "Failed to create render pass!");
