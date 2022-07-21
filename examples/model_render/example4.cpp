@@ -20,7 +20,7 @@ int main() try
     // auto model = kzn::sphere(1.f, 20, 20);
     auto model = Model::load("assets/models/monkey.obj");
 
-    Camera camera;
+    auto camera = Camera::perspective(50.f, window.aspect_ratio(), 0.1f, 100.f);
     camera.lookat_target(glm::vec3(5.f, 2.f, -2.f), glm::vec3(0.f, 0.f, 0.f));
 
     float counter = 0;
@@ -32,7 +32,7 @@ int main() try
         window.poll_events();
 
         // Update
-        camera.set_perspective(glm::radians(50.f), window.aspect_ratio(), 0.1f, 100.f);
+        camera.set_perspective(50.f, window.aspect_ratio(), 0.1f, 100.f);
 
         // Model rotation
         model.transform.rotation.y = glm::radians(counter);

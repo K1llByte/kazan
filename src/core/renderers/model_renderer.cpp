@@ -1,6 +1,5 @@
 #include "core/renderers/model_renderer.hpp"
 
-#include "core/camera.hpp"
 #include "core/model.hpp"
 
 namespace kzn

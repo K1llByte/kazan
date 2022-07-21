@@ -14,6 +14,7 @@ int main() try
     auto model_renderer = ModelRenderer(&renderer);
     auto gui = Interface(&renderer, window);
 
+    Log::error("DEBUG");
     auto model = Model::load("assets/models/suzanne_monkey.obj");
     auto model2 = Model::load("assets/models/suzanne_monkey.obj");
     model2.transform.position.z = 3.f;
@@ -23,9 +24,10 @@ int main() try
     //auto model2 = Model::load("../../Other/models/banana.obj");
     //model2.transform.position += glm::vec3{0.f, 0.f, -1.f};
 
+    // auto camera = Camera::perspective(50.f, window.aspect_ratio(), 0.1f, 100.f);
     Camera camera;
     camera.lookat_target({5.f, 2.f, 0.f}, {0.f, 0.f, 0.f});
-    CameraController camera_controller(&window, &camera);
+    auto camera_controller = CameraController(&window, &camera);
 
     float counter = 0;
     while(!window.should_close())
@@ -35,7 +37,7 @@ int main() try
         window.poll_events();
 
         // Update
-        camera.set_perspective(glm::radians(50.f), window.aspect_ratio(), 0.1f, 100.f);
+        camera.set_perspective(50.f, window.aspect_ratio(), 0.1f, 100.f);
         camera_controller.update(static_cast<float>(delta_time));
 
         // Model rotation
