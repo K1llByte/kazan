@@ -136,7 +136,7 @@ namespace kzn::vk
         }
 
         // 3. Create Depth Resources //
-        for(size_t i = 0; i < image_count; ++i)
+        for(size_t i = 0; i < swapchain_depths.size(); ++i)
         {
             VkImageCreateInfo image_info{};
             image_info.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
@@ -319,10 +319,11 @@ namespace kzn::vk
 
         // 4. Create Depth Resources //
         // 4.1 Create Depth Images  //
-        swapchain.swapchain_depths.resize(1);
-        swapchain.depth_allocation.resize(image_count);
-        swapchain.swapchain_depth_views.resize(image_count);
-        for(size_t i = 0; i < image_count; ++i)
+        const size_t num_depths = 1; 
+        swapchain.swapchain_depths.resize(num_depths);
+        swapchain.depth_allocation.resize(num_depths);
+        swapchain.swapchain_depth_views.resize(num_depths);
+        for(size_t i = 0; i < num_depths; ++i)
         {
             VkImageCreateInfo image_info{};
             image_info.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
