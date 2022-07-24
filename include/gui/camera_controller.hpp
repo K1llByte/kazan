@@ -28,7 +28,7 @@ namespace kzn
     {
     public:
         CameraController(Window* _window, Camera* _camera)
-            : window(_window), camera(_camera), input(window->input_handler()) {}
+            : window(_window), camera(_camera), input(*window) {}
 
         void update(float delta_time);
     

@@ -26,7 +26,7 @@ int main() try
     float counter = 0;
     bool render_wireframe_begin_state = false;
     bool render_wireframe = false;
-    while(!window.should_close())
+    while(!window.is_closed())
     {
         // Poll events
         window.poll_events();

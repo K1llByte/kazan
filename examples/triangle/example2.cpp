@@ -132,7 +132,7 @@ int main() try
     const auto window_extent = window.extent();
     auto viewport = kzn::vk::create_viewport(window_extent);
     auto scissor = kzn::vk::create_scissor(window_extent);
-    while (!window.should_close())
+    while (!window.is_closed())
     {
         window.poll_events();
 

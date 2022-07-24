@@ -8,13 +8,11 @@ using namespace kzn;
 int main() try
 {
     auto window = Window("Kazan", 1700, 800);
-    //auto input = Input();
-    auto input = window.input_handler();
+    auto input = Input(window);
     auto renderer = Renderer(&window);
     auto model_renderer = ModelRenderer(&renderer);
     auto gui = Interface(&renderer, window);
 
-    Log::error("DEBUG");
     auto model = Model::load("assets/models/suzanne_monkey.obj");
     auto model2 = Model::load("assets/models/suzanne_monkey.obj");
     model2.transform.position.z = 3.f;
@@ -29,7 +27,7 @@ int main() try
     CameraController camera_controller(&window, &camera);
 
     float counter = 0;
-    while(!window.should_close())
+    while(!window.is_closed())
     {
         auto delta_time = Time::delta();
         // Poll events
@@ -248,7 +246,7 @@ catch(const vk::ResultError& re)
 //     const auto window_extent = window.extent();
 //     auto viewport = kzn::vk::create_viewport(window_extent);
 //     auto scissor = kzn::vk::create_scissor(window_extent);
-//     while (!window.should_close())
+//     while (!window.is_closed())
 //     {
 //         window.poll_events();
 

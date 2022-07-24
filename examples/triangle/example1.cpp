@@ -111,7 +111,7 @@ int main() try
     auto window_extent = window.extent();
     auto viewport = vk::create_viewport(window_extent);
     auto scissor = vk::create_scissor(window_extent);
-    while (!window.should_close())
+    while (!window.is_closed())
     {
         // Log::info("New Loop");
         window.poll_events();

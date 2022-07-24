@@ -4,9 +4,6 @@
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_vulkan.h"
 
-// Debug
-#include <iostream>
-
 namespace kzn
 {
     Interface::Interface(Renderer* _renderer, Window& _window)
@@ -115,7 +112,8 @@ namespace kzn
 
             ImGui::ShowDemoWindow();
             ImGui::Begin("Demo window");
-            ImGui::Button("Hello!");
+            // ImGui::Button("Hello!");
+            ImGui::Image(, ImVec2(500,500))
             ImGui::End();
             
             // Render dear imgui into screen

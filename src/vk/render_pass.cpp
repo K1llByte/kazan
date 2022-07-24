@@ -15,7 +15,6 @@ namespace kzn::vk
 {
     RenderPass RenderPassBuilder::build() {
         // Build all VkSubpassDescription's
-        Log::error("before build");
         std::vector<VkSubpassDescription> real_subpass_descriptions;
         real_subpass_descriptions.reserve(subpasses_descriptions.size());
         // NOTE: The RenderPassBuilder will be limited to only 32 attachments in total
@@ -23,7 +22,6 @@ namespace kzn::vk
         std::vector<VkAttachmentReference> tmp_attachment_desc_storage;
         tmp_attachment_desc_storage.reserve(32);
 
-        Log::error("before loop");
         for(const auto& desc : subpasses_descriptions) {
             // Convert input_attachments into vector
             // of VkAttachmentReference's
@@ -97,7 +95,6 @@ namespace kzn::vk
             .pDependencies = subpasses_dependencies.data(),
         };
 
-        Log::error("before vkCreateRenderPass");
         VkRenderPass vkrender_pass;
         auto result = vkCreateRenderPass(device->vk_device(), &render_pass_create_info, nullptr, &vkrender_pass);
         VK_CHECK_MSG(result, "Failed to create render pass!");

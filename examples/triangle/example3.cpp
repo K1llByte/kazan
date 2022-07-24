@@ -14,7 +14,7 @@ int main()
     auto renderer = Renderer(&window);
 
     auto triangle_renderer = TriangleRenderer(&renderer);
-    while(!window.should_close())
+    while(!window.is_closed())
     {
         // Poll events
         window.poll_events();

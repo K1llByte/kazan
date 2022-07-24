@@ -2,31 +2,28 @@
 
 namespace kzn
 {
-    Input::Input(GLFWwindow* _glfw_window)
-        : glfw_window(_glfw_window) {}
+    Input::Input(Window& window)
+        : glfw_window(window.glfw_ptr()) {}
 
-    int Input::get_key(int key_code) const
-    {
+    Input::~Input() = default;
+    
+    int Input::get_key(int key_code) const {
         return glfwGetKey(glfw_window, key_code);
     }
 
-    bool Input::is_key_pressed(int key_code) const
-    {
+    bool Input::is_key_pressed(int key_code) const {
         return this->get_key(key_code) == GLFW_PRESS;
     }
 
-    bool Input::is_key_released(int key_code) const
-    {
+    bool Input::is_key_released(int key_code) const {
         return this->get_key(key_code) == GLFW_RELEASE;
     }
 
-    int Input::get_mouse_button(int button) const
-    {
+    int Input::get_mouse_button(int button) const {
         return glfwGetMouseButton(glfw_window, button);
     }
 
-    CursorPos Input::get_cursor_pos(int /*key_code*/) const
-    {
+    CursorPos Input::get_cursor_pos(int /*key_code*/) const {
         double x;
         double y;
         glfwGetCursorPos(glfw_window, &x, &y);
