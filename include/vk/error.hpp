@@ -67,6 +67,9 @@ namespace kzn::vk
     KZN_IMPL_ERROR(InvalidAttachmentIndex, "Attachment index provided isn't within available attachments!")
     KZN_IMPL_ERROR(ColorAndResolveNotSameSize, "Color and Resolve attachments are not que same size!")
 
+    // DescriptorSet
+    // TODO:
+
     // IO
     // KZN_IMPL_ERROR(FileError, "Failed to open file!")
 }

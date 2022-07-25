@@ -12,6 +12,9 @@ kazan.hpp include with all public API includes
     - Descriptor Pools
     - Descriptor Sets 
 ## Todo
+- debug, release and dev build modes
+- docs generation with hdoc
+- Try to refactor to struct pattern instead of build pattern
 -  RenderPassesManager
     - Usage:
         - auto& gui_render_pass = rp_manager[RP_GUI]
