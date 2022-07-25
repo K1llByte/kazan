@@ -9,6 +9,12 @@ namespace kzn
         render_pass(kzn::vk::simple_depth_render_pass(
             Context::device(),
             Context::swapchain().get_surface_format().format)),
+        allocator(&Context::device()),
+        cache(&Context::device()),
+        ubo(&Context::device(), sizeof(Tmp)),
+        desc_set(&Context::device(), allocator, cache, {
+            vk::BufferBinding::uniform(0, ubo.info())
+        }),
         pipeline(vk::Pipeline(
             &Context::device(),
             "assets/shaders/mesh/mesh.vert.spv",
@@ -16,6 +22,7 @@ namespace kzn
             vk::PipelineConfigBuilder(
                     vk::PipelineLayoutBuilder(&Context::device())
                         .add_push_constant(sizeof(PVM), VK_SHADER_STAGE_ALL_GRAPHICS) 
+                        .add_descriptor_set_layout(desc_set.layout())
                         .build(),
                     render_pass)
                 .set_polygon_mode(VK_POLYGON_MODE_FILL)
@@ -30,6 +37,7 @@ namespace kzn
             vk::PipelineConfigBuilder(
                     vk::PipelineLayoutBuilder(&Context::device())
                         .add_push_constant(sizeof(PVM), VK_SHADER_STAGE_ALL_GRAPHICS)
+                        .add_descriptor_set_layout(desc_set.layout())
                         .build(),
                     render_pass)
                 .set_polygon_mode(VK_POLYGON_MODE_LINE)
@@ -58,6 +66,9 @@ namespace kzn
         target_pipeline->set_viewport(cmd_buffer, viewport);
         target_pipeline->set_scissor(cmd_buffer, scissor);
         target_pipeline->bind(cmd_buffer);
+
+        // Bind descriptor set
+        desc_set.bind(cmd_buffer, target_pipeline->layout());
     }
 
     void ModelRenderer::unbind(vk::CommandBuffer& cmd_buffer)

@@ -13,6 +13,11 @@ layout(push_constant) uniform PVM
     mat4 model;
 } pvm;
 
+// Descriptor sets block
+layout(set = 0, binding = 0) uniform Tmp {
+    vec3 bias;
+} tmp;
+
 // Output
 layout(location = 0) out vec3 out_color;
 layout(location = 1) out vec3 out_frag_pos;
@@ -31,5 +36,5 @@ void main()
 
     out_frag_pos = vec3(pvm.model * vec4(v_position, 1.0));
     out_normal = mat3(transpose(inverse(pvm.model))) * normalize(v_normal);
-    out_color = v_color;
+    out_color = v_color * tmp.bias;
 }

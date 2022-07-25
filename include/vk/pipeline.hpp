@@ -68,14 +68,14 @@ namespace kzn::vk
     public:
         PipelineLayoutBuilder(Device* device);
 
-        // PipelineLayoutBuilder& add_descriptor_set(const DescriptorSet& set);
+        PipelineLayoutBuilder& add_descriptor_set_layout(VkDescriptorSetLayout set);
         PipelineLayoutBuilder& add_push_constant(uint32_t size, VkShaderStageFlags stages = VK_SHADER_STAGE_ALL_GRAPHICS);
 
         VkPipelineLayout build();
 
     private:
         Device*                            device = nullptr;
-        // std::vector<VkDescriptorSetLayout> set_layouts;
+        std::vector<VkDescriptorSetLayout> set_layouts;
         std::vector<VkPushConstantRange>   push_ranges;
     };
 

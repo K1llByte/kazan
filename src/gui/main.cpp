@@ -14,6 +14,7 @@ int main() try
     auto gui = Interface(&renderer, window);
 
     auto model = Model::load("assets/models/suzanne_monkey.obj");
+    // FIXME: No need to load obj again, reuse 'model'
     auto model2 = Model::load("assets/models/suzanne_monkey.obj");
     model2.transform.position.z = 3.f;
     // auto model = kzn::icosahedron(0.8f, 30, true);
@@ -80,6 +81,8 @@ int main() try
                 // Draw model 1
                 pvm.model = model.transform.mat4();
                 model_renderer.push(cmd_buffer, pvm);
+                Tmp tmp{};
+                model_renderer.ubo.upload(&tmp);
                 model.draw(cmd_buffer);
 
                 pvm.model = model2.transform.mat4();

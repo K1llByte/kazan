@@ -4,6 +4,7 @@
 #include "core/transform.hpp"
 #include "vk/buffers.hpp"
 
+// #define GLM_FORCE_DEFAULT_ALIGNED_GENTYPES
 #include <glm/glm.hpp>
 
 namespace kzn

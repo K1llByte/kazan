@@ -8,18 +8,24 @@ kazan.hpp include with all public API includes
 
 ## In Progress
 - Uniform Buffers
-    - Descriptor Set Layout
-    - Descriptor Pools
+    - ~~Descriptor Set Layout~~ Auto layout management with DescritptorSetCache
+    - ~~Descriptor Pools~~ Auto pools management with DescriptorSetAllocator
     - Descriptor Sets 
+    - Multiple Descriptor Sets creation support (DescriptorSet::multiple(...) && vk::MultipleBufferBinding{...})
 ## Todo
 - debug, release and dev build modes
 - docs generation with hdoc
 - Try to refactor to struct pattern instead of build pattern
+- Engine class:
+    - initializes eveything thats needs to be initialized
+    - Owns the lifetime of all graphic, window and input stuff
+    - Owns RenderPassManager and PipelineManager and maybe a ResourceManager
+    - Created a bunch of default pipelines and render passes
 -  RenderPassesManager
     - Usage:
         - auto& gui_render_pass = rp_manager[RP_GUI]
     - Since the renderer owns this structure all render passes are destroyed when they should
-    - 
+- PipelineManager
     
 
 - Make builders constexpr until build()

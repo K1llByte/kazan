@@ -101,7 +101,10 @@ namespace kzn::vk
         buffer_info.usage = VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT;
 
         VmaAllocationCreateInfo vma_alloc_info{};
-	    vma_alloc_info.usage = VMA_MEMORY_USAGE_AUTO; // VMA_MEMORY_USAGE_CPU_TO_GPU;
+        vma_alloc_info.flags = VMA_ALLOCATION_CREATE_HOST_ACCESS_SEQUENTIAL_WRITE_BIT;
+	    vma_alloc_info.usage = VMA_MEMORY_USAGE_AUTO_PREFER_DEVICE ;
+	    vma_alloc_info.requiredFlags = VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT;
+	    // vma_alloc_info.usage = VMA_MEMORY_USAGE_AUTO; // VMA_MEMORY_USAGE_CPU_TO_GPU;
 
         auto result = vmaCreateBuffer(
             device->allocator(),
@@ -117,5 +120,14 @@ namespace kzn::vk
     UniformBuffer::~UniformBuffer()
     {
         vmaDestroyBuffer(device->allocator(), buffer, allocation);
+    }
+
+    
+    VkDescriptorBufferInfo UniformBuffer::info() const {
+        return VkDescriptorBufferInfo{
+            .buffer = buffer,
+            .offset = 0,
+            .range = static_cast<uint64_t>(buffer_size),
+        };
     }
 } // namespace kzn::vk

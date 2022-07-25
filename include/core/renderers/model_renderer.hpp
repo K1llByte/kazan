@@ -3,6 +3,13 @@
 
 #include "core/renderer.hpp"
 #include "vk/pipeline.hpp"
+#include "vk/descriptor_set.hpp"
+#include "vk/buffers.hpp"
+
+// TODO: Delete this
+struct Tmp {
+    glm::vec3 bias{0.1, 0.5, 0.2};
+};
 
 namespace kzn
 {
@@ -25,10 +32,19 @@ namespace kzn
         void draw(vk::CommandBuffer& cmd_buffer);
 
     private:
-        Renderer*      renderer;
-        vk::RenderPass render_pass;
-        vk::Pipeline   pipeline;
-        vk::Pipeline   wireframe_pipeline;
+        Renderer*         renderer;
+        vk::RenderPass    render_pass;
+
+    public: // FIXME: TEMPORARY
+        vk::DescriptorSetAllocator   allocator;
+        vk::DescriptorSetLayoutCache cache;
+        vk::UniformBuffer            ubo;
+        vk::DescriptorSet            desc_set;
+    
+    private:
+        vk::Pipeline      pipeline;
+        vk::Pipeline      wireframe_pipeline;
+        
     };
 
     template<typename T>

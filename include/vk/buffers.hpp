@@ -49,6 +49,8 @@ namespace kzn::vk
 
         template<typename T>
         void upload(const T* data);
+
+        VkDescriptorBufferInfo info() const;
     
     private:
         Device*       device;
