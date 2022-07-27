@@ -266,6 +266,37 @@ namespace kzn::vk {
     }
 
 
+    std::vector<DescriptorSet> DescriptorSet::multiple(
+        size_t                                              _num_sets,
+        Device*                                             _device,
+        DescriptorSetAllocator&                             _allocator,
+        DescriptorSetLayoutCache&                           _cache,
+        const std::initializer_list<MultipleBufferBinding>& _bindings)
+    {
+        std::vector<DescriptorSet> sets;
+        sets.reserve(_num_sets);
+        // For each set to be created
+        for(size_t i = 0; i < _num_sets; ++i) {
+            // Make a tmp vector with set's unique buffer bindings
+            std::vector<BufferBinding> tmp;
+            tmp.reserve(_num_sets);
+            for(size_t j = 0; j < _num_sets; ++j)
+                tmp.emplace_back(
+                    _bindings[i].binding,
+                    _bindings[i].info[j],
+                    _bindings[i].type,
+                    _bindings[i].stages);
+            // Create set
+            sets.emplace_back(
+                _device,
+                _allocator,
+                _cache,
+                tmp);
+        }
+        return sets;
+    }
+
+
     void DescriptorSet::bind(vk::CommandBuffer& cmd_buffer, VkPipelineLayout pipeline_layout) const {
         vkCmdBindDescriptorSets(
             cmd_buffer.vk_command_buffer(),
