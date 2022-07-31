@@ -34,30 +34,31 @@ namespace kzn::vk {
         }
     };
 
-    struct MultipleBufferBinding {
-        uint32_t                            binding;
-        std::vector<VkDescriptorBufferInfo> info;
-        VkDescriptorType                    type;
-        VkShaderStageFlags                  stages = VK_SHADER_STAGE_ALL_GRAPHICS;
+    // TODO: Do this later
+    // struct MultipleBufferBinding {
+    //     uint32_t                            binding;
+    //     std::vector<VkDescriptorBufferInfo> info;
+    //     VkDescriptorType                    type;
+    //     VkShaderStageFlags                  stages = VK_SHADER_STAGE_ALL_GRAPHICS;
 
-        constexpr MultipleBufferBinding(
-            uint32_t               _binding,
-            std::initializer_list<VkDescriptorBufferInfo> _infos,
-            VkDescriptorType       _type,
-            VkShaderStageFlags     _stages = VK_SHADER_STAGE_ALL_GRAPHICS)
-            : binding(_binding)
-            , infos(_infos)
-            , type(_type)
-            , stages(_stages) {}
+    //     constexpr MultipleBufferBinding(
+    //         uint32_t               _binding,
+    //         std::initializer_list<VkDescriptorBufferInfo> _infos,
+    //         VkDescriptorType       _type,
+    //         VkShaderStageFlags     _stages = VK_SHADER_STAGE_ALL_GRAPHICS)
+    //         : binding(_binding)
+    //         , infos(_infos)
+    //         , type(_type)
+    //         , stages(_stages) {}
 
-        static constexpr BufferBinding uniform(
-            uint32_t                                      _binding,
-            std::initializer_list<VkDescriptorBufferInfo> _infos,
-            VkShaderStageFlags                            _stages = VK_SHADER_STAGE_ALL_GRAPHICS)
-        {
-            return MultipleBufferBinding{_binding, _infos, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, _stages};
-        }
-    };
+    //     static constexpr BufferBinding uniform(
+    //         uint32_t                                      _binding,
+    //         std::initializer_list<VkDescriptorBufferInfo> _infos,
+    //         VkShaderStageFlags                            _stages = VK_SHADER_STAGE_ALL_GRAPHICS)
+    //     {
+    //         return MultipleBufferBinding{_binding, _infos, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, _stages};
+    //     }
+    // };
 
 
     // DescriptorSetAllocator is a manager of DescriptorSetPool's which creates new pools
@@ -126,16 +127,18 @@ namespace kzn::vk {
             DescriptorSetLayoutCache&                       _cache,
             const std::initializer_list<vk::BufferBinding>& _bindings);
         
-        static std::vector<DescriptorSet> multiple(
-            size_t                                          _num_sets,
-            Device*                                         _device,
-            DescriptorSetAllocator&                         _allocator,
-            DescriptorSetLayoutCache&                       _cache,
-            const std::initializer_list<vk::MultipleBufferBinding>& _bindings);
+        // TODO: Do later
+        // static std::vector<DescriptorSet> multiple(
+        //     size_t                                          _num_sets,
+        //     Device*                                         _device,
+        //     DescriptorSetAllocator&                         _allocator,
+        //     DescriptorSetLayoutCache&                       _cache,
+        //     const std::initializer_list<vk::MultipleBufferBinding>& _bindings);
 
         VkDescriptorSetLayout layout() { return set_layout; }
 
         void bind(vk::CommandBuffer& cmd_buffer, VkPipelineLayout pipeline_layout) const;
+        // TODO: Do later
         // static void bind_multiple(...) const;
 
         private:

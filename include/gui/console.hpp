@@ -4,9 +4,11 @@
 #include <unordered_map>
 #include <functional>
 #include <variant>
+#include <cstdint>
+#include <string>
 
 namespace kzn::console {
-    enum CommandError: uint8_t {
+    enum CommandError/* : uint8_t */ {
         NONE,
         // Add Command errors
         CMD_EXISTS,
@@ -21,7 +23,7 @@ namespace kzn::console {
 
     struct Arg {
         using Any = std::variant<int,float,char*>;
-        enum Type: uint8_t {
+        enum Type/* : uint8_t */ {
             INT,
             FLOAT,
             STRING

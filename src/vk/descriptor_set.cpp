@@ -11,11 +11,11 @@ namespace kzn::vk {
         VkDescriptorPoolCreateFlags flags)
     {
         std::vector<VkDescriptorPoolSize> sizes;
-		sizes.reserve(pool_sizes.size());
-		for (auto sz : pool_sizes) {
-			sizes.push_back({ sz.first, uint32_t(sz.second * count) });
-		}
-		VkDescriptorPoolCreateInfo pool_info = {
+        sizes.reserve(pool_sizes.size());
+        for (auto sz : pool_sizes) {
+            sizes.push_back({ sz.first, uint32_t(sz.second * count) });
+        }
+        VkDescriptorPoolCreateInfo pool_info = {
             .sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO,
             .flags = flags,
             .maxSets = count,
@@ -23,11 +23,11 @@ namespace kzn::vk {
             .pPoolSizes = sizes.data(),
         };
 
-		VkDescriptorPool descriptor_pool;
-		vkCreateDescriptorPool(device.vk_device(), &pool_info, nullptr, &descriptor_pool);
+        VkDescriptorPool descriptor_pool;
+        vkCreateDescriptorPool(device.vk_device(), &pool_info, nullptr, &descriptor_pool);
 
-		return descriptor_pool;
-	}
+        return descriptor_pool;
+    }
 
 
     DescriptorSetAllocator::DescriptorSetAllocator(Device* _device)
@@ -62,20 +62,20 @@ namespace kzn::vk {
 
     void DescriptorSetAllocator::reset_pools() {
         for (auto& p : used_pools) {
-			vkResetDescriptorPool(device->vk_device(), p, 0);
-		}
+            vkResetDescriptorPool(device->vk_device(), p, 0);
+        }
 
-		free_pools = std::move(used_pools);
-		used_pools.clear();
-		current_pool = VK_NULL_HANDLE;
+        free_pools = std::move(used_pools);
+        used_pools.clear();
+        current_pool = VK_NULL_HANDLE;
     }
 
 
     VkDescriptorSet DescriptorSetAllocator::allocate(const VkDescriptorSetLayout& layout) {
         if(current_pool == VK_NULL_HANDLE) {
-			current_pool = grab_pool();
-			used_pools.push_back(current_pool);
-		}
+            current_pool = grab_pool();
+            used_pools.push_back(current_pool);
+        }
 
         VkDescriptorSetAllocateInfo alloc_info{
             .sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO,
@@ -111,52 +111,52 @@ namespace kzn::vk {
 
     VkDescriptorPool DescriptorSetAllocator::grab_pool() {
         if (free_pools.size() > 0) {
-			VkDescriptorPool pool = free_pools.back();
-			free_pools.pop_back();
-			return pool;
-		}
-		else {
-			return create_pool(*device, descriptor_sizes, 1000, 0);
-		}
+            VkDescriptorPool pool = free_pools.back();
+            free_pools.pop_back();
+            return pool;
+        }
+        else {
+            return create_pool(*device, descriptor_sizes, 1000, 0);
+        }
     }
 
 
     bool DescriptorSetLayoutCache::DescriptorLayoutInfo::operator==(const DescriptorLayoutInfo& other) const {
-		if (other.bindings.size() != bindings.size()) {
-			return false;
-		}
-		else {
-			// Compare each of the bindings is the same. Bindings are sorted so they will match
-			for(size_t i = 0; i < bindings.size(); i++) {
-				if(other.bindings[i].binding != bindings[i].binding
+        if (other.bindings.size() != bindings.size()) {
+            return false;
+        }
+        else {
+            // Compare each of the bindings is the same. Bindings are sorted so they will match
+            for(size_t i = 0; i < bindings.size(); i++) {
+                if(other.bindings[i].binding != bindings[i].binding
                     || other.bindings[i].descriptorType != bindings[i].descriptorType
                     || other.bindings[i].descriptorCount != bindings[i].descriptorCount
                     || other.bindings[i].stageFlags != bindings[i].stageFlags)
-				{
+                {
                     return false;
                 }
-			}
-			return true;
-		}
-	}
+            }
+            return true;
+        }
+    }
 
 
     size_t DescriptorSetLayoutCache::DescriptorLayoutInfo::hash() const {
-		using std::size_t;
-		using std::hash;
+        using std::size_t;
+        using std::hash;
 
-		size_t result = hash<size_t>()(bindings.size());
+        size_t result = hash<size_t>()(bindings.size());
 
-		for(const VkDescriptorSetLayoutBinding& b : bindings) {
-			// Pack the binding data into a single int64. Not fully correct but its ok
-			size_t binding_hash = b.binding | b.descriptorType << 8 | b.descriptorCount << 16 | b.stageFlags << 24;
+        for(const VkDescriptorSetLayoutBinding& b : bindings) {
+            // Pack the binding data into a single int64. Not fully correct but its ok
+            size_t binding_hash = b.binding | b.descriptorType << 8 | b.descriptorCount << 16 | b.stageFlags << 24;
 
-			// Shuffle the packed binding data and xor it with the main hash
-			result ^= hash<size_t>()(binding_hash);
-		}
+            // Shuffle the packed binding data and xor it with the main hash
+            result ^= hash<size_t>()(binding_hash);
+        }
 
-		return result;
-	}
+        return result;
+    }
 
 
     DescriptorSetLayoutCache::DescriptorSetLayoutCache(Device* _device)
@@ -165,54 +165,54 @@ namespace kzn::vk {
 
     DescriptorSetLayoutCache::~DescriptorSetLayoutCache() {
         for (auto& [_, layout] : layout_cache) {
-			vkDestroyDescriptorSetLayout(device->vk_device(), layout, nullptr);
-		}
+            vkDestroyDescriptorSetLayout(device->vk_device(), layout, nullptr);
+        }
     }
 
 
     VkDescriptorSetLayout DescriptorSetLayoutCache::create_descriptor_layout(VkDescriptorSetLayoutCreateInfo* info) {
-		DescriptorLayoutInfo layout_info;
-		layout_info.bindings.reserve(info->bindingCount);
-		bool is_sorted = true;
-		int32_t last_binding = -1;
-		for (uint32_t i = 0; i < info->bindingCount; i++) {
-			layout_info.bindings.push_back(info->pBindings[i]);
+        DescriptorLayoutInfo layout_info;
+        layout_info.bindings.reserve(info->bindingCount);
+        bool is_sorted = true;
+        int32_t last_binding = -1;
+        for (uint32_t i = 0; i < info->bindingCount; i++) {
+            layout_info.bindings.push_back(info->pBindings[i]);
 
-			// Check that the bindings are in strict increasing order
-			if (static_cast<int32_t>(info->pBindings[i].binding) > last_binding)
-			{
-				last_binding = info->pBindings[i].binding;
-			}
-			else{
-				is_sorted = false;
-			}
-		}
-		if (!is_sorted)
-		{
-			std::sort(
+            // Check that the bindings are in strict increasing order
+            if (static_cast<int32_t>(info->pBindings[i].binding) > last_binding)
+            {
+                last_binding = info->pBindings[i].binding;
+            }
+            else{
+                is_sorted = false;
+            }
+        }
+        if (!is_sorted)
+        {
+            std::sort(
                 layout_info.bindings.begin(),
                 layout_info.bindings.end(),
                 [](VkDescriptorSetLayoutBinding& a, VkDescriptorSetLayoutBinding& b ) {
                     return a.binding < b.binding;
                 }
             );
-		}
-		
-		auto it = layout_cache.find(layout_info);
-		if (it != layout_cache.end())
-		{
-			return (*it).second;
-		}
-		else {
-			VkDescriptorSetLayout layout;
-			vkCreateDescriptorSetLayout(device->vk_device(), info, nullptr, &layout);
+        }
+        
+        auto it = layout_cache.find(layout_info);
+        if (it != layout_cache.end())
+        {
+            return (*it).second;
+        }
+        else {
+            VkDescriptorSetLayout layout;
+            vkCreateDescriptorSetLayout(device->vk_device(), info, nullptr, &layout);
 
-			// layoutCache.emplace()
-			// add to cache
-			layout_cache[layout_info] = layout;
-			return layout;
-		}
-	}
+            // layoutCache.emplace()
+            // add to cache
+            layout_cache[layout_info] = layout;
+            return layout;
+        }
+    }
 
 
     DescriptorSet::DescriptorSet(
@@ -262,39 +262,39 @@ namespace kzn::vk {
         }
 
         // device->vk_device() must be the same as the allocator
-		vkUpdateDescriptorSets(device->vk_device(), static_cast<uint32_t>(_bindings.size()), writes.get(), 0, nullptr);
+        vkUpdateDescriptorSets(device->vk_device(), static_cast<uint32_t>(_bindings.size()), writes.get(), 0, nullptr);
     }
 
 
-    std::vector<DescriptorSet> DescriptorSet::multiple(
-        size_t                                              _num_sets,
-        Device*                                             _device,
-        DescriptorSetAllocator&                             _allocator,
-        DescriptorSetLayoutCache&                           _cache,
-        const std::initializer_list<MultipleBufferBinding>& _bindings)
-    {
-        std::vector<DescriptorSet> sets;
-        sets.reserve(_num_sets);
-        // For each set to be created
-        for(size_t i = 0; i < _num_sets; ++i) {
-            // Make a tmp vector with set's unique buffer bindings
-            std::vector<BufferBinding> tmp;
-            tmp.reserve(_num_sets);
-            for(size_t j = 0; j < _num_sets; ++j)
-                tmp.emplace_back(
-                    _bindings[i].binding,
-                    _bindings[i].info[j],
-                    _bindings[i].type,
-                    _bindings[i].stages);
-            // Create set
-            sets.emplace_back(
-                _device,
-                _allocator,
-                _cache,
-                tmp);
-        }
-        return sets;
-    }
+    // std::vector<DescriptorSet> DescriptorSet::multiple(
+    //     size_t                                              _num_sets,
+    //     Device*                                             _device,
+    //     DescriptorSetAllocator&                             _allocator,
+    //     DescriptorSetLayoutCache&                           _cache,
+    //     const std::initializer_list<MultipleBufferBinding>& _bindings)
+    // {
+    //     std::vector<DescriptorSet> sets;
+    //     sets.reserve(_num_sets);
+    //     // For each set to be created
+    //     for(size_t i = 0; i < _num_sets; ++i) {
+    //         // Make a tmp vector with set's unique buffer bindings
+    //         std::vector<BufferBinding> tmp;
+    //         tmp.reserve(_num_sets);
+    //         for(size_t j = 0; j < _num_sets; ++j)
+    //             tmp.emplace_back(
+    //                 _bindings[i].binding,
+    //                 _bindings[i].info[j],
+    //                 _bindings[i].type,
+    //                 _bindings[i].stages);
+    //         // Create set
+    //         sets.emplace_back(
+    //             _device,
+    //             _allocator,
+    //             _cache,
+    //             tmp);
+    //     }
+    //     return sets;
+    // }
 
 
     void DescriptorSet::bind(vk::CommandBuffer& cmd_buffer, VkPipelineLayout pipeline_layout) const {
