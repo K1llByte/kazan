@@ -8,7 +8,7 @@
 #include <string>
 
 namespace kzn::console {
-    enum CommandError/* : uint8_t */ {
+    enum CommandError: uint8_t {
         NONE,
         // Add Command errors
         CMD_EXISTS,
@@ -19,11 +19,13 @@ namespace kzn::console {
         INVALID_ARG_ACCESS,
     };
 
+
     inline const char* error_message(CommandError error);
+
 
     struct Arg {
         using Any = std::variant<int,float,char*>;
-        enum Type/* : uint8_t */ {
+        enum Type: uint8_t {
             INT,
             FLOAT,
             STRING
@@ -33,15 +35,18 @@ namespace kzn::console {
         enum Type type;
     };
 
+
     inline Arg Int(const char* _name) { return Arg{_name, Arg::INT}; }
     inline Arg Float(const char* _name) { return Arg{_name, Arg::FLOAT}; }
     inline Arg String(const char* _name) { return Arg{_name, Arg::STRING}; }
+    
     
     struct Action {
         size_t                         num_args;
         Arg*                           args;
         std::function<void(Arg::Any*)> action;
     };
+
     
     class Commands {
         public:
@@ -64,8 +69,6 @@ namespace kzn::console {
         void print(int identation = 0) const;
         CommandError execute(const char* cmd) const;
     };
-
-    //void testing(const char* asd);
 } // namespace kzn::console
 
 namespace kzn::console {

@@ -13,8 +13,10 @@ kazan.hpp include with all public API includes
     - Descriptor Sets 
     - Multiple Descriptor Sets creation support (DescriptorSet::multiple(...) && vk::MultipleBufferBinding{...})
 ## Todo
-- debug, release and dev build modes
+- Refactor pipeline creation to have less builder patterns (only PipelineBuilder)
+- Implement a concept to check with boost::pfr if a type T complies with alignment constraints
 - docs generation with hdoc
+- debug, release and dev build modes
 - Try to refactor to struct pattern instead of build pattern
 - Engine class:
     - initializes eveything thats needs to be initialized

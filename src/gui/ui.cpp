@@ -58,6 +58,15 @@ namespace kzn
 
         // TODO: Get main render pass
         ImGui_ImplVulkan_Init(&init_info, renderer->main_render_pass()->vk_render_pass());
+        
+        // Load Fonts
+        // - If no fonts are loaded, dear imgui will use the default font. You can also load multiple fonts and use ImGui::PushFont()/PopFont() to select them.
+        // - AddFontFromFileTTF() will return the ImFont* so you can store it if you need to select the font among multiple.
+        // - If the file cannot be loaded, the function will return NULL. Please handle those errors in your application (e.g. use an assertion, or display an error and quit).
+        // - The fonts will be rasterized at a given size (w/ oversampling) and stored into a texture when calling ImFontAtlas::Build()/GetTexDataAsXXXX(), which ImGui_ImplXXXX_NewFrame below will call.
+        // - Read 'docs/FONTS.md' for more instructions and details.
+        // - Remember that in C/C++ if you want to include a backslash \ in a string literal you need to write a double backslash \\ !
+        io.Fonts->AddFontFromFileTTF("assets/fonts/ruda.bold.ttf", 16.0f);
 
         // Implementation of single time commands
         {
@@ -82,6 +91,7 @@ namespace kzn
 
         // Setup Dear ImGui style
         ImGui::StyleColorsDark();
+        this->set_theme();
     }
 
 
@@ -127,5 +137,84 @@ namespace kzn
         {
             ImGui_ImplVulkan_RenderDrawData(ImGui::GetDrawData(), cmd_buffer.vk_command_buffer());
         }
+    }
+
+
+    void Interface::set_theme()
+    {
+        ImGuiStyle* style = &ImGui::GetStyle();
+
+        // Palette
+        // const auto AQUA         = ImVec4(0.408f, 0.616f, 0.416f, 1.f); // 689d6a
+        const auto DARK_GREY       = ImVec4(0.06f, 0.05f, 0.07f, 1.00f); // 0f0d12
+        const auto DARK_GREY_HOVER = ImVec4(0.24f, 0.23f, 0.29f, 1.00f);
+        const auto GREY            = ImVec4(0.10f, 0.09f, 0.12f, 1.00f); // 1a171f
+        const auto GREY_HOVER      = ImVec4(0.56f, 0.56f, 0.58f, 1.00f); // 8f8f94
+        const auto DEBUG           = ImVec4(1.00f, 0.00f, 0.00f, 1.00f); // 8f8f94
+
+        style->WindowPadding     = ImVec2(15, 15);
+        style->WindowRounding    = 5.0f;
+        style->FramePadding      = ImVec2(5, 5);
+        style->FrameRounding     = 4.0f;
+        style->ItemSpacing       = ImVec2(12, 8);
+        style->ItemInnerSpacing  = ImVec2(8, 6);
+        style->IndentSpacing     = 25.0f;
+        style->ScrollbarSize     = 15.0f;
+        style->ScrollbarRounding = 9.0f;
+        style->GrabMinSize       = 5.0f;
+        style->GrabRounding      = 3.0f;
+
+        style->Colors[ImGuiCol_Text]                  = ImVec4(0.80f, 0.80f, 0.83f, 1.00f);
+        style->Colors[ImGuiCol_TextDisabled]          = DARK_GREY_HOVER;
+        style->Colors[ImGuiCol_WindowBg]              = DARK_GREY;
+        style->Colors[ImGuiCol_ChildBg]               = ImVec4(0.07f, 0.07f, 0.09f, 1.00f);
+        style->Colors[ImGuiCol_PopupBg]               = ImVec4(0.07f, 0.07f, 0.09f, 1.00f);
+        style->Colors[ImGuiCol_Border]                = GREY; // ImVec4(0.80f, 0.80f, 0.83f, 0.88f);
+        style->Colors[ImGuiCol_BorderShadow]          = ImVec4(0.92f, 0.91f, 0.88f, 0.00f);
+        style->Colors[ImGuiCol_FrameBg]               = GREY;
+        style->Colors[ImGuiCol_FrameBgHovered]        = DARK_GREY_HOVER;
+        style->Colors[ImGuiCol_FrameBgActive]         = GREY_HOVER;
+        style->Colors[ImGuiCol_TitleBg]               = GREY;
+        style->Colors[ImGuiCol_TitleBgCollapsed]      = ImVec4(1.00f, 0.98f, 0.95f, 0.75f);
+        style->Colors[ImGuiCol_TitleBgActive]         = ImVec4(0.07f, 0.07f, 0.09f, 1.00f);
+        style->Colors[ImGuiCol_MenuBarBg]             = GREY;
+        style->Colors[ImGuiCol_ScrollbarBg]           = GREY;
+        style->Colors[ImGuiCol_ScrollbarGrab]         = ImVec4(0.80f, 0.80f, 0.83f, 0.31f);
+        style->Colors[ImGuiCol_ScrollbarGrabHovered]  = GREY_HOVER;
+        style->Colors[ImGuiCol_ScrollbarGrabActive]   = DARK_GREY;
+        style->Colors[ImGuiCol_CheckMark]             = ImVec4(0.80f, 0.80f, 0.83f, 0.31f);
+        style->Colors[ImGuiCol_SliderGrab]            = ImVec4(0.80f, 0.80f, 0.83f, 0.31f);
+        style->Colors[ImGuiCol_SliderGrabActive]      = DARK_GREY;
+        style->Colors[ImGuiCol_Button]                = GREY;
+        style->Colors[ImGuiCol_ButtonHovered]         = DARK_GREY_HOVER;
+        style->Colors[ImGuiCol_ButtonActive]          = GREY_HOVER;
+        style->Colors[ImGuiCol_Header]                = GREY;
+        style->Colors[ImGuiCol_HeaderHovered]         = GREY_HOVER;
+        style->Colors[ImGuiCol_HeaderActive]          = DARK_GREY;
+        style->Colors[ImGuiCol_Separator]             = DARK_GREY;
+        style->Colors[ImGuiCol_SeparatorHovered]      = DARK_GREY_HOVER;
+        style->Colors[ImGuiCol_SeparatorActive]       = GREY_HOVER;
+
+        style->Colors[ImGuiCol_Tab]                   = DARK_GREY;
+        style->Colors[ImGuiCol_TabHovered]            = DARK_GREY_HOVER;
+        style->Colors[ImGuiCol_TabActive]             = GREY;
+        style->Colors[ImGuiCol_TabUnfocused]          = DARK_GREY;
+        style->Colors[ImGuiCol_TabUnfocusedActive]    = GREY;
+
+        style->Colors[ImGuiCol_DockingPreview]        = DARK_GREY; //_HOVER;
+        style->Colors[ImGuiCol_DockingEmptyBg]        = DARK_GREY; //_HOVER;
+
+        style->Colors[ImGuiCol_ResizeGrip]            = ImVec4(0.00f, 0.00f, 0.00f, 0.00f);
+        style->Colors[ImGuiCol_ResizeGripHovered]     = GREY_HOVER;
+        style->Colors[ImGuiCol_ResizeGripActive]      = DARK_GREY;
+        // style->Colors[ImGuiCol_CloseButton]        = ImVec4(0.40f, 0.39f, 0.38f, 0.16f);
+        // style->Colors[ImGuiCol_CloseButtonHovered] = ImVec4(0.40f, 0.39f, 0.38f, 0.39f);
+        // style->Colors[ImGuiCol_CloseButtonActive]  = ImVec4(0.40f, 0.39f, 0.38f, 1.00f);
+        style->Colors[ImGuiCol_PlotLines]             = ImVec4(0.40f, 0.39f, 0.38f, 0.63f);
+        style->Colors[ImGuiCol_PlotLinesHovered]      = ImVec4(0.25f, 1.00f, 0.00f, 1.00f);
+        style->Colors[ImGuiCol_PlotHistogram]         = ImVec4(0.40f, 0.39f, 0.38f, 0.63f);
+        style->Colors[ImGuiCol_PlotHistogramHovered]  = ImVec4(0.25f, 1.00f, 0.00f, 1.00f);
+        style->Colors[ImGuiCol_TextSelectedBg]        = ImVec4(0.25f, 1.00f, 0.00f, 0.43f);
+        // style->Colors[ImGuiCol_ModalWindowDarkening] = ImVec4(1.00f, 0.98f, 0.95f, 0.73f);
     }
 }

@@ -20,6 +20,7 @@ namespace kzn {
 
         void setup();
         void draw(vk::CommandBuffer& cmd_buffer);
+        void set_theme();
     };
 }
 

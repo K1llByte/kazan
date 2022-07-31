@@ -64,38 +64,38 @@ namespace kzn::vk {
     // DescriptorSetAllocator is a manager of DescriptorSetPool's which creates new pools
     // when its needed
     class DescriptorSetAllocator {
-	    public:
+        public:
         using PoolSizes = std::vector<std::pair<VkDescriptorType,float>>;
 
         DescriptorSetAllocator(Device* _device);
         ~DescriptorSetAllocator();
 
-		void reset_pools();
-		VkDescriptorSet allocate(const VkDescriptorSetLayout& layout);
+        void reset_pools();
+        VkDescriptorSet allocate(const VkDescriptorSetLayout& layout);
 
-
-	    private:
-		Device*                       device;
-		VkDescriptorPool              current_pool = VK_NULL_HANDLE;
-		PoolSizes                     descriptor_sizes;
-		std::vector<VkDescriptorPool> used_pools;
-		std::vector<VkDescriptorPool> free_pools;
 
         private:
-		VkDescriptorPool grab_pool();
-	};
+        Device*                       device;
+        VkDescriptorPool              current_pool = VK_NULL_HANDLE;
+        PoolSizes                     descriptor_sizes;
+        std::vector<VkDescriptorPool> used_pools;
+        std::vector<VkDescriptorPool> free_pools;
+
+        private:
+        VkDescriptorPool grab_pool();
+    };
 
 
     class DescriptorSetLayoutCache {
         public:
         struct DescriptorLayoutInfo {
-			// TODO: Turn this into an inlined array
-			std::vector<VkDescriptorSetLayoutBinding> bindings;
+            // TODO: Turn this into an inlined array
+            std::vector<VkDescriptorSetLayoutBinding> bindings;
 
-			bool operator==(const DescriptorLayoutInfo& other) const;
+            bool operator==(const DescriptorLayoutInfo& other) const;
 
-			size_t hash() const;
-		};
+            size_t hash() const;
+        };
         
         DescriptorSetLayoutCache(Device* _device);
         ~DescriptorSetLayoutCache();
@@ -105,13 +105,13 @@ namespace kzn::vk {
 
         private:
         struct DescriptorLayoutHash {
-			std::size_t operator()(const DescriptorLayoutInfo& info) const { 
+            std::size_t operator()(const DescriptorLayoutInfo& info) const { 
                 return info.hash();
             }
-		};
+        };
 
         private:
-		Device* device;
+        Device* device;
         std::unordered_map<
             DescriptorLayoutInfo, 
             VkDescriptorSetLayout,
