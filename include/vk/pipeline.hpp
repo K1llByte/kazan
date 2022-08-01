@@ -119,6 +119,7 @@ namespace kzn::vk
 
     template<typename VertexType>
     PipelineConfigBuilder& PipelineConfigBuilder::set_type_vtx_input() noexcept
+        // Requires VertexType std::is_default_constructible<Ex1>
     {
         std::vector<VkVertexInputAttributeDescription> vertex_attributes;
         uint32_t i = 0;

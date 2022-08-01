@@ -6,7 +6,6 @@ add_requires("glfw")
 add_requires("fmt")
 -- glslangValidator
 add_requires("glslang", {configs = {binaryonly = true}})
-add_requires("vcpkg::boost-pfr", {alias = "boost"})
 
 ---------------- Reused functions ----------------
 
@@ -23,7 +22,6 @@ function kazan_deps()
     -- Dependencies
     add_packages("glm")
     add_packages("fmt")
-    add_packages("boost")
     add_packages("glfw")
     use_vulkan()
 end
@@ -61,6 +59,7 @@ function compilation_settings()
     -- add_includedirs("lib/stb/include")
     add_includedirs("lib/tiny_obj_loader/include")
     add_includedirs("lib/imgui_docking/include")
+    add_includedirs("lib/boost_pfr/include")
     add_includedirs("lib/vma/include")
 end
 
@@ -107,8 +106,6 @@ target("kazan")
     set_kind("static")
     add_files("src/**.cpp")
     remove_files("src/gui/**.cpp")
-    remove_files("src/main.cpp")
-    --remove_files("src/core/shapes.*pp")
 
 -------------------- Kazan GUI -------------------
 
@@ -131,6 +128,20 @@ target("kazui")
     -- Binary
     set_kind("binary")
     add_files("src/gui/*.cpp")
+    remove_files("src/gui/test.cpp")
+
+-- Temporary
+-- target("test")
+--     -- Compiler Settings
+--     compilation_settings()
+--     -- Dependencies
+--     kazan_deps()
+--     add_deps("imgui")
+--     add_deps("kazan")
+--     -- Binary
+--     set_kind("binary")
+--     add_files("src/gui/*.cpp")
+--     remove_files("src/gui/main.cpp")
 
 ------------------ Kazan Examples ----------------
 

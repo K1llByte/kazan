@@ -81,7 +81,9 @@ int main() try
                 // Draw model 1
                 pvm.model = model.transform.mat4();
                 model_renderer.push(cmd_buffer, pvm);
-                Tmp tmp{};
+                static int a = 0;
+                // a = (a+1) % 256;
+                Tmp tmp{{a,0.f,1.f}};
                 model_renderer.ubo.upload(&tmp);
                 model.draw(cmd_buffer);
 

@@ -7,28 +7,30 @@ USE const
 kazan.hpp include with all public API includes
 
 ## In Progress
-- Uniform Buffers
-    - ~~Descriptor Set Layout~~ Auto layout management with DescritptorSetCache
-    - ~~Descriptor Pools~~ Auto pools management with DescriptorSetAllocator
-    - Descriptor Sets 
-    - Multiple Descriptor Sets creation support (DescriptorSet::multiple(...) && vk::MultipleBufferBinding{...})
-## Todo
 - Refactor pipeline creation to have less builder patterns (only PipelineBuilder)
 - Implement a concept to check with boost::pfr if a type T complies with alignment constraints
+
+## Todo
+<!-- 
+Make staged submition for Vertex Buffers
+Make a solution for Uniform structured alignment
+-->
 - docs generation with hdoc
-- debug, release and dev build modes
 - Try to refactor to struct pattern instead of build pattern
+- debug, release and dev build modes
 - Engine class:
     - initializes eveything thats needs to be initialized
     - Owns the lifetime of all graphic, window and input stuff
     - Owns RenderPassManager and PipelineManager and maybe a ResourceManager
     - Created a bunch of default pipelines and render passes
--  RenderPassesManager
+-  ~~RenderPassesManager~~ ResourceManager
     - Usage:
         - auto& gui_render_pass = rp_manager[RP_GUI]
     - Since the renderer owns this structure all render passes are destroyed when they should
-- PipelineManager
-    
+- ~~PipelineManager~~ ResourceManager
+- Uniform Buffers
+    - Multiple Descriptor Sets creation support (DescriptorSet::multiple(...) && vk::MultipleBufferBinding{...})
+
 
 - Make builders constexpr until build()
 - Context singleton doesn't have a proper lifetime (might cause problems)
@@ -53,6 +55,10 @@ kazan.hpp include with all public API includes
 <!-- =================================== -->
 
 ## Done
+- Uniform Buffers
+    - ~~Descriptor Set Layout~~ Auto layout management with DescritptorSetCache
+    - ~~Descriptor Pools~~ Auto pools management with DescriptorSetAllocator
+    - Descriptor Sets 
 - ImGUI Docking test (with example)
 - Update Camera Controller with new Input System
 - Input system

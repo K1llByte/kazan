@@ -62,7 +62,7 @@ namespace kzn::vk
     template<typename T>
     void UniformBuffer::upload(const T* new_data)
     {
-        // Copy vertex data to GPU
+        // Copy uniform data to GPU
         void* data;
         vmaMapMemory(device->allocator(), allocation, &data);
         memcpy(data, new_data, buffer_size);
