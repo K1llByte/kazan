@@ -122,8 +122,12 @@ namespace kzn
 
             ImGui::ShowDemoWindow();
             ImGui::Begin("Demo window");
-            // ImGui::Button("Hello!");
-            // ImGui::Image(, ImVec2(500,500))
+            // ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
+            // // ImGui::Button("Hello!");
+            // ImGui::PopStyleVar();
+            auto [w,h] = ImGui::GetContentRegionAvail();
+            Log::error("{},{}",w, h);
+            // ImGui::Image(/* Texture ID */, ImVec2(500,500))
             ImGui::End();
             
             // Render dear imgui into screen
@@ -149,8 +153,10 @@ namespace kzn
         const auto DARK_GREY       = ImVec4(0.06f, 0.05f, 0.07f, 1.00f); // 0f0d12
         const auto DARK_GREY_HOVER = ImVec4(0.24f, 0.23f, 0.29f, 1.00f);
         const auto GREY            = ImVec4(0.10f, 0.09f, 0.12f, 1.00f); // 1a171f
-        const auto GREY_HOVER      = ImVec4(0.56f, 0.56f, 0.58f, 1.00f); // 8f8f94
-        const auto DEBUG           = ImVec4(1.00f, 0.00f, 0.00f, 1.00f); // 8f8f94
+        // const auto GREY_HOVER      = ImVec4(0.56f, 0.56f, 0.58f, 1.00f); // 8f8f94
+        const auto GREY_HOVER      = ImVec4(0.15f, 0.13f, 0.18f, 1.00f); // 8f8f94
+        const auto GREY_ACTIVE     = ImVec4(0.80f, 0.80f, 0.83f, 0.31f);
+        const auto DEBUG           = ImVec4(1.00f, 0.00f, 0.00f, 1.00f); // ff0000
 
         style->WindowPadding     = ImVec2(15, 15);
         style->WindowRounding    = 5.0f;
@@ -179,9 +185,9 @@ namespace kzn
         style->Colors[ImGuiCol_TitleBgActive]         = ImVec4(0.07f, 0.07f, 0.09f, 1.00f);
         style->Colors[ImGuiCol_MenuBarBg]             = GREY;
         style->Colors[ImGuiCol_ScrollbarBg]           = GREY;
-        style->Colors[ImGuiCol_ScrollbarGrab]         = ImVec4(0.80f, 0.80f, 0.83f, 0.31f);
-        style->Colors[ImGuiCol_ScrollbarGrabHovered]  = GREY_HOVER;
-        style->Colors[ImGuiCol_ScrollbarGrabActive]   = DARK_GREY;
+        style->Colors[ImGuiCol_ScrollbarGrab]         = GREY_HOVER; //ImVec4(0.80f, 0.80f, 0.83f, 0.31f);
+        style->Colors[ImGuiCol_ScrollbarGrabHovered]  = DARK_GREY_HOVER;
+        style->Colors[ImGuiCol_ScrollbarGrabActive]   = GREY_ACTIVE; // DARK_GREY;
         style->Colors[ImGuiCol_CheckMark]             = ImVec4(0.80f, 0.80f, 0.83f, 0.31f);
         style->Colors[ImGuiCol_SliderGrab]            = ImVec4(0.80f, 0.80f, 0.83f, 0.31f);
         style->Colors[ImGuiCol_SliderGrabActive]      = DARK_GREY;

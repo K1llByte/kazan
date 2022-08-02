@@ -17,11 +17,14 @@ namespace kzn
             vk::PipelineConfigBuilder(
                     vk::PipelineLayoutBuilder(&Context::device())
                         .build(),
-                    render_pass)
+                    render_pass
+                )
                 .set_polygon_mode(VK_POLYGON_MODE_FILL)
                 .set_dynamic_states({VK_DYNAMIC_STATE_VIEWPORT, VK_DYNAMIC_STATE_SCISSOR})
                 .set_front_face(VK_FRONT_FACE_CLOCKWISE)
-                .build()))
+                .build()
+            )
+        )
     {
         render_pass.create_framebuffers(Context::swapchain());
         renderer->add_render_pass(render_pass);

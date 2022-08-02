@@ -86,11 +86,6 @@ namespace kzn
 
         draw_func(cmd_buffer);
 
-        // Model draw commands
-        // vbo.bind(cmd_buffer);
-        // ibo.bind(cmd_buffer);
-        // vkCmdDrawIndexed(cmd_buffer.vk_command_buffer(), vertices.size(), 1, 0, 0, 0);
-
         /////////////////
         //  End Frame  //
         /////////////////

@@ -24,12 +24,15 @@ namespace kzn
                         .add_push_constant(sizeof(PVM), VK_SHADER_STAGE_ALL_GRAPHICS) 
                         .add_descriptor_set_layout(desc_set.layout())
                         .build(),
-                    render_pass)
+                    render_pass
+                )
                 .set_polygon_mode(VK_POLYGON_MODE_FILL)
                 .set_dynamic_states({VK_DYNAMIC_STATE_VIEWPORT, VK_DYNAMIC_STATE_SCISSOR})
-                .set_type_vtx_input<Vertex>()
                 // .set_vtx_input<glm::vec3, glm::vec3, glm::vec3, glm::vec2>()
-                .build())),
+                .set_type_vtx_input<Vertex>()
+                .build()
+            )
+        ),
         wireframe_pipeline(vk::Pipeline(
             &Context::device(),
             "assets/shaders/mesh/mesh_no_light.vert.spv",
@@ -39,11 +42,14 @@ namespace kzn
                         .add_push_constant(sizeof(PVM), VK_SHADER_STAGE_ALL_GRAPHICS)
                         .add_descriptor_set_layout(desc_set.layout())
                         .build(),
-                    render_pass)
+                    render_pass
+                )
                 .set_polygon_mode(VK_POLYGON_MODE_LINE)
                 .set_dynamic_states({VK_DYNAMIC_STATE_VIEWPORT, VK_DYNAMIC_STATE_SCISSOR})
                 .set_type_vtx_input<Vertex>()
-                .build()))
+                .build()
+            )
+        )
     {
         render_pass.create_framebuffers(Context::swapchain());
         renderer->add_render_pass(render_pass);

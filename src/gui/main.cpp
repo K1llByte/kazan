@@ -10,11 +10,11 @@ int main() try
     auto window = Window("Kazan", 1700, 800);
     auto input = Input(window);
     auto renderer = Renderer(&window);
+    // auto renderer = OffscreenRenderer(&render_image);
     auto model_renderer = ModelRenderer(&renderer);
     auto gui = Interface(&renderer, window);
 
     auto model = Model::load("assets/models/suzanne_monkey.obj");
-    // FIXME: No need to load obj again, reuse 'model'
     auto model2 = Model::load("assets/models/suzanne_monkey.obj");
     model2.transform.position.z = 3.f;
     // auto model = kzn::icosahedron(0.8f, 30, true);
@@ -82,8 +82,8 @@ int main() try
                 pvm.model = model.transform.mat4();
                 model_renderer.push(cmd_buffer, pvm);
                 static int a = 0;
-                // a = (a+1) % 256;
-                Tmp tmp{{a,0.f,1.f}};
+                a = (a+1) % 256;
+                Tmp tmp{{a/256.f,0.f,0.f}};
                 model_renderer.ubo.upload(&tmp);
                 model.draw(cmd_buffer);
 

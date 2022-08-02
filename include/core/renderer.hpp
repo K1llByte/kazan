@@ -50,8 +50,6 @@ namespace kzn
         inline static vk::Device* device = nullptr;
     };
 
-    // Forward declaration
-    class ModelRederer;
 
     class Renderer
     {

@@ -7,43 +7,76 @@ USE const
 kazan.hpp include with all public API includes
 
 ## In Progress
-- Refactor pipeline creation to have less builder patterns (only PipelineBuilder)
-- Implement a concept to check with boost::pfr if a type T complies with alignment constraints
 
 ## Todo
-<!-- 
-Make staged submition for Vertex Buffers
-Make a solution for Uniform structured alignment
--->
-- docs generation with hdoc
+
+[priority:high]
+- Make a solution for Uniform structured alignment
+<!-- - Implement a concept to check with boost::pfr if a type T complies with alignment constraints -->
+
+- Add textures (and samplers)
+
+- Imgui render to Image instead of window
+    - vk::Image wrapper to improve vulkan image creation
+        - Usage:
+            auto img = vk::Image(&device, {width,height}, vk::Image::Format::RGBA8);
+    - ImGuiRenderer implementation (only changes the presentation code)
+    - ImGuiWindow render target
+        - Usage:
+            - auto render_imgui_window = interface.render_window()
+        - with all methods the Window class has that the Renderer uses
+        like `was_resized()`, etc... 
+    
+- Make staged submition for Vertex Buffers
+
+[priority:medium]
 - Try to refactor to struct pattern instead of build pattern
+
+- Input Keyboard and GamePad enum wrappers to replace
+  GLFW's int values in Input class
+
+- Improve swapchain creation and configurability (when imgui offscreen renderer comes)
+
+[priority:low]
+- docs generation with hdoc
+
 - debug, release and dev build modes
+
+- Make staged submition for Vertex Buffers
+    - For now vertex buffers are in a host visible region on the GPU
+    i need to refactor the code to store a staging buffer and the real buffer
+    followed by a scheduled copy of the Host visible buffer to the real VertexBuffer
+
 - Engine class:
     - initializes eveything thats needs to be initialized
     - Owns the lifetime of all graphic, window and input stuff
     - Owns RenderPassManager and PipelineManager and maybe a ResourceManager
     - Created a bunch of default pipelines and render passes
--  ~~RenderPassesManager~~ ResourceManager
+    
+-  ~~RenderPassManager~~ ResourceManager
+    - Is a public member of Renderer
     - Usage:
         - auto& gui_render_pass = rp_manager[RP_GUI]
     - Since the renderer owns this structure all render passes are destroyed when they should
+
 - ~~PipelineManager~~ ResourceManager
+    - Easy to implement shader reload
+
 - Uniform Buffers
     - Multiple Descriptor Sets creation support (DescriptorSet::multiple(...) && vk::MultipleBufferBinding{...})
 
-
+<!-- Unsorted -->
 - Make builders constexpr until build()
 - Context singleton doesn't have a proper lifetime (might cause problems)
-- Texture mapping
 - Study RendererBackend + RendererFrontend architechture
     and change the singleton Context model i have now
 - Work on FIXME's and TODO's
 - Multisampling
 - Generating Mipmaps
 - Allow QueueFamilyIndices to create queues selectively
+
+[future]
 <!-- Future -->
-- Input Keyboard and GamePad enum wrappers to replace
-  GLFW's int values in Input class
 - Instanced rendering
 - Dynamic uniforms
 - Separate images and sampler descriptors

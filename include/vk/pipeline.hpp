@@ -105,8 +105,11 @@ namespace kzn::vk
         VkShaderModule   frag_shader_module;
         VkViewport       viewport;
     };
+} // namespace kzn::vk
 
+////////////////// IMPLEMENTATION //////////////////
 
+namespace kzn::vk {
     template<typename ...Ts>
     PipelineConfigBuilder& PipelineConfigBuilder::set_vtx_input() noexcept
     {
@@ -150,7 +153,6 @@ namespace kzn::vk
         config.vtx_attributes = std::move(vertex_attributes);
         return *this;
     }
-} // namespace kzn::vk
-
+}
 
 #endif // KZN_VK_PIPELINE_HPP
