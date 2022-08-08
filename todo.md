@@ -16,7 +16,13 @@ kazan.hpp include with all public API includes
 
 - Add textures (and samplers)
 
+- vk::Queue wrapper with submit method which receives vk::CommandBuffer as argument
+    - AND MUST BE NON COPYABLE
+
 - Imgui render to Image instead of window
+    - Refactor vk::SwapChain
+        - Remove Depth images and views creation, only handle the images
+        - present(present_queue, wait_semaphore) method to automaticly present the current image
     - vk::Image wrapper to improve vulkan image creation
         - Usage:
             auto img = vk::Image(&device, {width,height}, vk::Image::Format::RGBA8);

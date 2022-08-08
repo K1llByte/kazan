@@ -3,9 +3,6 @@
 
 #include "core/window.hpp"
 
-#define GLFW_INCLUDE_VULKAN
-#include <GLFW/glfw3.h>
-
 #include <vector>
 
 namespace kzn::vk
@@ -21,7 +18,7 @@ namespace kzn::vk
 
         VkSurfaceKHR create_surface(Window& window);
 
-    
+
     private:
         Instance() = default;
         

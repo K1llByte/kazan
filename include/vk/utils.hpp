@@ -24,7 +24,7 @@ namespace kzn::vk
     // TODO: Consider moving this to device method
     // or wrapper handler with destructor
     // NOTE: Fence starts signaled
-    VkFence create_fence(Device& device);
+    VkFence create_fence(Device& device, bool signaled = true);
     void destroy_semaphore(Device& device, VkSemaphore semaphore) noexcept;
     void destroy_fence(Device& device, VkFence fence) noexcept;
 

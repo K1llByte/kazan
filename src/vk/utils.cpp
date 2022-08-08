@@ -14,19 +14,18 @@ namespace kzn::vk
         return new_semaphore;
     }
 
-    VkFence create_fence(Device& device)
+    VkFence create_fence(Device& device, bool signaled)
     {
         VkFenceCreateInfo fence_info{};
         fence_info.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
-        fence_info.flags = VK_FENCE_CREATE_SIGNALED_BIT;
+        fence_info.flags = signaled ? VK_FENCE_CREATE_SIGNALED_BIT : 0;
         VkFence new_fence;
         auto result = vkCreateFence(device.vk_device(), &fence_info, nullptr, &new_fence);
         VK_CHECK_MSG(result, "Failed to create fence");
         return new_fence;
     }
 
-    void destroy_semaphore(Device& device, VkSemaphore semaphore) noexcept
-    {
+    void destroy_semaphore(Device& device, VkSemaphore semaphore) noexcept {
         vkDestroySemaphore(device.vk_device(), semaphore, nullptr);
     }
 
