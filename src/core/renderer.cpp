@@ -120,5 +120,6 @@ namespace kzn
             }
         }
 
+        Context::device().wait_idle();
     }
 } // namespace kzn

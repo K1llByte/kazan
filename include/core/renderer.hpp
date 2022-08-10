@@ -70,7 +70,8 @@ namespace kzn
         // window is resized
         void add_render_pass(vk::RenderPass& render_pass);
 
-        void wait_idle() { Context::device().wait_idle(); }
+        // TODO: Delete this completly later
+        // void wait_idle() { Context::device().wait_idle(); }
 
         void render_frame(std::function<void(vk::CommandBuffer&)>);
 

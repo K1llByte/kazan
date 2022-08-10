@@ -181,8 +181,25 @@ namespace kzn::vk
         submit_info.pSignalSemaphores = &signal_semaphore;
 
         auto result = vkQueueSubmit(graphics_queue, 1, &submit_info, fence);
-        VK_CHECK_MSG(result, "Failed to submit draw command buffer!");
+        VK_CHECK_MSG(result, "Failed to submit command buffer!");
     }
+
+
+    void Device::graphics_queue_submit(
+        CommandBuffer& cmd_buffer,
+        VkFence fence)
+    {
+        VkCommandBuffer cmd_buffers[] = {cmd_buffer.vk_command_buffer()};
+
+        VkSubmitInfo submit_info{};
+        submit_info.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+        submit_info.commandBufferCount = 1;
+        submit_info.pCommandBuffers = cmd_buffers;
+
+        auto result = vkQueueSubmit(graphics_queue, 1, &submit_info, fence);
+        VK_CHECK_MSG(result, "Failed to submit command buffer!");
+    }
+
 
     void Device::graphics_queue_submit(
         CommandBuffer& cmd_buffer)
@@ -195,7 +212,7 @@ namespace kzn::vk
         submit_info.pCommandBuffers = cmd_buffers;
 
         auto result = vkQueueSubmit(graphics_queue, 1, &submit_info, VK_NULL_HANDLE);
-        VK_CHECK_MSG(result, "Failed to submit draw command buffer!");
+        VK_CHECK_MSG(result, "Failed to submit command buffer!");
     }
 
     void Device::present_queue_present(Swapchain& swapchain, VkSemaphore wait_semaphore)
@@ -224,6 +241,34 @@ namespace kzn::vk
     void Device::wait_idle() noexcept
     {
         vkDeviceWaitIdle(vkdevice);
+    }
+
+
+    void Device::immediate_submit(std::function<void(vk::CommandBuffer&)>&& func) {
+        // TODO: avoid creating cmd pool and buffer i nthis method
+        // make one buffer device global and reset it at the end
+        
+        // Create a cmd pool
+        auto cmd_pool = vk::CommandPool(this);
+        // Allocate a cmd buffer from that pool
+        auto cmd_buffer = cmd_pool.allocate();
+
+        // Begin the command buffer recording with one time submit usage
+        cmd_buffer.begin(VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT);
+        // Record commands
+        func(cmd_buffer);
+        // End recording
+        cmd_buffer.end();
+
+        // When work is completed on the GPU this single use fence will be signaled
+        auto immediate_fence = create_fence(*this);
+        // Submit command buffer to the queue.
+        this->graphics_queue_submit(cmd_buffer, immediate_fence);
+        // Wait
+        vkWaitForFences(vkdevice, 1, &immediate_fence, true, 9999999999);
+
+        // Destroy single use fence
+        destroy_fence(*this, immediate_fence);
     }
 
 

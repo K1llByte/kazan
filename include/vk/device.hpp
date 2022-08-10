@@ -7,6 +7,7 @@
 
 #include <optional>
 #include <exception>
+#include <functional>
 
 namespace kzn::vk
 {
@@ -62,9 +63,14 @@ namespace kzn::vk
             VkSemaphore signal_semaphore,
             VkFence fence);
         void graphics_queue_submit(
+            CommandBuffer& cmd_buffer,
+            VkFence fence);
+        void graphics_queue_submit(
             CommandBuffer& cmd_buffer);
         void present_queue_present(Swapchain& swapchain, VkSemaphore wait_semaphore);
         void wait_idle() noexcept;
+        // Begin a dedicated cmd buffer and submit immediatly the work to the GPU
+        void immediate_submit(std::function<void(vk::CommandBuffer&)>&&);
 
     private:
         Device() = default;

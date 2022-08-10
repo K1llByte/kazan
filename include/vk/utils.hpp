@@ -31,6 +31,9 @@ namespace kzn::vk
     VkViewport create_viewport(VkExtent2D extent);
     VkRect2D create_scissor(VkExtent2D extent);
 
+    // Create buffer
+    // void create_buffer(Device& device, );
+
     // Vertex Input utilities
     struct VertexInputDescription
     {

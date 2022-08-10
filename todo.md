@@ -15,9 +15,14 @@ kazan.hpp include with all public API includes
 <!-- - Implement a concept to check with boost::pfr if a type T complies with alignment constraints -->
 
 - Add textures (and samplers)
+    vk::Image
 
 - vk::Queue wrapper with submit method which receives vk::CommandBuffer as argument
     - AND MUST BE NON COPYABLE
+
+- Vulkan Backend singleton
+    - Manages the current Context and vulkan long lived objects
+    - provides VkBackend::device(), VkBackend::swapchain() and VkBackend::instance() 
 
 - Imgui render to Image instead of window
     - Refactor vk::SwapChain

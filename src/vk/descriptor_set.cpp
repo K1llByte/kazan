@@ -222,6 +222,7 @@ namespace kzn::vk {
         const std::initializer_list<vk::BufferBinding>& _bindings)
         : device(_device)
     {
+        // Unique pointer array
         auto layout_bindings = std::make_unique<VkDescriptorSetLayoutBinding[]>(_bindings.size());
         auto writes = std::make_unique<VkWriteDescriptorSet[]>(_bindings.size());
         size_t i = 0;
@@ -243,7 +244,10 @@ namespace kzn::vk {
             .pBindings = layout_bindings.get(),
         };
         
+        // Use descreiptor layour cache to create the layout if
+        // it isn't created already
         set_layout = _cache.create_descriptor_layout(&layout_info);
+        // Use automaticly managed descriptor set allocator
         vk_descriptor_set = _allocator.allocate(set_layout);
 
         
@@ -261,8 +265,13 @@ namespace kzn::vk {
             ++i;
         }
 
-        // device->vk_device() must be the same as the allocator
-        vkUpdateDescriptorSets(device->vk_device(), static_cast<uint32_t>(_bindings.size()), writes.get(), 0, nullptr);
+        // device->vk_device() must be the same as the one allocator uses
+        vkUpdateDescriptorSets(
+            device->vk_device(),
+            static_cast<uint32_t>(_bindings.size()),
+            writes.get(),
+            0,
+            nullptr);
     }
 
 

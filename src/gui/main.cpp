@@ -81,9 +81,11 @@ int main() try
                 // Draw model 1
                 pvm.model = model.transform.mat4();
                 model_renderer.push(cmd_buffer, pvm);
-                static int a = 0;
-                a = (a+1) % 256;
-                Tmp tmp{{a/256.f,0.f,0.f}};
+                static float a = 0;
+                a += (1*0.5f);
+                if(a > 255.f)
+                    a = 0.f;
+                Tmp tmp{{a/256.f,0.f,a/256.f}};
                 model_renderer.ubo.upload(&tmp);
                 model.draw(cmd_buffer);
 
@@ -115,7 +117,7 @@ int main() try
         }
         ++counter;
     }
-    renderer.wait_idle();
+    // renderer.wait_idle();
 }
 catch(const vk::ResultError& re)
 {

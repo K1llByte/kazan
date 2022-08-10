@@ -2,6 +2,7 @@
 #define KZN_VK_ERROR_HPP
 
 #include "core/utils.hpp"
+#include "core/log.hpp"
 
 #ifndef GLFW_INCLUDE_VULKAN
 #   include <vulkan/vulkan.h>
