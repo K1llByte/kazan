@@ -5,11 +5,6 @@
 namespace kzn::vk {
     Image::Image(Device* _device, VkExtent3D image_extent)
         : device(_device)
-        , image_size( 
-            image_extent.width *
-            image_extent.height * 
-            image_extent.depth * 
-            pixel_size)
     {
         // Steps:
         // 1. Create staging buffer
@@ -19,7 +14,11 @@ namespace kzn::vk {
         // Pixel size for format: 4 bytes
         const VkFormat format = VK_FORMAT_R8G8B8A8_SRGB;
         const uint32_t pixel_size = 4;
-        
+        image_size =  
+            image_extent.width *
+            image_extent.height * 
+            image_extent.depth * 
+            pixel_size;
         
         // Allocate vertex buffer
         VkBufferCreateInfo buffer_info = {};
@@ -78,7 +77,7 @@ namespace kzn::vk {
     }
 
 
-    void upload(void* data) {
+    void Image::upload(void* data) {
         // Steps:
         // 1. Upload data to staging buffer
         // 2. Copy data to image
@@ -95,6 +94,6 @@ namespace kzn::vk {
         // 2.1. Transition image
 
         // 2.2. Copy buffer to image
-        
+
     }
 } // namespace kzn::vk
