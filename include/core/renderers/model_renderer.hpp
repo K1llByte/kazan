@@ -5,6 +5,8 @@
 #include "vk/pipeline.hpp"
 #include "vk/descriptor_set.hpp"
 #include "vk/buffers.hpp"
+#include "core/texture.hpp"
+#include "vk/image.hpp"
 
 // TODO: Delete this
 struct Tmp {
@@ -13,8 +15,7 @@ struct Tmp {
 
 namespace kzn
 {
-    struct PVM
-    {
+    struct PVM {
         glm::mat4 proj_view;
         glm::mat4 model;
     };
@@ -39,6 +40,8 @@ namespace kzn
         vk::DescriptorSetAllocator   allocator;
         vk::DescriptorSetLayoutCache cache;
         vk::UniformBuffer            ubo;
+        Texture                      tex_data;
+        vk::Image                    tex;
         vk::DescriptorSet            desc_set;
     
     private:

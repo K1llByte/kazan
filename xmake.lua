@@ -56,7 +56,7 @@ function compilation_settings()
     --set_policy("build.optimization.lto")
     -- Include dirs
     add_includedirs("include")
-    -- add_includedirs("lib/stb/include")
+    add_includedirs("lib/stb/include")
     add_includedirs("lib/tiny_obj_loader/include")
     add_includedirs("lib/imgui_docking/include")
     add_includedirs("lib/boost_pfr/include")

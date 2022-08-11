@@ -50,7 +50,7 @@ namespace kzn::vk
         template<typename T>
         void upload(const T* data);
 
-        VkDescriptorBufferInfo info() const;
+        VkDescriptorBufferInfo info() const noexcept;
     
     private:
         Device*       device;

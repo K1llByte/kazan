@@ -253,15 +253,31 @@ namespace kzn::vk {
         
         i = 0;
         for(const auto& binding : _bindings) {
-            writes[i] = VkWriteDescriptorSet{
-                .sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
-                .dstSet = vk_descriptor_set,
-                .dstBinding = binding.binding,
-                // .dstArrayElement = 0,
-                .descriptorCount = 1,
-                .descriptorType = binding.type,
-                .pBufferInfo = &binding.info,
-            };
+            // Image sampler
+            if(binding.type == VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER) {
+                writes[i] = VkWriteDescriptorSet{
+                    .sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
+                    .dstSet = vk_descriptor_set,
+                    .dstBinding = binding.binding,
+                    // .dstArrayElement = 0,
+                    .descriptorCount = 1,
+                    .descriptorType = binding.type,
+                    .pImageInfo = &binding.image_info,
+                };
+            }
+            // Uniform
+            else { 
+                writes[i] = VkWriteDescriptorSet{
+                    .sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
+                    .dstSet = vk_descriptor_set,
+                    .dstBinding = binding.binding,
+                    // .dstArrayElement = 0,
+                    .descriptorCount = 1,
+                    .descriptorType = binding.type,
+                    .pBufferInfo = &binding.buffer_info,
+                };
+
+            }
             ++i;
         }
 

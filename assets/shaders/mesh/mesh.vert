@@ -22,6 +22,7 @@ layout(set = 0, binding = 0) uniform Tmp {
 layout(location = 0) out vec3 out_color;
 layout(location = 1) out vec3 out_frag_pos;
 layout(location = 2) out vec3 out_normal;
+layout(location = 3) out vec2 out_tex_coords;
 
 //////////////////////////////////////////////////////////
 
@@ -37,4 +38,5 @@ void main()
     out_frag_pos = vec3(pvm.model * vec4(v_position, 1.0));
     out_normal = mat3(transpose(inverse(pvm.model))) * normalize(v_normal);
     out_color = v_color * tmp.bias;
+    out_tex_coords = v_tex;
 }

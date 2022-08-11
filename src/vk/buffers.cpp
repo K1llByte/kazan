@@ -123,7 +123,7 @@ namespace kzn::vk
     }
 
     
-    VkDescriptorBufferInfo UniformBuffer::info() const {
+    VkDescriptorBufferInfo UniformBuffer::info() const noexcept {
         return VkDescriptorBufferInfo{
             .buffer = buffer,
             .offset = 0,

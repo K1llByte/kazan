@@ -11,7 +11,8 @@
 namespace kzn::vk {
     struct BufferBinding {
         uint32_t               binding;
-        VkDescriptorBufferInfo info;
+        VkDescriptorBufferInfo buffer_info;
+        VkDescriptorImageInfo  image_info;
         VkDescriptorType       type;
         VkShaderStageFlags     stages = VK_SHADER_STAGE_ALL_GRAPHICS;
 
@@ -21,7 +22,17 @@ namespace kzn::vk {
             VkDescriptorType       _type,
             VkShaderStageFlags     _stages = VK_SHADER_STAGE_ALL_GRAPHICS)
             : binding(_binding)
-            , info(_info)
+            , buffer_info(_info)
+            , type(_type)
+            , stages(_stages) {}
+        
+        constexpr BufferBinding(
+            uint32_t               _binding,
+            VkDescriptorImageInfo  _info,
+            VkDescriptorType       _type,
+            VkShaderStageFlags     _stages = VK_SHADER_STAGE_ALL_GRAPHICS)
+            : binding(_binding)
+            , image_info(_info)
             , type(_type)
             , stages(_stages) {}
 
@@ -30,7 +41,15 @@ namespace kzn::vk {
             VkDescriptorBufferInfo _info,
             VkShaderStageFlags     _stages = VK_SHADER_STAGE_ALL_GRAPHICS)
         {
-            return BufferBinding{_binding, _info, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, _stages};
+            return BufferBinding(_binding, _info, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, _stages);
+        }
+
+        static constexpr BufferBinding sampler(
+            uint32_t               _binding,
+            VkDescriptorImageInfo _info,
+            VkShaderStageFlags     _stages = VK_SHADER_STAGE_ALL_GRAPHICS)
+        {
+            return BufferBinding(_binding, _info, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, _stages);
         }
     };
 

@@ -12,8 +12,11 @@ namespace kzn
         allocator(&Context::device()),
         cache(&Context::device()),
         ubo(&Context::device(), sizeof(Tmp)),
+        tex_data(Texture::load("assets/textures/grid512.png")),
+        tex(&Context::device(), tex_data.get_extent()),
         desc_set(&Context::device(), allocator, cache, {
-            vk::BufferBinding::uniform(0, ubo.info())
+            vk::BufferBinding::uniform(0, ubo.info()),
+            vk::BufferBinding::sampler(1, tex.info(), VK_SHADER_STAGE_FRAGMENT_BIT)
         }),
         pipeline(vk::Pipeline(
             &Context::device(),
@@ -51,6 +54,7 @@ namespace kzn
             )
         )
     {
+        tex.upload(tex_data.get_data());
         render_pass.create_framebuffers(Context::swapchain());
         renderer->add_render_pass(render_pass);
     }
