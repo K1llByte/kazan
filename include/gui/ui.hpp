@@ -6,6 +6,11 @@
 #include "core/texture.hpp"
 #include "vk/image.hpp"
 
+// TODO: 
+#include "imgui.h"
+#include "imgui_impl_glfw.h"
+#include "imgui_impl_vulkan.h"
+
 namespace kzn {
     class Interface
     {
@@ -14,8 +19,10 @@ namespace kzn {
         VkDescriptorPool imgui_pool;
         Renderer*        renderer;
         // Temporary:
-        Texture   texture;
-        vk::Image image;
+        Texture     texture;
+        vk::Image   image;
+        ImTextureID tex_id;
+        
 
         public:
         Interface(Renderer* _renderer, Window& _window);

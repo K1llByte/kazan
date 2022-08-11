@@ -1,8 +1,8 @@
 #include "gui/ui.hpp"
 
-#include "imgui.h"
-#include "imgui_impl_glfw.h"
-#include "imgui_impl_vulkan.h"
+// #include "imgui.h"
+// #include "imgui_impl_glfw.h"
+// #include "imgui_impl_vulkan.h"
 
 namespace kzn
 {
@@ -96,6 +96,11 @@ namespace kzn
         // Setup Dear ImGui style
         ImGui::StyleColorsDark();
         this->set_theme();
+
+        tex_id = ImGui_ImplVulkan_AddTexture(
+            image.get_sampler(),
+            image.get_image_view(),
+            VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
     }
 
 
@@ -132,10 +137,10 @@ namespace kzn
             auto [w,h] = ImGui::GetContentRegionAvail();
             // Log::error("{},{}",w, h);
             
-            auto tex_id = (ImTextureID) ImGui_ImplVulkan_AddTexture(
-                image.get_sampler(),
-                image.get_image_view(),
-                VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+            // tex_id = (ImTextureID) ImGui_ImplVulkan_AddTexture(
+            //     image.get_sampler(),
+            //     image.get_image_view(),
+            //     VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
             ImGui::Image(tex_id, ImVec2(w,h));
             ImGui::End();
             

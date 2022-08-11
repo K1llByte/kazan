@@ -22,6 +22,7 @@ kazan.hpp include with all public API includes
     - Provides VkBackend::device(), VkBackend::swapchain() and VkBackend::instance() 
 
 - Imgui render to Image instead of window
+    - vk::image option to not include staging buffer
     - Make vk::Framebuffer class that represents a framebuffer (with all respective attachments)
         - Make a ctor that automaticly creates Framebuffer by receiving Swapchain
     - Refactor vk::SwapChain

@@ -6,7 +6,7 @@
 namespace kzn::vk {
     class Image {
         public:
-        Image(Device* _device, VkExtent3D image_extent);
+        Image(Device* _device, VkExtent3D image_extent, bool _has_staging_buffer = true);
         ~Image();
 
         VkImage     get_image() noexcept { return texture_image; }
@@ -15,6 +15,7 @@ namespace kzn::vk {
 
         VkDescriptorImageInfo info() const noexcept;
 
+        void init_staging_buffer();
         void upload(void* data);
 
         private:
@@ -22,6 +23,7 @@ namespace kzn::vk {
         uint64_t       image_size;
         VkExtent3D     extent;
         // Vulkan data
+        bool has_staging_buffer;
         Device*        device;
         VkBuffer       staging_buffer;
         VmaAllocation  staging_buffer_allocation;

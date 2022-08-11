@@ -73,6 +73,9 @@ namespace kzn::vk
     // Push Constants
     KZN_IMPL_ERROR(PushNotUniform, "Structure provided to push constant doesn't have uniform members!")
 
+    // Image
+    KZN_IMPL_ERROR(NoStagingBuffer, "Not possible to upload data to an image without staging buffer!")
+
     // DescriptorSet
     // TODO:
 

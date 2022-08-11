@@ -215,8 +215,7 @@ namespace kzn::vk
         VK_CHECK_MSG(result, "Failed to submit command buffer!");
     }
 
-    void Device::present_queue_present(Swapchain& swapchain, VkSemaphore wait_semaphore)
-    {
+    void Device::present_queue_present(Swapchain& swapchain, VkSemaphore wait_semaphore) {
         VkPresentInfoKHR present_info{};
         present_info.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
         present_info.waitSemaphoreCount = 1;
@@ -228,12 +227,10 @@ namespace kzn::vk
         present_info.pImageIndices = indices;
         present_info.pResults = nullptr; // Optional
         auto result = vkQueuePresentKHR(present_queue, &present_info);
-        if(result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR)
-        {
+        if(result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR) {
             throw SwapchainResized();
         }
-        else
-        {
+        else {
             VK_CHECK_MSG(result, "Failed to present swap chain image!");
         }
     }

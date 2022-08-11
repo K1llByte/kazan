@@ -48,11 +48,10 @@
 using namespace kzn;
 
 struct Foo {
-    glsl::vec3 a;
-    glsl::vec3 b;
-    
+    glm::vec3 a;
+    int&      b;
 };
 
 int main() {
-    fmt::print("is uniform? {}\n", glsl::is_uniform<Foo>());
+    fmt::print("size with ref? {}\n", sizeof(Foo));
 }
