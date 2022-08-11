@@ -261,7 +261,7 @@ namespace kzn::vk
         cmd_buffer.end();
 
         // When work is completed on the GPU this single use fence will be signaled
-        auto immediate_fence = create_fence(*this);
+        auto immediate_fence = create_fence(*this, false);
         // Submit command buffer to the queue.
         this->graphics_queue_submit(cmd_buffer, immediate_fence);
         // Wait
