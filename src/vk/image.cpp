@@ -38,13 +38,14 @@ namespace kzn::vk {
         buffer_alloc_info.usage = VMA_MEMORY_USAGE_CPU_ONLY;
 
         // Allocate the staging buffer
-        VK_CHECK_MSG(vmaCreateBuffer(
+        auto result = vmaCreateBuffer(
             device->allocator(),
             &buffer_info,
             &buffer_alloc_info,
             &staging_buffer,
             &staging_buffer_allocation,
-            nullptr), "Failed to allocate image staging buffer");
+            nullptr);
+        VK_CHECK_MSG(result, "Failed to allocate image staging buffer");
 
         // 2. Create image
         VkImageCreateInfo image_info{};
@@ -65,13 +66,14 @@ namespace kzn::vk {
         VmaAllocationCreateInfo image_alloc_info = {};
         image_alloc_info.usage = VMA_MEMORY_USAGE_GPU_ONLY;
 
-        VK_CHECK_MSG(vmaCreateImage(
+        result = vmaCreateImage(
             device->allocator(),
             &image_info,
             &image_alloc_info,
             &texture_image,
             &texture_image_allocation,
-            nullptr), "Failed to allocate texture image");
+            nullptr);
+        VK_CHECK_MSG(result, "Failed to allocate texture image");
 
         // 3. Create image view
         VkImageViewCreateInfo view_info{};
@@ -85,7 +87,7 @@ namespace kzn::vk {
         view_info.subresourceRange.baseArrayLayer = 0;
         view_info.subresourceRange.layerCount = 1;
 
-        auto result = vkCreateImageView(device->vk_device(), &view_info, nullptr, &texture_image_view);
+        result = vkCreateImageView(device->vk_device(), &view_info, nullptr, &texture_image_view);
         VK_CHECK_MSG(result, "Failed to create texture image view");
 
         // 4. Create image sampler

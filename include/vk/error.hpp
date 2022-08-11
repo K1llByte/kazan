@@ -68,6 +68,11 @@ namespace kzn::vk
     KZN_IMPL_ERROR(InvalidAttachmentIndex, "Attachment index provided isn't within available attachments!")
     KZN_IMPL_ERROR(ColorAndResolveNotSameSize, "Color and Resolve attachments are not que same size!")
 
+    // UniformBuffer
+    KZN_IMPL_ERROR(NotUniform, "Structure provided to uniform buffer doesn't have uniform members!")
+    // Push Constants
+    KZN_IMPL_ERROR(PushNotUniform, "Structure provided to push constant doesn't have uniform members!")
+
     // DescriptorSet
     // TODO:
 

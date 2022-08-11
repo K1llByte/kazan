@@ -41,50 +41,18 @@
 // }
 
 #include <type_traits>
-#include <glm/glm.hpp>
-#include <boost/pfr.hpp>
+#include "vk/uniform.hpp"
 
-template< class T, class ...U>
-inline constexpr bool is_any_v = (std::is_same_v<T, U> || ...);
+// struct Bar;
 
-template<typename T>
-constexpr bool is_uniform()
-    requires std::is_default_constructible<T>::value
-{
-    bool res = true;
-    boost::pfr::for_each_field(std::forward<T>(T{}), [&res]<typename Field>(Field&) {
-        res = is_any_v<
-            Field,
-            bool,
-            int,
-            uint,
-            float,
-            double,
-            glm::bvec2, glm::bvec3, glm::bvec4,
-            glm::ivec2, glm::ivec3, glm::ivec4,
-            glm::uvec2, glm::uvec3, glm::uvec4,
-            glm::vec2,  glm::vec3,  glm::vec4,
-            glm::dvec2, glm::dvec3, glm::dvec4,
-            glm::mat2,    glm::mat3,   glm::mat4,
-            glm::mat2x3,  glm::mat2x4,
-            glm::mat3x2,  glm::mat3x4,
-            glm::mat4x2,  glm::mat4x3,
-            glm::dmat2,   glm::dmat3,  glm::dmat4,
-            glm::dmat2x3, glm::dmat2x4,
-            glm::dmat3x2, glm::dmat3x4,
-            glm::dmat4x2, glm::dmat4x3>;
-        });
-    return res;
-}
-
-struct Bar;
+using namespace kzn;
 
 struct Foo {
-    glm::vec3 a;
-    glm::vec3 b;
+    glsl::vec3 a;
+    glsl::vec3 b;
+    
 };
 
 int main() {
-    constexpr size_t counter = count_fields<Foo>();
-    fmt::print("{}\n", counter);
+    fmt::print("is uniform? {}\n", glsl::is_uniform<Foo>());
 }

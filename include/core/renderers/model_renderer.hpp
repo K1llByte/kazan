@@ -7,17 +7,17 @@
 #include "vk/buffers.hpp"
 #include "core/texture.hpp"
 #include "vk/image.hpp"
+// #include "vk/error.hpp"
 
-// TODO: Delete this
-struct Tmp {
-    glm::vec3 bias{0.1, 0.5, 0.2};
-};
+namespace kzn {
+    struct Tmp {
+        glsl::vec3 bias1 = glm::vec3{0.0, 1.0, 0.0};
+        glsl::vec3 bias2 = glm::vec3{1.0, 1.0, 1.0};
+    };
 
-namespace kzn
-{
     struct PVM {
-        glm::mat4 proj_view;
-        glm::mat4 model;
+        glsl::mat4 proj_view;
+        glsl::mat4 model;
     };
 
     class ModelRenderer
@@ -53,14 +53,19 @@ namespace kzn
     template<typename T>
     void ModelRenderer::push(vk::CommandBuffer& cmd_buffer, const T& data)
     {
-        vkCmdPushConstants(
-            cmd_buffer.vk_command_buffer(),
-            pipeline.layout(),
-            VK_SHADER_STAGE_ALL_GRAPHICS,
-            0,
-            sizeof(T),
-            &data
-        );
+        if(glsl::is_uniform<T>()) {
+            vkCmdPushConstants(
+                cmd_buffer.vk_command_buffer(),
+                pipeline.layout(),
+                VK_SHADER_STAGE_ALL_GRAPHICS,
+                0,
+                sizeof(T),
+                &data
+            );
+        }
+        else {
+            throw vk::PushNotUniform();
+        }
     }
 } // namespace kzn
 

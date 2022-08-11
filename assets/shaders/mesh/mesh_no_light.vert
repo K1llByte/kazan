@@ -15,7 +15,8 @@ layout(push_constant) uniform PVM
 
 // Descriptor sets block
 layout(set = 0, binding = 0) uniform Tmp {
-    vec3 bias;  
+    vec3 bias1;
+    vec3 bias2;
 } tmp;
 
 // Output
@@ -27,5 +28,5 @@ void main()
 {
     // gl_Position = push.pvm * vec4(v_position, 1.0f);
     gl_Position = pvm.proj_view * pvm.model * vec4(v_position, 1.0f);
-    out_color = v_color * tmp.bias;
+    out_color = tmp.bias2.xyz;
 }

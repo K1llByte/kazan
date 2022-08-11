@@ -24,8 +24,7 @@ namespace kzn
         // 3x Image Fences
         image_fences.resize(Context::swapchain().num_images());
         per_frame_data.reserve(PerFrameData::MAX_FRAMES_IN_FLIGHT);
-        for(std::size_t i = 0; i < PerFrameData::MAX_FRAMES_IN_FLIGHT; ++i)
-        {
+        for(std::size_t i = 0; i < PerFrameData::MAX_FRAMES_IN_FLIGHT; ++i) {
             per_frame_data.emplace_back(&Context::device(), cmd_pool);
         }
 

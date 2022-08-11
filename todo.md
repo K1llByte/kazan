@@ -11,20 +11,19 @@ kazan.hpp include with all public API includes
 ## Todo
 
 [priority:high]
-- Make a solution for Uniform structured alignment
-<!-- - Implement a concept to check with boost::pfr if a type T complies with alignment constraints -->
-
-- Add textures (and samplers)
-    vk::Image
 
 - vk::Queue wrapper with submit method which receives vk::CommandBuffer as argument
     - AND MUST BE NON COPYABLE
 
 - Vulkan Backend singleton
     - Manages the current Context and vulkan long lived objects
-    - provides VkBackend::device(), VkBackend::swapchain() and VkBackend::instance() 
+    - Manages DescriptorSetAllocator and DescriptorSetCache
+    - RenderPassManager, PipelineManager
+    - Provides VkBackend::device(), VkBackend::swapchain() and VkBackend::instance() 
 
 - Imgui render to Image instead of window
+    - Make vk::Framebuffer class that represents a framebuffer (with all respective attachments)
+        - Make a ctor that automaticly creates Framebuffer by receiving Swapchain
     - Refactor vk::SwapChain
         - Remove Depth images and views creation, only handle the images
         - present(present_queue, wait_semaphore) method to automaticly present the current image
@@ -38,7 +37,6 @@ kazan.hpp include with all public API includes
         - with all methods the Window class has that the Renderer uses
         like `was_resized()`, etc... 
     
-- Make staged submition for Vertex Buffers
 
 [priority:medium]
 - Try to refactor to struct pattern instead of build pattern
@@ -47,6 +45,8 @@ kazan.hpp include with all public API includes
   GLFW's int values in Input class
 
 - Improve swapchain creation and configurability (when imgui offscreen renderer comes)
+
+- Make staged submition for Vertex Buffers
 
 [priority:low]
 - docs generation with hdoc
@@ -99,6 +99,9 @@ kazan.hpp include with all public API includes
 <!-- =================================== -->
 
 ## Done
+- Make a solution for Uniform structured alignment
+- Add textures (and samplers)
+    vk::Image
 - Uniform Buffers
     - ~~Descriptor Set Layout~~ Auto layout management with DescritptorSetCache
     - ~~Descriptor Pools~~ Auto pools management with DescriptorSetAllocator

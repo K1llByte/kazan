@@ -131,17 +131,17 @@ target("kazui")
     remove_files("src/gui/test.cpp")
 
 -- Temporary
--- target("test")
---     -- Compiler Settings
---     compilation_settings()
---     -- Dependencies
---     kazan_deps()
---     add_deps("imgui")
---     add_deps("kazan")
---     -- Binary
---     set_kind("binary")
---     add_files("src/gui/*.cpp")
---     remove_files("src/gui/main.cpp")
+target("test")
+    -- Compiler Settings
+    compilation_settings()
+    -- Dependencies
+    kazan_deps()
+    add_deps("imgui")
+    add_deps("kazan")
+    -- Binary
+    set_kind("binary")
+    add_files("src/gui/*.cpp")
+    remove_files("src/gui/main.cpp")
 
 ------------------ Kazan Examples ----------------
 

@@ -126,7 +126,7 @@ namespace kzn
             // // ImGui::Button("Hello!");
             // ImGui::PopStyleVar();
             auto [w,h] = ImGui::GetContentRegionAvail();
-            Log::error("{},{}",w, h);
+            // Log::error("{},{}",w, h);
             // ImGui::Image(/* Texture ID */, ImVec2(500,500))
             ImGui::End();
             

@@ -3,6 +3,7 @@
 
 #include "vk/device.hpp"
 #include "vk/cmd_buffers.hpp"
+#include "vk/uniform.hpp"
 
 #include "vk_mem_alloc.h"
 
@@ -62,11 +63,18 @@ namespace kzn::vk
     template<typename T>
     void UniformBuffer::upload(const T* new_data)
     {
-        // Copy uniform data to GPU
-        void* data;
-        vmaMapMemory(device->allocator(), allocation, &data);
-        memcpy(data, new_data, buffer_size);
-        vmaUnmapMemory(device->allocator(), allocation);
+        // Can't be in template requires due to
+        // pfr::for_each_field not being constexpr
+        if(glsl::is_uniform<T>()) {
+            // Copy uniform data to GPU
+            void* data;
+            vmaMapMemory(device->allocator(), allocation, &data);
+            memcpy(data, new_data, buffer_size);
+            vmaUnmapMemory(device->allocator(), allocation);
+        }
+        else {
+            throw NotUniform();
+        }
     }
 } // namespace kzn::vk
 

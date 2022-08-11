@@ -83,11 +83,11 @@ int main() try
                 // Draw model 1
                 pvm.model = model.transform.mat4();
                 model_renderer.push(cmd_buffer, pvm);
-                static float a = 0;
-                a += (1*0.5f);
-                if(a > 255.f)
-                    a = 0.f;
-                Tmp tmp{{a/256.f,0.f,a/256.f}};
+                // static float a = 0;
+                // a += (1*0.5f);
+                // if(a > 255.f)
+                //     a = 0.f;
+                Tmp tmp{};
                 model_renderer.ubo.upload(&tmp);
                 model.draw(cmd_buffer);
 

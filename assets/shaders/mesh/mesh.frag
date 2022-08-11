@@ -21,6 +21,6 @@ void main()
 {
     const vec3 norm_frag_normal = normalize(frag_normal);
     float light_intensity = max(dot(norm_frag_normal, DIR_TO_LIGHT), 0) + AMBIENT_LIGHT;
-    // out_color = vec4(frag_color * light_intensity, 1.0);
-    out_color = texture(tex_sampler, frag_tex_coords);
+    vec3 real_frag_color = texture(tex_sampler, frag_tex_coords).xyz;
+    out_color = vec4(real_frag_color * light_intensity, 1.0);
 }

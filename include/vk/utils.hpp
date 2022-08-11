@@ -4,7 +4,6 @@
 #include "core/log.hpp"
 #include "vk/error.hpp"
 
-// #define GLM_FORCE_DEFAULT_ALIGNED_GENTYPES
 #include <glm/glm.hpp>
 #include <boost/pfr.hpp>
 
