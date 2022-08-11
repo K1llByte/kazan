@@ -8,7 +8,11 @@ namespace kzn
 {
     Interface::Interface(Renderer* _renderer, Window& _window)
         : renderer(_renderer)
+        , texture(Texture::load("assets/textures/grid512.png"))
+        , image(&Context::device(), texture.get_extent())
     {
+        image.upload(texture.get_data());
+        
         std::vector<VkDescriptorPoolSize> pool_sizes{
             { VK_DESCRIPTOR_TYPE_SAMPLER, 1000 },
             { VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1000 },
@@ -127,7 +131,12 @@ namespace kzn
             // ImGui::PopStyleVar();
             auto [w,h] = ImGui::GetContentRegionAvail();
             // Log::error("{},{}",w, h);
-            // ImGui::Image(/* Texture ID */, ImVec2(500,500))
+            
+            auto tex_id = (ImTextureID) ImGui_ImplVulkan_AddTexture(
+                image.get_sampler(),
+                image.get_image_view(),
+                VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+            ImGui::Image(tex_id, ImVec2(w,h));
             ImGui::End();
             
             // Render dear imgui into screen

@@ -3,6 +3,8 @@
 
 #include "vk/cmd_buffers.hpp"
 #include "core/renderer.hpp"
+#include "core/texture.hpp"
+#include "vk/image.hpp"
 
 namespace kzn {
     class Interface
@@ -11,6 +13,9 @@ namespace kzn {
         bool             render_ui = false;
         VkDescriptorPool imgui_pool;
         Renderer*        renderer;
+        // Temporary:
+        Texture   texture;
+        vk::Image image;
 
         public:
         Interface(Renderer* _renderer, Window& _window);

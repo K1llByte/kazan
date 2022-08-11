@@ -7,7 +7,6 @@
 #include "vk/buffers.hpp"
 #include "core/texture.hpp"
 #include "vk/image.hpp"
-// #include "vk/error.hpp"
 
 namespace kzn {
     struct Tmp {
@@ -69,4 +68,4 @@ namespace kzn {
     }
 } // namespace kzn
 
-#endif // KZN_MODEL_RENDERER_HPPModelRenderer
+#endif // KZN_MODEL_RENDERER_HPP

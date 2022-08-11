@@ -9,6 +9,10 @@ namespace kzn::vk {
         Image(Device* _device, VkExtent3D image_extent);
         ~Image();
 
+        VkImage     get_image() noexcept { return texture_image; }
+        VkImageView get_image_view() noexcept { return texture_image_view; }
+        VkSampler   get_sampler() noexcept { return texture_sampler; }
+
         VkDescriptorImageInfo info() const noexcept;
 
         void upload(void* data);
