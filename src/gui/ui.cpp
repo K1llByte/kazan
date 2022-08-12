@@ -23,15 +23,10 @@ ImVec4 to_srgb(ImVec4 rgba) {
     return rgba;
 }
 
-namespace kzn
-{
-    Interface::Interface(Renderer* _renderer, Window& _window)
+namespace kzn {
+    Interface::Interface(OffscreenRenderer* _renderer, Window& _window)
         : renderer(_renderer)
-        , texture(Texture::load("assets/textures/grid512.png"))
-        , image(&Context::device(), texture.get_extent())
     {
-        image.upload(texture.get_data());
-
         std::vector<VkDescriptorPoolSize> pool_sizes{
             { VK_DESCRIPTOR_TYPE_SAMPLER, 1000 },
             { VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1000 },
@@ -93,6 +88,9 @@ namespace kzn
 
         // Implementation of single time commands
         {
+            // Context::device().immediate_submit([&](){
+            //     ImGui_ImplVulkan_CreateFontsTexture(cmd_buffer.vk_command_buffer());
+            // });
             auto cmd_buffer = renderer->get_cmd_pool().allocate();
             cmd_buffer.begin(VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT);
             ImGui_ImplVulkan_CreateFontsTexture(cmd_buffer.vk_command_buffer());
@@ -104,11 +102,6 @@ namespace kzn
             // cmd buffer will be freed when it's out of scope
         }
 
-        //
-        //auto cmd_buffer = device.begin_single_time_commands();
-        //ImGui_ImplVulkan_CreateFontsTexture(cmd_buffer);
-        //device.end_single_time_commands(cmd_buffer);
-
         //clear font textures from cpu data
         ImGui_ImplVulkan_DestroyFontUploadObjects();
 
@@ -116,14 +109,42 @@ namespace kzn
         ImGui::StyleColorsDark();
         this->set_theme();
 
-        tex_id = ImGui_ImplVulkan_AddTexture(
-            image.get_sampler(),
-            image.get_image_view(),
-            VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+        // Create image view for each render image and sampler
+        // And finally create all imgui texture ids
+        const auto& render_images = renderer->get_render_images();
+        render_tex_ids.reserve(render_images.size());
+        render_image_views.reserve(render_images.size());
+        render_image_sampler = vk::create_sampler(Context::device());
+        for(size_t i = 0; i < render_images.size(); ++i) {
+            // Create image view
+            render_image_views.push_back(
+                vk::create_image_view(
+                    Context::device(),
+                    render_images[i],
+                    VK_FORMAT_B8G8R8A8_SRGB,
+                    VK_IMAGE_ASPECT_COLOR_BIT
+                )
+            );
+            // Get ImTextureID
+            render_tex_ids.push_back(
+                ImGui_ImplVulkan_AddTexture(
+                    render_image_sampler,
+                    render_image_views[i],
+                    VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL)
+            );
+        }
     }
 
 
     Interface::~Interface() {
+        for(const auto& img_view : render_image_views) {
+            vk::destroy_image_view(
+                Context::device(),
+                img_view
+            );
+        }
+        vk::destroy_sampler(Context::device(), render_image_sampler);
+        
         vkDestroyDescriptorPool(Context::device().vk_device(), imgui_pool, nullptr);
         ImGui_ImplVulkan_Shutdown();
 
@@ -160,7 +181,7 @@ namespace kzn
             //     image.get_sampler(),
             //     image.get_image_view(),
             //     VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
-            ImGui::Image(tex_id, ImVec2(w,h));
+            ImGui::Image(render_tex_ids[Context::swapchain().current_index()], ImVec2(w,h));
             ImGui::End();
             
             // Render dear imgui into screen

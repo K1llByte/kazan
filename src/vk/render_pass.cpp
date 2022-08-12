@@ -222,12 +222,12 @@ namespace kzn::vk
 
     //////////////////////// FIXME: TEMPORARY ///////////////////////////////
 
-    RenderPass simple_depth_render_pass(vk::Device& device, VkFormat surface_format) {
+    RenderPass simple_depth_render_pass(vk::Device& device, VkFormat surface_format, VkImageLayout color_final_layout) {
         auto render_pass_builder = RenderPassBuilder(&device)
             ///////// Specify attachments descriptions /////////
             .add_attachment(
                 vk::AttachmentDesc(surface_format)
-                    .set_final_layout(VK_IMAGE_LAYOUT_PRESENT_SRC_KHR),
+                    .set_final_layout(color_final_layout),
                 VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL // AttachmentRef layout
             )
             .add_attachment(

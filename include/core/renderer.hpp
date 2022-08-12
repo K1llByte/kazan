@@ -54,7 +54,7 @@ namespace kzn
     class Renderer
     {
         // friend class ModelRenderer;
-    public:
+        public:
         Renderer(Window* window);
         ~Renderer();
 
@@ -70,10 +70,11 @@ namespace kzn
         // window is resized
         void add_render_pass(vk::RenderPass& render_pass);
         void on_swapchain_resize(std::function<void()>&& callback) {resize_callback = std::move(callback);}
+        virtual void render_frame(std::function<void(vk::CommandBuffer&)>);
+        virtual const std::vector<VkImage>& get_render_images() { return Context::swapchain().images(); }
+        virtual VkExtent2D get_render_extent() { return Context::swapchain().get_extent(); }
 
-        void render_frame(std::function<void(vk::CommandBuffer&)>);
-
-    private:
+        protected:
         Window*                  window = nullptr;
         std::unique_ptr<Context> context;
         vk::CommandPool          cmd_pool;

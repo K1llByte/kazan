@@ -1,51 +1,52 @@
-#include "core/renderer.hpp"
+#include "core/offscreen_renderer.hpp"
 
-#include "core/context.hpp"
-#include "vk/device_features.hpp"
-#include "vk/utils.hpp"
+#include "vk/error.hpp"
 
-
-namespace kzn
-{
-    Renderer::Renderer(Window* window)
-        : window(window),
-        // Initialize Context
-        context(Context::create(window)),
-        // Create Vulkan Instance
-        // Create device
-        // Create Swapchain
-        // Create command pool and buffers
-        cmd_pool(&Context::device())
+namespace kzn {
+    OffscreenRenderer::OffscreenRenderer(Window* _window, ImGuiWindow* _imgui_window)
+        : Renderer(_window)
+        , imgui_window(_imgui_window)
+        , render_images(3)
+        , render_allocation(3)
     {
-        // Create all data per frame in flight
-        // Initialize command buffers
-        // Initialize sync primitives
-        // 2x In Flight Frame Data
-        // 3x Image Fences
-        image_fences.resize(Context::swapchain().num_images());
-        per_frame_data.reserve(PerFrameData::MAX_FRAMES_IN_FLIGHT);
-        for(std::size_t i = 0; i < PerFrameData::MAX_FRAMES_IN_FLIGHT; ++i) {
-            per_frame_data.emplace_back(&Context::device(), cmd_pool);
+        const auto num_images = Context::swapchain().num_images();
+        render_extent = Context::swapchain().get_extent();
+        for(size_t i = 0; i < num_images; ++i) {
+            VkImageCreateInfo image_info{};
+            image_info.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
+            image_info.imageType = VK_IMAGE_TYPE_2D;
+            image_info.format = VK_FORMAT_B8G8R8A8_SRGB;
+            image_info.extent = VkExtent3D{
+                render_extent.width,
+                render_extent.height,
+                1
+            };
+            image_info.mipLevels = 1;
+            image_info.arrayLayers = 1;
+            image_info.samples = VK_SAMPLE_COUNT_1_BIT;
+            image_info.tiling = VK_IMAGE_TILING_OPTIMAL;
+            image_info.usage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_SAMPLED_BIT;
+            // image_info.initialLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+            // Allocate it from GPU local memory
+            VmaAllocationCreateInfo img_alloc_info{};
+            img_alloc_info.usage = VMA_MEMORY_USAGE_GPU_ONLY;
+            img_alloc_info.requiredFlags = VkMemoryPropertyFlags(VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
+            auto result = vmaCreateImage(Context::device().allocator(), &image_info, &img_alloc_info, &render_images[i], &render_allocation[i], nullptr);
+            // TODO: Uncomment
+            // VK_CHECK_MSG(result, "Failed to create color image!");
         }
-
-        const auto window_extent = window->extent();
-        viewport = vk::create_viewport(window_extent);
-        scissor = vk::create_scissor(window_extent);
     }
+
     
-    Renderer::~Renderer()
-    {
-        // Context::destroy();
+    OffscreenRenderer::~OffscreenRenderer() {
+        // Destroy render images
+        for(size_t i = 0; i < render_images.size(); ++i) {
+            vmaDestroyImage(Context::device().allocator(), render_images[i], render_allocation[i]);
+        }
     }
 
-    void Renderer::add_render_pass(vk::RenderPass& render_pass)
-    {
-        // Add render pass
-        render_passes.push_back(&render_pass);
-    }
 
-    void Renderer::render_frame(std::function<void(vk::CommandBuffer&)> draw_func)
-    {
+    void OffscreenRenderer::render_frame(std::function<void(vk::CommandBuffer&)> draw_func) {
         /////////////////
         // Begin Frame //
         /////////////////

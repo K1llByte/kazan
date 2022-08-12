@@ -2,7 +2,7 @@
 #define UI_H
 
 #include "vk/cmd_buffers.hpp"
-#include "core/renderer.hpp"
+#include "core/offscreen_renderer.hpp"
 #include "core/texture.hpp"
 #include "vk/image.hpp"
 
@@ -19,13 +19,13 @@ namespace kzn {
         VkDescriptorPool imgui_pool;
         Renderer*        renderer;
         // Temporary:
-        Texture     texture;
-        vk::Image   image;
-        ImTextureID tex_id;
+        std::vector<VkImageView> render_image_views;
+        VkSampler                render_image_sampler;
+        std::vector<ImTextureID> render_tex_ids;
         
 
         public:
-        Interface(Renderer* _renderer, Window& _window);
+        Interface(OffscreenRenderer* _renderer, Window& _window);
         ~Interface();
 
         void toggle();

@@ -11,10 +11,12 @@ kazan.hpp include with all public API includes
 ## Todo
 
 [priority:high]
+- Redesign ...Renderer
+- Redesign vk::Image and images in general
 
 - Imgui render to Image instead of window
     - [x] vk::image option to not include staging buffer
-    - [ ] Make vk::Framebuffer class that represents a framebuffer (with all respective attachments)
+    - [ ] Make vk::Framebuffers class that represents all framebuffers (with all respective attachments)
         - [ ] Make a ctor that automaticly creates Framebuffer by receiving Swapchain
     - [ ] Refactor vk::SwapChain
         - [ ] Remove Depth images and views creation, only handle the images

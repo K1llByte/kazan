@@ -9,13 +9,14 @@ namespace kzn
         // Initialize render_pass
         render_pass(kzn::vk::simple_depth_render_pass(
             Context::device(),
-            Context::swapchain().get_surface_format().format)),
+            Context::swapchain().get_surface_format().format,
+            VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL)),
         // Initialize framebuffers
         framebuffers(
             &Context::device(),
             &render_pass,
-            Context::swapchain().images(),
-            Context::swapchain().get_extent()),
+            renderer->get_render_images(),
+            renderer->get_render_extent()),
         // Initialize Descriptor set
         allocator(&Context::device()),
         cache(&Context::device()),
@@ -64,16 +65,15 @@ namespace kzn
         )
     {
         tex.upload(tex_data.get_data());
-
-
-        renderer->on_swapchain_resize([&]() {
-            // Recreate framebuffers from swapchain
-            framebuffers.recreate(
-                Context::swapchain().images(),
-                Context::swapchain().get_extent()
-            );
-        });
-
+        // Set callback to recreate framebuffers on swapchain resize
+        // renderer->on_swapchain_resize([&]() {
+        //     // Recreate framebuffers from swapchain
+        //     framebuffers.recreate(
+        //         renderer->get_render_images(),
+        //         renderer->get_render_extent()
+        //     );
+        // });
+        // Add render pass to renderer
         renderer->add_render_pass(render_pass);
     }
 

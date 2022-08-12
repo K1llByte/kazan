@@ -120,6 +120,19 @@ namespace kzn::vk
 
         return attributes;
     }
+
+    ////////// Vulkan image utils //////////
+    // VkImage create_image(Device& device);
+    VkImageView create_image_view(
+        Device& device,
+        VkImage image,
+        VkFormat format,
+        VkImageAspectFlags aspect_mask);
+    VkSampler create_sampler(Device& device);
+
+    // void destroy_image(Device& device);
+    void destroy_image_view(Device& device, VkImageView image_view);
+    void destroy_sampler(Device& device, VkSampler sampler);
 }
 
 #endif // KZN_VK_UTILS_HPP

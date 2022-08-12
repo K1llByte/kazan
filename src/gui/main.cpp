@@ -3,15 +3,18 @@
 // Kazui headers
 #include "gui/camera_controller.hpp"
 #include "gui/ui.hpp"
+#include "core/offscreen_renderer.hpp"
+#include "core/renderers/gui_subrender.hpp"
 
 using namespace kzn;
 int main() try
 {
     auto window = Window("Kazan", 1700, 800);
     auto input = Input(window);
-    auto renderer = Renderer(&window);
-    // auto renderer = OffscreenRenderer(&render_image);
+    // auto renderer = Renderer(&window);
+    auto renderer = OffscreenRenderer(&window, nullptr);
     auto model_renderer = ModelRenderer(&renderer);
+    auto gui_subrender = GuiSubrender(&renderer);
     auto gui = Interface(&renderer, window);
 
     // auto model = Model::load("assets/models/suzanne_monkey.obj");
@@ -34,6 +37,7 @@ int main() try
     CameraController camera_controller(&window, &camera);
 
     float counter = 0;
+    gui.toggle();
     while(!window.is_closed())
     {
         auto delta_time = Time::delta();
@@ -108,8 +112,11 @@ int main() try
                 // pvm.model = model3.transform.mat4();
                 // model_renderer.push(cmd_buffer, pvm);
                 // model3.draw(cmd_buffer);
-                gui.draw(cmd_buffer);
             model_renderer.unbind(cmd_buffer);
+
+            gui_subrender.begin(cmd_buffer);
+                gui.draw(cmd_buffer);
+            gui_subrender.end(cmd_buffer);
         });
 
         // Show FPS each second
