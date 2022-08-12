@@ -4,12 +4,13 @@
 #include "core/log.hpp"
 
 
-void destroy_framebuffers(kzn::vk::Device* device, const std::vector<VkFramebuffer>& framebuffers)
-{
-    for(const auto& framebuffer : framebuffers) {
-        vkDestroyFramebuffer(device->vk_device(), framebuffer, nullptr);
-    }
-}
+// TODO: Delete
+// void destroy_framebuffers(kzn::vk::Device* device, const std::vector<VkFramebuffer>& framebuffers)
+// {
+//     for(const auto& framebuffer : framebuffers) {
+//         vkDestroyFramebuffer(device->vk_device(), framebuffer, nullptr);
+//     }
+// }
 
 namespace kzn::vk
 {
@@ -106,102 +107,100 @@ namespace kzn::vk
 
     RenderPass::~RenderPass()
     {
+        // TODO: Delete
         // Destroy Framebuffers
-        destroy_framebuffers(device, framebuffers);
-        Log::debug("Framebuffers destroyed");
+        // destroy_framebuffers(device, framebuffers);
+        // Log::debug("Framebuffers destroyed");
         // Destroy RenderPass
         vkDestroyRenderPass(device->vk_device(), vkrender_pass, nullptr);
         Log::debug("RenderPass destroyed");
     }
 
 
-    void RenderPass::create_framebuffers(Swapchain& swapchain)
-    {
-        const auto num_images = swapchain.num_images();
-        framebuffers.resize(num_images);
-        auto& image_views = swapchain.image_views();
-        // Its a vector, but can be just 1 depth buffer
-        auto& depth_image_views = swapchain.depth_image_views();
-        auto extent = swapchain.get_extent();
-        for(std::size_t i = 0; i < num_images; ++i)
-        {
-            auto attachments = std::array{
-                image_views[i],
-                depth_image_views[0] // [i]
-            };
+    // void RenderPass::create_framebuffers(Swapchain& swapchain)
+    // {
+    //     const auto num_images = swapchain.num_images();
+    //     framebuffers.resize(num_images);
+    //     auto& image_views = swapchain.image_views();
+    //     // Its a vector, but can be just 1 depth buffer
+    //     auto& depth_image_views = swapchain.depth_image_views();
+    //     auto extent = swapchain.get_extent();
+    //     for(std::size_t i = 0; i < num_images; ++i)
+    //     {
+    //         auto attachments = std::array{
+    //             image_views[i],
+    //             depth_image_views[0] // [i]
+    //         };
 
-            VkFramebufferCreateInfo create_info{};
-            create_info.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
-            create_info.renderPass = vkrender_pass;
-            create_info.attachmentCount = static_cast<uint32_t>(attachments.size());
-            create_info.pAttachments = attachments.data();
-            create_info.width = extent.width;
-            create_info.height = extent.height;
-            create_info.layers = 1;
+    //         VkFramebufferCreateInfo create_info{};
+    //         create_info.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
+    //         create_info.renderPass = vkrender_pass;
+    //         create_info.attachmentCount = static_cast<uint32_t>(attachments.size());
+    //         create_info.pAttachments = attachments.data();
+    //         create_info.width = extent.width;
+    //         create_info.height = extent.height;
+    //         create_info.layers = 1;
 
-            auto result = vkCreateFramebuffer(device->vk_device(), &create_info, nullptr, &framebuffers[i]);
-            VK_CHECK_MSG(result, "Failed to create framebuffer!");
-        }
-        Log::debug("Framebuffers created");
-    }
-
-
-    void RenderPass::recreate_framebuffers(Swapchain& swapchain)
-    {
-        auto num_images = framebuffers.size();
-        // Destroy old framebuffers
-        destroy_framebuffers(device, framebuffers);
-        // Create new VkFramebuffers
-        auto& image_views = swapchain.image_views();
-        auto& depth_image_views = swapchain.depth_image_views();
-        auto extent = swapchain.get_extent();
-        for(std::size_t i = 0; i < num_images; ++i)
-        {
-            auto attachments = std::array{
-                image_views[i],
-                depth_image_views[0]
-            };
-
-            VkFramebufferCreateInfo create_info{};
-            create_info.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
-            create_info.renderPass = vkrender_pass;
-            create_info.attachmentCount = static_cast<uint32_t>(attachments.size());
-            create_info.pAttachments = attachments.data();
-            create_info.width = extent.width;
-            create_info.height = extent.height;
-            create_info.layers = 1;
-
-            auto result = vkCreateFramebuffer(device->vk_device(), &create_info, nullptr, &framebuffers[i]);
-            VK_CHECK_MSG(result, "Failed to create framebuffer!");
-        }
-        Log::debug("Framebuffers recreated");
-    }
+    //         auto result = vkCreateFramebuffer(device->vk_device(), &create_info, nullptr, &framebuffers[i]);
+    //         VK_CHECK_MSG(result, "Failed to create framebuffer!");
+    //     }
+    //     Log::debug("Framebuffers created");
+    // }
 
 
-    void RenderPass::begin(CommandBuffer& cmd_buffer, const Swapchain& swapchain)
+    // void RenderPass::recreate_framebuffers(Swapchain& swapchain)
+    // {
+    //     auto num_images = framebuffers.size();
+    //     // Destroy old framebuffers
+    //     destroy_framebuffers(device, framebuffers);
+    //     // Create new VkFramebuffers
+    //     auto& image_views = swapchain.image_views();
+    //     auto& depth_image_views = swapchain.depth_image_views();
+    //     auto extent = swapchain.get_extent();
+    //     for(std::size_t i = 0; i < num_images; ++i)
+    //     {
+    //         auto attachments = std::array{
+    //             image_views[i],
+    //             depth_image_views[0]
+    //         };
+
+    //         VkFramebufferCreateInfo create_info{};
+    //         create_info.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
+    //         create_info.renderPass = vkrender_pass;
+    //         create_info.attachmentCount = static_cast<uint32_t>(attachments.size());
+    //         create_info.pAttachments = attachments.data();
+    //         create_info.width = extent.width;
+    //         create_info.height = extent.height;
+    //         create_info.layers = 1;
+
+    //         auto result = vkCreateFramebuffer(device->vk_device(), &create_info, nullptr, &framebuffers[i]);
+    //         VK_CHECK_MSG(result, "Failed to create framebuffer!");
+    //     }
+    //     Log::debug("Framebuffers recreated");
+    // }
+
+
+    void RenderPass::begin(CommandBuffer& cmd_buffer, Framebuffer& framebuffer)
     {
         VkRenderPassBeginInfo begin_info{};
         begin_info.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
         begin_info.renderPass = vkrender_pass;
-        begin_info.framebuffer = framebuffers[swapchain.current_index()];
+        begin_info.framebuffer = framebuffer.vk_framebuffer;
         begin_info.renderArea.offset = {0, 0};
-        auto ext = swapchain.get_extent();
+        begin_info.renderArea.extent = framebuffer.extent;
 
-        begin_info.renderArea.extent = ext;
+        // VkClearValue depth_clear;
+        // depth_clear.depthStencil.depth = 1.f;
+        // auto clear_values = std::array{
+        //     /* Color clear */
+        //     VkClearValue{{{0.009, 0.009, 0.009, 1.0f}}},
+        //     /* Depth clear */
+        //     depth_clear
+        //     // VkClearValue{{1.f, 0.f}}
+        // };
 
-        VkClearValue depth_clear;
-	    depth_clear.depthStencil.depth = 1.f;
-        auto clear_values = std::array{
-            /* clear_color */
-            // Unorm
-            //VkClearValue{{{0.160f, 0.156f, 0.156f, 1.0f}}},
-            // sRGB
-            VkClearValue{{{0.009, 0.009, 0.009, 1.0f}}},
-            depth_clear
-            // VkClearValue{{1.f, 0.f}}
-        };
-        begin_info.clearValueCount = static_cast<uint32_t>(clear_values.size());
-        begin_info.pClearValues = clear_values.data();
+        begin_info.clearValueCount = static_cast<uint32_t>(framebuffer.clear_values.size());
+        begin_info.pClearValues = framebuffer.clear_values.data();
 
         // VK_SUBPASS_CONTENTS_INLINE: The render pass commands
         // will be embedded in the primary command buffer itself and

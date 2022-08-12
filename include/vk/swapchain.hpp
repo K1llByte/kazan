@@ -16,10 +16,8 @@ namespace kzn::vk
         VkSurfaceFormatKHR get_surface_format() const noexcept { return surface_format; }
         VkPresentModeKHR get_present_mode() const noexcept { return present_mode; }
         VkExtent2D get_extent() const noexcept { return extent; }
-        std::size_t num_images() const noexcept { return swapchain_image_views.size(); }
-        // TODO: Change name from 'image_views' to 'color_image_views'
-        const std::vector<VkImageView>& image_views() noexcept { return swapchain_image_views; }
-        const std::vector<VkImageView>& depth_image_views() noexcept { return swapchain_depth_views; }
+        std::size_t num_images() const noexcept { return swapchain_images.size(); }
+        const std::vector<VkImage>& images() noexcept { return swapchain_images; }
         std::size_t current_index() const noexcept { return current_image_idx; }
 
         uint32_t acquire_next(VkSemaphore img_available_semaphore);
@@ -31,10 +29,6 @@ namespace kzn::vk
     private:
         VkSwapchainKHR             vkswapchain;
         std::vector<VkImage>       swapchain_images;
-        std::vector<VkImageView>   swapchain_image_views;
-        std::vector<VkImage>       swapchain_depths;
-        std::vector<VkImageView>   swapchain_depth_views;
-        std::vector<VmaAllocation> depth_allocation;
         VkSurfaceKHR               surface;
         VkSurfaceFormatKHR         surface_format;
         VkPresentModeKHR           present_mode;

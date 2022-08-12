@@ -7,6 +7,7 @@
 #include "vk/buffers.hpp"
 #include "core/texture.hpp"
 #include "vk/image.hpp"
+#include "vk/framebuffer.hpp"
 
 namespace kzn {
     struct Tmp {
@@ -34,6 +35,7 @@ namespace kzn {
     private:
         Renderer*         renderer;
         vk::RenderPass    render_pass;
+        vk::Framebuffers  framebuffers;
 
     public: // FIXME: TEMPORARY
         vk::DescriptorSetAllocator   allocator;

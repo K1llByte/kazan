@@ -6,9 +6,17 @@ namespace kzn
 {
     ModelRenderer::ModelRenderer(Renderer* _renderer)
         : renderer(_renderer),
+        // Initialize render_pass
         render_pass(kzn::vk::simple_depth_render_pass(
             Context::device(),
             Context::swapchain().get_surface_format().format)),
+        // Initialize framebuffers
+        framebuffers(
+            &Context::device(),
+            &render_pass,
+            Context::swapchain().images(),
+            Context::swapchain().get_extent()),
+        // Initialize Descriptor set
         allocator(&Context::device()),
         cache(&Context::device()),
         ubo(&Context::device(), sizeof(Tmp)),
@@ -18,6 +26,7 @@ namespace kzn
             vk::BufferBinding::uniform(0, ubo.info()),
             vk::BufferBinding::sampler(1, tex.info(), VK_SHADER_STAGE_FRAGMENT_BIT)
         }),
+        // Initialize pipelines
         pipeline(vk::Pipeline(
             &Context::device(),
             "assets/shaders/mesh/mesh.vert.spv",
@@ -55,14 +64,25 @@ namespace kzn
         )
     {
         tex.upload(tex_data.get_data());
-        render_pass.create_framebuffers(Context::swapchain());
+
+
+        renderer->on_swapchain_resize([&]() {
+            // Recreate framebuffers from swapchain
+            framebuffers.recreate(
+                Context::swapchain().images(),
+                Context::swapchain().get_extent()
+            );
+        });
+
         renderer->add_render_pass(render_pass);
     }
 
     void ModelRenderer::bind(vk::CommandBuffer& cmd_buffer, bool render_wireframe)
     {
         // auto& cmd_buffer = renderer->current_cmd_buffer();
-        render_pass.begin(cmd_buffer, Context::swapchain());
+        render_pass.begin(
+            cmd_buffer,
+            framebuffers.get(Context::swapchain().current_index()));
 
         // auto& cmd_buffer = renderer->current_cmd_buffer();
         auto& viewport = renderer->current_viewport();

@@ -35,11 +35,13 @@ namespace kzn
     
     Renderer::~Renderer()
     {
+        Log::debug("Framebuffers destroyed");
         // Context::destroy();
     }
 
     void Renderer::add_render_pass(vk::RenderPass& render_pass)
     {
+        // Add render pass
         render_passes.push_back(&render_pass);
     }
 
@@ -68,11 +70,8 @@ namespace kzn
             Context::swapchain().recreate(win_extent);
             viewport = vk::create_viewport(win_extent);
             scissor = vk::create_scissor(win_extent);
-            // TODO: Research more about this Framebuffer recreation
-            for(auto render_pass : render_passes)
-            {
-                render_pass->recreate_framebuffers(Context::swapchain());
-            }
+            // Resize callback
+            resize_callback();
             return;
         }
 
@@ -92,8 +91,7 @@ namespace kzn
         // Stop registering commands to the cmd buffer
         cmd_buffer.end(); // throws ResultError if it fails to record command buffer
 
-        if(image_fences[image_idx] != VK_NULL_HANDLE)
-        {
+        if(image_fences[image_idx] != VK_NULL_HANDLE) {
             vkWaitForFences(Context::device().vk_device(), 1, &image_fences[image_idx], VK_TRUE, UINT64_MAX);
         }
         image_fences[image_idx] = in_flight_fence;
@@ -112,11 +110,8 @@ namespace kzn
             Context::swapchain().recreate(win_extent);
             viewport = vk::create_viewport(win_extent);
             scissor = vk::create_scissor(win_extent);
-            // TODO: Research more about this Framebuffer recreation
-            for(auto render_pass : render_passes)
-            {
-                render_pass->recreate_framebuffers(Context::swapchain());
-            }
+            // Resize callback
+            resize_callback();
         }
 
         Context::device().wait_idle();

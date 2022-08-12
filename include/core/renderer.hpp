@@ -69,9 +69,7 @@ namespace kzn
         // NOTE: Only used to recreate RenderPass Framebuffers when
         // window is resized
         void add_render_pass(vk::RenderPass& render_pass);
-
-        // TODO: Delete this completly later
-        // void wait_idle() { Context::device().wait_idle(); }
+        void on_swapchain_resize(std::function<void()>&& callback) {resize_callback = std::move(callback);}
 
         void render_frame(std::function<void(vk::CommandBuffer&)>);
 
@@ -88,6 +86,9 @@ namespace kzn
         
         // RenderPasses that need recreation of framebuffers
         std::vector<vk::RenderPass*> render_passes;
+
+        // On swapchain resize callback
+        std::function<void()> resize_callback;
     };
 } // namespace kzn
 

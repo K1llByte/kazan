@@ -42,6 +42,13 @@ namespace kzn::vk
     };
 
 
+    struct Framebuffer {
+        VkFramebuffer              vk_framebuffer;
+        VkExtent2D&                extent;
+        std::vector<VkClearValue>& clear_values;
+    };
+
+
     class RenderPass
     {
         friend class RenderPassBuilder;
@@ -51,9 +58,10 @@ namespace kzn::vk
     
         VkRenderPass vk_render_pass() noexcept { return vkrender_pass; }
 
-        void create_framebuffers(Swapchain& swapchain);
-        void recreate_framebuffers(Swapchain& swapchain);
-        void begin(CommandBuffer& cmd_buffer, const Swapchain& swapchain);
+        // TODO: Delete
+        // void create_framebuffers(Swapchain& swapchain);
+        // void recreate_framebuffers(Swapchain& swapchain);
+        void begin(CommandBuffer& cmd_buffer, Framebuffer& framebuffer);
         void end(CommandBuffer& cmd_buffer);
 
         private:
@@ -62,7 +70,8 @@ namespace kzn::vk
         private:
         VkRenderPass               vkrender_pass;
         Device*                    device;
-        std::vector<VkFramebuffer> framebuffers;
+        // TODO: Delete
+        // std::vector<VkFramebuffer> framebuffers;
     };
 
 
