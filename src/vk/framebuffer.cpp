@@ -190,67 +190,6 @@ namespace kzn::vk {
     }
 
 
-    // Framebuffer::Framebuffer(
-    //     Device*                                  _device,
-    //     RenderPass&                              _render_pass,
-    //     const std::initializer_list<Attachment>& _attachments,
-    //     VkExtent2D                               _extent)
-    //     : device(_device)
-    //     , vk_render_pass(_render_pass.vk_render_pass())
-    //     , extent{_extent.width, _extent.height}
-    // {
-    //     std::vector<VkImageView> attachments;
-    //     attachments.reserve(_attachments.size());
-    //     auto it = _attachments.begin();
-    //     for(size_t i = 0; i < _attachments.size(); ++i) {
-    //         attachments.push_back(it->image_view);
-    //         ++it;
-    //     }
-    //     VkFramebufferCreateInfo create_info{};
-    //     create_info.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
-    //     create_info.renderPass = vk_render_pass;
-    //     create_info.attachmentCount = static_cast<uint32_t>(attachments.size());
-    //     create_info.pAttachments = attachments.data();
-    //     create_info.width = _extent.width;
-    //     create_info.height = _extent.height;
-    //     create_info.layers = 1;
-
-    //     auto result = vkCreateFramebuffer(device->vk_device(), &create_info, nullptr, &framebuffer);
-    //     VK_CHECK_MSG(result, "Failed to create framebuffer!");
-    // }
-
-
-    // void Framebuffer::recreate(
-    //     const std::initializer_list<Attachment>& _attachments,
-    //     VkExtent2D new_extent)
-    // {
-    //     extent = VkExtent2D{new_extent.width, new_extent.height};
-    //     std::vector<VkImageView> attachments;
-    //     attachments.reserve(_attachments.size());
-    //     auto it = _attachments.begin();
-    //     for(size_t i = 0; i < _attachments.size(); ++i) {
-    //         attachments.push_back(it->image_view);
-    //         ++it;
-    //     }
-    //     VkFramebufferCreateInfo create_info{};
-    //     create_info.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
-    //     create_info.renderPass = vk_render_pass;
-    //     create_info.attachmentCount = static_cast<uint32_t>(attachments.size());
-    //     create_info.pAttachments = attachments.data();
-    //     create_info.width = new_extent.width;
-    //     create_info.height = new_extent.height;
-    //     create_info.layers = 1;
-
-    //     auto result = vkCreateFramebuffer(device->vk_device(), &create_info, nullptr, &framebuffer);
-    //     VK_CHECK_MSG(result, "Failed to create framebuffer!");
-    // }
-
-
-    // Framebuffer::~Framebuffer() {
-    //     vkDestroyFramebuffer(device->vk_device(), framebuffer, nullptr);
-    // }
-
-
     Framebuffers::Framebuffers(
         Device*                     _device,
         RenderPass*                 _render_pass,
