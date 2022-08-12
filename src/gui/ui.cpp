@@ -169,18 +169,17 @@ namespace kzn {
             ImGui_ImplGlfw_NewFrame();
             ImGui::NewFrame();
 
+            ImGui::DockSpaceOverViewport();
             ImGui::ShowDemoWindow();
-            ImGui::Begin("Demo window");
-            // ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
+            ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
+            ImGui::Begin("Viewport");
+            ImGui::PopStyleVar();
+            
+
             // // ImGui::Button("Hello!");
             // ImGui::PopStyleVar();
             auto [w,h] = ImGui::GetContentRegionAvail();
-            // Log::error("{},{}",w, h);
             
-            // tex_id = (ImTextureID) ImGui_ImplVulkan_AddTexture(
-            //     image.get_sampler(),
-            //     image.get_image_view(),
-            //     VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
             ImGui::Image(render_tex_ids[Context::swapchain().current_index()], ImVec2(w,h));
             ImGui::End();
             
