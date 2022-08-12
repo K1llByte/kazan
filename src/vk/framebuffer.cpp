@@ -166,7 +166,6 @@ namespace kzn::vk {
                 // Destroy image
                 vmaDestroyImage(device->allocator(), image, allocation);
             }
-            Log::error("ATTACHMENT DESTROYED {}", (kind == COLOR) ? "COLOR" : "DEPTH");
         }
     }
 
@@ -306,7 +305,6 @@ namespace kzn::vk {
         const std::vector<VkImage>& new_color_images,
         VkExtent2D                  new_extent)
     {
-        Log::error("Before recreate");
         // Create attachments
         extent = new_extent;
         depth_attachmemnt = std::unique_ptr<Attachment>(new Attachment(Attachment::DEPTH, device, new_extent));
