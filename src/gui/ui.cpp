@@ -4,6 +4,25 @@
 // #include "imgui_impl_glfw.h"
 // #include "imgui_impl_vulkan.h"
 
+// float to_srgb(float l) {
+//     return (l <= 0.0031308f)
+//         ? l * 12.92f
+//         : 1.055f * pow(l, 1.0f/2.4f) - 0.055f;
+// }
+
+// float to_linear(float l) {
+//     return (l <= 0.04045f)
+//         ? l / 12.92f
+//         : pow((l + 0.055f) / 1.055f, 2.4f);
+// }
+
+ImVec4 to_srgb(ImVec4 rgba) {
+    rgba.x /= 4.5f; // to_srgb(rgba.x);
+    rgba.y /= 4.5f; // to_srgb(rgba.y);
+    rgba.z /= 4.5f; // to_srgb(rgba.z);
+    return rgba;
+}
+
 namespace kzn
 {
     Interface::Interface(Renderer* _renderer, Window& _window)
@@ -12,7 +31,7 @@ namespace kzn
         , image(&Context::device(), texture.get_extent())
     {
         image.upload(texture.get_data());
-        
+
         std::vector<VkDescriptorPoolSize> pool_sizes{
             { VK_DESCRIPTOR_TYPE_SAMPLER, 1000 },
             { VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1000 },
@@ -162,15 +181,24 @@ namespace kzn
     {
         ImGuiStyle* style = &ImGui::GetStyle();
 
-        // Palette
+        // UNORM Palette
         // const auto AQUA         = ImVec4(0.408f, 0.616f, 0.416f, 1.f); // 689d6a
-        const auto DARK_GREY       = ImVec4(0.06f, 0.05f, 0.07f, 1.00f); // 0f0d12
-        const auto DARK_GREY_HOVER = ImVec4(0.24f, 0.23f, 0.29f, 1.00f);
-        const auto GREY            = ImVec4(0.10f, 0.09f, 0.12f, 1.00f); // 1a171f
+        const auto DARK_GREY       = to_srgb(ImVec4(0.06f, 0.05f, 0.07f, 1.00f)); // 0f0d12
+        const auto DARK_GREY_HOVER = to_srgb(ImVec4(0.24f, 0.23f, 0.29f, 1.00f));
+        const auto GREY            = to_srgb(ImVec4(0.10f, 0.09f, 0.12f, 1.00f)); // 1a171f
         // const auto GREY_HOVER      = ImVec4(0.56f, 0.56f, 0.58f, 1.00f); // 8f8f94
         const auto GREY_HOVER      = ImVec4(0.15f, 0.13f, 0.18f, 1.00f); // 8f8f94
         const auto GREY_ACTIVE     = ImVec4(0.80f, 0.80f, 0.83f, 0.31f);
         const auto DEBUG           = ImVec4(1.00f, 0.00f, 0.00f, 1.00f); // ff0000
+
+        // SRGB Palette
+        // // const auto AQUA         = ImVec4(0.408f, 0.616f, 0.416f, 1.f); // 689d6a
+        // const auto DEBUG           = ImVec4(1.00f, 0.00f, 0.00f, 1.00f); // ff0000
+        // const auto DARK_GREY       = ImVec4(0.004753f, 0.004006f, 0.006017f, 1.00f); // 0f0d12
+        // const auto DARK_GREY_HOVER = ImVec4(0.046964f, 0.043233f, 0.068384f, 1.00f);
+        // const auto GREY            = ImVec4(0.010022f, 0.008540f, 0.013411f, 1.00f); // 1a171f
+        // const auto GREY_HOVER      = ImVec4(0.019606f, 0.015325f, 0.027211f, 1.00f); // 8f8f94
+        // const auto GREY_ACTIVE     = ImVec4(0.603827f, 0.603827f, 0.655930f, 0.31f);
 
         style->WindowPadding     = ImVec2(15, 15);
         style->WindowRounding    = 5.0f;

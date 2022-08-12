@@ -193,7 +193,10 @@ namespace kzn::vk
 	    depth_clear.depthStencil.depth = 1.f;
         auto clear_values = std::array{
             /* clear_color */
-            VkClearValue{{{0.160f, 0.156f, 0.156f, 1.0f}}},
+            // Unorm
+            //VkClearValue{{{0.160f, 0.156f, 0.156f, 1.0f}}},
+            // sRGB
+            VkClearValue{{{0.009, 0.009, 0.009, 1.0f}}},
             depth_clear
             // VkClearValue{{1.f, 0.f}}
         };

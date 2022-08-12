@@ -15,10 +15,14 @@ int main() try
     auto gui = Interface(&renderer, window);
 
     // auto model = Model::load("assets/models/suzanne_monkey.obj");
-    // auto model2 = Model::load("assets/models/suzanne_monkey.obj");
-    auto model = kzn::plane(1.f);
-    auto model2 = kzn::plane(1.f);
+    auto model = Model::load("assets/models/viking_room.obj");
+    model.transform.rotation.z += glm::radians(90.f);
+    model.transform.rotation.y += glm::radians(90.f);
+    auto model2 = Model::load("assets/models/viking_room.obj");
+    model2.transform = model.transform;
     model2.transform.position.z = 3.f;
+
+    // auto model2 = kzn::plane(1.f);
     // auto model = kzn::icosahedron(0.8f, 30, true);
     // model.transform.position += glm::vec3{0.f, 0.f, 1.f};
     // auto model2 = kzn::sphere(0.8f, 17, 16);

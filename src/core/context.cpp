@@ -36,5 +36,6 @@ namespace kzn
         // Create swapchain
         _swapchain(vk::SwapchainBuilder(&_device, surface, window->extent())
             .set_present_mode(VK_PRESENT_MODE_FIFO_KHR)
+            // .set_present_mode(VK_PRESENT_MODE_IMMEDIATE_KHR)
             .build()) {}
 } // namespace kzn

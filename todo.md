@@ -12,6 +12,23 @@ kazan.hpp include with all public API includes
 
 [priority:high]
 
+- Imgui render to Image instead of window
+    - [x] vk::image option to not include staging buffer
+    - [ ] Make vk::Framebuffer class that represents a framebuffer (with all respective attachments)
+        - [ ] Make a ctor that automaticly creates Framebuffer by receiving Swapchain
+    - [ ] Refactor vk::SwapChain
+        - [ ] Remove Depth images and views creation, only handle the images
+        - [ ] present(present_queue, wait_semaphore) method to automaticly present the current image
+    - [ ] vk::Image wrapper to improve vulkan image creation
+        - Usage:
+            auto img = vk::Image(&device, {width,height}, vk::Image::Format::RGBA8);
+    - [ ] ImGuiRenderer implementation (only changes the presentation code)
+    - [ ] ImGuiWindow render target
+        - Usage:
+            - auto render_imgui_window = interface.render_window()
+        - with all methods the Window class has that the Renderer uses
+        like `was_resized()`, etc... 
+
 - vk::Queue wrapper with submit method which receives vk::CommandBuffer as argument
     - AND MUST BE NON COPYABLE
 
@@ -19,25 +36,8 @@ kazan.hpp include with all public API includes
     - Manages the current Context and vulkan long lived objects
     - Manages DescriptorSetAllocator and DescriptorSetCache
     - RenderPassManager, PipelineManager
-    - Provides VkBackend::device(), VkBackend::swapchain() and VkBackend::instance() 
+    - Provides VkBackend::device(), VkBackend::swapchain() and VkBackend::instance()
 
-- Imgui render to Image instead of window
-    - vk::image option to not include staging buffer
-    - Make vk::Framebuffer class that represents a framebuffer (with all respective attachments)
-        - Make a ctor that automaticly creates Framebuffer by receiving Swapchain
-    - Refactor vk::SwapChain
-        - Remove Depth images and views creation, only handle the images
-        - present(present_queue, wait_semaphore) method to automaticly present the current image
-    - vk::Image wrapper to improve vulkan image creation
-        - Usage:
-            auto img = vk::Image(&device, {width,height}, vk::Image::Format::RGBA8);
-    - ImGuiRenderer implementation (only changes the presentation code)
-    - ImGuiWindow render target
-        - Usage:
-            - auto render_imgui_window = interface.render_window()
-        - with all methods the Window class has that the Renderer uses
-        like `was_resized()`, etc... 
-    
 
 [priority:medium]
 - Try to refactor to struct pattern instead of build pattern

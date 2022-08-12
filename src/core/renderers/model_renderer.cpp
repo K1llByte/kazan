@@ -12,7 +12,7 @@ namespace kzn
         allocator(&Context::device()),
         cache(&Context::device()),
         ubo(&Context::device(), sizeof(Tmp)),
-        tex_data(Texture::load("assets/textures/grid512.png")),
+        tex_data(Texture::load("assets/textures/viking_room.png")),
         tex(&Context::device(), tex_data.get_extent()),
         desc_set(&Context::device(), allocator, cache, {
             vk::BufferBinding::uniform(0, ubo.info()),
