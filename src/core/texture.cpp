@@ -4,10 +4,10 @@
 #include "stb_image.h"
 
 namespace kzn {
-    Texture Texture::load(const std::filesystem::path& file_path) {
+    Texture Texture::load(const char* file_path) {
         int tex_width, tex_height, tex_channels;
         auto* loaded_data = stbi_load(
-            file_path.c_str(),
+            file_path,
             &tex_width,
             &tex_height,
             &tex_channels,
