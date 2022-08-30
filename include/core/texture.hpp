@@ -8,7 +8,7 @@
 namespace kzn {
     class Texture {
         public:
-        static Texture load(const std::filesystem::path& file_path);
+        static Texture load(const char* file_path);
 
         VkExtent3D get_extent() const noexcept {
             return extent;
