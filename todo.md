@@ -23,7 +23,7 @@ kazan.hpp include with all public API includes
         - [ ] present(present_queue, wait_semaphore) method to automaticly present the current image
     - [ ] vk::Image wrapper to improve vulkan image creation
         - Usage:
-            auto img = vk::Image(&device, {width,height}, vk::Image::Format::RGBA8);
+            auto img = vk::Image(&device, {width,height}, vk::ImageFormat::RGBA8);
     - [ ] ImGuiRenderer implementation (only changes the presentation code)
     - [ ] ImGuiWindow render target
         - Usage:

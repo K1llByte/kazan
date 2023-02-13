@@ -64,7 +64,7 @@ namespace kzn
             )
         )
     {
-        tex.upload(tex_data.get_data());
+        // tex.upload(tex_data.get_data());
         // Set callback to recreate framebuffers on swapchain resize
         // renderer->on_swapchain_resize([&]() {
         //     // Recreate framebuffers from swapchain

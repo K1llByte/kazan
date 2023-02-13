@@ -9,14 +9,10 @@
 #define GLFW_INCLUDE_VULKAN
 #include <GLFW/glfw3.h>
 
-// TODO: Implement Cheshire Cat window abstraction
-// If KZN_WINDOW_GLFW_IMPL is defined the GLFW Implementation will be used
-// (WIP) If KZN_WINDOW_SDL_IMPL is defined the GLFW Implementation will be used
-// Otherwise the GLFW Implementation will be used
 #define KZN_WINDOW_GLFW_IMPL
 
 #ifndef KZN_WINDOW_GLFW_IMPL
-#   error "No Window implementation defined"
+#   error "No Window implementation specified"
 #endif
 
 namespace kzn {
