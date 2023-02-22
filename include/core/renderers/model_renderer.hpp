@@ -54,7 +54,8 @@ namespace kzn {
     template<typename T>
     void ModelRenderer::push(vk::CommandBuffer& cmd_buffer, const T& data)
     {
-        if(glsl::is_uniform<T>()) {
+        if constexpr (glsl::is_uniform<T>())
+        {
             vkCmdPushConstants(
                 cmd_buffer.vk_command_buffer(),
                 pipeline.layout(),

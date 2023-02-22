@@ -17,7 +17,7 @@
 
 namespace kzn {
     class Window {        
-        friend void framebuffer_resized(GLFWwindow*,int,int);
+        friend void framebuffer_resized(GLFWwindow*, int, int);
 
         public:
         Window(const std::string_view& name, int width, int height);
@@ -35,7 +35,7 @@ namespace kzn {
         // TODO: Make an appropriate event system
         
 #ifdef KZN_WINDOW_GLFW_IMPL
-        GLFWwindow* glfw_ptr() const noexcept { return glfw_window; }
+        GLFWwindow* glfw_ptr() const { return glfw_window; }
 #endif
 
         private:

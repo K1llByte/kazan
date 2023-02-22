@@ -7,7 +7,7 @@
 #include "core/input.hpp"
 #include "core/renderer.hpp"
 #include "core/renderers/model_renderer.hpp"
-#include "core/renderers/triangle_renderer.hpp"
+#include "core/renderers/triangle_pass.hpp"
 #include "core/model.hpp"
 #include "core/camera.hpp"
 #include "core/shapes.hpp"
@@ -23,6 +23,7 @@
 #include "vk/device_features.hpp"
 #include "vk/utils.hpp"
 #include "vk/error.hpp"
+#include "vk/commands.hpp"
 
 #include "utils/time.hpp"
 

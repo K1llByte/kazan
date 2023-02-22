@@ -10,9 +10,6 @@
 #include <type_traits>
 #include <array>
 
-// NOTE: If this file won't have more things besides VK_CHECK's
-// then consider moving everything from error.hpp to here
-
 namespace kzn::vk
 {
     class Device;

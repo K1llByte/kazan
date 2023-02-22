@@ -1,6 +1,7 @@
 #include "core/renderers/model_renderer.hpp"
 
 #include "core/model.hpp"
+#include "vk/commands.hpp"
 
 namespace kzn
 {
@@ -93,8 +94,8 @@ namespace kzn
         {
             target_pipeline = &wireframe_pipeline;
         }
-        target_pipeline->set_viewport(cmd_buffer, viewport);
-        target_pipeline->set_scissor(cmd_buffer, scissor);
+        vk::cmd_set_viewport(cmd_buffer, viewport);
+        vk::cmd_set_scissor(cmd_buffer, scissor);
         target_pipeline->bind(cmd_buffer);
 
         // Bind descriptor set

@@ -284,26 +284,6 @@ namespace kzn::vk
         Log::debug("Pipeline destroyed");
     }
 
-    void Pipeline::set_viewport(CommandBuffer& cmd_buffer, VkViewport _viewport)
-    {
-        vkCmdSetViewport(
-            cmd_buffer.vk_command_buffer(),
-            0,
-            1,
-            &_viewport
-        );
-    }
-
-    void Pipeline::set_scissor(CommandBuffer& cmd_buffer, VkRect2D scissor)
-    {
-        vkCmdSetScissor(
-            cmd_buffer.vk_command_buffer(),
-            0,
-            1,
-            &scissor
-        );
-    }
-
     void Pipeline::bind(CommandBuffer& cmd_buffer)
     {
         vkCmdBindPipeline(

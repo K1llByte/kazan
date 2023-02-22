@@ -4,7 +4,6 @@
 #include "vk/utils.hpp"
 
 
-
 namespace kzn {
 
     void framebuffer_resized(GLFWwindow* window, int width, int height) {
@@ -21,15 +20,19 @@ namespace kzn {
     {
         // Initialize glfw
         glfwInit();
-        // Turn off OpenGl context initialization
+        // Turn off OpenGL context initialization
         glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
+        
         // Turn off resizable window
         // glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
-        // Initialize window
+
+        // Create window
         glfw_window = glfwCreateWindow(width, height, name.data(), nullptr, nullptr);
         glfwSetWindowUserPointer(glfw_window, this);
+        
         // Hide mouse cursor
         // glfwSetInputMode(glfw_window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
+
         // On framebuffer resize callback
         glfwSetFramebufferSizeCallback(glfw_window, framebuffer_resized);
         Log::debug("Window created");
@@ -38,6 +41,7 @@ namespace kzn {
     Window::~Window() {
         // Destroy window
         glfwDestroyWindow(glfw_window);
+
         // Destroy glfw
         glfwTerminate();
         glfw_window = nullptr;
@@ -67,8 +71,8 @@ namespace kzn {
 
     std::vector<const char*> Window::required_extensions() {
         uint32_t glfw_extension_count = 0;
-        const char** glfw_extensions;
-        glfw_extensions = glfwGetRequiredInstanceExtensions(&glfw_extension_count);
+        // const char** glfw_extensions;
+        auto glfw_extensions = glfwGetRequiredInstanceExtensions(&glfw_extension_count);
         return std::vector<const char*>(
             glfw_extensions,
             glfw_extensions + glfw_extension_count);

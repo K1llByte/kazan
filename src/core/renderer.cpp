@@ -1,6 +1,7 @@
 #include "core/renderer.hpp"
 
 #include "core/context.hpp"
+#include "core/events/event_handlers.hpp"
 #include "vk/device_features.hpp"
 #include "vk/utils.hpp"
 
@@ -70,7 +71,7 @@ namespace kzn
             viewport = vk::create_viewport(win_extent);
             scissor = vk::create_scissor(win_extent);
             // Resize callback
-            resize_callback();
+            EventManager::submit(ResizeEvent{});
             return;
         }
 
@@ -93,6 +94,7 @@ namespace kzn
         if(image_fences[image_idx] != VK_NULL_HANDLE) {
             vkWaitForFences(Context::device().vk_device(), 1, &image_fences[image_idx], VK_TRUE, UINT64_MAX);
         }
+        
         image_fences[image_idx] = in_flight_fence;
         vkResetFences(Context::device().vk_device(), 1, &in_flight_fence);
         Context::device().graphics_queue_submit(cmd_buffer, img_available, finished_render, in_flight_fence);
@@ -110,7 +112,7 @@ namespace kzn
             viewport = vk::create_viewport(win_extent);
             scissor = vk::create_scissor(win_extent);
             // Resize callback
-            resize_callback();
+            EventManager::submit(ResizeEvent{});
         }
 
         Context::device().wait_idle();

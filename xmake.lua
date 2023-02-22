@@ -34,7 +34,7 @@ function compilation_settings()
     set_warnings("allextra") -- -Wall -Wextra -Wfatal-errors (if error enabled)
     set_optimize("fastest") -- -O3
 
-    --add_rules("mode.asan")
+    add_rules("mode.asan")
     -- add_rules("mode.lsan")
     -- add_rules("mode.ubsan")
     
@@ -106,8 +106,6 @@ target("kazan")
     set_kind("static")
     add_files("src/**.cpp")
     remove_files("src/gui/**.cpp")
-    -- TODO: Remove this after refactor
-    remove_files("src/core/renderers/triangle_renderer.*")
 
 -------------------- Kazan GUI -------------------
 
