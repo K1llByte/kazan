@@ -39,12 +39,6 @@ namespace kzn
         // Context::destroy();
     }
 
-    void Renderer::add_render_pass(vk::RenderPass& render_pass)
-    {
-        // Add render pass
-        render_passes.push_back(&render_pass);
-    }
-
     void Renderer::render_frame(std::function<void(vk::CommandBuffer&)> draw_func)
     {
         /////////////////
@@ -70,7 +64,7 @@ namespace kzn
             Context::swapchain().recreate(win_extent);
             viewport = vk::create_viewport(win_extent);
             scissor = vk::create_scissor(win_extent);
-            // Resize callback
+            // Resize event submition
             EventManager::submit(ResizeEvent{});
             return;
         }
@@ -94,7 +88,7 @@ namespace kzn
         if(image_fences[image_idx] != VK_NULL_HANDLE) {
             vkWaitForFences(Context::device().vk_device(), 1, &image_fences[image_idx], VK_TRUE, UINT64_MAX);
         }
-        
+
         image_fences[image_idx] = in_flight_fence;
         vkResetFences(Context::device().vk_device(), 1, &in_flight_fence);
         Context::device().graphics_queue_submit(cmd_buffer, img_available, finished_render, in_flight_fence);

@@ -75,7 +75,7 @@ namespace kzn {
         init_info.MSAASamples = VK_SAMPLE_COUNT_1_BIT;
 
         // TODO: Get main render pass
-        ImGui_ImplVulkan_Init(&init_info, renderer->main_render_pass()->vk_render_pass());
+        // ImGui_ImplVulkan_Init(&init_info, renderer->main_render_pass()->vk_render_pass());
         
         // Load Fonts
         // - If no fonts are loaded, dear imgui will use the default font. You can also load multiple fonts and use ImGui::PushFont()/PopFont() to select them.

@@ -13,19 +13,11 @@ int main(void)
 
         renderer.render_frame([&](auto& cmd_buffer)
         {
-            triangle_pass.render(cmd_buffer, [&cmd_buffer] {
-                vk::cmd_draw(cmd_buffer, 3, 1, 0, 0);
+            // Begin render pass
+            triangle_pass.render(cmd_buffer, [&] {
+                // triangle_pipeline.bind();
+                vk::cmd_draw(cmd_buffer, 4, 1, 0, 0);
             });
         });
-        
-        // renderer.render_frame([&](auto& ctx) {
-        //     // Begin render pass with color and depth buffer
-        //     geometry_pass.render(framebuffer, [&] { // Begins render pass
-        //         // Draw and other stuff ...
-        //         transform_ubo.bind(ctx.cmd_buffer);
-        //         model_pipeline.bind(ctx.cmd_buffer);
-        //         example_model.draw(ctx.cmd_buffer);
-        //     }); // Ends render pass
-        // });
     }
 }

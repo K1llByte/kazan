@@ -107,78 +107,10 @@ namespace kzn::vk
 
     RenderPass::~RenderPass()
     {
-        // TODO: Delete
-        // Destroy Framebuffers
-        // destroy_framebuffers(device, framebuffers);
-        // Log::debug("Framebuffers destroyed");
         // Destroy RenderPass
         vkDestroyRenderPass(device->vk_device(), vkrender_pass, nullptr);
         Log::debug("RenderPass destroyed");
     }
-
-
-    // void RenderPass::create_framebuffers(Swapchain& swapchain)
-    // {
-    //     const auto num_images = swapchain.num_images();
-    //     framebuffers.resize(num_images);
-    //     auto& image_views = swapchain.image_views();
-    //     // Its a vector, but can be just 1 depth buffer
-    //     auto& depth_image_views = swapchain.depth_image_views();
-    //     auto extent = swapchain.get_extent();
-    //     for(std::size_t i = 0; i < num_images; ++i)
-    //     {
-    //         auto attachments = std::array{
-    //             image_views[i],
-    //             depth_image_views[0] // [i]
-    //         };
-
-    //         VkFramebufferCreateInfo create_info{};
-    //         create_info.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
-    //         create_info.renderPass = vkrender_pass;
-    //         create_info.attachmentCount = static_cast<uint32_t>(attachments.size());
-    //         create_info.pAttachments = attachments.data();
-    //         create_info.width = extent.width;
-    //         create_info.height = extent.height;
-    //         create_info.layers = 1;
-
-    //         auto result = vkCreateFramebuffer(device->vk_device(), &create_info, nullptr, &framebuffers[i]);
-    //         VK_CHECK_MSG(result, "Failed to create framebuffer!");
-    //     }
-    //     Log::debug("Framebuffers created");
-    // }
-
-
-    // void RenderPass::recreate_framebuffers(Swapchain& swapchain)
-    // {
-    //     auto num_images = framebuffers.size();
-    //     // Destroy old framebuffers
-    //     destroy_framebuffers(device, framebuffers);
-    //     // Create new VkFramebuffers
-    //     auto& image_views = swapchain.image_views();
-    //     auto& depth_image_views = swapchain.depth_image_views();
-    //     auto extent = swapchain.get_extent();
-    //     for(std::size_t i = 0; i < num_images; ++i)
-    //     {
-    //         auto attachments = std::array{
-    //             image_views[i],
-    //             depth_image_views[0]
-    //         };
-
-    //         VkFramebufferCreateInfo create_info{};
-    //         create_info.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
-    //         create_info.renderPass = vkrender_pass;
-    //         create_info.attachmentCount = static_cast<uint32_t>(attachments.size());
-    //         create_info.pAttachments = attachments.data();
-    //         create_info.width = extent.width;
-    //         create_info.height = extent.height;
-    //         create_info.layers = 1;
-
-    //         auto result = vkCreateFramebuffer(device->vk_device(), &create_info, nullptr, &framebuffers[i]);
-    //         VK_CHECK_MSG(result, "Failed to create framebuffer!");
-    //     }
-    //     Log::debug("Framebuffers recreated");
-    // }
-
 
     void RenderPass::begin(CommandBuffer& cmd_buffer, Framebuffer& framebuffer)
     {

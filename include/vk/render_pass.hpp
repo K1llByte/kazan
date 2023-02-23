@@ -58,9 +58,6 @@ namespace kzn::vk
     
         VkRenderPass vk_render_pass() noexcept { return vkrender_pass; }
 
-        // TODO: Delete
-        // void create_framebuffers(Swapchain& swapchain);
-        // void recreate_framebuffers(Swapchain& swapchain);
         void begin(CommandBuffer& cmd_buffer, Framebuffer& framebuffer);
         void end(CommandBuffer& cmd_buffer);
 
@@ -68,10 +65,8 @@ namespace kzn::vk
         RenderPass(Device* _device, VkRenderPass _render_pass);
 
         private:
-        VkRenderPass               vkrender_pass;
-        Device*                    device;
-        // TODO: Delete
-        // std::vector<VkFramebuffer> framebuffers;
+        VkRenderPass vkrender_pass;
+        Device*      device;
     };
 
 

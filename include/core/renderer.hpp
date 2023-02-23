@@ -53,7 +53,6 @@ namespace kzn
 
     class Renderer
     {
-        // friend class ModelRenderer;
         public:
         Renderer(Window* window);
         ~Renderer();
@@ -63,13 +62,7 @@ namespace kzn
         vk::CommandPool& get_cmd_pool() { return cmd_pool; }
         VkViewport& current_viewport() { return viewport; }
         VkRect2D& current_scissor() { return scissor; }
-        // FIXME: This is temporary
-        vk::RenderPass* main_render_pass() { return render_passes[0]; }
 
-        // NOTE: Only used to recreate RenderPass Framebuffers when
-        // window is resized
-        void add_render_pass(vk::RenderPass& render_pass);
-        void on_swapchain_resize(std::function<void()>&& callback) {resize_callback = std::move(callback);}
         virtual void render_frame(std::function<void(vk::CommandBuffer&)>);
         virtual const std::vector<VkImage>& get_render_images() { return Context::swapchain().images(); }
         virtual VkExtent2D get_render_extent() { return Context::swapchain().get_extent(); }
@@ -84,12 +77,6 @@ namespace kzn
         VkViewport                viewport;
         VkRect2D                  scissor;
         vk::CommandBuffer*        current_command_buffer = nullptr;
-        
-        // RenderPasses that need recreation of framebuffers
-        std::vector<vk::RenderPass*> render_passes;
-
-        // On swapchain resize callback
-        std::function<void()> resize_callback;
     };
 } // namespace kzn
 

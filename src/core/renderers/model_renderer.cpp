@@ -74,8 +74,9 @@ namespace kzn
         //         renderer->get_render_extent()
         //     );
         // });
+        
         // Add render pass to renderer
-        renderer->add_render_pass(render_pass);
+        // renderer->add_render_pass(render_pass);
     }
 
     void ModelRenderer::bind(vk::CommandBuffer& cmd_buffer, bool render_wireframe)

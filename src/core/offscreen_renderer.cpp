@@ -71,7 +71,6 @@ namespace kzn {
             viewport = vk::create_viewport(win_extent);
             scissor = vk::create_scissor(win_extent);
             // Resize callback
-            resize_callback();
             return;
         }
 
@@ -111,7 +110,6 @@ namespace kzn {
             viewport = vk::create_viewport(win_extent);
             scissor = vk::create_scissor(win_extent);
             // Resize callback
-            resize_callback();
         }
 
         Context::device().wait_idle();

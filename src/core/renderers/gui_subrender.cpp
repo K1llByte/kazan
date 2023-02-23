@@ -15,15 +15,7 @@ namespace kzn {
             Context::swapchain().get_extent())
         {
             // Set callback to recreate framebuffers on swapchain resize
-            renderer->on_swapchain_resize([&]() {
-                // Recreate framebuffers from swapchain
-                framebuffers.recreate(
-                    Context::swapchain().images(),
-                    Context::swapchain().get_extent()
-                );
-            });
-            // Add render pass to renderer
-            renderer->add_render_pass(render_pass);
+            // TODO:
         }
 
     void GuiSubrender::begin(vk::CommandBuffer& cmd_buffer) {
