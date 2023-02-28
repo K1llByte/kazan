@@ -19,22 +19,6 @@ namespace kzn
             &render_pass,
             renderer->get_render_images(),
             renderer->get_render_extent())
-        , pipeline(vk::Pipeline(
-            &Context::device(),
-            "assets/shaders/triangle/triangle.vert.spv",
-            "assets/shaders/triangle/triangle.frag.spv",
-            vk::PipelineConfigBuilder(
-                    vk::PipelineLayoutBuilder(&Context::device())
-                        .build(),
-                    render_pass
-                )
-                .set_topology(VK_PRIMITIVE_TOPOLOGY_TRIANGLE_FAN)
-                .set_polygon_mode(VK_POLYGON_MODE_FILL)
-                .set_dynamic_states({VK_DYNAMIC_STATE_VIEWPORT, VK_DYNAMIC_STATE_SCISSOR})
-                .set_front_face(VK_FRONT_FACE_CLOCKWISE)
-                .build()
-            )
-        )
     {
 
     }

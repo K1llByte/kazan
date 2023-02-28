@@ -28,19 +28,19 @@ namespace kzn::vk
 
 namespace kzn
 {
-    template<typename T>
-    void cmd_push_constants(
-        CommandBuffer& cmd_buffer,
-        VkPipelineLayout layout,
-        const T& data)
-    {
-        vkCmdPushConstants(
-            cmd_buffer.vk_command_buffer(),
-            layout,
-            VK_SHADER_STAGE_ALL_GRAPHICS,
-            0,
-            sizeof(T),
-            &data
-        );
-    }
+    // template<typename T>
+    // void cmd_push_constants(
+    //     CommandBuffer& cmd_buffer,
+    //     VkPipelineLayout layout,
+    //     const T& data)
+    // {
+    //     vkCmdPushConstants(
+    //         cmd_buffer.vk_command_buffer(),
+    //         layout,
+    //         VK_SHADER_STAGE_ALL_GRAPHICS,
+    //         0,
+    //         sizeof(T),
+    //         &data
+    //     );
+    // }
 } // namespace kzn

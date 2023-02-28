@@ -4,6 +4,21 @@
 #include "core/log.hpp"
 
 namespace kzn::vk {
+    VkDescriptorSetLayout DescriptorSetLayoutBuilder::build(vk::Device& _device) {
+        auto create_info = VkDescriptorSetLayoutCreateInfo{
+            .sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO,
+            .pNext = nullptr,
+            .flags = 0,
+            .bindingCount = 0,
+            .pBindings = nullptr,
+        };
+
+        VkDescriptorSetLayout desc_set_layout;
+        VK_CHECK(vkCreateDescriptorSetLayout(_device.vk_device(), &create_info, nullptr, &desc_set_layout));
+        return desc_set_layout;
+    }
+
+
     VkDescriptorPool create_pool(
         Device& device,
         const DescriptorSetAllocator::PoolSizes& pool_sizes,
@@ -53,10 +68,12 @@ namespace kzn::vk {
 
     DescriptorSetAllocator::~DescriptorSetAllocator() {
         // Delete every pool held
-        for(auto p : free_pools)
+        for(auto p : free_pools) {
             vkDestroyDescriptorPool(device->vk_device(), p, nullptr);
-        for(auto p : used_pools)
+        }
+        for(auto p : used_pools) {
             vkDestroyDescriptorPool(device->vk_device(), p, nullptr);
+        }
     }
 
 
@@ -170,7 +187,7 @@ namespace kzn::vk {
     }
 
 
-    VkDescriptorSetLayout DescriptorSetLayoutCache::create_descriptor_layout(VkDescriptorSetLayoutCreateInfo* info) {
+    VkDescriptorSetLayout DescriptorSetLayoutCache::create_layout(VkDescriptorSetLayoutCreateInfo* info) {
         DescriptorLayoutInfo layout_info;
         layout_info.bindings.reserve(info->bindingCount);
         bool is_sorted = true;
@@ -246,11 +263,11 @@ namespace kzn::vk {
         
         // Use descreiptor layour cache to create the layout if
         // it isn't created already
-        set_layout = _cache.create_descriptor_layout(&layout_info);
+        set_layout = _cache.create_layout(&layout_info);
         // Use automaticly managed descriptor set allocator
         vk_descriptor_set = _allocator.allocate(set_layout);
 
-        
+
         i = 0;
         for(const auto& binding : _bindings) {
             // Image sampler
@@ -276,7 +293,6 @@ namespace kzn::vk {
                     .descriptorType = binding.type,
                     .pBufferInfo = &binding.buffer_info,
                 };
-
             }
             ++i;
         }

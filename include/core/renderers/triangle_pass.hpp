@@ -17,6 +17,7 @@ namespace kzn
         template<typename F>
             requires std::is_invocable_r_v<void, F>
         void render(vk::CommandBuffer& cmd_buffer, F&& func);
+        vk::RenderPass& get_render_pass() { return render_pass; }
 
         void on_resize(const ResizeEvent&);
 
@@ -24,7 +25,6 @@ namespace kzn
         Renderer*        renderer;
         vk::RenderPass   render_pass;
         vk::Framebuffers framebuffers;
-        vk::Pipeline     pipeline;
     };
 } // namespace kzn
 
@@ -46,13 +46,6 @@ namespace kzn
             cmd_buffer,
             framebuffers.get(Context::swapchain().current_index())
         );
-
-        auto& viewport = renderer->current_viewport();
-        auto& scissor = renderer->current_scissor();
-        
-        pipeline.bind(cmd_buffer);
-        vk::cmd_set_viewport(cmd_buffer, viewport);
-        vk::cmd_set_scissor(cmd_buffer, scissor);
 
         ///////////////////
         // Register Cmds //

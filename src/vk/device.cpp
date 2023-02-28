@@ -335,8 +335,8 @@ namespace kzn::vk
             // work of the next checks isnt being done for no reason
 
             // 1. Require to be a dedicated GPU
-            if(device_properties.deviceType != VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU)
-                continue;
+            // if(device_properties.deviceType != VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU)
+            //     continue;
 
             indices = get_queue_families(iter_device, surface);
             // 2. Require to have all needed queue families

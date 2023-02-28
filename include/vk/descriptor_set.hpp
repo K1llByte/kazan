@@ -9,75 +9,22 @@
 #include <unordered_map>
 
 namespace kzn::vk {
-    struct BufferBinding {
-        uint32_t               binding;
-        VkDescriptorBufferInfo buffer_info;
-        VkDescriptorImageInfo  image_info;
-        VkDescriptorType       type;
-        VkShaderStageFlags     stages = VK_SHADER_STAGE_ALL_GRAPHICS;
-
-        constexpr BufferBinding(
-            uint32_t               _binding,
-            VkDescriptorBufferInfo _info,
-            VkDescriptorType       _type,
-            VkShaderStageFlags     _stages = VK_SHADER_STAGE_ALL_GRAPHICS)
-            : binding(_binding)
-            , buffer_info(_info)
-            , type(_type)
-            , stages(_stages) {}
-        
-        constexpr BufferBinding(
-            uint32_t               _binding,
-            VkDescriptorImageInfo  _info,
-            VkDescriptorType       _type,
-            VkShaderStageFlags     _stages = VK_SHADER_STAGE_ALL_GRAPHICS)
-            : binding(_binding)
-            , image_info(_info)
-            , type(_type)
-            , stages(_stages) {}
-
-        static constexpr BufferBinding uniform(
-            uint32_t               _binding,
-            VkDescriptorBufferInfo _info,
-            VkShaderStageFlags     _stages = VK_SHADER_STAGE_ALL_GRAPHICS)
-        {
-            return BufferBinding(_binding, _info, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, _stages);
-        }
-
-        static constexpr BufferBinding sampler(
-            uint32_t               _binding,
-            VkDescriptorImageInfo _info,
-            VkShaderStageFlags     _stages = VK_SHADER_STAGE_ALL_GRAPHICS)
-        {
-            return BufferBinding(_binding, _info, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, _stages);
-        }
+    class DescriptorSetLayout {
+        private:
+        std::vector<VkDescriptorSetLayoutBinding> m_layout_bindings;
     };
+    
+    class DescriptorSetLayoutBuilder {
+        public:
+        DescriptorSetLayoutBuilder() = default;
+        ~DescriptorSetLayoutBuilder() = default;
 
-    // TODO: Do this later
-    // struct MultipleBufferBinding {
-    //     uint32_t                            binding;
-    //     std::vector<VkDescriptorBufferInfo> info;
-    //     VkDescriptorType                    type;
-    //     VkShaderStageFlags                  stages = VK_SHADER_STAGE_ALL_GRAPHICS;
 
-    //     constexpr MultipleBufferBinding(
-    //         uint32_t               _binding,
-    //         std::initializer_list<VkDescriptorBufferInfo> _infos,
-    //         VkDescriptorType       _type,
-    //         VkShaderStageFlags     _stages = VK_SHADER_STAGE_ALL_GRAPHICS)
-    //         : binding(_binding)
-    //         , infos(_infos)
-    //         , type(_type)
-    //         , stages(_stages) {}
+        VkDescriptorSetLayout build(vk::Device& _device);
 
-    //     static constexpr BufferBinding uniform(
-    //         uint32_t                                      _binding,
-    //         std::initializer_list<VkDescriptorBufferInfo> _infos,
-    //         VkShaderStageFlags                            _stages = VK_SHADER_STAGE_ALL_GRAPHICS)
-    //     {
-    //         return MultipleBufferBinding{_binding, _infos, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, _stages};
-    //     }
-    // };
+        private:
+        std::vector<VkDescriptorSetLayoutBinding> m_layout_bindings;
+    };
 
 
     // DescriptorSetAllocator is a manager of DescriptorSetPool's which creates new pools
@@ -91,7 +38,7 @@ namespace kzn::vk {
 
         void reset_pools();
         VkDescriptorSet allocate(const VkDescriptorSetLayout& layout);
-
+        // TODO: // DescriptorSet allocate(const DescriptorSetLayout& layout);
 
         private:
         Device*                       device;
@@ -119,8 +66,8 @@ namespace kzn::vk {
         DescriptorSetLayoutCache(Device* _device);
         ~DescriptorSetLayoutCache();
 
-        VkDescriptorSetLayout create_descriptor_layout(
-            VkDescriptorSetLayoutCreateInfo* info); // TODO:
+        VkDescriptorSetLayout create_layout(
+            VkDescriptorSetLayoutCreateInfo* info);
 
         private:
         struct DescriptorLayoutHash {
