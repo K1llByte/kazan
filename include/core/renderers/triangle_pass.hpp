@@ -12,7 +12,7 @@ namespace kzn
     {
     public:
         TrianglePass(Renderer* _renderer);
-        ~TrianglePass();
+        ~TrianglePass() = default;
 
         template<typename F>
             requires std::is_invocable_r_v<void, F>

@@ -7,17 +7,20 @@ namespace kzn
 {
     ModelRenderer::ModelRenderer(Renderer* _renderer)
         : renderer(_renderer),
+        
         // Initialize render_pass
         render_pass(kzn::vk::simple_depth_render_pass(
             Context::device(),
             Context::swapchain().get_surface_format().format,
             VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL)),
+            
         // Initialize framebuffers
         framebuffers(
             &Context::device(),
             &render_pass,
             renderer->get_render_images(),
             renderer->get_render_extent()),
+            
         // Initialize Descriptor set
         allocator(&Context::device()),
         cache(&Context::device()),
@@ -28,6 +31,7 @@ namespace kzn
             vk::BufferBinding::uniform(0, ubo.info()),
             vk::BufferBinding::sampler(1, tex.info(), VK_SHADER_STAGE_FRAGMENT_BIT)
         }),
+        
         // Initialize pipelines
         pipeline(vk::Pipeline(
             &Context::device(),
@@ -74,9 +78,6 @@ namespace kzn
         //         renderer->get_render_extent()
         //     );
         // });
-        
-        // Add render pass to renderer
-        // renderer->add_render_pass(render_pass);
     }
 
     void ModelRenderer::bind(vk::CommandBuffer& cmd_buffer, bool render_wireframe)
@@ -86,7 +87,6 @@ namespace kzn
             cmd_buffer,
             framebuffers.get(Context::swapchain().current_index()));
 
-        // auto& cmd_buffer = renderer->current_cmd_buffer();
         auto& viewport = renderer->current_viewport();
         auto& scissor = renderer->current_scissor();
         

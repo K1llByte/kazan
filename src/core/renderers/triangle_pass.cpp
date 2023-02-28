@@ -39,11 +39,6 @@ namespace kzn
 
     }
 
-    TrianglePass::~TrianglePass()
-    {
-        
-    }
-
     void TrianglePass::on_resize(const ResizeEvent&) {
         framebuffers.recreate(
             renderer->get_render_images(),
