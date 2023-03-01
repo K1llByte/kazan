@@ -35,7 +35,7 @@ namespace kzn::vk
     }
 
     PipelineConfigBuilder::PipelineConfigBuilder(
-        VkPipelineLayout layout,
+        PipelineLayout layout,
         RenderPass& render_pass)
         : config{}
     {
@@ -170,7 +170,7 @@ namespace kzn::vk
     PipelineConfig PipelineConfigBuilder::build()
     {
         if(config.render_pass == VK_NULL_HANDLE
-            || config.pipeline_layout == VK_NULL_HANDLE)
+            || config.pipeline_layout.pipeline_layout == VK_NULL_HANDLE)
         {
             // TODO: Since these are required parameters this exception shouldn't exist
             throw std::runtime_error("'VkPipelineLayout' and 'VkRenderPass' must be set");
@@ -186,17 +186,18 @@ namespace kzn::vk
         return *this;
     }
 
-    PipelineLayoutBuilder& PipelineLayoutBuilder::add_descriptor_set_layout(VkDescriptorSetLayout set) {
-        set_layouts.push_back(set);
+    PipelineLayoutBuilder& PipelineLayoutBuilder::add_descriptor_set_layout(DescriptorSetLayout set_layout) {
+        set_layouts.push_back(set_layout);
+        vk_set_layouts.push_back(set_layout.vk_layout());
         return *this;
     }
 
-    VkPipelineLayout PipelineLayoutBuilder::build()
+    PipelineLayout PipelineLayoutBuilder::build()
     {
         VkPipelineLayoutCreateInfo pipeline_layout_info{
             .sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO,
-            .setLayoutCount = static_cast<uint32_t>(set_layouts.size()),
-            .pSetLayouts = set_layouts.data(),
+            .setLayoutCount = static_cast<uint32_t>(vk_set_layouts.size()),
+            .pSetLayouts = vk_set_layouts.data(),
             .pushConstantRangeCount = static_cast<uint32_t>(push_ranges.size()),
             .pPushConstantRanges = push_ranges.data(),
         };
@@ -204,7 +205,10 @@ namespace kzn::vk
         VkPipelineLayout pipeline_layout;
         auto result = vkCreatePipelineLayout(device->vk_device(), &pipeline_layout_info, nullptr, &pipeline_layout);
         VK_CHECK_MSG(result, "Failed to create pipeline layout!");
-        return pipeline_layout;
+        return PipelineLayout{
+            pipeline_layout,
+            std::move(set_layouts),
+        };
     }
 
     Pipeline::Pipeline(
@@ -216,7 +220,8 @@ namespace kzn::vk
     {
         vert_shader_module = create_shader_module(*device, vert_shader_path);
         frag_shader_module = create_shader_module(*device, frag_shader_path);
-        pipeline_layout = config.pipeline_layout;
+        pipeline_layout = config.pipeline_layout.pipeline_layout;
+        descriptor_sets_layouts = config.pipeline_layout.descriptor_sets_layouts;
 
         VkPipelineShaderStageCreateInfo shader_stages[2];
         // Vertex Shader
@@ -257,7 +262,7 @@ namespace kzn::vk
         pipeline_info.pDepthStencilState = &config.depth_stencil_info;
         pipeline_info.pDynamicState = &config.dynamic_state_info;
 
-        pipeline_info.layout = config.pipeline_layout;
+        pipeline_info.layout = config.pipeline_layout.pipeline_layout;
         pipeline_info.renderPass = config.render_pass;
         pipeline_info.subpass = config.subpass;
 
