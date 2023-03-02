@@ -3,15 +3,13 @@
 #include "vk/pipeline.hpp"
 
 namespace kzn {
-    inline vk::Pipeline create_triangle_pipeline(vk::RenderPass& render_pass, vk::DescriptorSetLayoutCache& layout_cache) {
-
+    inline vk::Pipeline create_triangle_pipeline(
+        vk::RenderPass&               render_pass,
+        vk::DescriptorSetLayoutCache& layout_cache)
+    {
         auto desc_set_0_layout = vk::DescriptorSetLayoutBuilder()
             .add_uniform(0)
             .build(layout_cache);
-
-        for(const auto& binding : desc_set_0_layout.bindings()) {
-            Log::error("One");
-        }
 
         auto pipeline_layout = vk::PipelineLayoutBuilder(&Context::device())
             .add_descriptor_set_layout(desc_set_0_layout)
@@ -33,23 +31,32 @@ namespace kzn {
         );
     }
 
-    // inline vk::Pipeline create_phong_pipeline(vk::RenderPass& _render_pass) {
-    //     auto pipeline_layout = vk::PipelineLayoutBuilder(&Context::device())
-    //             .add_push_constant(sizeof(PVM), VK_SHADER_STAGE_ALL_GRAPHICS) 
-    //             .add_descriptor_set_layout(desc_set0_layout)
-    //         .build();
-        
-    //     auto pipeline_config = vk::PipelineConfigBuilder(pipeline_layout, _render_pass)
-    //         .set_polygon_mode(VK_POLYGON_MODE_FILL)
-    //         .set_dynamic_states({VK_DYNAMIC_STATE_VIEWPORT, VK_DYNAMIC_STATE_SCISSOR})
-    //         .set_type_vtx_input<Vertex>()
-    //         .build();
 
-    //     return vk::Pipeline(
-    //         &Context::device(),
-    //         "assets/shaders/mesh/mesh.vert.spv",
-    //         "assets/shaders/mesh/mesh.frag.spv",
-    //         pipeline_config
-    //     );
-    // }
+    struct PVM {
+        glsl::mat4 proj_view;
+        glsl::mat4 model;
+    };
+
+    inline vk::Pipeline create_mesh_pipeline(
+        vk::RenderPass&               render_pass,
+        vk::DescriptorSetLayoutCache& layout_cache)
+    {
+
+        auto pipeline_layout = vk::PipelineLayoutBuilder(&Context::device())
+                .add_push_constant(sizeof(PVM), VK_SHADER_STAGE_ALL_GRAPHICS) 
+            .build();
+        
+        auto pipeline_config = vk::PipelineConfigBuilder(pipeline_layout, render_pass)
+            .set_polygon_mode(VK_POLYGON_MODE_FILL)
+            .set_dynamic_states({VK_DYNAMIC_STATE_VIEWPORT, VK_DYNAMIC_STATE_SCISSOR})
+            .set_type_vtx_input<Vertex>()
+            .build();
+
+        return vk::Pipeline(
+            &Context::device(),
+            "assets/shaders/mesh/mesh.vert.spv",
+            "assets/shaders/mesh/mesh.frag.spv",
+            pipeline_config
+        );
+    }
 } // namespace kzn

@@ -8,11 +8,11 @@
 
 namespace kzn
 {
-    class TrianglePass: public EventHandlers
+    class SimpleDepthPass: public EventHandlers
     {
     public:
-        TrianglePass(Renderer* _renderer);
-        ~TrianglePass() = default;
+        SimpleDepthPass(Renderer* _renderer);
+        ~SimpleDepthPass() = default;
 
         template<typename F>
             requires std::is_invocable_r_v<void, F>
@@ -36,7 +36,7 @@ namespace kzn
 {
     template<typename F>
         requires std::is_invocable_r_v<void, F>
-    void TrianglePass::render(vk::CommandBuffer& cmd_buffer, F&& func)
+    void SimpleDepthPass::render(vk::CommandBuffer& cmd_buffer, F&& func)
     {
         //////////////////////
         // Begin RenderPass //

@@ -1,13 +1,13 @@
-#include "core/renderers/triangle_pass.hpp"
+#include "core/passes/simple_depth_pass.hpp"
 
 #include "core/camera.hpp"
 #include "core/model.hpp"
 
 namespace kzn
 {
-    TrianglePass::TrianglePass(Renderer* _renderer)
+    SimpleDepthPass::SimpleDepthPass(Renderer* _renderer)
         : EventHandlers{
-            kzn::register_event_handler(this, &TrianglePass::on_resize)
+            kzn::register_event_handler(this, &SimpleDepthPass::on_resize)
         }
         , renderer(_renderer)
         , render_pass(kzn::vk::simple_depth_render_pass(
@@ -23,7 +23,7 @@ namespace kzn
 
     }
 
-    void TrianglePass::on_resize(const ResizeEvent&) {
+    void SimpleDepthPass::on_resize(const ResizeEvent&) {
         framebuffers.recreate(
             renderer->get_render_images(),
             renderer->get_render_extent()

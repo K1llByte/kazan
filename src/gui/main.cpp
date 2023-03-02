@@ -1,11 +1,7 @@
 #include "kazan.hpp"
 
 #include "gui/default_pipelines.hpp"
-
-struct Tmp {
-    kzn::glsl::vec3 bias1 = glm::vec3{0.0f, 1.0f, 0.0f};
-    kzn::glsl::vec3 bias2 = glm::vec3{1.0f, 1.0f, 1.0f};
-};
+#include "gui/camera_controller.hpp"
 
 int main(void)
 {
@@ -15,50 +11,71 @@ int main(void)
 
     auto desc_set_layout_cache = vk::DescriptorSetLayoutCache(&Context::device());
     auto desc_set_allocator = vk::DescriptorSetAllocator(&Context::device());
+ 
+    auto depth_pass = SimpleDepthPass(&renderer);
 
-    auto triangle_pass = TrianglePass(&renderer);
-    auto triangle_pipeline = create_triangle_pipeline(
-        triangle_pass.get_render_pass(),
+    auto mesh_pipeline = create_mesh_pipeline(
+        depth_pass.get_render_pass(),
         desc_set_layout_cache
     );
 
-    auto tmp = Tmp{};
-    auto tmp_ubo = vk::UniformBuffer(&Context::device(), sizeof(Tmp));
-    tmp_ubo.upload(&tmp);
-
-    auto desc_set0 = desc_set_allocator.allocate(
-        triangle_pipeline.descriptor_set_layout(0));
-    desc_set0.update({
-        vk::DescriptorInfo{tmp_ubo.info()}
-    });
-
-
     // Models
-    // auto monki = Model::load("assets/models/monkey.obj");
-    // auto model_pipeline = ModelPipeline();
+    auto monkey = Model::load("assets/models/monkey.obj");
+    auto viking_room = Model::load("assets/models/viking_room.obj");
+    viking_room.transform.rotation.z += glm::radians(90.f);
+    viking_room.transform.rotation.y += glm::radians(90.f);
+    viking_room.transform.position.z += 4.f;
 
-    // pipeline_manager["phong"]
-    // pipeline_manager["phong_wireframe"]
+    auto camera = Camera::perspective(50.f, window.aspect_ratio(), 0.1f, 100.f);
+    camera.lookat_target({10.f, 2.f, 0.f}, {0.f, 0.f, 0.f});
 
+    auto pvm_monkey = PVM{
+        camera.projection() * camera.view(),
+        monkey.transform.mat4()
+    };
+    auto pvm_viking_room = PVM{
+        camera.projection() * camera.view(),
+        viking_room.transform.mat4()
+    };
 
+    auto controller = CameraController(&window, &camera);
+
+    // auto pvm_ubo = vk::UniformBuffer(&Context::device(), sizeof(PVM));
+    // pvm_ubo.upload(&pvm);
+
+    // auto desc_set0 = desc_set_allocator.allocate(
+    //     triangle_pipeline.descriptor_set_layout(0));
+    // desc_set0.update({
+    //     vk::DescriptorInfo{tmp_ubo.info()}
+    // });
 
     while(!window.is_closed())
     {
         window.poll_events();
 
         // Update
-        tmp.bias1 += glm::vec3{0.005f, 0.f, 0.f};
-        tmp_ubo.upload(&tmp);
+        controller.update(0.016);
+        pvm_monkey.proj_view = camera.projection() * camera.view();
+        pvm_viking_room.proj_view = camera.projection() * camera.view();
+
+        // if(window.was_resized()) {
+        //     camera.set_perspective(50.f, window.aspect_ratio(), 0.1f, 100.f);
+        // }
 
         // Render
         renderer.render_frame([&](auto& cmd_buffer) {
             // Begin render pass
-            triangle_pass.render(cmd_buffer, [&] {
-                triangle_pipeline.bind(cmd_buffer);
-                desc_set0.bind(cmd_buffer, triangle_pipeline.layout());
+            depth_pass.render(cmd_buffer, [&] {
                 vk::cmd_set_viewport(cmd_buffer, renderer.current_viewport());
                 vk::cmd_set_scissor(cmd_buffer, renderer.current_scissor());
-                vk::cmd_draw(cmd_buffer, 3, 1, 0, 0);
+                mesh_pipeline.bind(cmd_buffer);
+                // TODO: add constraints to this cmd
+                // Model 1
+                vk::cmd_push_constants(cmd_buffer, mesh_pipeline.layout(), pvm_monkey);
+                monkey.draw(cmd_buffer);
+                // Model 2
+                vk::cmd_push_constants(cmd_buffer, mesh_pipeline.layout(), pvm_viking_room);
+                viking_room.draw(cmd_buffer);
 
                 // triangle_pipeline.bind(cmd_buffer);
                 // desc_set.bind(cmd_buffer, triangle_pipeline.layout());
