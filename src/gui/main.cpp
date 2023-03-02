@@ -1,4 +1,3 @@
-#define KZN_LOG_LEVEL 5
 #include "kazan.hpp"
 
 #include "gui/default_pipelines.hpp"
