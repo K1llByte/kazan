@@ -4,17 +4,19 @@
 
 namespace kzn {
     inline vk::Pipeline create_triangle_pipeline(vk::RenderPass& render_pass, vk::DescriptorSetLayoutCache& layout_cache) {
-        // NOTE: Temporary
-        // auto cache = DescriptorSetLayoutCache(&Context::device());
-        // auto allocator = DescriptorSetAllocator(&Context::device());
 
         auto desc_set_0_layout = vk::DescriptorSetLayoutBuilder()
             .add_uniform(0)
             .build(layout_cache);
 
+        for(const auto& binding : desc_set_0_layout.bindings()) {
+            Log::error("One");
+        }
+
         auto pipeline_layout = vk::PipelineLayoutBuilder(&Context::device())
             .add_descriptor_set_layout(desc_set_0_layout)
             .build();
+        
 
         auto pipeline_config = vk::PipelineConfigBuilder(pipeline_layout, render_pass)
             .set_topology(VK_PRIMITIVE_TOPOLOGY_TRIANGLE_FAN)
@@ -25,7 +27,7 @@ namespace kzn {
 
         return vk::Pipeline(
             &Context::device(),
-            "assets/shaders/triangle/triangle.vert.spv",
+            "assets/shaders/triangle/triangle_test.vert.spv",
             "assets/shaders/triangle/triangle.frag.spv",
             pipeline_config
         );

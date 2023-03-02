@@ -10,6 +10,9 @@
 #include <span>
 
 namespace kzn::vk {
+    class DescriptorSet;
+    class DescriptorSetLayout;
+
     // DescriptorSetAllocator is a manager of DescriptorSetPool's which creates new pools
     // when its needed
     class DescriptorSetAllocator {
@@ -20,7 +23,7 @@ namespace kzn::vk {
         ~DescriptorSetAllocator();
 
         void reset_pools();
-        VkDescriptorSet allocate(const VkDescriptorSetLayout& layout);
+        DescriptorSet allocate(const DescriptorSetLayout& layout);
         // TODO: // DescriptorSet allocate(const DescriptorSetLayout& layout);
 
         private:
@@ -35,8 +38,6 @@ namespace kzn::vk {
     };
 
 
-    class DescriptorSetLayout;
-
     class DescriptorSetLayoutCache {
         public:
         struct DescriptorLayoutInfo {
@@ -47,12 +48,12 @@ namespace kzn::vk {
 
             size_t hash() const;
         };
-        
+
         DescriptorSetLayoutCache(Device* _device);
         ~DescriptorSetLayoutCache();
 
         DescriptorSetLayout create_layout(
-            std::vector<VkDescriptorSetLayoutBinding>&& info);
+            const std::vector<VkDescriptorSetLayoutBinding>& info);
 
         private:
         struct DescriptorLayoutHash {
@@ -76,16 +77,16 @@ namespace kzn::vk {
         friend class DescriptorSetLayoutCache;
 
         public:
-        std::span<VkDescriptorSetLayoutBinding> bindings() const;
+        std::span<const VkDescriptorSetLayoutBinding> bindings() const { return m_layout_bindings; };
         VkDescriptorSetLayout vk_layout() const { return m_layout; }
 
         private:
-        std::span<VkDescriptorSetLayoutBinding> m_layout_bindings;
-        VkDescriptorSetLayout                   m_layout;
+        std::span<const VkDescriptorSetLayoutBinding> m_layout_bindings;
+        VkDescriptorSetLayout                         m_layout;
 
         private:
         DescriptorSetLayout(
-            std::span<VkDescriptorSetLayoutBinding> layout_bindings,
+            std::span<const VkDescriptorSetLayoutBinding> layout_bindings,
             VkDescriptorSetLayout                   layout)
             : m_layout_bindings(layout_bindings)
             , m_layout(layout)
@@ -112,17 +113,23 @@ namespace kzn::vk {
     };
 
 
-    class DescriptorSet {
-        public:
-        
-        DescriptorSetLayout layout() { return m_set_layout; }
+    union DescriptorInfo {
+        VkDescriptorBufferInfo buffer_info;
+        VkDescriptorImageInfo image_info;
+    };
 
+
+    class DescriptorSet {
+        friend class DescriptorSetAllocator;
+        
+        public:
         void bind(vk::CommandBuffer& cmd_buffer, VkPipelineLayout pipeline_layout) const;
+        void update(std::initializer_list<DescriptorInfo> descriptor_infos);
 
         private:
         Device*             m_device;
         VkDescriptorSet     m_vk_descriptor_set;
-        DescriptorSetLayout m_set_layout;
+        DescriptorSetLayout m_layout;
 
         private:
         DescriptorSet(
