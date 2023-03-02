@@ -19,14 +19,14 @@ namespace kzn::vk
         create_info.queueFamilyIndex = device->queue_families().graphics_family.value();
         auto result = vkCreateCommandPool(device->vk_device(), &create_info, nullptr, &vkcommand_pool);
         VK_CHECK_MSG(result, "Failed to create command pool!");
-        Log::debug("Command Pool created");
+        Log::trace("Command Pool created");
     }
     
     CommandPool::~CommandPool()
     {
         // Destroy Command Pool
         vkDestroyCommandPool(device->vk_device(), vkcommand_pool, nullptr);
-        Log::debug("Command Pool destroyed");
+        Log::trace("Command Pool destroyed");
     }
 
     CommandBuffer CommandPool::allocate()

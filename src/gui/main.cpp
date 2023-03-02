@@ -9,12 +9,6 @@ int main(void)
     using namespace kzn;
     auto window = Window("Kazui", 1000, 800);
     auto renderer = Renderer(&window);
-    Log::error("Hello World");
-    Log::warning("Hello World");
-    Log::info("Hello World");
-    Log::debug("Hello World");
-    Log::trace("Hello World");
-
     auto desc_set_layout_cache = vk::DescriptorSetLayoutCache(&Context::device());
     auto desc_set_allocator = vk::DescriptorSetAllocator(&Context::device());
  

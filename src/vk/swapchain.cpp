@@ -9,7 +9,7 @@ namespace kzn::vk
     {
         // Destroy Swapchain
         vkDestroySwapchainKHR(device->vk_device(), vkswapchain, nullptr);
-        Log::debug("Swapchain destroyed");
+        Log::trace("Swapchain destroyed");
     }
 
     uint32_t Swapchain::acquire_next(VkSemaphore img_available_semaphore)

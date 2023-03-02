@@ -150,7 +150,7 @@ namespace kzn::vk
         vmaDestroyAllocator(vma_allocator);
         // Destroy logical device instance
         vkDestroyDevice(vkdevice, nullptr);
-        Log::debug("Device destroyed");
+        Log::trace("Device destroyed");
     }
 
     const SwapChainSupport& Device::query_swapchain_support(VkSurfaceKHR surface) noexcept
@@ -391,10 +391,10 @@ namespace kzn::vk
             ++i;
         }
 
-        Log::debug("Device Validation Layers:");
+        Log::trace("Device Validation Layers:");
         for(const auto& vl : validation_layers)
         {
-            Log::debug("- {}", vl);
+            Log::trace("- {}", vl);
         }
         VkDeviceCreateInfo create_info{};
         create_info.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
@@ -409,7 +409,7 @@ namespace kzn::vk
         VkDevice vkdevice = VK_NULL_HANDLE;
         auto result = vkCreateDevice(vkphysical_device, &create_info, nullptr, &vkdevice);
         VK_CHECK_MSG(result, "Failed to create logical device!");
-        Log::debug("Device created");
+        Log::trace("Device created");
 
 
         auto device = Device();

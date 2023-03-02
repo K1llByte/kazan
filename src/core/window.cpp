@@ -35,7 +35,7 @@ namespace kzn {
 
         // On framebuffer resize callback
         glfwSetFramebufferSizeCallback(glfw_window, framebuffer_resized);
-        Log::debug("Window created");
+        Log::trace("Window created");
     }
 
     Window::~Window() {
@@ -45,7 +45,7 @@ namespace kzn {
         // Destroy glfw
         glfwTerminate();
         glfw_window = nullptr;
-        Log::debug("Window destroyed");
+        Log::trace("Window destroyed");
     }
 
     bool Window::is_closed() const noexcept {

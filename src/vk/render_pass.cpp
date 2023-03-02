@@ -99,7 +99,7 @@ namespace kzn::vk
         VkRenderPass vkrender_pass;
         auto result = vkCreateRenderPass(device->vk_device(), &render_pass_create_info, nullptr, &vkrender_pass);
         VK_CHECK_MSG(result, "Failed to create render pass!");
-        Log::debug("RenderPass created");
+        Log::trace("RenderPass created");
 
         return RenderPass(device, vkrender_pass);
     }
@@ -109,7 +109,7 @@ namespace kzn::vk
     {
         // Destroy RenderPass
         vkDestroyRenderPass(device->vk_device(), vkrender_pass, nullptr);
-        Log::debug("RenderPass destroyed");
+        Log::trace("RenderPass destroyed");
     }
 
     void RenderPass::begin(CommandBuffer& cmd_buffer, Framebuffer& framebuffer)

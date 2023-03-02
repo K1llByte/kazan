@@ -23,7 +23,7 @@ namespace kzn
             img_available = vk::create_semaphore(*device);
             finished_render = vk::create_semaphore(*device);
             in_flight_fence = vk::create_fence(*device);
-            Log::debug("PerFrameData created");
+            Log::trace("PerFrameData created");
         }
 
         ~PerFrameData()
@@ -31,7 +31,7 @@ namespace kzn
             vk::destroy_semaphore(*device, img_available);
             vk::destroy_semaphore(*device, finished_render);
             vk::destroy_fence(*device, in_flight_fence);
-            Log::debug("PerFrameData destroyed");
+            Log::trace("PerFrameData destroyed");
         }
 
         // static std::size_t current() noexcept { return PerFrameData::next_idx; }

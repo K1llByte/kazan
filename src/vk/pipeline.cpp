@@ -277,7 +277,7 @@ namespace kzn::vk
                 nullptr,
                 &graphics_pipeline);
         VK_CHECK_MSG(result, "Failed to create graphics pipeline!");
-        Log::debug("Pipeline created");
+        Log::trace("Pipeline created");
     }
 
     Pipeline::~Pipeline()
@@ -286,7 +286,7 @@ namespace kzn::vk
         vkDestroyShaderModule(device->vk_device(), frag_shader_module, nullptr);
         vkDestroyPipelineLayout(device->vk_device(), pipeline_layout, nullptr);
         vkDestroyPipeline(device->vk_device(), graphics_pipeline, nullptr);
-        Log::debug("Pipeline destroyed");
+        Log::trace("Pipeline destroyed");
     }
 
     void Pipeline::bind(CommandBuffer& cmd_buffer)
