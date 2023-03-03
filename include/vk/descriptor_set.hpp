@@ -104,6 +104,9 @@ namespace kzn::vk {
         DescriptorSetLayoutBuilder& add_uniform(
             uint32_t binding,
             VkShaderStageFlags stage_flags = VK_SHADER_STAGE_ALL_GRAPHICS);
+        DescriptorSetLayoutBuilder& add_sampler(
+            uint32_t binding,
+            VkShaderStageFlags stage_flags = VK_SHADER_STAGE_ALL_GRAPHICS);
 
         DescriptorSetLayout build(
             DescriptorSetLayoutCache& _cache);

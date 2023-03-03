@@ -10,6 +10,7 @@
 #include "core/model.hpp"
 #include "core/camera.hpp"
 #include "core/shapes.hpp"
+#include "core/texture.hpp"
 
 #include "vk/instance.hpp"
 #include "vk/device.hpp"
@@ -24,6 +25,8 @@
 #include "vk/error.hpp"
 #include "vk/commands.hpp"
 #include "vk/uniform.hpp"
+#include "vk/image.hpp"
+
 
 
 #include "utils/time.hpp"

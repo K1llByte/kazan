@@ -128,7 +128,6 @@ int main() try
         auto finished_render = per_frame_data[frame_idx].finished_render;
         auto in_flight_fence = per_frame_data[frame_idx].in_flight_fence;
 
-        // Log::warning("Begin try");
         vkWaitForFences(device.vk_device(), 1, &in_flight_fence, VK_TRUE, UINT64_MAX);
         uint32_t image_idx;
         try {
@@ -145,7 +144,6 @@ int main() try
         }
         
         // vkResetFences(device.vk_device(), 1, &in_flight_fence);
-        // Log::warning("End try");
 
         cmd_buffer.reset();
         cmd_buffer.begin();

@@ -118,6 +118,11 @@ namespace kzn::vk
         return attributes;
     }
 
+    // union DescriptorInfo {
+    //     VkDescriptorImageInfo  image_info;
+    //     VkDescriptorBufferInfo buffer_info;
+    // };
+
     ////////// Vulkan image utils //////////
     // VkImage create_image(Device& device);
     VkImageView create_image_view(

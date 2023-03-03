@@ -19,14 +19,23 @@ namespace kzn::vk {
         return *this;
     }
 
+    DescriptorSetLayoutBuilder& DescriptorSetLayoutBuilder::add_sampler(
+        uint32_t binding,
+        VkShaderStageFlags stage_flags)
+    {
+        m_layout_bindings.push_back(VkDescriptorSetLayoutBinding{
+            .binding = binding,
+            .descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
+            .descriptorCount = 1,
+            .stageFlags = stage_flags,
+            .pImmutableSamplers = nullptr,
+        });
+
+        return *this;
+    }
+
     DescriptorSetLayout DescriptorSetLayoutBuilder::build(DescriptorSetLayoutCache& _cache) {
-        auto tmp = _cache.create_layout(m_layout_bindings);
-        // FIXME: THE PROBLEM IS HERE
-        for(const auto& b : tmp.bindings()) {
-            Log::error("create_layout: binding = {}", b.binding);
-            Log::error("create_layout: descriptorType = {}", b.descriptorType);
-        }
-        return tmp;
+        return _cache.create_layout(m_layout_bindings);
     }
 
 
@@ -241,10 +250,6 @@ namespace kzn::vk {
             // Add layout to cache
             layout_cache[layout_info] = layout;
             
-            for(const auto& b : layout_info.bindings) {
-                Log::error("create_layout: binding = {}", b.binding);
-                Log::error("create_layout: descriptorType = {}", b.descriptorType);
-            }
             // Return non-owning layout
             auto it = layout_cache.find(layout_info);
             return DescriptorSetLayout(
@@ -379,12 +384,10 @@ namespace kzn::vk {
     void DescriptorSet::update(std::initializer_list<DescriptorInfo> descriptor_infos) {
         auto bindings = m_layout.bindings();
         // Create allocated array of VkWriteDescriptorSet
-        Log::error("Size: {}", bindings.size());
         auto writes = std::vector<VkWriteDescriptorSet>(bindings.size());
 
         size_t i = 0;
         for(auto& desc_info : descriptor_infos) {
-            Log::error("AAAAAAAAAAAAAAAAAAAAAAAAAA");
             // If binding is combined image sampler
             if(bindings[i].descriptorType == VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER) {
                 // Add image_info VkWriteDescriptorSet
@@ -399,8 +402,6 @@ namespace kzn::vk {
                 };
             }
             else {
-                Log::warning("{}", bindings[i].binding);
-                Log::warning("{}", bindings[i].descriptorType);
                 // Add buffer_info VkWriteDescriptorSet
                 writes[i] = VkWriteDescriptorSet{
                     .sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
@@ -415,7 +416,6 @@ namespace kzn::vk {
             ++i;
         }
         
-        Log::error("Before vkUpdateDescriptorSets");
         vkUpdateDescriptorSets(
             m_device->vk_device(),
             static_cast<uint32_t>(bindings.size()),

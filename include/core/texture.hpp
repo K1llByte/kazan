@@ -1,5 +1,4 @@
-#ifndef KZN_TEXTURE_HPP
-#define KZN_TEXTURE_HPP
+#pragma once
 
 #include "vk/utils.hpp"
 
@@ -25,5 +24,3 @@ namespace kzn {
         VkExtent3D     extent;
     };
 } // namespace kzn
-
-#endif // KZN_TEXTURE_HPP

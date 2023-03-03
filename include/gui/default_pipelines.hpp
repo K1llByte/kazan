@@ -41,9 +41,13 @@ namespace kzn {
         vk::RenderPass&               render_pass,
         vk::DescriptorSetLayoutCache& layout_cache)
     {
+        auto desc_set_0_layout = vk::DescriptorSetLayoutBuilder()
+            .add_sampler(0)
+            .build(layout_cache);
 
         auto pipeline_layout = vk::PipelineLayoutBuilder(&Context::device())
-                .add_push_constant(sizeof(PVM), VK_SHADER_STAGE_ALL_GRAPHICS) 
+            .add_push_constant(sizeof(PVM), VK_SHADER_STAGE_ALL_GRAPHICS) 
+            .add_descriptor_set_layout(desc_set_0_layout) 
             .build();
         
         auto pipeline_config = vk::PipelineConfigBuilder(pipeline_layout, render_pass)
@@ -54,8 +58,8 @@ namespace kzn {
 
         return vk::Pipeline(
             &Context::device(),
-            "assets/shaders/mesh/mesh.vert.spv",
-            "assets/shaders/mesh/mesh.frag.spv",
+            "assets/shaders/mesh/mesh_textured.vert.spv",
+            "assets/shaders/mesh/mesh_textured.frag.spv",
             pipeline_config
         );
     }

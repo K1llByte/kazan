@@ -2,6 +2,7 @@
 #define KZN_VK_IMAGE_HPP
 
 #include "vk/device.hpp"
+#include "vk/descriptor_set.hpp"
 
 namespace kzn::vk {
     class Image {
@@ -13,7 +14,7 @@ namespace kzn::vk {
         VkImageView get_image_view() noexcept { return texture_image_view; }
         VkSampler   get_sampler() noexcept { return texture_sampler; }
 
-        VkDescriptorImageInfo info() const noexcept;
+        DescriptorInfo info() const noexcept;
 
         void init_staging_buffer();
         void upload(void* data);
