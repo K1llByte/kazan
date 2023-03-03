@@ -26,6 +26,8 @@ int main(void)
 
     // Models
     auto viking_room = Model::load("assets/models/viking_room.obj");
+    viking_room.transform.rotation.z += glm::radians(90.f);
+    viking_room.transform.rotation.y += glm::radians(90.f);
 
     auto camera = Camera::perspective(50.f, window.aspect_ratio(), 0.1f, 100.f);
     camera.lookat_target({10.f, 2.f, 0.f}, {0.f, 0.f, 0.f});
