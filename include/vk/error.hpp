@@ -16,7 +16,7 @@
             {                                 \
                 Log::error("(VkResult = {})", \
                     res);                     \
-                throw ResultError(res);       \
+                throw vk::ResultError(res);   \
             }                                 \
         }
 
@@ -26,7 +26,7 @@
             {                                 \
                 Log::error(msg __VA_OPT__(,)  \
                      __VA_ARGS__);            \
-                throw ResultError(res);       \
+                throw vk::ResultError(res);   \
             }                                 \
         }
 

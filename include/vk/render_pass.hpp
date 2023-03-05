@@ -218,10 +218,6 @@ namespace kzn::vk {
         subpasses_dependencies.push_back(subpass_dependency);
         return *this;
     }   
-    
-    //////////////////////// FIXME: TEMPORARY ////////////////////////
-
-    RenderPass simple_depth_render_pass(Device& device, VkFormat surface_format, VkImageLayout color_final_layout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR);
 }
 
 #endif // KZN_VK_RENDER_PASS_HPP

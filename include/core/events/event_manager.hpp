@@ -5,6 +5,9 @@
 #include <type_traits>
 #include <utility>
 #include <vector>
+#include <cstdint>
+#include <functional>
+#include <algorithm>
 
 #include "core/events/event.hpp"
 

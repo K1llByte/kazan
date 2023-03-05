@@ -1,5 +1,4 @@
-#ifndef KZN_VK_DESCRIPTOR_SET_HPP
-#define KZN_VK_DESCRIPTOR_SET_HPP
+#pragma once
 
 #include "vk/device.hpp"
 #include "vk/cmd_buffers.hpp"
@@ -141,5 +140,3 @@ namespace kzn::vk {
             DescriptorSetLayout layout);
     };
 } // namespace kzn::vk
-
-#endif // KZN_VK_DESCRIPTOR_SET_HPP

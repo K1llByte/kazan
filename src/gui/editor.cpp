@@ -1,22 +1,10 @@
-#include "gui/ui.hpp"
+#include "gui/editor.hpp"
 
-// #include "imgui.h"
-// #include "imgui_impl_glfw.h"
-// #include "imgui_impl_vulkan.h"
+#include "core/context.hpp"
+#include "gui/editor_events.hpp"
+#include "vk/utils.hpp"
 
-// float to_srgb(float l) {
-//     return (l <= 0.0031308f)
-//         ? l * 12.92f
-//         : 1.055f * pow(l, 1.0f/2.4f) - 0.055f;
-// }
-
-// float to_linear(float l) {
-//     return (l <= 0.04045f)
-//         ? l / 12.92f
-//         : pow((l + 0.055f) / 1.055f, 2.4f);
-// }
-
-ImVec4 to_srgb(ImVec4 rgba) {
+inline ImVec4 to_srgb(ImVec4 rgba) {
     rgba.x /= 4.5f; // to_srgb(rgba.x);
     rgba.y /= 4.5f; // to_srgb(rgba.y);
     rgba.z /= 4.5f; // to_srgb(rgba.z);
@@ -24,8 +12,7 @@ ImVec4 to_srgb(ImVec4 rgba) {
 }
 
 namespace kzn {
-    Interface::Interface(OffscreenRenderer* _renderer, Window& _window)
-        : renderer(_renderer)
+    Editor::Editor(Window& window, ScreenDepthPass& screen_depth_pass)
     {
         std::vector<VkDescriptorPoolSize> pool_sizes{
             { VK_DESCRIPTOR_TYPE_SAMPLER, 1000 },
@@ -48,11 +35,9 @@ namespace kzn {
         pool_info.poolSizeCount = static_cast<uint32_t>(pool_sizes.size());
         pool_info.pPoolSizes = pool_sizes.data();
 
-        {
-            using namespace kzn::vk;
-            auto res = vkCreateDescriptorPool(Context::device().vk_device(), &pool_info, nullptr, &imgui_pool);
-            VK_CHECK_MSG(res, "error creating imgui descriptor pool");
-        }
+        // Create ImGui descriptor pool
+        auto res = vkCreateDescriptorPool(Context::device().vk_device(), &pool_info, nullptr, &m_imgui_pool);
+        VK_CHECK_MSG(res, "Error creating ImGui descriptor pool");
 
         // Setup Dear ImGui context
         IMGUI_CHECKVERSION();
@@ -60,7 +45,7 @@ namespace kzn {
         ImGuiIO &io = ImGui::GetIO();
         io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
         // Setup Platform/Renderer bindings
-        ImGui_ImplGlfw_InitForVulkan(_window.glfw_ptr(), true);
+        ImGui_ImplGlfw_InitForVulkan(window.glfw_ptr(), true);
 
         // This initializes imgui for Vulkan
         ImGui_ImplVulkan_InitInfo init_info{};
@@ -68,14 +53,14 @@ namespace kzn {
         init_info.PhysicalDevice = Context::device().vk_physical_device();
         init_info.Device = Context::device().vk_device();
         init_info.Queue = Context::device().vk_graphics_queue();
-        init_info.DescriptorPool = imgui_pool;
+        init_info.DescriptorPool = m_imgui_pool;
         const uint32_t img_count = static_cast<uint32_t>(Context::swapchain().num_images());
         init_info.MinImageCount = img_count;
         init_info.ImageCount = img_count;
         init_info.MSAASamples = VK_SAMPLE_COUNT_1_BIT;
 
         // TODO: Get main render pass
-        // ImGui_ImplVulkan_Init(&init_info, renderer->main_render_pass()->vk_render_pass());
+        ImGui_ImplVulkan_Init(&init_info, screen_depth_pass.get_render_pass().vk_render_pass());
         
         // Load Fonts
         // - If no fonts are loaded, dear imgui will use the default font. You can also load multiple fonts and use ImGui::PushFont()/PopFont() to select them.
@@ -86,66 +71,86 @@ namespace kzn {
         // - Remember that in C/C++ if you want to include a backslash \ in a string literal you need to write a double backslash \\ !
         io.Fonts->AddFontFromFileTTF("assets/fonts/ruda.bold.ttf", 16.0f);
 
-        // Implementation of single time commands
-        {
-            // Context::device().immediate_submit([&](auto& cmd_buffer){
-            //     ImGui_ImplVulkan_CreateFontsTexture(cmd_buffer.vk_command_buffer());
-            // });
-            auto cmd_buffer = renderer->get_cmd_pool().allocate();
-            cmd_buffer.begin(VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT);
+        // Submit fonts texture
+        Context::device().immediate_submit([&](auto& cmd_buffer){
             ImGui_ImplVulkan_CreateFontsTexture(cmd_buffer.vk_command_buffer());
-            cmd_buffer.end();
-            // submit
-            Context::device().graphics_queue_submit(cmd_buffer);
-            // wait queue idle
-            vkQueueWaitIdle(Context::device().vk_graphics_queue());
-            // cmd buffer will be freed when it's out of scope
-        }
+        });
+        
 
         //clear font textures from cpu data
         ImGui_ImplVulkan_DestroyFontUploadObjects();
 
         // Setup Dear ImGui style
         ImGui::StyleColorsDark();
-        this->set_theme();
+        set_theme();
 
-        // Create image view for each render image and sampler
-        // And finally create all imgui texture ids
-        const auto& render_images = renderer->get_render_images();
-        render_tex_ids.reserve(render_images.size());
-        render_image_views.reserve(render_images.size());
-        render_image_sampler = vk::create_sampler(Context::device());
-        for(size_t i = 0; i < render_images.size(); ++i) {
-            // Create image view
-            render_image_views.push_back(
-                vk::create_image_view(
-                    Context::device(),
-                    render_images[i],
-                    VK_FORMAT_B8G8R8A8_SRGB,
-                    VK_IMAGE_ASPECT_COLOR_BIT
-                )
-            );
-            // Get ImTextureID
-            render_tex_ids.push_back(
-                ImGui_ImplVulkan_AddTexture(
-                    render_image_sampler,
-                    render_image_views[i],
-                    VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL)
-            );
-        }
+        // Create Viewport render target //
+        
+        // Create VkImage and allocation
+        auto render_extent = Context::swapchain().get_extent();
+        VkImageCreateInfo image_info{};
+        image_info.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
+        image_info.imageType = VK_IMAGE_TYPE_2D;
+        image_info.format = VK_FORMAT_B8G8R8A8_SRGB;
+        image_info.extent = VkExtent3D{
+            render_extent.width,
+            render_extent.height,
+            1
+        };
+        image_info.mipLevels = 1;
+        image_info.arrayLayers = 1;
+        image_info.samples = VK_SAMPLE_COUNT_1_BIT;
+        image_info.tiling = VK_IMAGE_TILING_OPTIMAL;
+        image_info.usage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_SAMPLED_BIT;
+        image_info.initialLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL; //VK_IMAGE_LAYOUT_UNDEFINED;
+        // Allocate it from GPU local memory
+        VmaAllocationCreateInfo img_alloc_info{};
+        img_alloc_info.usage = VMA_MEMORY_USAGE_GPU_ONLY;
+        img_alloc_info.requiredFlags = VkMemoryPropertyFlags(VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
+        auto result = vmaCreateImage(
+            Context::device().allocator(),
+            &image_info,
+            &img_alloc_info,
+            &m_render_target_image,
+            &m_render_target_allocation,
+            nullptr
+        );
+        VK_CHECK_MSG(result, "Failed to create color image!");
+
+        // Create VkImageView and VkSampler
+        m_render_target_image_view = vk::create_image_view(
+            Context::device(),
+            m_render_target_image,
+            VK_FORMAT_B8G8R8A8_SRGB,
+            VK_IMAGE_ASPECT_COLOR_BIT
+        );
+        m_render_target_sampler = vk::create_sampler(Context::device());
+
+        // And finally create imgui texture id
+        m_render_target_tex_id = ImGui_ImplVulkan_AddTexture(
+            m_render_target_sampler,
+            m_render_target_image_view,
+            VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+
+
+        // ImTextureID   m_render_target_tex_id
+        // VkImage       m_render_target_image
+        // VmaAllocation m_render_target_allocation
+        // VkImageView   m_render_target_image_view
+        // VkSampler     m_render_target_sampler
     }
 
 
-    Interface::~Interface() {
-        for(const auto& img_view : render_image_views) {
-            vk::destroy_image_view(
-                Context::device(),
-                img_view
-            );
-        }
-        vk::destroy_sampler(Context::device(), render_image_sampler);
+    Editor::~Editor() {
+        vmaDestroyImage(Context::device().allocator(), m_render_target_image, m_render_target_allocation);
+
+        vk::destroy_image_view(
+            Context::device(),
+            m_render_target_image_view
+        );
+        vk::destroy_sampler(Context::device(), m_render_target_sampler);
         
-        vkDestroyDescriptorPool(Context::device().vk_device(), imgui_pool, nullptr);
+        vkDestroyDescriptorPool(Context::device().vk_device(), m_imgui_pool, nullptr);
         ImGui_ImplVulkan_Shutdown();
 
         // ImGui_ImplVulkan_Shutdown();
@@ -154,48 +159,33 @@ namespace kzn {
     }
 
 
-    void Interface::toggle()
+    void Editor::draw(vk::CommandBuffer& cmd_buffer)
     {
-        render_ui = !render_ui;
+        // Render your GUI
+        ImGui_ImplVulkan_NewFrame();
+        ImGui_ImplGlfw_NewFrame();
+        ImGui::NewFrame();
+
+        ImGui::DockSpaceOverViewport();
+        ImGui::ShowDemoWindow();
+        ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
+        ImGui::Begin("Viewport");
+        auto [w,h] = ImGui::GetContentRegionAvail();
+        
+        ImGui::Image(m_render_target_tex_id, ImVec2(w,h));
+
+        ImGui::PopStyleVar();
+        ImGui::End();
+        
+        // Render dear imgui into screen
+        ImGui::Render();
+
+        // Submit draw commands
+        ImGui_ImplVulkan_RenderDrawData(ImGui::GetDrawData(), cmd_buffer.vk_command_buffer());
     }
 
 
-    void Interface::setup()
-    {
-        if(render_ui)
-        {
-            // Render your GUI
-            ImGui_ImplVulkan_NewFrame();
-            ImGui_ImplGlfw_NewFrame();
-            ImGui::NewFrame();
-
-            ImGui::DockSpaceOverViewport();
-            ImGui::ShowDemoWindow();
-            ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
-            ImGui::Begin("Viewport");
-            ImGui::PopStyleVar();
-            
-
-            auto [w,h] = ImGui::GetContentRegionAvail();
-            
-            ImGui::Image(render_tex_ids[Context::swapchain().current_index()], ImVec2(w,h));
-            ImGui::End();
-            
-            // Render dear imgui into screen
-            ImGui::Render();
-        }
-    }
-
-    void Interface::draw(vk::CommandBuffer& cmd_buffer)
-    {
-        if(render_ui)
-        {
-            ImGui_ImplVulkan_RenderDrawData(ImGui::GetDrawData(), cmd_buffer.vk_command_buffer());
-        }
-    }
-
-
-    void Interface::set_theme()
+    void Editor::set_theme()
     {
         ImGuiStyle* style = &ImGui::GetStyle();
 
@@ -282,5 +272,28 @@ namespace kzn {
         style->Colors[ImGuiCol_PlotHistogramHovered]  = ImVec4(0.25f, 1.00f, 0.00f, 1.00f);
         style->Colors[ImGuiCol_TextSelectedBg]        = ImVec4(0.25f, 1.00f, 0.00f, 0.43f);
         // style->Colors[ImGuiCol_ModalWindowDarkening] = ImVec4(1.00f, 0.98f, 0.95f, 0.73f);
+    }
+
+
+    bool Editor::handle_viewport_resize()
+    {
+        auto [width, height] = ImGui::GetContentRegionAvail();
+
+        if(m_viewport_extent.x != width || m_viewport_extent.y != height)
+        {
+            // The window is too small or collapsed.
+            if(width == 0 || height == 0)
+            {
+                return false;
+            }
+
+            m_viewport_extent = {width, height};
+
+            EventManager::submit(ViewportResizeEvent{});
+
+            return true;
+        }
+
+        return false;
     }
 }

@@ -1,7 +1,5 @@
-// Print debug logs
-#define KZN_DEBUG_LOGS
-
-// #define KZN_VK_DEBUG_LAYERS // USELESS
+// Logs level
+// #define KZN_DEBUG_LOGS
 
 // Validations of input parameters
-#define KZN_VALIDATION
+// #define KZN_VALIDATION

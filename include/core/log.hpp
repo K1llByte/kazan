@@ -71,7 +71,6 @@ namespace kzn
         static Log instance;
     };
 
-
     template<typename... Args>
     void Log::error(fmt::format_string<Args...> in, Args&& ...args)
     {
