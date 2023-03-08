@@ -2,7 +2,6 @@
 
 #include "vk/utils.hpp"
 #include "vk/error.hpp"
-#include "config.hpp"
 
 #include <array>
 
