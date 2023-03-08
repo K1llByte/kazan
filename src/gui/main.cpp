@@ -85,7 +85,31 @@ using namespace kzn;
 // Testing ImGui
 #include "gui/editor.hpp"
 
-int main(void)
+struct CameraResizer:
+    public EventHandlers
+{
+    Camera*      m_camera;
+    RenderImage* m_render_image;
+
+    CameraResizer(RenderImage* render_image, Camera* camera)
+        : EventHandlers{
+            register_event_handler(this, &CameraResizer::on_viewport_resize)
+        }
+        , m_camera{camera}
+        , m_render_image{render_image}
+    {
+
+    }
+
+    void on_viewport_resize(const ViewportResizeEvent&)
+    {
+        Log::debug("REEEEEEEEEEEEEEEEESSSSSSSSIIIIIIIIIIIIIIIIIIIZEEEEEEEEEEEEEE");
+        auto extent = m_render_image->extent();
+        m_camera->set_perspective(50.f, extent.width / extent.height, 0.1f, 100.f);
+    }
+};
+
+int main(void) try
 {
     auto window = Window("Kazui", 1000, 800);
     auto renderer = Renderer(&window);
@@ -94,7 +118,7 @@ int main(void)
 
     auto screen_depth_pass = ScreenDepthPass();
     auto editor = Editor(window, screen_depth_pass);
-    auto depth_pass = DepthPass(editor.viewport_image());
+    auto depth_pass = DepthPass(editor.viewport_render_image());
     
     ///////////////////////////////
     auto mesh_pipeline = create_mesh_pipeline(
@@ -109,7 +133,8 @@ int main(void)
 
     auto camera = Camera::perspective(50.f, window.aspect_ratio(), 0.1f, 100.f);
     camera.lookat_target({10.f, 2.f, 0.f}, {0.f, 0.f, 0.f});
-    // TMP: auto camera_resizer = CameraResizer(&camera, &window);
+    auto camera_resizer = CameraResizer(editor.viewport_render_image(), &camera);
+    auto controller = CameraController(&window, &camera);
 
     auto pvm_viking_room = PVM{
         camera.projection() * camera.view(),
@@ -131,6 +156,10 @@ int main(void)
     {
         window.poll_events();
 
+        // Update
+        controller.update(0.016);
+        pvm_viking_room.proj_view = camera.projection() * camera.view();
+
         // Render //
         renderer.render_frame([&](auto& cmd_buffer) {
             // Geometry pass
@@ -151,4 +180,8 @@ int main(void)
             });
         });
     }
+}
+catch(vk::ResultError re)
+{
+    Log::error("{}", re.raw());
 }

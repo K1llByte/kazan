@@ -1,5 +1,4 @@
-#ifndef KZN_VK_IMAGE_HPP
-#define KZN_VK_IMAGE_HPP
+#pragma once
 
 #include "vk/device.hpp"
 #include "vk/descriptor_set.hpp"
@@ -34,5 +33,3 @@ namespace kzn::vk {
         VkSampler      texture_sampler;
     };
 } // namespace kzn::vk
-
-#endif // KZN_VK_IMAGE_HPP

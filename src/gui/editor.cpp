@@ -13,6 +13,15 @@ inline ImVec4 to_srgb(ImVec4 rgba) {
 
 namespace kzn {
     Editor::Editor(Window& window, ScreenDepthPass& screen_depth_pass)
+        : m_viewport_extent(Context::swapchain().get_extent())
+        , m_render_image(
+            &Context::device(),
+            VkExtent3D{
+                m_viewport_extent.width,
+                m_viewport_extent.height,
+                1
+            }
+        )
     {
         std::vector<VkDescriptorPoolSize> pool_sizes{
             { VK_DESCRIPTOR_TYPE_SAMPLER, 1000 },
@@ -84,72 +93,15 @@ namespace kzn {
         ImGui::StyleColorsDark();
         set_theme();
 
-        // Create Viewport render target //
-        
-        // Create VkImage and allocation
-        auto render_extent = Context::swapchain().get_extent();
-        VkImageCreateInfo image_info{};
-        image_info.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
-        image_info.imageType = VK_IMAGE_TYPE_2D;
-        image_info.format = VK_FORMAT_B8G8R8A8_SRGB;
-        image_info.extent = VkExtent3D{
-            render_extent.width,
-            render_extent.height,
-            1
-        };
-        image_info.mipLevels = 1;
-        image_info.arrayLayers = 1;
-        image_info.samples = VK_SAMPLE_COUNT_1_BIT;
-        image_info.tiling = VK_IMAGE_TILING_OPTIMAL;
-        image_info.usage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_SAMPLED_BIT;
-        image_info.initialLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL; //VK_IMAGE_LAYOUT_UNDEFINED;
-        // Allocate it from GPU local memory
-        VmaAllocationCreateInfo img_alloc_info{};
-        img_alloc_info.usage = VMA_MEMORY_USAGE_GPU_ONLY;
-        img_alloc_info.requiredFlags = VkMemoryPropertyFlags(VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
-        auto result = vmaCreateImage(
-            Context::device().allocator(),
-            &image_info,
-            &img_alloc_info,
-            &m_render_target_image,
-            &m_render_target_allocation,
-            nullptr
-        );
-        VK_CHECK_MSG(result, "Failed to create color image!");
-
-        // Create VkImageView and VkSampler
-        m_render_target_image_view = vk::create_image_view(
-            Context::device(),
-            m_render_target_image,
-            VK_FORMAT_B8G8R8A8_SRGB,
-            VK_IMAGE_ASPECT_COLOR_BIT
-        );
-        m_render_target_sampler = vk::create_sampler(Context::device());
-
-        // And finally create imgui texture id
-        m_render_target_tex_id = ImGui_ImplVulkan_AddTexture(
-            m_render_target_sampler,
-            m_render_target_image_view,
+        // Create Viewport RenderImage ImGui Texture ID
+        m_render_image_tex_id = ImGui_ImplVulkan_AddTexture(
+            m_render_image.sampler(),
+            m_render_image.image_view(),
             VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
-
-
-        // ImTextureID   m_render_target_tex_id
-        // VkImage       m_render_target_image
-        // VmaAllocation m_render_target_allocation
-        // VkImageView   m_render_target_image_view
-        // VkSampler     m_render_target_sampler
     }
 
 
     Editor::~Editor() {
-        vmaDestroyImage(Context::device().allocator(), m_render_target_image, m_render_target_allocation);
-
-        vk::destroy_image_view(
-            Context::device(),
-            m_render_target_image_view
-        );
-        vk::destroy_sampler(Context::device(), m_render_target_sampler);
-        
         vkDestroyDescriptorPool(Context::device().vk_device(), m_imgui_pool, nullptr);
         ImGui_ImplVulkan_Shutdown();
 
@@ -170,12 +122,28 @@ namespace kzn {
         ImGui::ShowDemoWindow();
         ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
         ImGui::Begin("Viewport");
-        auto [w,h] = ImGui::GetContentRegionAvail();
-        
-        ImGui::Image(m_render_target_tex_id, ImVec2(w,h));
+        if(viewport_resized())
+        {
+            Log::debug("RECREATE RENDER IMAGE");
+            // Recreate RenderImage
+            m_render_image.recreate(VkExtent3D{m_viewport_extent.width, m_viewport_extent.height, 1});
+            // Get ImGui Texture ID
+            m_render_image_tex_id = ImGui_ImplVulkan_AddTexture(
+                m_render_image.sampler(),
+                m_render_image.image_view(),
+                VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+            // Submit event
+            EventManager::submit(ViewportResizeEvent{});
+        }
+        else
+        {
+            auto region = ImGui::GetContentRegionAvail();
+            ImGui::Image(m_render_image_tex_id, region);
+        }
 
         ImGui::PopStyleVar();
         ImGui::End();
+
         
         // Render dear imgui into screen
         ImGui::Render();
@@ -275,11 +243,11 @@ namespace kzn {
     }
 
 
-    bool Editor::handle_viewport_resize()
+    bool Editor::viewport_resized()
     {
         auto [width, height] = ImGui::GetContentRegionAvail();
 
-        if(m_viewport_extent.x != width || m_viewport_extent.y != height)
+        if(m_viewport_extent.width != width || m_viewport_extent.height != height)
         {
             // The window is too small or collapsed.
             if(width == 0 || height == 0)
@@ -288,8 +256,6 @@ namespace kzn {
             }
 
             m_viewport_extent = {width, height};
-
-            EventManager::submit(ViewportResizeEvent{});
 
             return true;
         }

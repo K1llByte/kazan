@@ -2,8 +2,12 @@
 
 namespace kzn
 {
-    DepthPass::DepthPass(VkImage render_target)
-        : render_pass(vk::RenderPassBuilder(&Context::device())
+    DepthPass::DepthPass(RenderImage* render_image)
+        : m_render_image(render_image)
+        , EventHandlers{
+            register_event_handler(this, &DepthPass::on_viewport_resize)
+        }
+        , m_render_pass(vk::RenderPassBuilder(&Context::device())
             ///////// Specify attachments descriptions /////////
             .add_attachment(
                 vk::AttachmentDesc(Context::swapchain().get_surface_format().format)
@@ -45,14 +49,26 @@ namespace kzn
                 }
             ).build()
         )
-        // Initialize framebuffers
-        , framebuffers(
+        // Initialize m_framebuffers
+        , m_framebuffers(
             &Context::device(),
-            &render_pass,
-            {render_target},
-            // TODO: Not correct
-            Context::swapchain().get_extent())
+            &m_render_pass,
+            {m_render_image->image()},
+            // FIXME: NOT IDEAL
+            VkExtent2D{m_render_image->extent().width, m_render_image->extent().height}
+        )
     {
 
+    }
+
+
+    void DepthPass::on_viewport_resize(const ViewportResizeEvent&) {
+        auto new_extent = VkExtent2D{m_render_image->extent().width, m_render_image->extent().height};
+        // Log::debug("{}, {}", new_extent.width, new_extent.height);
+        m_framebuffers.recreate(
+            {m_render_image->image()},
+            // FIXME: 
+            new_extent
+        );
     }
 } // namespace kzn

@@ -1,26 +1,33 @@
 #pragma once
 
 #include "core/events/event_handlers.hpp"
+#include "gui/editor_events.hpp"
 #include "vk/framebuffer.hpp"
 #include "vk/commands.hpp"
 #include "core/context.hpp"
 
+#include "core/render_image.hpp"
+
 namespace kzn
 {
-    class DepthPass
+    class DepthPass: public EventHandlers
     {
     public:
-        DepthPass(VkImage render_target);
+        DepthPass(RenderImage* render_image);
         ~DepthPass() = default;
 
         template<typename F>
             requires std::is_invocable_r_v<void, F>
         void render(vk::CommandBuffer& cmd_buffer, F&& func);
-        vk::RenderPass& get_render_pass() { return render_pass; }
+
+        vk::RenderPass& get_render_pass() { return m_render_pass; }
+
+        void on_viewport_resize(const ViewportResizeEvent&);
 
     private:
-        vk::RenderPass   render_pass;
-        vk::Framebuffers framebuffers;
+        RenderImage*     m_render_image;
+        vk::RenderPass   m_render_pass;
+        vk::Framebuffers m_framebuffers;
     };
 } // namespace kzn
 
@@ -38,9 +45,9 @@ namespace kzn
         // Begin RenderPass //
         //////////////////////
 
-        render_pass.begin(
+        m_render_pass.begin(
             cmd_buffer,
-            framebuffers.get(0)
+            m_framebuffers.get(0)
         );
 
         ///////////////////
@@ -53,6 +60,6 @@ namespace kzn
         // End RenderPass //
         ////////////////////
 
-        render_pass.end(cmd_buffer);
+        m_render_pass.end(cmd_buffer);
     }
 } // namespace kzn

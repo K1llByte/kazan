@@ -246,6 +246,7 @@ namespace kzn::vk {
     {
         // Create attachments
         extent = new_extent;
+        // NOTE: Big oof
         depth_attachmemnt = std::unique_ptr<Attachment>(new Attachment(Attachment::DEPTH, device, new_extent));
         color_attachmemnts.clear();
         for(size_t i = 0; i < new_color_images.size(); ++i) {
