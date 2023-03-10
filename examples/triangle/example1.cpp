@@ -65,8 +65,9 @@ int main() try
 
     auto device = vk::DeviceBuilder(instance)
                       .set_surface(surface)
-                      // NOTE: IF THIS EXTENSION ISN'T LOADED THEN THE SwapchainBuilder
-                      // will give a seg fault
+                      // FIXME: IF THIS EXTENSION ISN'T LOADED THEN THE SwapchainBuilder
+                      // will give a seg fault. (Maybe store enabled extensions in device,
+                      // and check in SwapchainBuilder if is enabled)
                       .set_extensions({VK_KHR_SWAPCHAIN_EXTENSION_NAME})
                       .build();
 
