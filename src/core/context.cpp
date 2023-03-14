@@ -5,7 +5,7 @@
 
 namespace kzn
 {
-    Context* Context::create(Window* window)
+    Context* Context::create(Window& window)
     {
         return (Context::self = new Context(window));
     }
@@ -13,18 +13,19 @@ namespace kzn
     void Context::destroy()
     {
         delete self;
+        self = nullptr;
     }
 
-    Context::Context(Window* window)
+    Context::Context(Window& window)
         // Create Vulkan Instance
-        : _instance(vk::InstanceBuilder()
+        : m_instance(vk::InstanceBuilder()
             .enable_validation_layers()
-            .set_extensions(window->required_extensions())
+            .set_extensions(window.required_extensions())
             .build()),
-        surface(_instance.create_surface(*window)),
+        m_surface(m_instance.create_surface(window)),
         // Create Device
-        _device(vk::DeviceBuilder(_instance)
-            .set_surface(surface)
+        m_device(vk::DeviceBuilder(m_instance)
+            .set_surface(m_surface)
             // NOTE: IF THIS EXTENSION ISN'T LOADED THEN THE
             // SwapchainBuilder will seg fault
             .set_extensions({VK_KHR_SWAPCHAIN_EXTENSION_NAME})
@@ -34,7 +35,7 @@ namespace kzn
             }))
             .build()),
         // Create swapchain
-        _swapchain(vk::SwapchainBuilder(&_device, surface, window->extent())
+        m_swapchain(vk::SwapchainBuilder(&m_device, m_surface, window.extent())
             .set_present_mode(VK_PRESENT_MODE_FIFO_KHR)
             // .set_present_mode(VK_PRESENT_MODE_IMMEDIATE_KHR)
             .build()) {}

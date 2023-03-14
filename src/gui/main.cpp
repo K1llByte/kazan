@@ -109,7 +109,7 @@ struct CameraResizer:
     }
 };
 
-int main(void) try
+int main() try
 {
     auto window = Window("Kazui", 1000, 800);
     auto renderer = Renderer(&window);
