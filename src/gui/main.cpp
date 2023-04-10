@@ -103,7 +103,6 @@ struct CameraResizer:
 
     void on_viewport_resize(const ViewportResizeEvent&)
     {
-        Log::debug("REEEEEEEEEEEEEEEEESSSSSSSSIIIIIIIIIIIIIIIIIIIZEEEEEEEEEEEEEE");
         auto extent = m_render_image->extent();
         m_camera->set_perspective(50.f, extent.width / extent.height, 0.1f, 100.f);
     }

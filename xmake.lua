@@ -1,3 +1,5 @@
+add_rules("mode.debug", "mode.release")
+
 -------------- Package requirements --------------
 
 add_requires("vulkan-headers")
@@ -32,28 +34,26 @@ function compilation_settings()
     -- (xmake 2.6.8)
     --set_policy("build.warning", true) -- Allways show warnings
     set_warnings("allextra") -- -Wall -Wextra -Wfatal-errors (if error enabled)
-    set_optimize("fastest") -- -O3
+    -- set_optimize("fastest") -- -O3
+    set_optimize("none") -- -O3
 
     add_rules("mode.asan")
     -- add_rules("mode.lsan")
     -- add_rules("mode.ubsan")
     
-    -- GCC flags
     if is_plat("linux", "macosx") then
+        -- GCC flags
         add_cxxflags("-Wshadow", "-Wpedantic")
-    end
-    -- GCC Options
-    if is_plat("linux", "macosx") then
+        -- GCC Options
         add_links("pthread") --, "m", "dl")
     end
-    -- MSVC Options
     if is_plat("windows") then 
-        -- Allow variadic macros
-        add_cxxflags("/Zc:preprocessor")
+        -- MSVC Options
+        add_cxxflags("/Zc:preprocessor") -- Allow variadic macros
     end
     set_targetdir("bin/")
-    -- LTO (xmake 2.6.9)
-    --set_policy("build.optimization.lto")
+    -- Link Time Optimization
+    set_policy("build.optimization.lto", true)
     -- Include dirs
     add_includedirs("include")
     add_includedirs("lib/stb/include")

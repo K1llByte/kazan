@@ -1,13 +1,5 @@
 .vscode/
 .xmake/
-
 bin/
 build/
 models/**.obj
-
-kazan.md
-vulkan.md
-todo.md
-mkmod
-total_lines
-imgui.ini
