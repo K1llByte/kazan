@@ -7,12 +7,12 @@ namespace kzn {
         vk::RenderPass&               render_pass,
         vk::DescriptorSetLayoutCache& layout_cache)
     {
-        auto desc_set_0_layout = vk::DescriptorSetLayoutBuilder()
+        auto dset_0_layout = vk::DescriptorSetLayoutBuilder()
             .add_uniform(0)
             .build(layout_cache);
 
         auto pipeline_layout = vk::PipelineLayoutBuilder(&Context::device())
-            .add_descriptor_set_layout(desc_set_0_layout)
+            .add_descriptor_set_layout(dset_0_layout)
             .build();
         
 
@@ -41,13 +41,13 @@ namespace kzn {
         vk::RenderPass&               render_pass,
         vk::DescriptorSetLayoutCache& layout_cache)
     {
-        auto desc_set_0_layout = vk::DescriptorSetLayoutBuilder()
+        auto dset_0_layout = vk::DescriptorSetLayoutBuilder()
             .add_sampler(0)
             .build(layout_cache);
 
         auto pipeline_layout = vk::PipelineLayoutBuilder(&Context::device())
             .add_push_constant(sizeof(PVM), VK_SHADER_STAGE_ALL_GRAPHICS) 
-            .add_descriptor_set_layout(desc_set_0_layout) 
+            .add_descriptor_set_layout(dset_0_layout) 
             .build();
         
         auto pipeline_config = vk::PipelineConfigBuilder(pipeline_layout, render_pass)
