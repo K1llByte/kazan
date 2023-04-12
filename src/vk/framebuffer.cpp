@@ -228,7 +228,7 @@ namespace kzn::vk {
             VK_CHECK_MSG(result, "Failed to create framebuffer!");
             framebuffers.emplace_back(framebuffer, extent, clear_values);
         }
-        Log::debug("Framebuffers Created");
+        Log::trace("Framebuffers Created");
     }
 
 
@@ -246,6 +246,7 @@ namespace kzn::vk {
     {
         // Create attachments
         extent = new_extent;
+        // NOTE: Big oof
         depth_attachmemnt = std::unique_ptr<Attachment>(new Attachment(Attachment::DEPTH, device, new_extent));
         color_attachmemnts.clear();
         for(size_t i = 0; i < new_color_images.size(); ++i) {
@@ -271,7 +272,7 @@ namespace kzn::vk {
             auto result = vkCreateFramebuffer(device->vk_device(), &create_info, nullptr, &framebuffer.vk_framebuffer);
             VK_CHECK_MSG(result, "Failed to create framebuffer!");
         }
-        Log::debug("Framebuffers recreated");
+        Log::trace("Framebuffers recreated");
     }
         
     Framebuffer& Framebuffers::get(uint32_t index) {

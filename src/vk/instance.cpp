@@ -2,7 +2,6 @@
 
 #include "vk/utils.hpp"
 #include "vk/error.hpp"
-#include "config.hpp"
 
 #include <array>
 
@@ -58,10 +57,10 @@ namespace kzn::vk
         {
             // Destroy surface
             vkDestroySurfaceKHR(vkinstance, surface, nullptr);
-            Log::debug("Surface destroyed");
+            Log::trace("Surface destroyed");
         }
         vkDestroyInstance(vkinstance, nullptr);
-        Log::debug("Instance destroyed");
+        Log::trace("Instance destroyed");
     }
 
     const std::vector<const char*>& Instance::get_validation_layers() const noexcept
@@ -75,7 +74,7 @@ namespace kzn::vk
         // Create surface
         auto result = glfwCreateWindowSurface(vkinstance, window.glfw_ptr(), nullptr, &surface);
         VK_CHECK_MSG(result, "Failed to create window surface!");
-        Log::debug("Surface created");
+        Log::trace("Surface created");
         return surface;
     }
 
@@ -154,7 +153,7 @@ namespace kzn::vk
         std::vector<VkExtensionProperties> available_extensions(extension_count);
         vkEnumerateInstanceExtensionProperties(nullptr, &extension_count, available_extensions.data());
 
-        // Log::debug("Available extensions:");
+        // Log::trace("Available extensions:");
         // for (const auto& extension : available_extensions)
         // {
         //     Log::debug(extension.extensionName);
@@ -174,15 +173,15 @@ namespace kzn::vk
         create_info.pApplicationInfo = &app_info;
         create_info.enabledExtensionCount = static_cast<uint32_t>(instance_extensions.size());
         create_info.ppEnabledExtensionNames = instance_extensions.data();
-        Log::debug("Enabled extensions:");
+        Log::trace("Enabled extensions:");
         for (const auto& extension_name : instance_extensions)
         {
-            Log::debug("- {}", extension_name);
+            Log::trace("- {}", extension_name);
         }
 
         auto result = vkCreateInstance(&create_info, nullptr, &vkinstance);
         VK_CHECK_MSG(result, "Failed to create VkInstance (VkResult = {})");
-        Log::debug("Instance created");
+        Log::trace("Instance created");
 
         // 4. Setup debug messeger //
         if(with_validation_layers)

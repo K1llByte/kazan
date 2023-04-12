@@ -1,5 +1,4 @@
-#ifndef KZN_CORE_MODEL_HPP
-#define KZN_CORE_MODEL_HPP
+#pragma once
 
 #include "core/transform.hpp"
 #include "vk/buffers.hpp"
@@ -62,5 +61,3 @@ namespace kzn
         return seed ^ tail_seed;
     }
 } // namespace kzn
-
-#endif // KZN_CORE_MODEL_HPP

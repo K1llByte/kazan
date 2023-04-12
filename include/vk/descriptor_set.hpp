@@ -1,5 +1,4 @@
-#ifndef KZN_VK_DESCRIPTOR_SET_HPP
-#define KZN_VK_DESCRIPTOR_SET_HPP
+#pragma once
 
 #include "vk/device.hpp"
 #include "vk/cmd_buffers.hpp"
@@ -7,78 +6,11 @@
 
 #include <initializer_list>
 #include <unordered_map>
+#include <span>
 
 namespace kzn::vk {
-    struct BufferBinding {
-        uint32_t               binding;
-        VkDescriptorBufferInfo buffer_info;
-        VkDescriptorImageInfo  image_info;
-        VkDescriptorType       type;
-        VkShaderStageFlags     stages = VK_SHADER_STAGE_ALL_GRAPHICS;
-
-        constexpr BufferBinding(
-            uint32_t               _binding,
-            VkDescriptorBufferInfo _info,
-            VkDescriptorType       _type,
-            VkShaderStageFlags     _stages = VK_SHADER_STAGE_ALL_GRAPHICS)
-            : binding(_binding)
-            , buffer_info(_info)
-            , type(_type)
-            , stages(_stages) {}
-        
-        constexpr BufferBinding(
-            uint32_t               _binding,
-            VkDescriptorImageInfo  _info,
-            VkDescriptorType       _type,
-            VkShaderStageFlags     _stages = VK_SHADER_STAGE_ALL_GRAPHICS)
-            : binding(_binding)
-            , image_info(_info)
-            , type(_type)
-            , stages(_stages) {}
-
-        static constexpr BufferBinding uniform(
-            uint32_t               _binding,
-            VkDescriptorBufferInfo _info,
-            VkShaderStageFlags     _stages = VK_SHADER_STAGE_ALL_GRAPHICS)
-        {
-            return BufferBinding(_binding, _info, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, _stages);
-        }
-
-        static constexpr BufferBinding sampler(
-            uint32_t               _binding,
-            VkDescriptorImageInfo _info,
-            VkShaderStageFlags     _stages = VK_SHADER_STAGE_ALL_GRAPHICS)
-        {
-            return BufferBinding(_binding, _info, VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, _stages);
-        }
-    };
-
-    // TODO: Do this later
-    // struct MultipleBufferBinding {
-    //     uint32_t                            binding;
-    //     std::vector<VkDescriptorBufferInfo> info;
-    //     VkDescriptorType                    type;
-    //     VkShaderStageFlags                  stages = VK_SHADER_STAGE_ALL_GRAPHICS;
-
-    //     constexpr MultipleBufferBinding(
-    //         uint32_t               _binding,
-    //         std::initializer_list<VkDescriptorBufferInfo> _infos,
-    //         VkDescriptorType       _type,
-    //         VkShaderStageFlags     _stages = VK_SHADER_STAGE_ALL_GRAPHICS)
-    //         : binding(_binding)
-    //         , infos(_infos)
-    //         , type(_type)
-    //         , stages(_stages) {}
-
-    //     static constexpr BufferBinding uniform(
-    //         uint32_t                                      _binding,
-    //         std::initializer_list<VkDescriptorBufferInfo> _infos,
-    //         VkShaderStageFlags                            _stages = VK_SHADER_STAGE_ALL_GRAPHICS)
-    //     {
-    //         return MultipleBufferBinding{_binding, _infos, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, _stages};
-    //     }
-    // };
-
+    class DescriptorSet;
+    class DescriptorSetLayout;
 
     // DescriptorSetAllocator is a manager of DescriptorSetPool's which creates new pools
     // when its needed
@@ -90,8 +22,8 @@ namespace kzn::vk {
         ~DescriptorSetAllocator();
 
         void reset_pools();
-        VkDescriptorSet allocate(const VkDescriptorSetLayout& layout);
-
+        DescriptorSet allocate(const DescriptorSetLayout& layout);
+        // TODO: // DescriptorSet allocate(const DescriptorSetLayout& layout);
 
         private:
         Device*                       device;
@@ -115,12 +47,12 @@ namespace kzn::vk {
 
             size_t hash() const;
         };
-        
+
         DescriptorSetLayoutCache(Device* _device);
         ~DescriptorSetLayoutCache();
 
-        VkDescriptorSetLayout create_descriptor_layout(
-            VkDescriptorSetLayoutCreateInfo* info); // TODO:
+        DescriptorSetLayout create_layout(
+            const std::vector<VkDescriptorSetLayoutBinding>& info);
 
         private:
         struct DescriptorLayoutHash {
@@ -130,41 +62,81 @@ namespace kzn::vk {
         };
 
         private:
+        using Key = DescriptorLayoutInfo;
+        using Value = VkDescriptorSetLayout;
         Device* device;
         std::unordered_map<
-            DescriptorLayoutInfo, 
-            VkDescriptorSetLayout,
+            Key,
+            Value,
             DescriptorLayoutHash> layout_cache;
     };
 
 
-    class DescriptorSet {
+    class DescriptorSetLayout {
+        friend class DescriptorSetLayoutCache;
+
         public:
-        DescriptorSet(
-            Device*                                         _device,
-            DescriptorSetAllocator&                         _allocator,
-            DescriptorSetLayoutCache&                       _cache,
-            const std::initializer_list<vk::BufferBinding>& _bindings);
-        
-        // TODO: Do later
-        // static std::vector<DescriptorSet> multiple(
-        //     size_t                                          _num_sets,
-        //     Device*                                         _device,
-        //     DescriptorSetAllocator&                         _allocator,
-        //     DescriptorSetLayoutCache&                       _cache,
-        //     const std::initializer_list<vk::MultipleBufferBinding>& _bindings);
-
-        VkDescriptorSetLayout layout() { return set_layout; }
-
-        void bind(vk::CommandBuffer& cmd_buffer, VkPipelineLayout pipeline_layout) const;
-        // TODO: Do later
-        // static void bind_multiple(...) const;
+        std::span<const VkDescriptorSetLayoutBinding> bindings() const { return m_layout_bindings; };
+        VkDescriptorSetLayout vk_layout() const { return m_layout; }
 
         private:
-        VkDescriptorSet        vk_descriptor_set;
-        VkDescriptorSetLayout  set_layout = VK_NULL_HANDLE;
-        Device*                device;
+        std::span<const VkDescriptorSetLayoutBinding> m_layout_bindings;
+        VkDescriptorSetLayout                         m_layout;
+
+        private:
+        DescriptorSetLayout(
+            std::span<const VkDescriptorSetLayoutBinding> layout_bindings,
+            VkDescriptorSetLayout                   layout)
+            : m_layout_bindings(layout_bindings)
+            , m_layout(layout)
+        {
+
+        }
+    };
+
+
+    class DescriptorSetLayoutBuilder {
+        public:
+        DescriptorSetLayoutBuilder() = default;
+        ~DescriptorSetLayoutBuilder() = default;
+
+        DescriptorSetLayoutBuilder& add_uniform(
+            uint32_t binding,
+            VkShaderStageFlags stage_flags = VK_SHADER_STAGE_ALL_GRAPHICS);
+        DescriptorSetLayoutBuilder& add_sampler(
+            uint32_t binding,
+            VkShaderStageFlags stage_flags = VK_SHADER_STAGE_ALL_GRAPHICS);
+
+        DescriptorSetLayout build(
+            DescriptorSetLayoutCache& _cache);
+
+        private:
+        std::vector<VkDescriptorSetLayoutBinding> m_layout_bindings;
+    };
+
+
+    union DescriptorInfo {
+        VkDescriptorBufferInfo buffer_info;
+        VkDescriptorImageInfo image_info;
+    };
+
+
+    class DescriptorSet {
+        friend class DescriptorSetAllocator;
+        
+        public:
+        void bind(vk::CommandBuffer& cmd_buffer, VkPipelineLayout pipeline_layout) const;
+        void update(std::initializer_list<DescriptorInfo> descriptor_infos);
+
+        private:
+        Device*             m_device;
+        VkDescriptorSet     m_vk_descriptor_set;
+        DescriptorSetLayout m_layout;
+
+        private:
+        DescriptorSet(
+            Device*             device,
+            VkDescriptorSet     descriptor_set,
+            DescriptorSetLayout layout);
     };
 } // namespace kzn::vk
-
-#endif // KZN_VK_DESCRIPTOR_SET_HPP

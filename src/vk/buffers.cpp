@@ -1,7 +1,5 @@
 #include "vk/buffers.hpp"
 
-#include "vk/utils.hpp"
-
 #define VMA_IMPLEMENTATION
 #include "vk_mem_alloc.h"
 
@@ -123,11 +121,13 @@ namespace kzn::vk
     }
 
     
-    VkDescriptorBufferInfo UniformBuffer::info() const noexcept {
-        return VkDescriptorBufferInfo{
-            .buffer = buffer,
-            .offset = 0,
-            .range = static_cast<uint64_t>(buffer_size),
+    DescriptorInfo UniformBuffer::info() const noexcept {
+        return DescriptorInfo{
+            .buffer_info = VkDescriptorBufferInfo{
+                .buffer = buffer,
+                .offset = 0,
+                .range = static_cast<uint64_t>(buffer_size),
+            }
         };
     }
 } // namespace kzn::vk

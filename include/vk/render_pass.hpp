@@ -58,9 +58,6 @@ namespace kzn::vk
     
         VkRenderPass vk_render_pass() noexcept { return vkrender_pass; }
 
-        // TODO: Delete
-        // void create_framebuffers(Swapchain& swapchain);
-        // void recreate_framebuffers(Swapchain& swapchain);
         void begin(CommandBuffer& cmd_buffer, Framebuffer& framebuffer);
         void end(CommandBuffer& cmd_buffer);
 
@@ -68,10 +65,8 @@ namespace kzn::vk
         RenderPass(Device* _device, VkRenderPass _render_pass);
 
         private:
-        VkRenderPass               vkrender_pass;
-        Device*                    device;
-        // TODO: Delete
-        // std::vector<VkFramebuffer> framebuffers;
+        VkRenderPass vkrender_pass;
+        Device*      device;
     };
 
 
@@ -223,10 +218,6 @@ namespace kzn::vk {
         subpasses_dependencies.push_back(subpass_dependency);
         return *this;
     }   
-    
-    //////////////////////// FIXME: TEMPORARY ////////////////////////
-
-    RenderPass simple_depth_render_pass(Device& device, VkFormat surface_format, VkImageLayout color_final_layout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR);
 }
 
 #endif // KZN_VK_RENDER_PASS_HPP

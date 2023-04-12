@@ -1,6 +1,7 @@
 #include "vk/image.hpp"
 
 #include "vk/cmd_buffers.hpp"
+#include "vk/utils.hpp"
 
 #include "vk_mem_alloc.h"
 
@@ -134,11 +135,13 @@ namespace kzn::vk {
     }
 
 
-    VkDescriptorImageInfo Image::info() const noexcept {
-        return VkDescriptorImageInfo{
-            .sampler = texture_sampler,
-            .imageView = texture_image_view,
-            .imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
+    DescriptorInfo Image::info() const noexcept {
+        return DescriptorInfo{
+            .image_info = VkDescriptorImageInfo{
+                .sampler = texture_sampler,
+                .imageView = texture_image_view,
+                .imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
+            }
         };
     }
 

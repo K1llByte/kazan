@@ -26,7 +26,7 @@ namespace ex
             img_available = vk::create_semaphore(*device);
             finished_render = vk::create_semaphore(*device);
             in_flight_fence = vk::create_fence(*device);
-            Log::debug("PerFrameData created");
+            Log::trace("PerFrameData created");
         }
 
         ~PerFrameData()
@@ -34,7 +34,7 @@ namespace ex
             vk::destroy_semaphore(*device, img_available);
             vk::destroy_semaphore(*device, finished_render);
             vk::destroy_fence(*device, in_flight_fence);
-            Log::debug("PerFrameData destroyed");
+            Log::trace("PerFrameData destroyed");
         }
 
         // static std::size_t current() noexcept { return PerFrameData::next_idx; }
@@ -65,8 +65,9 @@ int main() try
 
     auto device = vk::DeviceBuilder(instance)
                       .set_surface(surface)
-                      // NOTE: IF THIS EXTENSION ISN'T LOADED THEN THE SwapchainBuilder
-                      // will give a seg fault
+                      // FIXME: IF THIS EXTENSION ISN'T LOADED THEN THE SwapchainBuilder
+                      // will give a seg fault. (Maybe store enabled extensions in device,
+                      // and check in SwapchainBuilder if is enabled)
                       .set_extensions({VK_KHR_SWAPCHAIN_EXTENSION_NAME})
                       .build();
 
@@ -128,7 +129,6 @@ int main() try
         auto finished_render = per_frame_data[frame_idx].finished_render;
         auto in_flight_fence = per_frame_data[frame_idx].in_flight_fence;
 
-        // Log::warning("Begin try");
         vkWaitForFences(device.vk_device(), 1, &in_flight_fence, VK_TRUE, UINT64_MAX);
         uint32_t image_idx;
         try {
@@ -145,7 +145,6 @@ int main() try
         }
         
         // vkResetFences(device.vk_device(), 1, &in_flight_fence);
-        // Log::warning("End try");
 
         cmd_buffer.reset();
         cmd_buffer.begin();

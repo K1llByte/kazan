@@ -39,19 +39,3 @@
 //     auto err = commands_tree.execute("create sphere 1 20 20");
 //     fmt::print("{}\n", kzn::console::error_message(err));
 // }
-
-#include <type_traits>
-#include "vk/uniform.hpp"
-
-// struct Bar;
-
-using namespace kzn;
-
-struct Foo {
-    glm::vec3 a;
-    int&      b;
-};
-
-int main() {
-    fmt::print("size with ref? {}\n", sizeof(Foo));
-}

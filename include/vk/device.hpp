@@ -1,5 +1,4 @@
-#ifndef KZN_VK_DEVICE_HPP
-#define KZN_VK_DEVICE_HPP
+#pragma once
 
 #include "vk/instance.hpp"
 
@@ -107,5 +106,3 @@ namespace kzn::vk
         VkInstance                    vkinstance;
     };
 } // namespace kzn::vk
-
-#endif // KZN_VK_DEVICE_HPP

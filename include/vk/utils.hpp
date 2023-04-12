@@ -10,9 +10,6 @@
 #include <type_traits>
 #include <array>
 
-// NOTE: If this file won't have more things besides VK_CHECK's
-// then consider moving everything from error.hpp to here
-
 namespace kzn::vk
 {
     class Device;
@@ -120,6 +117,11 @@ namespace kzn::vk
 
         return attributes;
     }
+
+    // union DescriptorInfo {
+    //     VkDescriptorImageInfo  image_info;
+    //     VkDescriptorBufferInfo buffer_info;
+    // };
 
     ////////// Vulkan image utils //////////
     // VkImage create_image(Device& device);

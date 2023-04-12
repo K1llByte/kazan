@@ -13,7 +13,7 @@ int main()
     auto window = Window("Kazan", 1700, 800);
     auto renderer = Renderer(&window);
 
-    auto triangle_renderer = TriangleRenderer(&renderer);
+    auto triangle_renderer = ScreenDepthPass(&renderer);
     while(!window.is_closed())
     {
         // Poll events

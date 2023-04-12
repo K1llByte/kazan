@@ -4,6 +4,7 @@
 #include "vk/device.hpp"
 #include "vk/cmd_buffers.hpp"
 #include "vk/uniform.hpp"
+#include "vk/descriptor_set.hpp"
 
 #include "vk_mem_alloc.h"
 
@@ -34,7 +35,7 @@ namespace kzn::vk
 
         void upload(const uint32_t* indices);
         void bind(CommandBuffer& cmd_buffer);
-    
+
     private:
         Device*       device;
         VkBuffer      buffer;
@@ -48,11 +49,11 @@ namespace kzn::vk
         UniformBuffer(Device* device, VkDeviceSize buffer_size);
         ~UniformBuffer();
 
-        template<typename T>
+        template<typename T> // TODO: Is uniform trait check
         void upload(const T* data);
 
-        VkDescriptorBufferInfo info() const noexcept;
-    
+        DescriptorInfo info() const noexcept;
+
     private:
         Device*       device;
         VkBuffer      buffer;

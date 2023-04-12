@@ -9,7 +9,7 @@ namespace kzn
 {
     void CameraController::update(float dt)
     {
-        constexpr float move_speed = 1.5f;
+        constexpr float move_speed = 2.5f;
         constexpr float look_speed = 1.5f;
         // constexpr float sensibility = 0.7f;
         glm::vec3 pos = camera->position();

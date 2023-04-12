@@ -9,7 +9,7 @@ layout(location = 3) in vec2 frag_tex_coords;
 // Output
 layout(location = 0) out vec4 out_color;
 
-layout(set = 0, binding = 1) uniform sampler2D tex_sampler;
+// layout(set = 0, binding = 1) uniform sampler2D tex_sampler;
 
 // Constants
 const vec3 DIR_TO_LIGHT = normalize(vec3(0.0, 6.0, -10.0));
@@ -21,7 +21,8 @@ void main()
 {
     const vec3 norm_frag_normal = normalize(frag_normal);
     float light_intensity = max(dot(norm_frag_normal, DIR_TO_LIGHT), 0) + AMBIENT_LIGHT;
-    vec3 real_frag_color = texture(tex_sampler, frag_tex_coords).xyz;
+    // vec3 real_frag_color = texture(tex_sampler, frag_tex_coords).xyz;
     // out_color = vec4(real_frag_color * light_intensity, 1.0);
-    out_color = vec4(real_frag_color, 1.0);
+
+    out_color = vec4(vec3(0.2) * light_intensity, 1.0);
 }

@@ -6,11 +6,12 @@
 #include "core/window.hpp"
 #include "core/input.hpp"
 #include "core/renderer.hpp"
-#include "core/renderers/model_renderer.hpp"
-#include "core/renderers/triangle_renderer.hpp"
+#include "core/passes/screen_depth_pass.hpp"
+#include "core/passes/depth_pass.hpp"
 #include "core/model.hpp"
 #include "core/camera.hpp"
 #include "core/shapes.hpp"
+#include "core/texture.hpp"
 
 #include "vk/instance.hpp"
 #include "vk/device.hpp"
@@ -23,6 +24,11 @@
 #include "vk/device_features.hpp"
 #include "vk/utils.hpp"
 #include "vk/error.hpp"
+#include "vk/commands.hpp"
+#include "vk/uniform.hpp"
+#include "vk/image.hpp"
+
+
 
 #include "utils/time.hpp"
 
