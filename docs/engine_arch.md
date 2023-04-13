@@ -1,14 +1,22 @@
 # Engine architecture
 
-## Structure
+## Project Structure
 
-- core
+- core/
     - logger
     - asserts
     - memory
-- math
-- graphics
-- editor
+- 
+- math/
+- events/
+- physics/
+- ai/
+- graphics/
+    <!-- High Level API -->
+    <!-- Vulkan API -->
+    - vk/
+- editor/
+    - main.cpp
 
 ## Exposed dependencies
 
