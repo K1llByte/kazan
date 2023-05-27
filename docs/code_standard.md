@@ -64,3 +64,7 @@ class Foo {
 };
 ```
 
+__________________________________________________
+## Error handling
+
+- Always use exceptions (To be consistent and avoid ignoring exceptions)

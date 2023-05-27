@@ -55,7 +55,7 @@ function compilation_settings()
     -- Link Time Optimization
     set_policy("build.optimization.lto", true)
     -- Include dirs
-    add_includedirs("include")
+    add_includedirs("src")
     add_includedirs("lib/stb/include")
     add_includedirs("lib/tiny_obj_loader/include")
     add_includedirs("lib/imgui_docking/include")
@@ -105,7 +105,7 @@ target("kazan")
     -- Library
     set_kind("static")
     add_files("src/**.cpp")
-    remove_files("src/gui/**.cpp")
+    remove_files("src/editor/**.cpp")
 
 -------------------- Kazan GUI -------------------
 
@@ -127,44 +127,4 @@ target("kazui")
     add_deps("kazan")
     -- Binary
     set_kind("binary")
-    add_files("src/gui/*.cpp")
-    remove_files("src/gui/test.cpp")
-    -- TODO: Remove this after refactor
-    remove_files("src/core/renderers/triangle_renderer.*")
-
--- Temporary
-target("test")
-    -- Compiler Settings
-    compilation_settings()
-    -- Dependencies
-    kazan_deps()
-    add_deps("imgui")
-    add_deps("kazan")
-    -- Binary
-    set_kind("binary")
-    add_files("src/gui/*.cpp")
-    remove_files("src/gui/main.cpp")
-
------------------- Kazan Examples ----------------
-
--- "model_render/example4.cpp"
-function make_examples(examples)
-    for i,v in ipairs(examples) do
-        target("example" .. tostring(i))
-            -- Compiler Settings
-            compilation_settings()
-            -- Dependencies
-            kazan_deps()
-            add_deps("kazan")
-            -- Binary
-            set_kind("binary")
-            add_files("examples/" .. tostring(v))
-    end
-end
-
-make_examples({
-    "triangle/example1.cpp",
-    "triangle/example2.cpp",
-    "triangle/example3.cpp",
-    "model_render/example4.cpp"
-})
+    add_files("src/editor/*.cpp")

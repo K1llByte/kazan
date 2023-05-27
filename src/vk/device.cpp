@@ -2,433 +2,328 @@
 
 #include "core/log.hpp"
 #include "vk/error.hpp"
-#include "vk/utils.hpp"
-#include "vk/cmd_buffers.hpp"
-#include "vk/swapchain.hpp"
 
+#define VMA_IMPLEMENTATION
+#include "vk_mem_alloc.h"
 
+#include <tuple>
 #include <unordered_set>
-#include <algorithm>
-#include <limits>
 
-namespace kzn::vk
-{
-    QueueFamilies get_queue_families(VkPhysicalDevice physical_device, VkSurfaceKHR surface)
-    {
 
-        // Logic to find queue family indices to populate struct with
-        uint32_t queue_family_count = 0;
-        vkGetPhysicalDeviceQueueFamilyProperties(physical_device, &queue_family_count, nullptr);
-        std::vector<VkQueueFamilyProperties> queue_families(queue_family_count);
-        vkGetPhysicalDeviceQueueFamilyProperties(physical_device, &queue_family_count, queue_families.data());
+namespace kzn::vk {
 
-        QueueFamilies indices;
-        for(size_t i = 0 ; i < queue_families.size() ; ++i)
-        {
-            if(queue_families[i].queueFlags & VK_QUEUE_GRAPHICS_BIT)
-            {
-                indices.graphics_family = i;
-            }
-            // The Present Queue support check isn't in an else statement
-            // because there could be a queue_family with support for both
-            // Graphics and Present
-            VkBool32 present_support = false;
-            vkGetPhysicalDeviceSurfaceSupportKHR(physical_device, static_cast<uint32_t>(i), surface, &present_support);
-            if(present_support)
-                indices.present_family = i;
-            if(indices.is_complete())
-                break;
+QueueFamilies get_queue_families(
+    VkPhysicalDevice physical_device,
+    VkSurfaceKHR surface
+) {
+    // Logic to find queue family indices to populate struct with
+    uint32_t queue_family_count = 0;
+    vkGetPhysicalDeviceQueueFamilyProperties(
+        physical_device,
+        &queue_family_count,
+        nullptr
+    );
+    std::vector<VkQueueFamilyProperties> queue_families(queue_family_count);
+    vkGetPhysicalDeviceQueueFamilyProperties(
+        physical_device,
+        &queue_family_count,
+        queue_families.data()
+    );
+
+    QueueFamilies indices;
+    for (size_t i = 0; i < queue_families.size(); ++i) {
+        if (queue_families[i].queueFlags & VK_QUEUE_GRAPHICS_BIT) {
+            indices.graphics_family = i;
         }
 
-        return indices;
-    }
+        // The Present Queue support check isn't in an else statement
+        // because there could be a queue_family with support for both
+        // Graphics and Present
+        // VkBool32 present_support = VK_FALSE;
+        // vkGetPhysicalDeviceSurfaceSupportKHR(
+        //     physical_device,
+        //     static_cast<uint32_t>(i),
+        //     surface,
+        //     &present_support
+        // );
 
-    bool check_device_extensions_support(VkPhysicalDevice physical_device, const std::vector<const char*>& device_extensions)
-    {
-        uint32_t extension_count;
-        vkEnumerateDeviceExtensionProperties(physical_device, nullptr, &extension_count, nullptr);
-        std::vector<VkExtensionProperties> available_extensions(extension_count);
-        vkEnumerateDeviceExtensionProperties(physical_device, nullptr, &extension_count, available_extensions.data());
+        // if (present_support)
+        //     indices.present_family = static_cast<uint32_t>(i);
 
-        // TODO: Change set creation to faster check
-        std::unordered_set<std::string> required_extensions(
-            device_extensions.begin(),
-            device_extensions.end()
-            );
-        for (const auto& extension : available_extensions)
-        {
-            required_extensions.erase(extension.extensionName);
-        }
-        return required_extensions.empty();
-    }
-
-    SwapChainSupport get_swapchain_support(VkPhysicalDevice physical_device, VkSurfaceKHR surface)
-    {
-        SwapChainSupport support;
-
-        // 1. Get Surface capabilities
-        vkGetPhysicalDeviceSurfaceCapabilitiesKHR(physical_device, surface, &support.capabilities);
-
-        // 2. Get Surface possible formats
-        uint32_t format_count;
-        vkGetPhysicalDeviceSurfaceFormatsKHR(physical_device, surface, &format_count, nullptr);
-        if(format_count != 0)
-        {
-            support.formats.resize(format_count);
-            vkGetPhysicalDeviceSurfaceFormatsKHR(physical_device, surface, &format_count, support.formats.data());
-        }
-
-        // 3. Get Surface possible present modes
-        uint32_t present_mode_count;
-        vkGetPhysicalDeviceSurfacePresentModesKHR(physical_device, surface, &present_mode_count, nullptr);
-        if(present_mode_count != 0)
-        {
-            support.present_modes.resize(present_mode_count);
-            vkGetPhysicalDeviceSurfacePresentModesKHR(physical_device, surface, &present_mode_count, support.present_modes.data());
-        }
-
-        return support;
-    }
-
-    VkSurfaceFormatKHR SwapChainSupport::select_format() const noexcept
-    {
-        for(const auto& format : formats)
-        {
-            if(format.format == VK_FORMAT_B8G8R8A8_SRGB
-                && format.colorSpace == VK_COLOR_SPACE_SRGB_NONLINEAR_KHR)
-            // if(format.format == VK_FORMAT_R8G8B8A8_UNORM
-            //     && format.colorSpace == VK_COLOR_SPACE_SRGB_NONLINEAR_KHR)
-            {
-                return format;
-            }
-        }
-
-        assert(formats.size() > 0);
-        return formats[0];
-    }
-
-    VkPresentModeKHR SwapChainSupport::select_present_mode() const noexcept
-    {
-        for(const auto& present_mode : present_modes)
-        {
-            if (present_mode == VK_PRESENT_MODE_MAILBOX_KHR)
-            {
-                return present_mode;
-            }
-        }
-        // FIFO mode is guaranteed to be available
-        return VK_PRESENT_MODE_FIFO_KHR;
-        // return VK_PRESENT_MODE_IMMEDIATE_KHR;
-    }
-
-    VkExtent2D SwapChainSupport::select_extent(VkExtent2D extent) const noexcept
-    {
-        // Window managers set currentExtent width and height when ...
-        if(capabilities.currentExtent.width != std::numeric_limits<uint32_t>::max())
-        {
-            return capabilities.currentExtent;
-        }
-        else
-        {
-            extent.width = glm::clamp(
-                extent.width,
-                capabilities.minImageExtent.width,
-                capabilities.maxImageExtent.width
-            );
-            extent.height = glm::clamp(
-                extent.height,
-                capabilities.minImageExtent.height,
-                capabilities.maxImageExtent.height
-            );
-            return extent;
-        }
-    }
-
-    Device::~Device()
-    {
-        // Destroy Vma Allocator
-        vmaDestroyAllocator(vma_allocator);
-        // Destroy logical device instance
-        vkDestroyDevice(vkdevice, nullptr);
-        Log::trace("Device destroyed");
-    }
-
-    const SwapChainSupport& Device::query_swapchain_support(VkSurfaceKHR surface) noexcept
-    {
-        return (swapchain_support_details = get_swapchain_support(physical_device, surface));
-    }
-
-    void Device::graphics_queue_submit(
-        CommandBuffer& cmd_buffer,
-        VkSemaphore wait_semaphore,
-        VkSemaphore signal_semaphore,
-        VkFence fence)
-    {
-        VkSubmitInfo submit_info{};
-        submit_info.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
-        // Semaphores to wait
-        // FIXME: This is hardcoded make it better later
-        VkPipelineStageFlags wait_stages[] = {VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT};
-        submit_info.waitSemaphoreCount = 1;
-        submit_info.pWaitSemaphores = &wait_semaphore;
-        submit_info.pWaitDstStageMask = wait_stages;
-        // Command Buffers
-        submit_info.commandBufferCount = 1;
-        VkCommandBuffer cmd_buffers[] = {cmd_buffer.vk_command_buffer()};
-        submit_info.pCommandBuffers = cmd_buffers;
-        // Semaphores to signal
-        submit_info.signalSemaphoreCount = 1;
-        submit_info.pSignalSemaphores = &signal_semaphore;
-
-        auto result = vkQueueSubmit(graphics_queue, 1, &submit_info, fence);
-        VK_CHECK_MSG(result, "Failed to submit command buffer!");
-    }
-
-
-    void Device::graphics_queue_submit(
-        CommandBuffer& cmd_buffer,
-        VkFence fence)
-    {
-        VkCommandBuffer cmd_buffers[] = {cmd_buffer.vk_command_buffer()};
-
-        VkSubmitInfo submit_info{};
-        submit_info.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
-        submit_info.commandBufferCount = 1;
-        submit_info.pCommandBuffers = cmd_buffers;
-
-        auto result = vkQueueSubmit(graphics_queue, 1, &submit_info, fence);
-        VK_CHECK_MSG(result, "Failed to submit command buffer!");
-    }
-
-
-    void Device::graphics_queue_submit(
-        CommandBuffer& cmd_buffer)
-    {
-        VkCommandBuffer cmd_buffers[] = {cmd_buffer.vk_command_buffer()};
-
-        VkSubmitInfo submit_info{};
-        submit_info.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
-        submit_info.commandBufferCount = 1;
-        submit_info.pCommandBuffers = cmd_buffers;
-
-        auto result = vkQueueSubmit(graphics_queue, 1, &submit_info, VK_NULL_HANDLE);
-        VK_CHECK_MSG(result, "Failed to submit command buffer!");
-    }
-
-    void Device::present_queue_present(Swapchain& swapchain, VkSemaphore wait_semaphore) {
-        VkPresentInfoKHR present_info{};
-        present_info.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
-        present_info.waitSemaphoreCount = 1;
-        present_info.pWaitSemaphores = &wait_semaphore;
-        present_info.swapchainCount = 1;
-        VkSwapchainKHR swapchains[] = { swapchain.vk_swapchain() };
-        present_info.pSwapchains = swapchains;
-        uint32_t indices[] = { static_cast<uint32_t>(swapchain.current_index()) };
-        present_info.pImageIndices = indices;
-        present_info.pResults = nullptr; // Optional
-        auto result = vkQueuePresentKHR(present_queue, &present_info);
-        if(result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR) {
-            throw SwapchainResized();
-        }
-        else {
-            VK_CHECK_MSG(result, "Failed to present swap chain image!");
-        }
-    }
-
-    void Device::wait_idle() noexcept
-    {
-        vkDeviceWaitIdle(vkdevice);
-    }
-
-
-    void Device::immediate_submit(std::function<void(vk::CommandBuffer&)>&& func) {
-        // TODO: avoid creating cmd pool and buffer i nthis method
-        // make one buffer device global and reset it at the end
-        
-        // Create a cmd pool
-        auto cmd_pool = vk::CommandPool(this);
-        // Allocate a cmd buffer from that pool
-        auto cmd_buffer = cmd_pool.allocate();
-
-        // Begin the command buffer recording with one time submit usage
-        cmd_buffer.begin(VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT);
-        // Record commands
-        func(cmd_buffer);
-        // End recording
-        cmd_buffer.end();
-
-        // When work is completed on the GPU this single use fence will be signaled
-        auto immediate_fence = create_fence(*this, false);
-        // Submit command buffer to the queue.
-        this->graphics_queue_submit(cmd_buffer, immediate_fence);
-        // Wait
-        vkWaitForFences(vkdevice, 1, &immediate_fence, true, 9999999999);
-
-        // Destroy single use fence
-        destroy_fence(*this, immediate_fence);
-    }
-
-
-    DeviceBuilder::DeviceBuilder(Instance& instance)
-    {
-        vkinstance = instance.vk_instance();
-        uint32_t device_count = 0;
-        vkEnumeratePhysicalDevices(vkinstance, &device_count, nullptr);
-        if(device_count == 0)
-        {
-            throw NoGPUSupport();
-        }
-        available_devices.resize(device_count);
-        vkEnumeratePhysicalDevices(vkinstance, &device_count, available_devices.data());
-
-        // Copy validation layer list
-        validation_layers = instance.get_validation_layers();
-    }
-
-    DeviceBuilder& DeviceBuilder::set_surface(VkSurfaceKHR _surface) noexcept
-    {
-        // NOTE: Device creation with Present Queue requires
-        // surface handle before creation
-        this->surface = _surface;
-        return *this;
-    }
-
-    DeviceBuilder& DeviceBuilder::set_extensions(const std::vector<const char*>& extensions)
-    {
-        this->device_extensions.insert(
-            this->device_extensions.end(),
-            extensions.begin(),
-            extensions.end()
-            );
-        return *this;
-    }
-
-    DeviceBuilder& DeviceBuilder::set_features(const VkPhysicalDeviceFeatures& features) noexcept
-    {
-        device_features = features;
-        return *this;
-    }
-
-    Device DeviceBuilder::build()
-    {
-        // 1. Select physical device.
-        // 2. Create device
-        //   2.1. Create device queues
-        //   2.2. Create cmd pool
-
-        // 1. Select physical device //
-        // For each available device check if is suitable.
-        VkPhysicalDevice vkphysical_device = VK_NULL_HANDLE;
-        QueueFamilies indices;
-        SwapChainSupport swapchain_support;
-        for(const auto& iter_device : available_devices)
-        {
-            // Loop body to check if its a suitable device
-            VkPhysicalDeviceProperties device_properties;
-            vkGetPhysicalDeviceProperties(iter_device, &device_properties);
-            VkPhysicalDeviceFeatures this_device_features;
-            vkGetPhysicalDeviceFeatures(iter_device, &this_device_features);
-
-            // TODO: This if statements are going too diagonal, maybe make it more vertical
-            // Fix: if(!condition) { continue; }
-            // NOTE: Serveral if statements are being made so that the
-            // work of the next checks isnt being done for no reason
-
-            // 1. Require to be a dedicated GPU
-            // if(device_properties.deviceType != VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU)
-            //     continue;
-
-            indices = get_queue_families(iter_device, surface);
-            // 2. Require to have all needed queue families
-            if(!indices.is_complete())
-                continue;
-
-            // 3. Require to support required device extensions
-            if(!check_device_extensions_support(iter_device, device_extensions))
-                continue;
-            
-            swapchain_support = get_swapchain_support(iter_device, surface);
-            // 4. Require SwapChain support
-            if(swapchain_support.formats.empty() || swapchain_support.present_modes.empty())
-                continue;
-            
-            // This device is suitable, end loop!
-            vkphysical_device = iter_device;
+        if (indices.is_complete())
             break;
-        }
-
-        if(vkphysical_device == VK_NULL_HANDLE)
-        {
-            throw NoGPUSuitable();
-        }
-        else
-        {
-            VkPhysicalDeviceProperties device_properties;
-            vkGetPhysicalDeviceProperties(vkphysical_device, &device_properties);
-            Log::info("Selected GPU: {}", device_properties.deviceName);
-        }
-
-        // 2. Create device //
-        // TODO: Refactor this, there's no need to create
-        // an auxiliar structure, elaborate the
-        // QueueFamilies class to provide an iterator 
-        std::unordered_set<uint32_t> unique_queue_families{
-            indices.graphics_family.value(),
-            indices.present_family.value()
-        };
-
-        float queue_priority = 1.0f;
-        std::vector<VkDeviceQueueCreateInfo> queue_create_infos(unique_queue_families.size());
-        size_t i = 0;
-        for(uint32_t queue_family : unique_queue_families)
-        {
-            queue_create_infos[i] = VkDeviceQueueCreateInfo{
-                .sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO,
-                .queueFamilyIndex = queue_family,
-                .queueCount = 1,
-                .pQueuePriorities = &queue_priority,
-            };
-            ++i;
-        }
-
-        Log::trace("Device Validation Layers:");
-        for(const auto& vl : validation_layers)
-        {
-            Log::trace("- {}", vl);
-        }
-        VkDeviceCreateInfo create_info{};
-        create_info.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
-        create_info.pQueueCreateInfos = queue_create_infos.data();
-        create_info.queueCreateInfoCount = static_cast<uint32_t>(queue_create_infos.size());
-        create_info.pEnabledFeatures = &device_features;
-        create_info.enabledExtensionCount = static_cast<uint32_t>(device_extensions.size());
-        create_info.ppEnabledExtensionNames = device_extensions.data();
-        create_info.enabledLayerCount = static_cast<uint32_t>(validation_layers.size());
-        create_info.ppEnabledLayerNames = validation_layers.data();
-
-        VkDevice vkdevice = VK_NULL_HANDLE;
-        auto result = vkCreateDevice(vkphysical_device, &create_info, nullptr, &vkdevice);
-        VK_CHECK_MSG(result, "Failed to create logical device!");
-        Log::trace("Device created");
-
-
-        auto device = Device();
-        // 2.1. Create device queues //
-        vkGetDeviceQueue(vkdevice, indices.graphics_family.value(), 0, &device.graphics_queue);
-        vkGetDeviceQueue(vkdevice, indices.present_family.value(), 0, &device.present_queue);
-
-        // 3. Create Vma Allocator //
-        VmaAllocatorCreateInfo allocator_info{};
-        allocator_info.physicalDevice = vkphysical_device;
-        allocator_info.device = vkdevice;
-        allocator_info.instance = vkinstance;
-        result = vmaCreateAllocator(&allocator_info, &device.vma_allocator);
-        VK_CHECK_MSG(result, "Failed to create Vma allocator");
-
-        device.vkdevice = vkdevice;
-        device.physical_device = vkphysical_device;
-        device.swapchain_support_details = std::move(swapchain_support);
-        device.queue_family_indices = std::move(indices);
-        return device;
     }
+
+    return indices;
+}
+
+bool supports_device_extensions(
+    VkPhysicalDevice physical_device,
+    std::vector<char const*> const& device_extensions
+) {
+    uint32_t extension_count;
+    vkEnumerateDeviceExtensionProperties(
+        physical_device,
+        nullptr,
+        &extension_count,
+        nullptr
+    );
+    std::vector<VkExtensionProperties> available_extensions(extension_count);
+    vkEnumerateDeviceExtensionProperties(
+        physical_device,
+        nullptr,
+        &extension_count,
+        available_extensions.data()
+    );
+
+    // TODO: Change set creation for a faster check
+    std::unordered_set<std::string> required_extensions(
+        device_extensions.begin(),
+        device_extensions.end()
+    );
+    for (auto const& extension : available_extensions) {
+        required_extensions.erase(extension.extensionName);
+    }
+    return required_extensions.empty();
+}
+
+SwapchainSupport get_swapchain_support(
+    VkPhysicalDevice vk_physical_device,
+    VkSurfaceKHR surface
+) {
+    SwapchainSupport support;
+
+    // 1. Get Surface capabilities
+    vkGetPhysicalDeviceSurfaceCapabilitiesKHR(
+        vk_physical_device,
+        surface,
+        &support.capabilities
+    );
+
+    // 2. Get Surface possible formats
+    uint32_t formats_count;
+    vkGetPhysicalDeviceSurfaceFormatsKHR(
+        vk_physical_device,
+        surface,
+        &formats_count,
+        nullptr
+    );
+    if (formats_count != 0) {
+        support.formats.resize(formats_count);
+        vkGetPhysicalDeviceSurfaceFormatsKHR(
+            vk_physical_device,
+            surface,
+            &formats_count,
+            support.formats.data()
+        );
+    }
+
+    // 3. Get Surface possible present modes
+    uint32_t present_modes_count;
+    vkGetPhysicalDeviceSurfacePresentModesKHR(
+        vk_physical_device,
+        surface,
+        &present_modes_count,
+        nullptr
+    );
+    if (present_modes_count != 0) {
+        support.present_modes.resize(present_modes_count);
+        vkGetPhysicalDeviceSurfacePresentModesKHR(
+            vk_physical_device,
+            surface,
+            &present_modes_count,
+            support.present_modes.data()
+        );
+    }
+
+    return support;
+}
+
+using SelectedDevice
+    = std::tuple<VkPhysicalDevice, QueueFamilies, SwapchainSupport>;
+
+std::vector<VkPhysicalDevice> get_available_devices(
+    vk::Instance& instance
+) {
+    // List available devices
+    uint32_t device_count = 0;
+    vkEnumeratePhysicalDevices(
+        instance.vk_instance(),
+        &device_count,
+        nullptr
+    );
+    if (device_count == 0) {
+        throw 1; // NoGPUSupport();
+    }
+
+    std::vector<VkPhysicalDevice> available_devices(device_count);
+    vkEnumeratePhysicalDevices(
+        instance.vk_instance(),
+        &device_count,
+        available_devices.data()
+    );
+    return available_devices;
+}
+
+SelectedDevice select_device(
+    vk::Instance& instance,
+    std::vector<VkPhysicalDevice> const& available_devices,
+    const std::vector<const char*>& required_extensions
+) {
+    VkPhysicalDevice vk_physical_device;
+    QueueFamilies queue_families;
+    SwapchainSupport swapchain_support;
+
+    // Find suitable device
+    for (auto const& device : available_devices) {
+        // Loop body to check if its a suitable device
+        // UNUSED:
+        VkPhysicalDeviceProperties device_properties;
+        vkGetPhysicalDeviceProperties(device, &device_properties);
+        VkPhysicalDeviceFeatures device_features;
+        vkGetPhysicalDeviceFeatures(device, &device_features);
+
+        // 1. Require to be a dedicated GPU
+        // if (device_properties.deviceType
+        //     != VK_PHYSICAL_DEVICE_TYPE_DISCRETE_GPU)
+        //     continue;
+
+        // 2. Require to have all needed queue families
+        queue_families = get_queue_families(device, VK_NULL_HANDLE); // TODO: later pass the surface handle instead 'surface'
+        if (!queue_families.is_complete()) {
+            continue;
+        }
+
+        // 3. Require to support required device extensions
+        if (!supports_device_extensions(device, required_extensions)) {
+            continue;
+        }
+
+        // 4. Require SwapChain support
+        // TODO:
+        // swapchain_support = get_swapchain_support(device, surface);
+        // if (swapchain_support.formats.empty()
+        //     || swapchain_support.present_modes.empty()) {
+        //     continue;
+        // }
+
+        // This device is suitable, end loop!
+        vk_physical_device = device;
+        break;
+    }
+
+    if (vk_physical_device == VK_NULL_HANDLE) {
+        throw 1; // NoGPUSuitable();
+    }
+    else {
+        VkPhysicalDeviceProperties device_properties;
+        vkGetPhysicalDeviceProperties(vk_physical_device, &device_properties);
+        Log::info("Selected GPU: {}", device_properties.deviceName);
+    }
+
+    return std::make_tuple(
+        vk_physical_device,
+        std::move(queue_families),
+        std::move(swapchain_support)
+    );
+}
+
+VkDevice create_device(
+    VkPhysicalDevice vk_physical_device,
+    QueueFamilies const& queue_families,
+    VkPhysicalDeviceFeatures const& device_features,
+    std::vector<char const*> const& device_extensions
+) {
+    // TODO: Refactor this, there's no need to create
+    // an auxiliar structure, elaborate the
+    // QueueFamilies class to provide an iterator
+    std::unordered_set<uint32_t> unique_queue_families {
+        queue_families.graphics_family.value(),
+        //queue_families.present_family.value()
+    };
+
+    std::vector<VkDeviceQueueCreateInfo> queue_create_infos(
+        unique_queue_families.size()
+    );
+
+    float queue_priority = 1.0f;
+    // for (size_t i = 0; i < unique_queue_families.size(); ++i) {
+    size_t i = 0;
+    for(const auto family_idx : unique_queue_families) {
+        queue_create_infos[i] = VkDeviceQueueCreateInfo {
+            .sType = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO,
+            .queueFamilyIndex = family_idx,
+            .queueCount = 1,
+            .pQueuePriorities = &queue_priority,
+        };
+    }
+
+    VkDeviceCreateInfo create_info {};
+    create_info.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
+    create_info.pQueueCreateInfos = queue_create_infos.data();
+    create_info.queueCreateInfoCount
+        = static_cast<uint32_t>(queue_create_infos.size());
+    create_info.pEnabledFeatures = &device_features;
+    create_info.enabledExtensionCount
+        = static_cast<uint32_t>(device_extensions.size());
+    create_info.ppEnabledExtensionNames = device_extensions.data();
+
+    VkDevice vk_device;
+    auto result
+        = vkCreateDevice(vk_physical_device, &create_info, nullptr, &vk_device);
+    VK_CHECK_MSG(result, "Failed to create logical device!");
+    Log::trace("Device created");
+
+    return vk_device;
+}
+
+Device::Device(
+    DeviceParams&& params
+) : m_instance(&params.instance) {
+    
+    // 1. Select physical device //
+    auto available_devices = get_available_devices(*m_instance);
+    auto [vk_physical_device, indices, swapchain_support]
+        = select_device(*m_instance, available_devices, params.device_extensions);
+
+    // 2. Create device //
+    m_vk_physical_device = vk_physical_device;
+    m_vk_device = create_device(
+        vk_physical_device,
+        indices,
+        params.device_features,
+        params.device_extensions
+    );
+
+    // 2.1. Get device queues //
+    vkGetDeviceQueue(
+        m_vk_device,
+        indices.graphics_family.value(),
+        0,
+        &m_vk_graphics_queue
+    );
+    // vkGetDeviceQueue(
+    //     m_vk_device,
+    //     indices.present_family.value(),
+    //     0,
+    //     &m_vk_present_queue
+    // );
+
+    // 3. Create Vma Allocator //
+    VmaAllocatorCreateInfo allocator_info {};
+    allocator_info.physicalDevice = m_vk_physical_device;
+    allocator_info.device = m_vk_device;
+    allocator_info.instance = m_instance->vk_instance();
+    auto result = vmaCreateAllocator(&allocator_info, &m_vma_allocator);
+    VK_CHECK_MSG(result, "Failed to create Vma allocator");
+}
+
+Device::~Device() {
+    // Destroy Vma Allocator
+    vmaDestroyAllocator(m_vma_allocator);
+    // Destroy logical device instance
+    vkDestroyDevice(m_vk_device, nullptr);
+    Log::trace("Device destroyed");
+}
+
 } // namespace kzn::vk
