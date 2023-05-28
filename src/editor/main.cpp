@@ -7,13 +7,13 @@
 // TODO: Create alias type in core/ Ref = std::reference_wrapper
 // and change every non_owning ptr to Ref 
 
-int main() {
-    using namespace kzn;
+using namespace kzn;
+int main() try {
 
     auto window = Window("Kazan Engine", 1000, 800);
 
     auto instance = vk::Instance({
-        //.extensions = window.required_extensions(),
+        .extensions = window.required_extensions(),
         .with_validation = true,
     });
     auto device = vk::Device(instance);
@@ -22,5 +22,7 @@ int main() {
     while(!window.is_closed()) {
         window.poll_events();
     }
-
+}
+catch(vk::ResultError re) {
+    Log::error("{}", re.message());
 }
