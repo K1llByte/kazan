@@ -12,7 +12,7 @@ struct InstanceParams {
 };
 
 class Instance {
-  public:
+public:
     // Ctor
     Instance(InstanceParams&& params = {});
     // Copy
@@ -24,11 +24,11 @@ class Instance {
     // Dtor
     ~Instance();
 
-  public:
+public:
     VkInstance vk_instance() { return m_vk_instance; }
 
-  private:
-    VkInstance m_vk_instance = VK_NULL_HANDLE;
+private:
+    VkInstance               m_vk_instance = VK_NULL_HANDLE;
     VkDebugUtilsMessengerEXT m_debug_messenger = VK_NULL_HANDLE;
 };
 

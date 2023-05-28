@@ -30,15 +30,14 @@ struct SwapchainSupport {
 };
 
 struct DeviceParams {
-    Instance& instance;
-    std::vector<char const*> device_extensions = {};
-    VkPhysicalDeviceFeatures device_features = {};
+    std::vector<char const*> extensions = {};
+    VkPhysicalDeviceFeatures features = {};
 };
 
 class Device {
   public:
     // Ctor
-    Device(DeviceParams&& params);
+    Device(Instance& instance, DeviceParams&& params = {});
     // Copy
     Device(Device const&) = delete;
     Device& operator=(Device const&) = delete;
@@ -49,12 +48,12 @@ class Device {
     ~Device();
 
   private:
-    vk::Instance* m_instance;
-    VkDevice m_vk_device = VK_NULL_HANDLE;
+    vk::Instance*    m_instance;
+    VkDevice         m_vk_device = VK_NULL_HANDLE;
     VkPhysicalDevice m_vk_physical_device = VK_NULL_HANDLE;
-    VkQueue m_vk_graphics_queue;
-    VkQueue m_vk_present_queue;
-    VmaAllocator m_vma_allocator;
+    VkQueue          m_vk_graphics_queue;
+    VkQueue          m_vk_present_queue;
+    VmaAllocator     m_vma_allocator;
 };
 
 } // namespace kzn::vk

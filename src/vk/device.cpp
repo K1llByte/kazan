@@ -57,9 +57,9 @@ QueueFamilies get_queue_families(
     return indices;
 }
 
-bool supports_device_extensions(
+bool supports_extensions(
     VkPhysicalDevice physical_device,
-    std::vector<char const*> const& device_extensions
+    std::vector<char const*> const& extensions
 ) {
     uint32_t extension_count;
     vkEnumerateDeviceExtensionProperties(
@@ -78,8 +78,8 @@ bool supports_device_extensions(
 
     // TODO: Change set creation for a faster check
     std::unordered_set<std::string> required_extensions(
-        device_extensions.begin(),
-        device_extensions.end()
+        extensions.begin(),
+        extensions.end()
     );
     for (auto const& extension : available_extensions) {
         required_extensions.erase(extension.extensionName);
@@ -180,8 +180,8 @@ SelectedDevice select_device(
         // UNUSED:
         VkPhysicalDeviceProperties device_properties;
         vkGetPhysicalDeviceProperties(device, &device_properties);
-        VkPhysicalDeviceFeatures device_features;
-        vkGetPhysicalDeviceFeatures(device, &device_features);
+        VkPhysicalDeviceFeatures features;
+        vkGetPhysicalDeviceFeatures(device, &features);
 
         // 1. Require to be a dedicated GPU
         // if (device_properties.deviceType
@@ -195,7 +195,7 @@ SelectedDevice select_device(
         }
 
         // 3. Require to support required device extensions
-        if (!supports_device_extensions(device, required_extensions)) {
+        if (!supports_extensions(device, required_extensions)) {
             continue;
         }
 
@@ -231,8 +231,8 @@ SelectedDevice select_device(
 VkDevice create_device(
     VkPhysicalDevice vk_physical_device,
     QueueFamilies const& queue_families,
-    VkPhysicalDeviceFeatures const& device_features,
-    std::vector<char const*> const& device_extensions
+    VkPhysicalDeviceFeatures const& features,
+    std::vector<char const*> const& extensions
 ) {
     // TODO: Refactor this, there's no need to create
     // an auxiliar structure, elaborate the
@@ -263,10 +263,10 @@ VkDevice create_device(
     create_info.pQueueCreateInfos = queue_create_infos.data();
     create_info.queueCreateInfoCount
         = static_cast<uint32_t>(queue_create_infos.size());
-    create_info.pEnabledFeatures = &device_features;
+    create_info.pEnabledFeatures = &features;
     create_info.enabledExtensionCount
-        = static_cast<uint32_t>(device_extensions.size());
-    create_info.ppEnabledExtensionNames = device_extensions.data();
+        = static_cast<uint32_t>(extensions.size());
+    create_info.ppEnabledExtensionNames = extensions.data();
 
     VkDevice vk_device;
     auto result
@@ -278,21 +278,22 @@ VkDevice create_device(
 }
 
 Device::Device(
+    Instance& instance,
     DeviceParams&& params
-) : m_instance(&params.instance) {
+) : m_instance(&instance) {
     
     // 1. Select physical device //
     auto available_devices = get_available_devices(*m_instance);
     auto [vk_physical_device, indices, swapchain_support]
-        = select_device(*m_instance, available_devices, params.device_extensions);
+        = select_device(*m_instance, available_devices, params.extensions);
 
     // 2. Create device //
     m_vk_physical_device = vk_physical_device;
     m_vk_device = create_device(
         vk_physical_device,
         indices,
-        params.device_features,
-        params.device_extensions
+        params.features,
+        params.extensions
     );
 
     // 2.1. Get device queues //
