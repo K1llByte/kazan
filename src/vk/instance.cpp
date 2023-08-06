@@ -117,8 +117,8 @@ Instance::Instance(InstanceParams&& params) {
         = static_cast<uint32_t>(params.extensions.size());
     create_info.ppEnabledExtensionNames = params.extensions.data();
 
-    if (! params.extensions.empty()) {
-        Log::trace("Enabled extensions:");
+    if (!params.extensions.empty()) {
+        Log::trace("Requested extensions:");
         for (auto ext_name : params.extensions) {
             Log::trace("- {}", ext_name);
         }

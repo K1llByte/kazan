@@ -20,9 +20,9 @@ struct QueueFamilies {
 };
 
 struct SwapchainSupport {
-    VkSurfaceCapabilitiesKHR capabilities;
+    VkSurfaceCapabilitiesKHR        capabilities;
     std::vector<VkSurfaceFormatKHR> formats;
-    std::vector<VkPresentModeKHR> present_modes;
+    std::vector<VkPresentModeKHR>   present_modes;
 
     VkSurfaceFormatKHR select_format() const;
     VkPresentModeKHR select_present_mode() const;
@@ -35,7 +35,7 @@ struct DeviceParams {
 };
 
 class Device {
-  public:
+public:
     // Ctor
     Device(Instance& instance, DeviceParams&& params = {});
     // Copy
@@ -47,12 +47,19 @@ class Device {
     // Dtor
     ~Device();
 
-  private:
-    vk::Instance*    m_instance;
+    // Getters
+    VkDevice vk_device() { return m_vk_device; }
+    const SwapchainSupport& swapchain_support() const { return m_swapchain_support; }
+    const QueueFamilies& queue_families() const { return m_queue_families; }
+
+private:
+    vk::Instance&    m_instance;
     VkDevice         m_vk_device = VK_NULL_HANDLE;
     VkPhysicalDevice m_vk_physical_device = VK_NULL_HANDLE;
     VkQueue          m_vk_graphics_queue;
     VkQueue          m_vk_present_queue;
+    SwapchainSupport m_swapchain_support;
+    QueueFamilies    m_queue_families;
     VmaAllocator     m_vma_allocator;
 };
 

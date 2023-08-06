@@ -12,6 +12,60 @@
 
 namespace kzn::vk {
 
+VkSurfaceFormatKHR SwapchainSupport::select_format() const
+{
+    for(const auto& format : formats) {
+        // if(format.format == VK_FORMAT_R8G8B8A8_UNORM
+        //     && format.colorSpace == VK_COLOR_SPACE_SRGB_NONLINEAR_KHR)
+        if(format.format == VK_FORMAT_B8G8R8A8_SRGB
+            && format.colorSpace == VK_COLOR_SPACE_SRGB_NONLINEAR_KHR)
+        {
+            return format;
+        }
+    }
+
+    assert(formats.size() > 0);
+    return formats[0];
+}
+
+VkPresentModeKHR SwapchainSupport::select_present_mode() const
+{
+    for(const auto& present_mode : present_modes)
+    {
+        if (present_mode == VK_PRESENT_MODE_MAILBOX_KHR)
+        {
+            return present_mode;
+        }
+    }
+    // FIFO mode is guaranteed to be available
+    return VK_PRESENT_MODE_FIFO_KHR;
+    // return VK_PRESENT_MODE_IMMEDIATE_KHR;
+}
+
+VkExtent2D SwapchainSupport::select_extent(VkExtent2D extent) const
+{
+    // Window managers set currentExtent width and height when ...
+    if(capabilities.currentExtent.width != std::numeric_limits<uint32_t>::max())
+    {
+        return capabilities.currentExtent;
+    }
+    else
+    {
+        extent.width = std::clamp(
+            extent.width,
+            capabilities.minImageExtent.width,
+            capabilities.maxImageExtent.width
+        );
+        extent.height = std::clamp(
+            extent.height,
+            capabilities.minImageExtent.height,
+            capabilities.maxImageExtent.height
+        );
+        return extent;
+    }
+}
+
+
 QueueFamilies get_queue_families(
     VkPhysicalDevice physical_device,
     VkSurfaceKHR surface
@@ -268,6 +322,13 @@ VkDevice create_device(
         = static_cast<uint32_t>(extensions.size());
     create_info.ppEnabledExtensionNames = extensions.data();
 
+    if (!extensions.empty()) {
+        Log::trace("Requested device extensions:");
+        for (auto ext_name : extensions) {
+            Log::trace("- {}", ext_name);
+        }
+    }
+
     VkDevice vk_device;
     auto result
         = vkCreateDevice(vk_physical_device, &create_info, nullptr, &vk_device);
@@ -280,15 +341,17 @@ VkDevice create_device(
 Device::Device(
     Instance& instance,
     DeviceParams&& params
-) : m_instance(&instance) {
+) : m_instance(instance) {
     
     // 1. Select physical device //
-    auto available_devices = get_available_devices(*m_instance);
+    auto available_devices = get_available_devices(m_instance);
     auto [vk_physical_device, indices, swapchain_support]
-        = select_device(*m_instance, available_devices, params.extensions);
+        = select_device(m_instance, available_devices, params.extensions);
 
     // 2. Create device //
     m_vk_physical_device = vk_physical_device;
+    m_swapchain_support = swapchain_support;
+    m_queue_families = indices;
     m_vk_device = create_device(
         vk_physical_device,
         indices,
@@ -314,7 +377,7 @@ Device::Device(
     VmaAllocatorCreateInfo allocator_info {};
     allocator_info.physicalDevice = m_vk_physical_device;
     allocator_info.device = m_vk_device;
-    allocator_info.instance = m_instance->vk_instance();
+    allocator_info.instance = m_instance.vk_instance();
     auto result = vmaCreateAllocator(&allocator_info, &m_vma_allocator);
     VK_CHECK_MSG(result, "Failed to create Vma allocator");
 }
