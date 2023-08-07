@@ -19,10 +19,11 @@ int main() try {
         .extensions = window.required_extensions(),
         .with_validation = true,
     });
+    auto surface = window.create_surface(instance);
     auto device = vk::Device(instance, {
         .extensions = { VK_KHR_SWAPCHAIN_EXTENSION_NAME },
+        .surface = surface.vk_surface()
     });
-    auto surface = window.create_surface(instance);
     auto swapchain = vk::Swapchain(device, surface, window.extent());
 
     while(!window.is_closed()) {

@@ -85,24 +85,24 @@ QueueFamilies get_queue_families(
     );
 
     QueueFamilies indices;
-    for (size_t i = 0; i < queue_families.size(); ++i) {
-        if (queue_families[i].queueFlags & VK_QUEUE_GRAPHICS_BIT) {
+    for(size_t i = 0; i < queue_families.size(); ++i) {
+        if(queue_families[i].queueFlags & VK_QUEUE_GRAPHICS_BIT) {
             indices.graphics_family = i;
         }
 
         // The Present Queue support check isn't in an else statement
         // because there could be a queue_family with support for both
         // Graphics and Present
-        // VkBool32 present_support = VK_FALSE;
-        // vkGetPhysicalDeviceSurfaceSupportKHR(
-        //     physical_device,
-        //     static_cast<uint32_t>(i),
-        //     surface,
-        //     &present_support
-        // );
+        VkBool32 present_support = VK_FALSE;
+        vkGetPhysicalDeviceSurfaceSupportKHR(
+            physical_device,
+            static_cast<uint32_t>(i),
+            surface,
+            &present_support
+        );
 
-        // if (present_support)
-        //     indices.present_family = static_cast<uint32_t>(i);
+        if (present_support)
+            indices.present_family = static_cast<uint32_t>(i);
 
         if (indices.is_complete())
             break;
@@ -222,7 +222,8 @@ std::vector<VkPhysicalDevice> get_available_devices(
 SelectedDevice select_device(
     vk::Instance& instance,
     std::vector<VkPhysicalDevice> const& available_devices,
-    const std::vector<const char*>& required_extensions
+    const std::vector<const char*>& required_extensions,
+    VkSurfaceKHR surface
 ) {
     VkPhysicalDevice vk_physical_device;
     QueueFamilies queue_families;
@@ -243,7 +244,7 @@ SelectedDevice select_device(
         //     continue;
 
         // 2. Require to have all needed queue families
-        queue_families = get_queue_families(device, VK_NULL_HANDLE); // TODO: later pass the surface handle instead 'surface'
+        queue_families = get_queue_families(device, surface); // TODO: later pass the surface handle instead 'surface'
         if (!queue_families.is_complete()) {
             continue;
         }
@@ -254,12 +255,11 @@ SelectedDevice select_device(
         }
 
         // 4. Require SwapChain support
-        // TODO:
-        // swapchain_support = get_swapchain_support(device, surface);
-        // if (swapchain_support.formats.empty()
-        //     || swapchain_support.present_modes.empty()) {
-        //     continue;
-        // }
+        swapchain_support = get_swapchain_support(device, surface);
+        if (swapchain_support.formats.empty()
+            || swapchain_support.present_modes.empty()) {
+            continue;
+        }
 
         // This device is suitable, end loop!
         vk_physical_device = device;
@@ -346,7 +346,7 @@ Device::Device(
     // 1. Select physical device //
     auto available_devices = get_available_devices(m_instance);
     auto [vk_physical_device, indices, swapchain_support]
-        = select_device(m_instance, available_devices, params.extensions);
+        = select_device(m_instance, available_devices, params.extensions, params.surface);
 
     // 2. Create device //
     m_vk_physical_device = vk_physical_device;
@@ -366,12 +366,12 @@ Device::Device(
         0,
         &m_vk_graphics_queue
     );
-    // vkGetDeviceQueue(
-    //     m_vk_device,
-    //     indices.present_family.value(),
-    //     0,
-    //     &m_vk_present_queue
-    // );
+    vkGetDeviceQueue(
+        m_vk_device,
+        indices.present_family.value(),
+        0,
+        &m_vk_present_queue
+    );
 
     // 3. Create Vma Allocator //
     VmaAllocatorCreateInfo allocator_info {};

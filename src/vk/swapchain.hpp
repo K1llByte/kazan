@@ -19,13 +19,14 @@ public:
     ~Swapchain();
 
 private:
-    vk::Device&          m_device;
-    VkSwapchainKHR       m_vk_swapchain = VK_NULL_HANDLE;
-    VkSurfaceFormatKHR   m_surface_format;
-    VkPresentModeKHR     m_present_mode;
-    VkExtent2D           m_extent;
-    uint32_t             m_image_count;
-    std::vector<VkImage> m_images;
+    vk::Device&              m_device;
+    VkSwapchainKHR           m_vk_swapchain = VK_NULL_HANDLE;
+    VkSurfaceFormatKHR       m_surface_format;
+    VkPresentModeKHR         m_present_mode;
+    VkExtent2D               m_extent;
+    uint32_t                 m_image_count;
+    std::vector<VkImage>     m_images;
+    std::vector<VkImageView> m_image_views;
 };
 
 } // namespace kzn::vk

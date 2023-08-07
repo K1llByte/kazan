@@ -15,7 +15,7 @@ struct QueueFamilies {
     std::optional<uint32_t> present_family;
 
     bool is_complete() const {
-        return graphics_family.has_value(); //&& present_family.has_value();
+        return graphics_family.has_value() && present_family.has_value();
     }
 };
 
@@ -32,6 +32,7 @@ struct SwapchainSupport {
 struct DeviceParams {
     std::vector<char const*> extensions = {};
     VkPhysicalDeviceFeatures features = {};
+    VkSurfaceKHR             surface = VK_NULL_HANDLE;
 };
 
 class Device {
