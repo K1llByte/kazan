@@ -15,7 +15,7 @@ public:
     // Move
     Swapchain(Swapchain&&) = delete;
     Swapchain& operator=(Swapchain&&) = delete;
-    // Ctor
+    // Dtor
     ~Swapchain();
 
 private:
