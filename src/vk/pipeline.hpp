@@ -21,11 +21,9 @@ public:
 
     // // VertexInput
     // template<typename ...Ts>
-    // PipelineConfigBuilder& set_vtx_input() noexcept;
+    // PipelineConfigBuilder& set_vertex_input() noexcept;
     // template<typename T>
-    // PipelineConfigBuilder& set_type_vtx_input() noexcept;
-    // // TODO: Non compile time version of this function
-    // // PipelineConfigBuilder& set_vtx_input(VertexInputDescription description) noexcept;
+    // PipelineConfigBuilder& set_type_vertex_input() noexcept;
 
     // // Input Assemply
     // PipelineConfigBuilder& set_topology(VkPrimitiveTopology topology) noexcept;
@@ -65,13 +63,28 @@ public:
     ShaderModule(const ShaderModule&) = delete;
     ShaderModule& operator=(const ShaderModule&) = delete;
     // Move
-    ShaderModule(ShaderModule&&) = default;
-    ShaderModule& operator=(ShaderModule&&) = default;
+    ShaderModule(ShaderModule&&) = delete;
+    ShaderModule& operator=(ShaderModule&&) = delete;
     // Dtor
-    ~ShaderModule() = default;
+    ~ShaderModule();
 
 private:
+    Device&        m_device;
     VkShaderModule m_shader_module;
 };
+
+//////////////////////////////////////////////////////////////
+//                      Implementation                      //
+//////////////////////////////////////////////////////////////
+
+// template<typename ...Ts>
+// PipelineConfig& PipelineConfig::set_vertex_input()
+// {
+//     uint32_t stride = (sizeof(Ts) + ...);
+//     config.vtx_bindings = std::vector{vertex_binding(stride,/*binding*/ 0)};
+//     auto attribs = vertex_attributes<Ts...>(/*binding*/ 0);
+//     config.vtx_attributes = std::vector(attribs.begin(), attribs.end());
+//     return *this;
+// }
 
 } // namespace kzn::vk

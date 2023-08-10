@@ -19,7 +19,7 @@ public:
     ~Swapchain();
 
 private:
-    vk::Device&              m_device;
+    Device&                  m_device;
     VkSwapchainKHR           m_vk_swapchain = VK_NULL_HANDLE;
     VkSurfaceFormatKHR       m_surface_format;
     VkPresentModeKHR         m_present_mode;

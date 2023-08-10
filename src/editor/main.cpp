@@ -4,6 +4,7 @@
 #include "vk/instance.hpp"
 #include "vk/surface.hpp"
 #include "vk/swapchain.hpp"
+#include "vk/pipeline.hpp"
 
 // #include "vk/vulkan_context.hpp"
 
@@ -25,6 +26,9 @@ int main() try {
         .surface = surface.vk_surface()
     });
     auto swapchain = vk::Swapchain(device, surface, window.extent());
+
+    vk::ShaderModule(device, "assets/shaders/triangle/triangle_test.vert.spv");
+    
 
     while(!window.is_closed()) {
         window.poll_events();

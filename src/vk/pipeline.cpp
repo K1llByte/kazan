@@ -100,7 +100,9 @@ PipelineConfig::PipelineConfig() {
 }
 
 
-ShaderModule::ShaderModule(Device& device, std::string_view file_path) {
+ShaderModule::ShaderModule(Device& device, std::string_view file_path)
+    : m_device{device}
+{
     // 1. Read code from file and store it in a vector
     std::ifstream file{file_path.data(), std::ios::ate | std::ios::binary};
     if(!file.is_open()) {
@@ -121,8 +123,12 @@ ShaderModule::ShaderModule(Device& device, std::string_view file_path) {
     create_info.codeSize = code.size();
     create_info.pCode = reinterpret_cast<const uint32_t*>(code.data());
 
-    auto result = vkCreateShaderModule(device.vk_device(), &create_info, nullptr, &m_shader_module);
+    auto result = vkCreateShaderModule(m_device.vk_device(), &create_info, nullptr, &m_shader_module);
     VK_CHECK_MSG(result, "Failed to load shader module!");
+}
+
+ShaderModule::~ShaderModule() {
+    vkDestroyShaderModule(m_device.vk_device(), m_shader_module, nullptr);
 }
 
 
