@@ -10,7 +10,7 @@ class PipelineConfig {
     friend class Pipeline;
 public:
     // Ctor
-    PipelineConfig();
+    PipelineConfig(VkRenderPass render_pass);
     // Copy
     PipelineConfig(const PipelineConfig&) = delete;
     PipelineConfig& operator=(const PipelineConfig&) = delete;
@@ -83,12 +83,11 @@ public:
     ~Pipeline();
 
 private:
-    Device&          m_device;
-    VkPipeline       m_pipeline;
-    VkPipelineLayout m_pipeline_layout = VK_NULL_HANDLE;
-    // Stages shader modules
+    Device&                     m_device;
+    VkPipeline                  m_pipeline;
+    VkPipelineLayout            m_pipeline_layout = VK_NULL_HANDLE;
     std::vector<VkShaderModule> m_shader_modules;
-    // VkViewport       m_viewport;
+    // VkViewport                  m_viewport;
 
 };
 
