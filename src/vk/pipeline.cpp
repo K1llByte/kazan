@@ -100,9 +100,39 @@ PipelineConfig::PipelineConfig() {
 }
 
 
-ShaderModule::ShaderModule(Device& device, std::string_view file_path)
-    : m_device{device}
-{
+// ShaderModule::ShaderModule(Device& device, std::string_view file_path)
+//     : m_device{device}
+// {
+//     // 1. Read code from file and store it in a vector
+//     std::ifstream file{file_path.data(), std::ios::ate | std::ios::binary};
+//     if(!file.is_open()) {
+//         Log::error("Failed to open file '{}'", file_path);
+//         throw 1; // TODO: Error handling
+//         //throw FileError();
+//     }
+
+//     const size_t file_size = static_cast<size_t>(file.tellg());
+//     std::vector<char> code(file_size);
+//     file.seekg(0);
+//     file.read(code.data(), file_size);
+//     file.close();
+
+//     // 2. Create shader module from the code
+//     VkShaderModuleCreateInfo create_info{};
+//     create_info.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
+//     create_info.codeSize = code.size();
+//     create_info.pCode = reinterpret_cast<const uint32_t*>(code.data());
+
+//     auto result = vkCreateShaderModule(m_device.vk_device(), &create_info, nullptr, &m_shader_module);
+//     VK_CHECK_MSG(result, "Failed to load shader module!");
+// }
+
+
+// ShaderModule::~ShaderModule() {
+//     vkDestroyShaderModule(m_device.vk_device(), m_shader_module, nullptr);
+// }
+
+VkShaderModule create_shader_module(Device& device, std::string_view file_path) {
     // 1. Read code from file and store it in a vector
     std::ifstream file{file_path.data(), std::ios::ate | std::ios::binary};
     if(!file.is_open()) {
@@ -123,13 +153,91 @@ ShaderModule::ShaderModule(Device& device, std::string_view file_path)
     create_info.codeSize = code.size();
     create_info.pCode = reinterpret_cast<const uint32_t*>(code.data());
 
-    auto result = vkCreateShaderModule(m_device.vk_device(), &create_info, nullptr, &m_shader_module);
+    VkShaderModule shader_module;
+    auto result = vkCreateShaderModule(device.vk_device(), &create_info, nullptr, &shader_module);
     VK_CHECK_MSG(result, "Failed to load shader module!");
+    return shader_module;
 }
 
-ShaderModule::~ShaderModule() {
-    vkDestroyShaderModule(m_device.vk_device(), m_shader_module, nullptr);
+
+Pipeline::Pipeline(
+    Device& device,
+    const PipelineStages& stages,
+    const PipelineConfig& config)
+    : m_device{device}
+{
+    auto vertex_shader_mod = create_shader_module(device, stages.vertex);
+    auto fragment_shader_mod = create_shader_module(device, stages.fragment);
+    m_shader_modules = { vertex_shader_mod, fragment_shader_mod };
+    // pipeline_layout = config.m_pipeline_layout.pipeline_layout;
+    // descriptor_sets_layouts = config.m_pipeline_layout.descriptor_sets_layouts;
+
+
+    VkPipelineShaderStageCreateInfo shader_stages[2];
+    // Vertex Shader
+    shader_stages[0].sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
+    shader_stages[0].stage = VK_SHADER_STAGE_VERTEX_BIT;
+    shader_stages[0].module = vertex_shader_mod;
+    shader_stages[0].pName = "main";
+    shader_stages[0].flags = 0;
+    shader_stages[0].pNext = nullptr;
+    shader_stages[0].pSpecializationInfo = nullptr;
+    // Fragment Shader
+    shader_stages[1].sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
+    shader_stages[1].stage = VK_SHADER_STAGE_FRAGMENT_BIT;
+    shader_stages[1].module = fragment_shader_mod;
+    shader_stages[1].pName = "main";
+    shader_stages[1].flags = 0;
+    shader_stages[1].pNext = nullptr;
+    shader_stages[1].pSpecializationInfo = nullptr;
+
+    // Setup vertex input description
+    VkPipelineVertexInputStateCreateInfo vertex_input_info{};
+    vertex_input_info.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
+    vertex_input_info.vertexAttributeDescriptionCount = static_cast<uint32_t>(config.m_vtx_attributes.size());
+    vertex_input_info.vertexBindingDescriptionCount = static_cast<uint32_t>(config.m_vtx_bindings.size());
+    vertex_input_info.pVertexAttributeDescriptions = config.m_vtx_attributes.data();
+    vertex_input_info.pVertexBindingDescriptions = config.m_vtx_bindings.data();
+
+    VkGraphicsPipelineCreateInfo pipeline_info{};
+    pipeline_info.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
+    pipeline_info.stageCount = std::size(shader_stages);
+    pipeline_info.pStages = shader_stages;
+    pipeline_info.pVertexInputState = &vertex_input_info;
+    pipeline_info.pInputAssemblyState = &config.m_input_assembly_info;
+    pipeline_info.pViewportState = &config.m_viewport_info;
+    pipeline_info.pRasterizationState = &config.m_rasterization_info;
+    pipeline_info.pMultisampleState = &config.m_multisample_info;
+    pipeline_info.pColorBlendState = &config.m_color_blend_info;
+    pipeline_info.pDepthStencilState = &config.m_depth_stencil_info;
+    pipeline_info.pDynamicState = &config.m_dynamic_state_info;
+
+    pipeline_info.layout = config.m_pipeline_layout;
+    pipeline_info.renderPass = config.m_render_pass;
+    pipeline_info.subpass = config.m_subpass;
+
+    pipeline_info.basePipelineIndex = -1;
+    pipeline_info.basePipelineHandle = VK_NULL_HANDLE;
+
+    auto result = vkCreateGraphicsPipelines(
+            m_device.vk_device(),
+            VK_NULL_HANDLE,
+            1,
+            &pipeline_info,
+            nullptr,
+            &m_pipeline);
+    VK_CHECK_MSG(result, "Failed to create graphics pipeline!");
+    Log::trace("Pipeline created");
 }
 
+
+Pipeline::~Pipeline() {
+    for(auto shader_module : m_shader_modules) {
+        vkDestroyShaderModule(m_device.vk_device(), shader_module, nullptr);
+    }
+    //vkDestroyPipelineLayout(device->vk_device(), pipeline_layout, nullptr);
+    vkDestroyPipeline(m_device.vk_device(), m_pipeline, nullptr);
+    Log::trace("Pipeline destroyed");
+}
 
 } // namespace kzn::vk

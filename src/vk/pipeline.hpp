@@ -7,6 +7,7 @@
 namespace kzn::vk {
 
 class PipelineConfig {
+    friend class Pipeline;
 public:
     // Ctor
     PipelineConfig();
@@ -50,27 +51,45 @@ private:
     VkPipelineDepthStencilStateCreateInfo          m_depth_stencil_info;
     std::vector<VkDynamicState>                    m_dynamic_state_enables;
     VkPipelineDynamicStateCreateInfo               m_dynamic_state_info;
-    //PipelineLayout                                 m_pipeline_layout;
-    //VkRenderPass                                   m_render_pass = VK_NULL_HANDLE;
-    //uint32_t                                       m_subpass = 0;
+    VkPipelineLayout                               m_pipeline_layout = VK_NULL_HANDLE;
+    VkRenderPass                                   m_render_pass = VK_NULL_HANDLE;
+    uint32_t                                       m_subpass = 0;
 };
 
-class ShaderModule {
+
+struct PipelineStages {
+    std::string_view vertex;
+    std::string_view tess_control;
+    std::string_view tess_evaluation;
+    std::string_view geometry;
+    std::string_view fragment;
+};
+
+
+class Pipeline {
 public:
     // Ctor
-    ShaderModule(Device& device, std::string_view filename);
+    Pipeline(
+        Device& device,
+        const PipelineStages& stages,
+        const PipelineConfig& config);
     // Copy
-    ShaderModule(const ShaderModule&) = delete;
-    ShaderModule& operator=(const ShaderModule&) = delete;
+    Pipeline(const Pipeline&) = delete;
+    Pipeline& operator=(const Pipeline&) = delete;
     // Move
-    ShaderModule(ShaderModule&&) = delete;
-    ShaderModule& operator=(ShaderModule&&) = delete;
+    Pipeline(Pipeline&&) = delete;
+    Pipeline& operator=(Pipeline&&) = delete;
     // Dtor
-    ~ShaderModule();
+    ~Pipeline();
 
 private:
-    Device&        m_device;
-    VkShaderModule m_shader_module;
+    Device&          m_device;
+    VkPipeline       m_pipeline;
+    VkPipelineLayout m_pipeline_layout = VK_NULL_HANDLE;
+    // Stages shader modules
+    std::vector<VkShaderModule> m_shader_modules;
+    // VkViewport       m_viewport;
+
 };
 
 //////////////////////////////////////////////////////////////

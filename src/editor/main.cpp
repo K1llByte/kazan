@@ -27,8 +27,7 @@ int main() try {
     });
     auto swapchain = vk::Swapchain(device, surface, window.extent());
 
-    vk::ShaderModule(device, "assets/shaders/triangle/triangle_test.vert.spv");
-    
+    //vk::Pipeline()
 
     while(!window.is_closed()) {
         window.poll_events();
