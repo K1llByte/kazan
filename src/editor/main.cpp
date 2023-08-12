@@ -27,14 +27,14 @@ int main() try {
     });
     auto swapchain = vk::Swapchain(device, surface, window.extent());
 
-    auto pipeline = vk::Pipeline(
-        device,
-        vk::PipelineStages{
-            .vertex = "../assets/shaders/triangle/triangle.vert.spv",
-            .fragment = "../assets/shaders/triangle/triangle.frag.spv",
-        },
-        vk::PipelineConfig(VK_NULL_HANDLE)
-    );
+    // auto pipeline = vk::Pipeline(
+    //     device,
+    //     vk::PipelineStages{
+    //         .vertex = "../assets/shaders/triangle/triangle.vert.spv",
+    //         .fragment = "../assets/shaders/triangle/triangle.frag.spv",
+    //     },
+    //     vk::PipelineConfig(VK_NULL_HANDLE)
+    // );
 
     while(!window.is_closed()) {
         window.poll_events();
