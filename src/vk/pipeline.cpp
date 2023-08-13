@@ -7,8 +7,8 @@
 
 namespace kzn::vk {
 
-PipelineConfig::PipelineConfig(VkRenderPass render_pass)
-    : m_render_pass{render_pass}
+PipelineConfig::PipelineConfig(const vk::RenderPass& render_pass)
+    : m_render_pass{render_pass.vk_render_pass()}
 {
     m_input_assembly_info = {};
     m_input_assembly_info.sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO;
@@ -247,7 +247,7 @@ Pipeline::Pipeline(
         1,
         &pipeline_info,
         nullptr,
-        &m_pipeline);
+        &m_vk_pipeline);
     VK_CHECK_MSG(result, "Failed to create graphics pipeline!");
     Log::trace("Pipeline created");
 }
@@ -258,7 +258,7 @@ Pipeline::~Pipeline() {
         vkDestroyShaderModule(m_device.vk_device(), shader_module, nullptr);
     }
     vkDestroyPipelineLayout(m_device.vk_device(), m_pipeline_layout, nullptr);
-    vkDestroyPipeline(m_device.vk_device(), m_pipeline, nullptr);
+    vkDestroyPipeline(m_device.vk_device(), m_vk_pipeline, nullptr);
     Log::trace("Pipeline destroyed");
 }
 

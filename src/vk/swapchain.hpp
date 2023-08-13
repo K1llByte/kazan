@@ -3,6 +3,8 @@
 #include "vk/device.hpp"
 #include "vk/surface.hpp"
 
+#include <span>
+
 namespace kzn::vk {
 
 class Swapchain {
@@ -17,6 +19,11 @@ public:
     Swapchain& operator=(Swapchain&&) = delete;
     // Dtor
     ~Swapchain();
+
+    constexpr VkFormat image_format() const { return m_surface_format.format; }
+    constexpr VkExtent2D extent() const { return m_extent; }
+    constexpr std::span<VkImage> image() { return std::span{m_images.data(), m_images.size()}; }
+    constexpr std::span<VkImageView> image_views() { return std::span{m_image_views.data(), m_image_views.size()}; }
 
 private:
     Device&                  m_device;

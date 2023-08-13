@@ -1,31 +1,106 @@
 #include "render_pass.hpp"
 
 #include "vk/error.hpp"
+#include "core/log.hpp"
+
+#include <algorithm>
 
 namespace kzn::vk {
 
 RenderPass::RenderPass(
     Device& device,
-    std::vector<VkAttachmentDescription>&& attachment_descriptions,
-    std::vector<VkSubpassDescription>&& subpass_descriptions,
-    std::vector<VkSubpassDependency>&& subpass_dependencies)
+    RenderPassParams&& params)
     : m_device{device}
+    , m_subpasses_count{params.subpasses.size()}
 {
+    // Convert params.attachments
+    std::vector<VkAttachmentDescription> attachments;
+    std::ranges::transform(params.attachments, std::back_inserter(attachments),
+        [](const AttachmentDesc& ad) {
+            return VkAttachmentDescription{
+                .flags = ad.flags,
+                .format = ad.format,
+                .samples = ad.samples,
+                .loadOp = ad.load_op,
+                .storeOp = ad.store_op,
+                .stencilLoadOp = ad.stencil_load_op,
+                .stencilStoreOp = ad.stencil_store_op,
+                .initialLayout = ad.initial_layout,
+                .finalLayout = ad.final_layout,
+            };
+        }
+    );
+
+    // CONVERT: params.subpasses
+    std::vector<VkSubpassDescription> subpasses;
+    std::ranges::transform(params.subpasses, std::back_inserter(subpasses),
+        [](const SubpassDesc& sd) {
+            return VkSubpassDescription {
+                .flags = sd.flags,
+                .pipelineBindPoint = sd.pipeline_bind_point,
+                .inputAttachmentCount = static_cast<uint32_t>(sd.input_attachments.size()),
+                .pInputAttachments = sd.input_attachments.data(),
+                .colorAttachmentCount = static_cast<uint32_t>(sd.color_attachments.size()),
+                .pColorAttachments = sd.color_attachments.data(),
+                .pResolveAttachments = sd.resolve_attachments.data(),
+                .pDepthStencilAttachment = sd.depth_stencil_attachment.data(),
+                .preserveAttachmentCount = static_cast<uint32_t>(sd.preserve_attachments.size()),
+                .pPreserveAttachments = sd.preserve_attachments.data(),
+            };
+        }
+    );
+
+
     VkRenderPassCreateInfo render_pass_info{};
     render_pass_info.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
-    render_pass_info.attachmentCount = static_cast<uint32_t>(attachment_descriptions.size());
-    render_pass_info.pAttachments = attachment_descriptions.data();
-    render_pass_info.subpassCount = static_cast<uint32_t>(subpass_descriptions.size());
-    render_pass_info.pSubpasses = subpass_descriptions.data();
-    render_pass_info.dependencyCount = static_cast<uint32_t>(subpass_dependencies.size());
-    render_pass_info.pDependencies = subpass_dependencies.data();
+    render_pass_info.attachmentCount = static_cast<uint32_t>(attachments.size());
+    render_pass_info.pAttachments = attachments.data();
+    render_pass_info.subpassCount = static_cast<uint32_t>(subpasses.size());
+    render_pass_info.pSubpasses = subpasses.data();
+    render_pass_info.dependencyCount = static_cast<uint32_t>(params.dependencies.size());
+    render_pass_info.pDependencies = params.dependencies.data();
 
-    auto result = vkCreateRenderPass(m_device.vk_device(), &render_pass_info, nullptr, &m_render_pass);
+    auto result = vkCreateRenderPass(m_device.vk_device(), &render_pass_info, nullptr, &m_vk_render_pass);
     VK_CHECK_MSG(result, "Failed to create render pass!");
+    Log::trace("Render Pass created");
 }
 
 RenderPass::~RenderPass() {
-    vkDestroyRenderPass(m_device.vk_device(), m_render_pass, nullptr);
+    vkDestroyRenderPass(m_device.vk_device(), m_vk_render_pass, nullptr);
+    Log::trace("Render Pass destroyed");
 }
+
+
+Framebuffer::Framebuffer(
+    RenderPass& render_pass,
+    const std::vector<VkImageView>& attachments,
+    VkExtent2D extent)
+    : m_device{render_pass.device()}
+{
     
+    VkFramebufferCreateInfo framebuffer_info{};
+    framebuffer_info.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
+    framebuffer_info.renderPass = render_pass.vk_render_pass();
+    framebuffer_info.attachmentCount = attachments.size();
+    framebuffer_info.pAttachments = attachments.data();
+    framebuffer_info.width = extent.width;
+    framebuffer_info.height = extent.height;
+    framebuffer_info.layers = 1;
+
+    auto result = vkCreateFramebuffer(m_device.vk_device(), &framebuffer_info, nullptr, &m_vk_framebuffer);
+    VK_CHECK_MSG(result, "Failed to create framebuffer!");
+}
+
+Framebuffer::Framebuffer(Framebuffer&& other)
+    : m_device{other.m_device}
+    , m_vk_framebuffer{other.m_vk_framebuffer}
+{
+    other.m_vk_framebuffer = VK_NULL_HANDLE;
+}
+
+Framebuffer::~Framebuffer() {
+    if(m_vk_framebuffer != VK_NULL_HANDLE) {
+        vkDestroyFramebuffer(m_device.vk_device(), m_vk_framebuffer, nullptr);
+    }
+}
 } // namespace kzn::vk

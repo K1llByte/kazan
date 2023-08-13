@@ -1,6 +1,6 @@
 #pragma once
 
-#include "device.hpp"
+#include "render_pass.hpp"
 
 #include <string_view>
 
@@ -10,7 +10,7 @@ class PipelineConfig {
     friend class Pipeline;
 public:
     // Ctor
-    PipelineConfig(VkRenderPass render_pass);
+    PipelineConfig(const vk::RenderPass& render_pass);
     // Copy
     PipelineConfig(const PipelineConfig&) = delete;
     PipelineConfig& operator=(const PipelineConfig&) = delete;
@@ -84,10 +84,9 @@ public:
 
 private:
     Device&                     m_device;
-    VkPipeline                  m_pipeline;
+    VkPipeline                  m_vk_pipeline;
     VkPipelineLayout            m_pipeline_layout = VK_NULL_HANDLE;
     std::vector<VkShaderModule> m_shader_modules;
-    // VkViewport                  m_viewport;
 
 };
 
