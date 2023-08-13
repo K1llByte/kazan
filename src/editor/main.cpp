@@ -7,6 +7,7 @@
 #include "vk/pipeline.hpp"
 #include "vk/render_pass.hpp"
 #include "vk/cmd_buffer.hpp"
+#include "vk/utils.hpp"
 
 // #include "vk/vulkan_context.hpp"
 
