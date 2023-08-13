@@ -17,6 +17,28 @@ CommandBuffer::CommandBuffer(Device& device, VkCommandPool pool) {
 }
 
 
+void CommandBuffer::begin(VkCommandBufferUsageFlags flags) {
+    VkCommandBufferBeginInfo begin_info{};
+    begin_info.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+    begin_info.flags = 0; // Optional
+    begin_info.pInheritanceInfo = nullptr; // Optional
+
+    auto result = vkBeginCommandBuffer(m_vk_cmd_buffer, &begin_info);
+    VK_CHECK_MSG(result, "Failed to begin recording command buffer!");
+}
+
+void CommandBuffer::end() {
+    auto result = vkEndCommandBuffer(m_vk_cmd_buffer);
+    VK_CHECK_MSG(result, "Failed to end recording command buffer!");
+}
+
+void CommandBuffer::reset(VkCommandBufferResetFlags flags) {
+    auto result = vkResetCommandBuffer(m_vk_cmd_buffer, flags);
+    VK_CHECK_MSG(result, "Failed to reset command buffer!");
+}
+
+
+
 CommandPool::CommandPool(Device& device)
     : m_device{device}
 {

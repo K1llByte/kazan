@@ -19,6 +19,10 @@ public:
 
     constexpr VkCommandBuffer vk_cmd_buffer() const { return m_vk_cmd_buffer; }
 
+    void begin(VkCommandBufferUsageFlags flags = 0);
+    void end();
+    void reset(VkCommandBufferResetFlags flags);
+
 private:
     VkCommandBuffer m_vk_cmd_buffer;
 };
