@@ -6,6 +6,7 @@
 #include "vk/swapchain.hpp"
 #include "vk/pipeline.hpp"
 #include "vk/render_pass.hpp"
+#include "vk/cmd_buffer.hpp"
 
 // #include "vk/vulkan_context.hpp"
 
@@ -14,7 +15,24 @@
 
 using namespace kzn;
 
-vk::vector<vk::Framebuffer> create_swapchain_framebuffers(vk::RenderPass& render_pass, const vk::Swapchain& swapchain)
+std::vector<vk::Framebuffer> create_swapchain_framebuffers(
+    vk::RenderPass& render_pass,
+    vk::Swapchain& swapchain)
+{
+    std::vector<vk::Framebuffer> swapchain_framebuffers;
+    const size_t imgs_count = swapchain.image_views().size();
+    swapchain_framebuffers.reserve(imgs_count);
+
+    for(size_t i = 0; i < imgs_count; ++i) {
+        swapchain_framebuffers.emplace_back(
+            render_pass,
+            std::vector{ swapchain.image_views()[i] },
+            swapchain.extent()
+        );
+    }
+
+    return swapchain_framebuffers;
+}
 
 vk::RenderPass simple_pass(vk::Device& device, VkFormat color_format) {
     std::vector attachment_descs {
@@ -67,17 +85,7 @@ int main() try {
 
     auto render_pass = simple_pass(device, swapchain.image_format());
     auto pipeline = triangle_pipeline(render_pass);
-
-    std::vector<vk::Framebuffer> swapchain_framebuffers;
-    const size_t imgs_count = swapchain.image_views().size();
-    swapchain_framebuffers.reserve(imgs_count);
-    for(size_t i = 0; i < imgs_count; ++i) {
-        swapchain_framebuffers.emplace_back(
-            render_pass,
-            std::vector{ swapchain.image_views()[i] },
-            swapchain.extent()
-        );
-    }
+    auto framebuffers = create_swapchain_framebuffers(render_pass, swapchain);
 
     while(!window.is_closed()) {
         window.poll_events();
