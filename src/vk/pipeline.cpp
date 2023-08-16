@@ -262,4 +262,12 @@ Pipeline::~Pipeline() {
     Log::trace("Pipeline destroyed");
 }
 
+
+void Pipeline::bind(vk::CommandBuffer& cmd_buffer) {
+    vkCmdBindPipeline(
+        cmd_buffer.vk_cmd_buffer(),
+        VK_PIPELINE_BIND_POINT_GRAPHICS,
+        m_vk_pipeline);
+}
+
 } // namespace kzn::vk

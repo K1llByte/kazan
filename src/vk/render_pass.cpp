@@ -71,11 +71,42 @@ RenderPass::~RenderPass() {
 }
 
 
+void RenderPass::begin(CommandBuffer& cmd_buffer, Framebuffer& framebuffer) {
+    VkRenderPassBeginInfo begin_info{};
+    begin_info.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
+    begin_info.renderPass = m_vk_render_pass;
+    begin_info.framebuffer = framebuffer.vk_framebuffer();
+    begin_info.renderArea.offset = {0, 0};
+    begin_info.renderArea.extent = framebuffer.extent();
+
+    // TODO: Make this an argument
+    auto clear_values = std::array{
+        // Color clear
+        VkClearValue{{{0.009, 0.009, 0.009, 1.0f}}},
+    };
+    begin_info.clearValueCount = static_cast<uint32_t>(clear_values.size());
+    begin_info.pClearValues = clear_values.data();
+
+    // VK_SUBPASS_CONTENTS_INLINE: The render pass commands
+    // will be embedded in the primary command buffer itself and
+    // no secondary command buffers will be executed.
+    // VK_SUBPASS_CONTENTS_SECONDARY_COMMAND_BUFFERS: The render
+    // pass commands will be executed from secondary command buffers.
+    vkCmdBeginRenderPass(cmd_buffer.vk_cmd_buffer(), &begin_info, VK_SUBPASS_CONTENTS_INLINE);
+}
+
+
+void RenderPass::end(CommandBuffer& cmd_buffer) {
+    vkCmdEndRenderPass(cmd_buffer.vk_cmd_buffer());
+}
+
+
 Framebuffer::Framebuffer(
     RenderPass& render_pass,
     const std::vector<VkImageView>& attachments,
     VkExtent2D extent)
     : m_device{render_pass.device()}
+    , m_extent{extent}
 {
     
     VkFramebufferCreateInfo framebuffer_info{};

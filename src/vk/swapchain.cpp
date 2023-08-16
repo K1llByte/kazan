@@ -100,6 +100,7 @@ Swapchain::Swapchain(Device& device, Surface& surface, VkExtent2D requested_exte
     }
 }
 
+
 Swapchain::~Swapchain() {
     // Destroy Image Views
     for(auto image_view : m_image_views) {
@@ -109,6 +110,18 @@ Swapchain::~Swapchain() {
     // Destroy Swapchain
     vkDestroySwapchainKHR(m_device.vk_device(), m_vk_swapchain, nullptr);
     Log::trace("Swapchain destroyed");
+}
+
+
+uint32_t Swapchain::acquire_next(VkSemaphore signal_semaphore) {
+    auto result = vkAcquireNextImageKHR(
+        m_device.vk_device(),
+        m_vk_swapchain,
+        UINT64_MAX,
+        signal_semaphore,
+        VK_NULL_HANDLE,
+        &m_current_index
+    );
 }
 
 }

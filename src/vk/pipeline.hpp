@@ -82,6 +82,8 @@ public:
     // Dtor
     ~Pipeline();
 
+    void bind(vk::CommandBuffer& cmd_buffer);
+
 private:
     Device&                     m_device;
     VkPipeline                  m_vk_pipeline;

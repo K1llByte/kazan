@@ -56,6 +56,8 @@ public:
     const SwapchainSupport& swapchain_support() const { return m_swapchain_support; }
     const QueueFamilies& queue_families() const { return m_queue_families; }
 
+    void wait_idle() { vkDeviceWaitIdle(m_vk_device); }
+
 private:
     vk::Instance&    m_instance;
     VkDevice         m_vk_device = VK_NULL_HANDLE;

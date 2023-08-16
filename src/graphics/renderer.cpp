@@ -39,14 +39,14 @@ void Renderer::render_frame(const RenderFrameFunc& render_func) {
 
     // Acquire next frame
     // TODO: Turn this into vk::Swapchain member function
-    uint32_t imageIndex;
+    uint32_t image_index;
     vkAcquireNextImageKHR(
         m_device.vk_device(),
         m_swapchain.vk_swapchain(),
         UINT64_MAX,
         m_image_available,
         VK_NULL_HANDLE,
-        &imageIndex);
+        &image_index);
     
     m_cmd_buffer.reset();
     m_cmd_buffer.begin();
@@ -83,6 +83,19 @@ void Renderer::render_frame(const RenderFrameFunc& render_func) {
     VK_CHECK_MSG(result, "Failed to submit command buffer!");
     
     // Preset frame
+    VkPresentInfoKHR present_info{};
+    present_info.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
+    present_info.waitSemaphoreCount = 1;
+    present_info.pWaitSemaphores = signal_semaphores;
+    VkSwapchainKHR swapchains[] = { m_swapchain.vk_swapchain() };
+    present_info.swapchainCount = 1;
+    present_info.pSwapchains = swapchains;
+    present_info.pImageIndices = &image_index;
+
+
+    result = vkQueuePresentKHR(m_device.present_queue(), &present_info);
+    VK_CHECK_MSG(result, "Failed to present frame!");
+
 }
 
 } // namespace kzn

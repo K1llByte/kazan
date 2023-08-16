@@ -1,10 +1,11 @@
 #pragma once
 
-#include "device.hpp"
+#include "vk/device.hpp"
+#include "vk/error.hpp"
 
 namespace kzn::vk {
 
-VkSemaphore create_semaphore(Device& device) {
+inline VkSemaphore create_semaphore(Device& device) {
     VkSemaphoreCreateInfo semaphore_info{};
     semaphore_info.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
     VkSemaphore semaphore;
@@ -13,7 +14,7 @@ VkSemaphore create_semaphore(Device& device) {
     return semaphore;
 }
 
-VkFence create_fence(Device& device, VkFenceCreateFlags flags = {}) {
+inline VkFence create_fence(Device& device, VkFenceCreateFlags flags = {}) {
     VkFenceCreateInfo fence_info{};
     fence_info.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
     fence_info.flags = flags;
@@ -23,12 +24,12 @@ VkFence create_fence(Device& device, VkFenceCreateFlags flags = {}) {
     return fence;
 }
 
-void destroy_semaphore(Device& device, VkSemaphore semaphore) {
+inline void destroy_semaphore(Device& device, VkSemaphore semaphore) {
     vkDestroySemaphore(device.vk_device(), semaphore, nullptr);
 }
 
 
-void destroy_fence(Device& device, VkFence fence) {
+inline void destroy_fence(Device& device, VkFence fence) {
     vkDestroyFence(device.vk_device(), fence, nullptr);
 }
 

@@ -8,6 +8,7 @@
 #include "vk/render_pass.hpp"
 #include "vk/cmd_buffer.hpp"
 #include "vk/utils.hpp"
+#include "graphics/renderer.hpp"
 
 // #include "vk/vulkan_context.hpp"
 
@@ -98,9 +99,35 @@ int main() try {
     auto pipeline = triangle_pipeline(render_pass);
     auto framebuffers = create_swapchain_framebuffers(render_pass, swapchain);
 
+    auto renderer = Renderer(device, swapchain, window);
+
     while(!window.is_closed()) {
         window.poll_events();
+        renderer.render_frame([&](auto& cmd_buffer) {
+            // Render pass
+            render_pass.begin(cmd_buffer, framebuffers[swapchain.current_index()]);
+            // pipeline.bind(cmd_buffer);
+            // // TODO: Utilities for scissor and viewport
+            // VkViewport viewport{};
+            // viewport.x = 0.0f;
+            // viewport.y = 0.0f;
+            // viewport.width = static_cast<float>(swapchain.extent().width);
+            // viewport.height = static_cast<float>(swapchain.extent().height);
+            // viewport.minDepth = 0.0f;
+            // viewport.maxDepth = 1.0f;
+            // vkCmdSetViewport(cmd_buffer.vk_cmd_buffer(), 0, 1, &viewport);
+
+            // VkRect2D scissor{};
+            // scissor.offset = {0, 0};
+            // scissor.extent = swapchain.extent();
+            // vkCmdSetScissor(cmd_buffer.vk_cmd_buffer(), 0, 1, &scissor);
+            // vkCmdDraw(cmd_buffer.vk_cmd_buffer(), 3, 1, 0, 0);
+            render_pass.end(cmd_buffer);
+        });
+
     }
+
+    device.wait_idle();
 }
 catch(vk::ResultError re) {
     Log::error("{}", re.message());

@@ -25,6 +25,9 @@ public:
     constexpr VkExtent2D extent() const { return m_extent; }
     constexpr std::span<VkImage> image() { return std::span{m_images.data(), m_images.size()}; }
     constexpr std::span<VkImageView> image_views() { return std::span{m_image_views.data(), m_image_views.size()}; }
+    constexpr size_t current_index() const { return m_current_index; }
+
+    uint32_t acquire_next(VkSemaphore signal_semaphore);
 
 private:
     Device&                  m_device;
@@ -35,6 +38,7 @@ private:
     uint32_t                 m_image_count;
     std::vector<VkImage>     m_images;
     std::vector<VkImageView> m_image_views;
+    uint32_t                 m_current_index = 0;
 };
 
 } // namespace kzn::vk

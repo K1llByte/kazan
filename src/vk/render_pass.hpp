@@ -1,9 +1,11 @@
 #pragma once
 
 #include "device.hpp"
+#include "cmd_buffer.hpp"
 
 #include <vector>
 #include <span>
+#include <functional>
 
 namespace kzn::vk {
 
@@ -37,6 +39,8 @@ struct RenderPassParams {
     std::vector<VkSubpassDependency> dependencies;
 };
 
+class Framebuffer;
+
 class RenderPass {
 public:
     // Ctor
@@ -54,6 +58,9 @@ public:
 
     constexpr Device& device() { return m_device; }
     constexpr VkRenderPass vk_render_pass() const { return m_vk_render_pass; }
+
+    void begin(CommandBuffer& cmd_buffer, Framebuffer& framebuffer);
+    void end(CommandBuffer& cmd_buffer);
 
 private:
     Device&      m_device;
@@ -76,10 +83,14 @@ public:
     Framebuffer& operator=(Framebuffer&&) = default;
     // Dtor
     ~Framebuffer();
+
+    constexpr VkFramebuffer vk_framebuffer() const { return m_vk_framebuffer; }
+    constexpr VkExtent2D extent() const { return m_extent; }
     
 private:
     Device&       m_device;
     VkFramebuffer m_vk_framebuffer;
+    VkExtent2D    m_extent;
 };
 
 } // namespace kzn::vk
