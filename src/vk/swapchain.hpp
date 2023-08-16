@@ -20,6 +20,7 @@ public:
     // Dtor
     ~Swapchain();
 
+    constexpr VkSwapchainKHR vk_swapchain() { return m_vk_swapchain; }
     constexpr VkFormat image_format() const { return m_surface_format.format; }
     constexpr VkExtent2D extent() const { return m_extent; }
     constexpr std::span<VkImage> image() { return std::span{m_images.data(), m_images.size()}; }

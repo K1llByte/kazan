@@ -50,6 +50,9 @@ public:
 
     // Getters
     VkDevice vk_device() { return m_vk_device; }
+    constexpr VkQueue graphics_queue() { return m_vk_graphics_queue; }
+    constexpr VkQueue present_queue() { return m_vk_present_queue; }
+
     const SwapchainSupport& swapchain_support() const { return m_swapchain_support; }
     const QueueFamilies& queue_families() const { return m_queue_families; }
 

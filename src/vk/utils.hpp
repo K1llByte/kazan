@@ -13,9 +13,10 @@ VkSemaphore create_semaphore(Device& device) {
     return semaphore;
 }
 
-VkFence create_fence(Device& device) {
+VkFence create_fence(Device& device, VkFenceCreateFlags flags = {}) {
     VkFenceCreateInfo fence_info{};
     fence_info.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
+    fence_info.flags = flags;
     VkFence fence;
     auto result = vkCreateFence(device.vk_device(), &fence_info, nullptr, &fence);
     VK_CHECK_MSG(result, "Failed to created synchronization fence!");
