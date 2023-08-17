@@ -122,6 +122,7 @@ uint32_t Swapchain::acquire_next(VkSemaphore signal_semaphore) {
         VK_NULL_HANDLE,
         &m_current_index
     );
+    return m_current_index;
 }
 
 }

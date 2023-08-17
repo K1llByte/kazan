@@ -38,15 +38,7 @@ void Renderer::render_frame(const RenderFrameFunc& render_func) {
     vkResetFences(m_device.vk_device(), 1, &m_in_flight_fence);
 
     // Acquire next frame
-    // TODO: Turn this into vk::Swapchain member function
-    uint32_t image_index;
-    vkAcquireNextImageKHR(
-        m_device.vk_device(),
-        m_swapchain.vk_swapchain(),
-        UINT64_MAX,
-        m_image_available,
-        VK_NULL_HANDLE,
-        &image_index);
+    uint32_t image_index = m_swapchain.acquire_next(m_image_available);
     
     m_cmd_buffer.reset();
     m_cmd_buffer.begin();
