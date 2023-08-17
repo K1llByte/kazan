@@ -47,7 +47,7 @@ PipelineConfig::PipelineConfig(const vk::RenderPass& render_pass)
     m_rasterization_info.polygonMode = VK_POLYGON_MODE_FILL;
     m_rasterization_info.lineWidth = 1.0f;
     m_rasterization_info.cullMode = VK_CULL_MODE_BACK_BIT; // VK_CULL_MODE_NONE;
-    m_rasterization_info.frontFace = VK_FRONT_FACE_COUNTER_CLOCKWISE; //VK_FRONT_FACE_CLOCKWISE;
+    m_rasterization_info.frontFace = VK_FRONT_FACE_CLOCKWISE; // VK_FRONT_FACE_COUNTER_CLOCKWISE;
     m_rasterization_info.depthBiasEnable = VK_FALSE;
     m_rasterization_info.depthBiasConstantFactor = 0.0f;  // Optional
     m_rasterization_info.depthBiasClamp = 0.0f;           // Optional
@@ -181,7 +181,7 @@ Pipeline::Pipeline(
         .setLayoutCount = 0,
         .pSetLayouts = nullptr,
         .pushConstantRangeCount = 0,
-        .pPushConstantRanges = 0,
+        .pPushConstantRanges = nullptr,
     };
 
     auto result = vkCreatePipelineLayout(m_device.vk_device(), &pipeline_layout_info, nullptr, &m_pipeline_layout);

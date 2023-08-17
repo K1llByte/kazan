@@ -116,7 +116,8 @@ int main() try {
                 framebuffers[swapchain.current_index()],
                 { VkClearValue{{{brightness, brightness, brightness, 1.0f}}} });
 
-            pipeline.bind(cmd_buffer);
+            //vk::cmd_set_viewport(cmd_buffer, renderer.current_viewport());
+            //vk::cmd_set_scissor(cmd_buffer, renderer.current_scissor());
             // // TODO: Utilities for scissor and viewport
             VkViewport viewport{};
             viewport.x = 0.0f;
@@ -131,6 +132,7 @@ int main() try {
             scissor.offset = {0, 0};
             scissor.extent = swapchain.extent();
             vkCmdSetScissor(cmd_buffer.vk_cmd_buffer(), 0, 1, &scissor);
+            pipeline.bind(cmd_buffer);
             vkCmdDraw(cmd_buffer.vk_cmd_buffer(), 3, 1, 0, 0);
             render_pass.end(cmd_buffer);
         });
