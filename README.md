@@ -12,6 +12,16 @@ This project is an experimental computer graphics engine for experimentation and
 ![](https://i.imgur.com/miT8j6t.png)
 <!-- ![](https://i.imgur.com/u8C2qSc.png) -->
 
+## Roadmap
+
+**Base renderer**
+- Dynamic viewport and scissor
+- Frames in flight
+- Resizable swapchain
+- Push constants
+- Descriptor sets
+    
+
 ## Building
 
 ```sh

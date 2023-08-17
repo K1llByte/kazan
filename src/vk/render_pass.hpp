@@ -59,7 +59,7 @@ public:
     constexpr Device& device() { return m_device; }
     constexpr VkRenderPass vk_render_pass() const { return m_vk_render_pass; }
 
-    void begin(CommandBuffer& cmd_buffer, Framebuffer& framebuffer);
+    void begin(CommandBuffer& cmd_buffer, Framebuffer& framebuffer, std::vector<VkClearValue>&& clear_values = {});
     void end(CommandBuffer& cmd_buffer);
 
 private:

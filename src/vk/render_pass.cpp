@@ -71,7 +71,7 @@ RenderPass::~RenderPass() {
 }
 
 
-void RenderPass::begin(CommandBuffer& cmd_buffer, Framebuffer& framebuffer) {
+void RenderPass::begin(CommandBuffer& cmd_buffer, Framebuffer& framebuffer, std::vector<VkClearValue>&& clear_values) {
     VkRenderPassBeginInfo begin_info{};
     begin_info.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
     begin_info.renderPass = m_vk_render_pass;
@@ -79,11 +79,6 @@ void RenderPass::begin(CommandBuffer& cmd_buffer, Framebuffer& framebuffer) {
     begin_info.renderArea.offset = {0, 0};
     begin_info.renderArea.extent = framebuffer.extent();
 
-    // TODO: Make this an argument
-    auto clear_values = std::array{
-        // Color clear
-        VkClearValue{{{0.009, 0.009, 0.009, 1.0f}}},
-    };
     begin_info.clearValueCount = static_cast<uint32_t>(clear_values.size());
     begin_info.pClearValues = clear_values.data();
 

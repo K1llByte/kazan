@@ -10,6 +10,8 @@
 #include "vk/utils.hpp"
 #include "graphics/renderer.hpp"
 
+#include <cmath>
+
 // #include "vk/vulkan_context.hpp"
 
 // TODO: Create alias type in core/ Ref = std::reference_wrapper
@@ -101,30 +103,40 @@ int main() try {
 
     auto renderer = Renderer(device, swapchain, window);
 
+    size_t frame_counter = 0;
     while(!window.is_closed()) {
         window.poll_events();
+        
+        // Render
         renderer.render_frame([&](auto& cmd_buffer) {
             // Render pass
-            render_pass.begin(cmd_buffer, framebuffers[swapchain.current_index()]);
-            // pipeline.bind(cmd_buffer);
-            // // TODO: Utilities for scissor and viewport
-            // VkViewport viewport{};
-            // viewport.x = 0.0f;
-            // viewport.y = 0.0f;
-            // viewport.width = static_cast<float>(swapchain.extent().width);
-            // viewport.height = static_cast<float>(swapchain.extent().height);
-            // viewport.minDepth = 0.0f;
-            // viewport.maxDepth = 1.0f;
-            // vkCmdSetViewport(cmd_buffer.vk_cmd_buffer(), 0, 1, &viewport);
+            float brightness = 0.5f + 0.5f * std::sin(0.001f * float(frame_counter));
+            render_pass.begin(
+                cmd_buffer,
+                framebuffers[swapchain.current_index()],
+                { VkClearValue{{{brightness, brightness, brightness, 1.0f}}} });
 
-            // VkRect2D scissor{};
-            // scissor.offset = {0, 0};
-            // scissor.extent = swapchain.extent();
-            // vkCmdSetScissor(cmd_buffer.vk_cmd_buffer(), 0, 1, &scissor);
-            // vkCmdDraw(cmd_buffer.vk_cmd_buffer(), 3, 1, 0, 0);
+            pipeline.bind(cmd_buffer);
+            // // TODO: Utilities for scissor and viewport
+            VkViewport viewport{};
+            viewport.x = 0.0f;
+            viewport.y = 0.0f;
+            viewport.width = static_cast<float>(swapchain.extent().width);
+            viewport.height = static_cast<float>(swapchain.extent().height);
+            viewport.minDepth = 0.0f;
+            viewport.maxDepth = 1.0f;
+            vkCmdSetViewport(cmd_buffer.vk_cmd_buffer(), 0, 1, &viewport);
+
+            VkRect2D scissor{};
+            scissor.offset = {0, 0};
+            scissor.extent = swapchain.extent();
+            vkCmdSetScissor(cmd_buffer.vk_cmd_buffer(), 0, 1, &scissor);
+            vkCmdDraw(cmd_buffer.vk_cmd_buffer(), 3, 1, 0, 0);
             render_pass.end(cmd_buffer);
         });
 
+        // Increment frame counter
+        frame_counter += 1;
     }
 
     device.wait_idle();
