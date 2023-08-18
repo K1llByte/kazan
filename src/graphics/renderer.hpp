@@ -9,6 +9,28 @@
 
 namespace kzn {
 
+struct PerFrameData {
+public:
+    vk::CommandBuffer cmd_buffer;
+    VkSemaphore       img_available;
+    VkSemaphore       finished_render;
+    VkFence           in_flight_fence;
+
+    // Ctor
+    PerFrameData(vk::Device& device, vk::CommandPool& cmd_pool);
+    // Copy
+    PerFrameData(const PerFrameData&) = delete;
+    PerFrameData& operator=(const PerFrameData&) = delete;
+    // Move
+    PerFrameData(PerFrameData&&) = delete;
+    PerFrameData& operator=(PerFrameData&&) = delete;
+    // Dtor
+    ~PerFrameData();
+
+private:
+    vk::Device& m_device;
+};
+
 class Renderer {
 public:
     using RenderFrameFunc = std::function<void(vk::CommandBuffer&)>;
@@ -33,12 +55,12 @@ private:
     vk::Device&       m_device;
     vk::Swapchain&    m_swapchain;
     vk::CommandPool   m_cmd_pool;
-    vk::CommandBuffer m_cmd_buffer;
     Window&           m_window;
     // Sync
-    VkSemaphore m_image_available; 
-    VkSemaphore m_render_finished; 
-    VkFence     m_in_flight_fence; 
+    constexpr static size_t   MAX_FRAMES_IN_FLIGHT = 2;
+    size_t                    m_next_idx = 0;
+    std::vector<PerFrameData> m_frame_data;
+
 };
 
 } // namespace kzn

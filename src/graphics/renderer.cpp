@@ -4,6 +4,22 @@
 
 namespace kzn {
 
+PerFrameData::PerFrameData(vk::Device& device, vk::CommandPool& cmd_pool)
+    : m_device{device}
+    , cmd_buffer(cmd_pool.allocate())
+{
+    img_available = vk::create_semaphore(m_device);
+    finished_render = vk::create_semaphore(m_device);
+    in_flight_fence = vk::create_fence(m_device);
+}
+
+PerFrameData::~PerFrameData() {
+    vk::destroy_semaphore(m_device, img_available);
+    vk::destroy_semaphore(m_device, finished_render);
+    vk::destroy_fence(m_device, in_flight_fence);
+}
+
+
 Renderer::Renderer(
     vk::Device& device,
     vk::Swapchain& swapchain,
@@ -11,8 +27,11 @@ Renderer::Renderer(
     : m_device{device}
     , m_swapchain{swapchain}
     , m_cmd_pool(device)
+    , m_frame_data(device, m_cmd_pool)
     , m_cmd_buffer(m_cmd_pool.allocate())
     , m_window{window}
+    // Per frame data
+    , 
 {
     m_image_available = vk::create_semaphore(m_device);
     m_render_finished = vk::create_semaphore(m_device);
