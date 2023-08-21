@@ -16,9 +16,9 @@ PerFrameData::PerFrameData(vk::Device& device, vk::CommandPool& cmd_pool)
 PerFrameData::PerFrameData(PerFrameData&& other)
     : cmd_buffer{std::move(other.cmd_buffer)}
     , img_available{other.img_available}
-    , finished_render{ther.finished_render}
+    , finished_render{other.finished_render}
     , in_flight_fence{other.in_flight_fence}
-    , m_device{other.device}
+    , m_device{other.m_device}
 {
     other.in_flight_fence = VK_NULL_HANDLE;
 }
