@@ -13,10 +13,22 @@ PerFrameData::PerFrameData(vk::Device& device, vk::CommandPool& cmd_pool)
     in_flight_fence = vk::create_fence(m_device, VK_FENCE_CREATE_SIGNALED_BIT);
 }
 
+PerFrameData::PerFrameData(PerFrameData&& other)
+    : cmd_buffer{std::move(other.cmd_buffer)}
+    , img_available{other.img_available}
+    , finished_render{ther.finished_render}
+    , in_flight_fence{other.in_flight_fence}
+    , m_device{other.device}
+{
+    other.in_flight_fence = VK_NULL_HANDLE;
+}
+
 PerFrameData::~PerFrameData() {
-    vk::destroy_semaphore(m_device, img_available);
-    vk::destroy_semaphore(m_device, finished_render);
-    vk::destroy_fence(m_device, in_flight_fence);
+    if(in_flight_fence != VK_NULL_HANDLE) {
+        vk::destroy_semaphore(m_device, img_available);
+        vk::destroy_semaphore(m_device, finished_render);
+        vk::destroy_fence(m_device, in_flight_fence);
+    }
 }
 
 

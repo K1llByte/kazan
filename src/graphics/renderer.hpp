@@ -22,7 +22,7 @@ public:
     PerFrameData(const PerFrameData&) = delete;
     PerFrameData& operator=(const PerFrameData&) = delete;
     // Move
-    PerFrameData(PerFrameData&&) = default;
+    PerFrameData(PerFrameData&&);
     PerFrameData& operator=(PerFrameData&&) = default;
     // Dtor
     ~PerFrameData();
