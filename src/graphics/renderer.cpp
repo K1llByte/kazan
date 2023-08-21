@@ -10,7 +10,7 @@ PerFrameData::PerFrameData(vk::Device& device, vk::CommandPool& cmd_pool)
 {
     img_available = vk::create_semaphore(m_device);
     finished_render = vk::create_semaphore(m_device);
-    in_flight_fence = vk::create_fence(m_device);
+    in_flight_fence = vk::create_fence(m_device, VK_FENCE_CREATE_SIGNALED_BIT);
 }
 
 PerFrameData::~PerFrameData() {
@@ -27,22 +27,13 @@ Renderer::Renderer(
     : m_device{device}
     , m_swapchain{swapchain}
     , m_cmd_pool(device)
-    , m_frame_data(device, m_cmd_pool)
-    , m_cmd_buffer(m_cmd_pool.allocate())
     , m_window{window}
-    // Per frame data
-    , 
 {
-    m_image_available = vk::create_semaphore(m_device);
-    m_render_finished = vk::create_semaphore(m_device);
-    m_in_flight_fence = vk::create_fence(m_device, VK_FENCE_CREATE_SIGNALED_BIT);
-}
-
-
-Renderer::~Renderer() {
-    vk::destroy_semaphore(m_device, m_image_available);
-    vk::destroy_semaphore(m_device, m_render_finished);
-    vk::destroy_fence(m_device, m_in_flight_fence);
+    // Per frame data
+    m_frame_data.reserve(MAX_FRAMES_IN_FLIGHT);
+    for(size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; ++i) {
+        m_frame_data.emplace_back(m_device, m_cmd_pool);
+    }
 }
 
 
@@ -52,45 +43,48 @@ void Renderer::render_frame(const RenderFrameFunc& render_func) {
     // Begin Frame //
     /////////////////
 
+    // Increment frame in flight index
+    m_frame_idx = (m_frame_idx + 1) % MAX_FRAMES_IN_FLIGHT;
+
     // Wait for previous frame
-    vkWaitForFences(m_device.vk_device(), 1, &m_in_flight_fence, VK_TRUE, UINT64_MAX);
-    vkResetFences(m_device.vk_device(), 1, &m_in_flight_fence);
+    vkWaitForFences(m_device.vk_device(), 1, &m_frame_data[m_frame_idx].in_flight_fence, VK_TRUE, UINT64_MAX);
+    vkResetFences(m_device.vk_device(), 1, &m_frame_data[m_frame_idx].in_flight_fence);
 
     // Acquire next frame
-    uint32_t image_index = m_swapchain.acquire_next(m_image_available);
+    uint32_t image_index = m_swapchain.acquire_next(m_frame_data[m_frame_idx].img_available);
     
-    m_cmd_buffer.reset();
-    m_cmd_buffer.begin();
+    m_frame_data[m_frame_idx].cmd_buffer.reset();
+    m_frame_data[m_frame_idx].cmd_buffer.begin();
 
     /////////////////
     //    Draw     //
     /////////////////
 
-    render_func(m_cmd_buffer);
+    render_func(m_frame_data[m_frame_idx].cmd_buffer);
 
     /////////////////
     //  End Frame  //
     /////////////////
 
     // Stop registering commands to the cmd buffer
-    m_cmd_buffer.end();
+    m_frame_data[m_frame_idx].cmd_buffer.end();
 
     // Submit command buffer
     VkSubmitInfo submit_info{};
     submit_info.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
-    VkSemaphore wait_semaphores[] = { m_image_available };
+    VkSemaphore wait_semaphores[] = { m_frame_data[m_frame_idx].img_available };
     VkPipelineStageFlags wait_stages[] = { VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT };
     submit_info.waitSemaphoreCount = 1;
     submit_info.pWaitSemaphores = wait_semaphores;
     submit_info.pWaitDstStageMask = wait_stages;
     submit_info.commandBufferCount = 1;
-    auto cmd_buffer = m_cmd_buffer.vk_cmd_buffer();
+    auto cmd_buffer = m_frame_data[m_frame_idx].cmd_buffer.vk_cmd_buffer();
     submit_info.pCommandBuffers = &cmd_buffer;
-    VkSemaphore signal_semaphores[] = { m_render_finished }; 
+    VkSemaphore signal_semaphores[] = { m_frame_data[m_frame_idx].finished_render }; 
     submit_info.signalSemaphoreCount = 1;
     submit_info.pSignalSemaphores = signal_semaphores;
 
-    auto result = vkQueueSubmit(m_device.graphics_queue() , 1, &submit_info, m_in_flight_fence);
+    auto result = vkQueueSubmit(m_device.graphics_queue() , 1, &submit_info, m_frame_data[m_frame_idx].in_flight_fence);
     VK_CHECK_MSG(result, "Failed to submit command buffer!");
     
     // Preset frame

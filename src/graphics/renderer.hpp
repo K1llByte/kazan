@@ -22,8 +22,8 @@ public:
     PerFrameData(const PerFrameData&) = delete;
     PerFrameData& operator=(const PerFrameData&) = delete;
     // Move
-    PerFrameData(PerFrameData&&) = delete;
-    PerFrameData& operator=(PerFrameData&&) = delete;
+    PerFrameData(PerFrameData&&) = default;
+    PerFrameData& operator=(PerFrameData&&) = default;
     // Dtor
     ~PerFrameData();
 
@@ -47,7 +47,7 @@ public:
     Renderer(Renderer&&) = delete;
     Renderer& operator=(Renderer&&) = delete;
     // Dtor
-    ~Renderer();
+    ~Renderer() = default;
 
     void render_frame(const RenderFrameFunc& render_func);
     
@@ -58,7 +58,7 @@ private:
     Window&           m_window;
     // Sync
     constexpr static size_t   MAX_FRAMES_IN_FLIGHT = 2;
-    size_t                    m_next_idx = 0;
+    size_t                    m_frame_idx = 0;
     std::vector<PerFrameData> m_frame_data;
 
 };

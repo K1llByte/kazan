@@ -12,8 +12,8 @@ public:
     CommandBuffer(const CommandBuffer&) = delete;
     CommandBuffer& operator=(const CommandBuffer&) = delete;
     // Move
-    CommandBuffer(CommandBuffer&&) = delete;
-    CommandBuffer& operator=(CommandBuffer&&) = delete;
+    CommandBuffer(CommandBuffer&&) = default;
+    CommandBuffer& operator=(CommandBuffer&&) = default;
     // Dtor
     ~CommandBuffer() = default;
 
