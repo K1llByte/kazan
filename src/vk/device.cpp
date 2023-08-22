@@ -196,29 +196,6 @@ SwapchainSupport get_swapchain_support(
 using SelectedDevice
     = std::tuple<VkPhysicalDevice, QueueFamilies, SwapchainSupport>;
 
-std::vector<VkPhysicalDevice> get_available_devices(
-    vk::Instance& instance
-) {
-    // List available devices
-    uint32_t device_count = 0;
-    vkEnumeratePhysicalDevices(
-        instance.vk_instance(),
-        &device_count,
-        nullptr
-    );
-    if (device_count == 0) {
-        throw 1; // NoGPUSupport();
-    }
-
-    std::vector<VkPhysicalDevice> available_devices(device_count);
-    vkEnumeratePhysicalDevices(
-        instance.vk_instance(),
-        &device_count,
-        available_devices.data()
-    );
-    return available_devices;
-}
-
 SelectedDevice select_device(
     vk::Instance& instance,
     std::vector<VkPhysicalDevice> const& available_devices,
@@ -344,9 +321,13 @@ Device::Device(
 ) : m_instance(instance) {
     
     // 1. Select physical device //
-    auto available_devices = get_available_devices(m_instance);
-    auto [vk_physical_device, indices, swapchain_support]
-        = select_device(m_instance, available_devices, params.extensions, params.surface);
+    auto available_devices = m_instance.available_devices();
+    auto [vk_physical_device, indices, swapchain_support] = select_device(
+        m_instance,
+        available_devices,
+        params.extensions,
+        params.surface
+    );
 
     // 2. Create device //
     m_vk_physical_device = vk_physical_device;

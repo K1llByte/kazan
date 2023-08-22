@@ -16,7 +16,6 @@ This project is an experimental computer graphics engine for experimentation and
 
 **Base renderer**
 - Dynamic viewport and scissor
-- Frames in flight
 - Resizable swapchain
 - Push constants
 - Descriptor sets

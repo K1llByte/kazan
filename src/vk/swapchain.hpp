@@ -28,9 +28,11 @@ public:
     constexpr size_t current_index() const { return m_current_index; }
 
     uint32_t acquire_next(VkSemaphore signal_semaphore);
+    void recreate(VkExtent2D new_extent);
 
 private:
     Device&                  m_device;
+    VkSurfaceKHR             m_surface;
     VkSwapchainKHR           m_vk_swapchain = VK_NULL_HANDLE;
     VkSurfaceFormatKHR       m_surface_format;
     VkPresentModeKHR         m_present_mode;

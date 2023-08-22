@@ -12,8 +12,6 @@
 
 #include <cmath>
 
-// #include "vk/vulkan_context.hpp"
-
 // TODO: Create alias type in core/ Ref = std::reference_wrapper
 // and change every non_owning ptr to Ref 
 

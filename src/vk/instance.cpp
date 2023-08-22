@@ -154,6 +154,7 @@ Instance::Instance(InstanceParams&& params) {
     }
 }
 
+
 Instance::~Instance() {
     if (m_debug_messenger != VK_NULL_HANDLE) {
         destroy_debug_utils_messenger_ext(
@@ -171,6 +172,28 @@ Instance::~Instance() {
     // }
     vkDestroyInstance(m_vk_instance, nullptr);
     Log::trace("Instance destroyed");
+}
+
+
+std::vector<VkPhysicalDevice> Instance::available_devices() const {
+    // List available devices
+    uint32_t device_count = 0;
+    vkEnumeratePhysicalDevices(
+        m_vk_instance,
+        &device_count,
+        nullptr
+    );
+    if (device_count == 0) {
+        throw 1; // NoGPUSupport();
+    }
+
+    std::vector<VkPhysicalDevice> available_devices(device_count);
+    vkEnumeratePhysicalDevices(
+        m_vk_instance,
+        &device_count,
+        available_devices.data()
+    );
+    return available_devices;
 }
 
 } // namespace kzn::vk

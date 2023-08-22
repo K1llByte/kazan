@@ -6,7 +6,8 @@
 namespace kzn::vk {
 
 Swapchain::Swapchain(Device& device, Surface& surface, VkExtent2D requested_extent)
-    : m_device(device)
+    : m_device{device}
+    , m_surface{surface.vk_surface()}
 {
 
     const auto& support = m_device.swapchain_support();
@@ -28,7 +29,7 @@ Swapchain::Swapchain(Device& device, Surface& surface, VkExtent2D requested_exte
 
     VkSwapchainCreateInfoKHR create_info{};
     create_info.sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR;
-    create_info.surface = surface.vk_surface();
+    create_info.surface = m_surface;
     create_info.minImageCount = request_image_count;
     create_info.imageFormat = m_surface_format.format;
     create_info.imageColorSpace = m_surface_format.colorSpace;
@@ -123,6 +124,70 @@ uint32_t Swapchain::acquire_next(VkSemaphore signal_semaphore) {
         &m_current_index
     );
     return m_current_index;
+}
+
+
+void Swapchain::recreate(VkExtent2D new_extent) {
+    // Wait until device is idle
+    m_device.wait_idle();
+
+    // TODO: m_device.find_swapchain_support(m_surface);
+    const auto& support = m_device.swapchain_support();
+    
+    // Create new swapchain
+    m_surface_format = support.select_format();
+    m_present_mode = support.select_present_mode();
+    m_extent = support.select_extent(new_extent);
+
+    auto image_count = static_cast<uint32_t>(m_images.size());
+
+    VkSwapchainCreateInfoKHR create_info{};
+    create_info.sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR;
+    create_info.surface = m_surface;
+
+    create_info.minImageCount = image_count;
+    create_info.imageFormat = m_surface_format.format;
+    create_info.imageColorSpace = m_surface_format.colorSpace;
+    create_info.imageExtent = m_extent;
+    create_info.imageArrayLayers = 1;
+    create_info.imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
+    auto indices = m_device.queue_families();
+    uint32_t queue_families_indices[] = {
+        indices.graphics_family.value(),
+        indices.present_family.value()
+    };
+
+    if (indices.graphics_family != indices.present_family) {
+        create_info.imageSharingMode = VK_SHARING_MODE_CONCURRENT;
+        create_info.queueFamilyIndexCount = 2;
+        create_info.pQueueFamilyIndices = queue_families_indices;
+    }
+    else {
+        create_info.imageSharingMode = VK_SHARING_MODE_EXCLUSIVE;
+        create_info.queueFamilyIndexCount = 0; // Optional
+        create_info.pQueueFamilyIndices = nullptr; // Optional
+    }
+
+    VkSwapchainKHR old_vkswapchain = m_vk_swapchain;
+    create_info.preTransform = support.capabilities.currentTransform;
+    // NOTE: if we want window to be transparent
+    // this needs to change
+    create_info.compositeAlpha = VK_COMPOSITE_ALPHA_OPAQUE_BIT_KHR;
+    create_info.presentMode = m_present_mode;
+    create_info.clipped = VK_TRUE;
+    create_info.oldSwapchain = old_vkswapchain;
+
+    auto result = vkCreateSwapchainKHR(m_device.vk_device(), &create_info, nullptr, &m_vk_swapchain);
+    VK_CHECK_MSG(result, "Failed to create swap chain!");
+
+    // Not sure if i need to retrieve image_count
+    // FIXME: Might be a problem here
+    // vkGetSwapchainImagesKHR(device->vk_device(), vkswapchain, &image_count, nullptr);
+    // swapchain_images.resize(image_count);
+    vkGetSwapchainImagesKHR(m_device.vk_device(), m_vk_swapchain, &image_count, m_images.data());
+
+    // Destroy old Swapchain
+    vkDestroySwapchainKHR(m_device.vk_device(), old_vkswapchain, nullptr);
 }
 
 }
