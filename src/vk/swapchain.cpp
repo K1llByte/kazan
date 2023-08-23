@@ -114,7 +114,7 @@ Swapchain::~Swapchain() {
 }
 
 
-uint32_t Swapchain::acquire_next(VkSemaphore signal_semaphore) {
+std::optional<uint32_t> Swapchain::acquire_next(VkSemaphore signal_semaphore) {
     auto result = vkAcquireNextImageKHR(
         m_device.vk_device(),
         m_vk_swapchain,
@@ -123,7 +123,14 @@ uint32_t Swapchain::acquire_next(VkSemaphore signal_semaphore) {
         VK_NULL_HANDLE,
         &m_current_index
     );
-    return m_current_index;
+    if(result == VK_ERROR_OUT_OF_DATE_KHR) {
+        return std::nullopt;
+    }
+    else if(result == VK_SUCCESS || result == VK_SUBOPTIMAL_KHR) {
+        return m_current_index;
+    }
+
+    throw vk::ResultError(result);
 }
 
 

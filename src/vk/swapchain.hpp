@@ -27,7 +27,7 @@ public:
     constexpr std::span<VkImageView> image_views() { return std::span{m_image_views.data(), m_image_views.size()}; }
     constexpr size_t current_index() const { return m_current_index; }
 
-    uint32_t acquire_next(VkSemaphore signal_semaphore);
+    std::optional<uint32_t> acquire_next(VkSemaphore signal_semaphore);
     void recreate(VkExtent2D new_extent);
 
 private:

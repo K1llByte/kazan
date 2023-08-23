@@ -55,15 +55,22 @@ void Renderer::render_frame(const RenderFrameFunc& render_func) {
     // Begin Frame //
     /////////////////
 
-    // Increment frame in flight index
-    m_frame_idx = (m_frame_idx + 1) % MAX_FRAMES_IN_FLIGHT;
-
     // Wait for previous frame
     vkWaitForFences(m_device.vk_device(), 1, &m_frame_data[m_frame_idx].in_flight_fence, VK_TRUE, UINT64_MAX);
     vkResetFences(m_device.vk_device(), 1, &m_frame_data[m_frame_idx].in_flight_fence);
 
     // Acquire next frame
-    uint32_t image_index = m_swapchain.acquire_next(m_frame_data[m_frame_idx].img_available);
+    auto opt_image_index = m_swapchain.acquire_next(m_frame_data[m_frame_idx].img_available);
+    if(!opt_image_index.has_value()) {
+        const auto new_extent = m_window.extent();
+        m_swapchain.recreate(new_extent);
+        return;
+    }
+    uint32_t image_index = opt_image_index.value();
+    
+    // Only reset the fence if we are submitting work
+    vkResetFences(m_device.vk_device(), 1, &m_frame_data[m_frame_idx].in_flight_fence);
+
     
     m_frame_data[m_frame_idx].cmd_buffer.reset();
     m_frame_data[m_frame_idx].cmd_buffer.begin();
@@ -112,7 +119,16 @@ void Renderer::render_frame(const RenderFrameFunc& render_func) {
 
     result = vkQueuePresentKHR(m_device.present_queue(), &present_info);
     VK_CHECK_MSG(result, "Failed to present frame!");
+    
+    if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR) {
+        m_swapchain.recreate(m_window.extent());
+    }
+    else if (result != VK_SUCCESS) {
+        throw vk::ResultError(result);
+    }
 
+    // Increment frame in flight index
+    m_frame_idx = (m_frame_idx + 1) % MAX_FRAMES_IN_FLIGHT;
 }
 
 } // namespace kzn
