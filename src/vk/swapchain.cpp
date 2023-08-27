@@ -138,8 +138,7 @@ void Swapchain::recreate(VkExtent2D new_extent) {
     // Wait until device is idle
     m_device.wait_idle();
 
-    // TODO: m_device.find_swapchain_support(m_surface);
-    const auto& support = m_device.swapchain_support();
+    const auto& support = m_device.find_swapchain_support(m_surface);
     
     // Create new swapchain
     m_surface_format = support.select_format();

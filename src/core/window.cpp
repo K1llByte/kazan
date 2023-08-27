@@ -22,16 +22,17 @@ Window::Window(const std::string_view& name, int _width, int _height)
     glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
     
     // Turn off resizable window
-    glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
+    glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
     // Create window
     m_glfw_window = glfwCreateWindow(m_width, m_height, name.data(), nullptr, nullptr);
     glfwSetWindowUserPointer(m_glfw_window, this);
     
+    // On framebuffer resize callback
+    glfwSetFramebufferSizeCallback(m_glfw_window, framebuffer_resized);
+    
     // Hide mouse cursor
     // glfwSetInputMode(m_glfw_window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
 
-    // On framebuffer resize callback
-    glfwSetFramebufferSizeCallback(m_glfw_window, framebuffer_resized);
     Log::trace("Window created");
 }
 

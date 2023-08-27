@@ -371,4 +371,9 @@ Device::~Device() {
     Log::trace("Device destroyed");
 }
 
+const SwapchainSupport& Device::find_swapchain_support(VkSurfaceKHR surface) {
+    m_swapchain_support = get_swapchain_support(m_vk_physical_device, surface);
+    return m_swapchain_support;
+}
+
 } // namespace kzn::vk

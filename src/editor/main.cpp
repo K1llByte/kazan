@@ -74,8 +74,8 @@ vk::Pipeline triangle_pipeline(vk::RenderPass& render_pass) {
     return vk::Pipeline(
         render_pass.device(),
         vk::PipelineStages{
-            .vertex = "assets/shaders/triangle/triangle.vert.spv",
-            .fragment = "assets/shaders/triangle/triangle.frag.spv",
+            .vertex = "../assets/shaders/triangle/triangle.vert.spv",
+            .fragment = "../assets/shaders/triangle/triangle.frag.spv",
         },
         vk::PipelineConfig(render_pass)
     );
@@ -100,6 +100,9 @@ int main() try {
     auto framebuffers = create_swapchain_framebuffers(render_pass, swapchain);
 
     auto renderer = Renderer(device, swapchain, window);
+    renderer.on_swapchain_resize([]() {
+
+    });
 
     size_t frame_counter = 0;
     while(!window.is_closed()) {
@@ -130,6 +133,7 @@ int main() try {
             scissor.offset = {0, 0};
             scissor.extent = swapchain.extent();
             vkCmdSetScissor(cmd_buffer.vk_cmd_buffer(), 0, 1, &scissor);
+            
             pipeline.bind(cmd_buffer);
             vkCmdDraw(cmd_buffer.vk_cmd_buffer(), 3, 1, 0, 0);
             render_pass.end(cmd_buffer);

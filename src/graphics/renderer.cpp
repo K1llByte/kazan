@@ -55,12 +55,16 @@ void Renderer::render_frame(const RenderFrameFunc& render_func) {
     // Begin Frame //
     /////////////////
 
+    auto& cmd_buffer = m_frame_data[m_frame_idx].cmd_buffer;
+    auto& img_available = m_frame_data[m_frame_idx].img_available;
+    auto& finished_render = m_frame_data[m_frame_idx].finished_render;
+    auto& in_flight_fence = m_frame_data[m_frame_idx].in_flight_fence;
+
     // Wait for previous frame
-    vkWaitForFences(m_device.vk_device(), 1, &m_frame_data[m_frame_idx].in_flight_fence, VK_TRUE, UINT64_MAX);
-    vkResetFences(m_device.vk_device(), 1, &m_frame_data[m_frame_idx].in_flight_fence);
+    vkWaitForFences(m_device.vk_device(), 1, &in_flight_fence, VK_TRUE, UINT64_MAX);
 
     // Acquire next frame
-    auto opt_image_index = m_swapchain.acquire_next(m_frame_data[m_frame_idx].img_available);
+    auto opt_image_index = m_swapchain.acquire_next(img_available);
     if(!opt_image_index.has_value()) {
         const auto new_extent = m_window.extent();
         m_swapchain.recreate(new_extent);
@@ -69,48 +73,45 @@ void Renderer::render_frame(const RenderFrameFunc& render_func) {
     uint32_t image_index = opt_image_index.value();
     
     // Only reset the fence if we are submitting work
-    vkResetFences(m_device.vk_device(), 1, &m_frame_data[m_frame_idx].in_flight_fence);
+    vkResetFences(m_device.vk_device(), 1, &in_flight_fence);
 
-    
-    m_frame_data[m_frame_idx].cmd_buffer.reset();
-    m_frame_data[m_frame_idx].cmd_buffer.begin();
+    cmd_buffer.reset();
+    cmd_buffer.begin();
 
     /////////////////
     //    Draw     //
     /////////////////
 
-    render_func(m_frame_data[m_frame_idx].cmd_buffer);
+    render_func(cmd_buffer);
 
     /////////////////
     //  End Frame  //
     /////////////////
 
     // Stop registering commands to the cmd buffer
-    m_frame_data[m_frame_idx].cmd_buffer.end();
+    cmd_buffer.end();
 
     // Submit command buffer
     VkSubmitInfo submit_info{};
     submit_info.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
-    VkSemaphore wait_semaphores[] = { m_frame_data[m_frame_idx].img_available };
     VkPipelineStageFlags wait_stages[] = { VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT };
     submit_info.waitSemaphoreCount = 1;
-    submit_info.pWaitSemaphores = wait_semaphores;
+    submit_info.pWaitSemaphores = &img_available;
     submit_info.pWaitDstStageMask = wait_stages;
     submit_info.commandBufferCount = 1;
-    auto cmd_buffer = m_frame_data[m_frame_idx].cmd_buffer.vk_cmd_buffer();
-    submit_info.pCommandBuffers = &cmd_buffer;
-    VkSemaphore signal_semaphores[] = { m_frame_data[m_frame_idx].finished_render }; 
+    VkCommandBuffer cmd_buffers[] = { cmd_buffer.vk_cmd_buffer() };
+    submit_info.pCommandBuffers = cmd_buffers;
     submit_info.signalSemaphoreCount = 1;
-    submit_info.pSignalSemaphores = signal_semaphores;
+    submit_info.pSignalSemaphores = &finished_render;
 
-    auto result = vkQueueSubmit(m_device.graphics_queue() , 1, &submit_info, m_frame_data[m_frame_idx].in_flight_fence);
+    auto result = vkQueueSubmit(m_device.graphics_queue() , 1, &submit_info, in_flight_fence);
     VK_CHECK_MSG(result, "Failed to submit command buffer!");
     
     // Preset frame
     VkPresentInfoKHR present_info{};
     present_info.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
     present_info.waitSemaphoreCount = 1;
-    present_info.pWaitSemaphores = signal_semaphores;
+    present_info.pWaitSemaphores = &finished_render;
     VkSwapchainKHR swapchains[] = { m_swapchain.vk_swapchain() };
     present_info.swapchainCount = 1;
     present_info.pSwapchains = swapchains;
@@ -120,7 +121,7 @@ void Renderer::render_frame(const RenderFrameFunc& render_func) {
     result = vkQueuePresentKHR(m_device.present_queue(), &present_info);
     VK_CHECK_MSG(result, "Failed to present frame!");
     
-    if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR) {
+    if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR || m_window.was_resized()) {
         m_swapchain.recreate(m_window.extent());
     }
     else if (result != VK_SUCCESS) {
