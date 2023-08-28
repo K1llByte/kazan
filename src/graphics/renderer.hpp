@@ -50,6 +50,12 @@ public:
     ~Renderer() = default;
 
     void render_frame(const RenderFrameFunc& render_func);
+
+    // Callbacks
+    template<typename F>
+    void on_swapchain_resize(F&& callback) {
+        m_on_swapchain_resize = std::move(callback);
+    }
     
 private:
     vk::Device&       m_device;
@@ -60,7 +66,7 @@ private:
     constexpr static size_t   MAX_FRAMES_IN_FLIGHT = 2;
     size_t                    m_frame_idx = 0;
     std::vector<PerFrameData> m_frame_data;
-
+    std::function<void()>     m_on_swapchain_resize;
 };
 
 } // namespace kzn

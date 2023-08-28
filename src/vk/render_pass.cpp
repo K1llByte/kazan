@@ -120,6 +120,7 @@ Framebuffer::Framebuffer(
 Framebuffer::Framebuffer(Framebuffer&& other)
     : m_device{other.m_device}
     , m_vk_framebuffer{other.m_vk_framebuffer}
+    , m_extent{other.m_extent}
 {
     other.m_vk_framebuffer = VK_NULL_HANDLE;
 }
@@ -129,4 +130,5 @@ Framebuffer::~Framebuffer() {
         vkDestroyFramebuffer(m_device.vk_device(), m_vk_framebuffer, nullptr);
     }
 }
+
 } // namespace kzn::vk

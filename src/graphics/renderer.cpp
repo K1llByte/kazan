@@ -66,8 +66,15 @@ void Renderer::render_frame(const RenderFrameFunc& render_func) {
     // Acquire next frame
     auto opt_image_index = m_swapchain.acquire_next(img_available);
     if(!opt_image_index.has_value()) {
-        const auto new_extent = m_window.extent();
-        m_swapchain.recreate(new_extent);
+        // FIXME: Temporary
+        // int width = 0, height = 0;
+        // glfwGetFramebufferSize(m_window.glfw_ptr(), &width, &height);
+        // while (width == 0 || height == 0) {
+        //     glfwGetFramebufferSize(m_window.glfw_ptr(), &width, &height);
+        //     glfwWaitEvents();
+        // }
+        m_swapchain.recreate(m_window.extent());
+        m_on_swapchain_resize();
         return;
     }
     uint32_t image_index = opt_image_index.value();
@@ -119,10 +126,16 @@ void Renderer::render_frame(const RenderFrameFunc& render_func) {
 
 
     result = vkQueuePresentKHR(m_device.present_queue(), &present_info);
-    VK_CHECK_MSG(result, "Failed to present frame!");
-    
     if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR || m_window.was_resized()) {
+        // FIXME: Temporary
+        // int width = 0, height = 0;
+        // glfwGetFramebufferSize(m_window.glfw_ptr(), &width, &height);
+        // while (width == 0 || height == 0) {
+        //     glfwGetFramebufferSize(m_window.glfw_ptr(), &width, &height);
+        //     glfwWaitEvents();
+        // }
         m_swapchain.recreate(m_window.extent());
+        m_on_swapchain_resize();
     }
     else if (result != VK_SUCCESS) {
         throw vk::ResultError(result);

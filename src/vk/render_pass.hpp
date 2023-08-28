@@ -80,13 +80,13 @@ public:
     Framebuffer& operator=(const Framebuffer&) = delete;
     // Move
     Framebuffer(Framebuffer&&);
-    Framebuffer& operator=(Framebuffer&&) = default;
+    Framebuffer& operator=(Framebuffer&&);
     // Dtor
     ~Framebuffer();
 
     constexpr VkFramebuffer vk_framebuffer() const { return m_vk_framebuffer; }
     constexpr VkExtent2D extent() const { return m_extent; }
-    
+
 private:
     Device&       m_device;
     VkFramebuffer m_vk_framebuffer;

@@ -21,19 +21,20 @@ std::vector<vk::Framebuffer> create_swapchain_framebuffers(
     vk::RenderPass& render_pass,
     vk::Swapchain& swapchain)
 {
-    std::vector<vk::Framebuffer> swapchain_framebuffers;
+    std::vector<vk::Framebuffer> framebuffers;
     const size_t imgs_count = swapchain.image_views().size();
-    swapchain_framebuffers.reserve(imgs_count);
+    framebuffers.reserve(imgs_count);
 
     for(size_t i = 0; i < imgs_count; ++i) {
-        swapchain_framebuffers.emplace_back(
+        auto image_views = std::vector{ swapchain.image_views()[i] };
+        framebuffers.emplace_back(
             render_pass,
-            std::vector{ swapchain.image_views()[i] },
+            std::move(image_views),
             swapchain.extent()
         );
     }
 
-    return swapchain_framebuffers;
+    return framebuffers;
 }
 
 vk::RenderPass simple_pass(vk::Device& device, VkFormat color_format) {
@@ -74,8 +75,8 @@ vk::Pipeline triangle_pipeline(vk::RenderPass& render_pass) {
     return vk::Pipeline(
         render_pass.device(),
         vk::PipelineStages{
-            .vertex = "../assets/shaders/triangle/triangle.vert.spv",
-            .fragment = "../assets/shaders/triangle/triangle.frag.spv",
+            .vertex = "assets/shaders/triangle/triangle.vert.spv",
+            .fragment = "assets/shaders/triangle/triangle.frag.spv",
         },
         vk::PipelineConfig(render_pass)
     );
@@ -100,8 +101,9 @@ int main() try {
     auto framebuffers = create_swapchain_framebuffers(render_pass, swapchain);
 
     auto renderer = Renderer(device, swapchain, window);
-    renderer.on_swapchain_resize([]() {
 
+    renderer.on_swapchain_resize([&] {
+        framebuffers = create_swapchain_framebuffers(render_pass, swapchain);
     });
 
     size_t frame_counter = 0;
