@@ -216,10 +216,10 @@ Pipeline::Pipeline(
     // Setup vertex input description
     VkPipelineVertexInputStateCreateInfo vertex_input_info{};
     vertex_input_info.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
-    vertex_input_info.vertexAttributeDescriptionCount = static_cast<uint32_t>(config.m_vtx_attributes.size());
-    vertex_input_info.vertexBindingDescriptionCount = static_cast<uint32_t>(config.m_vtx_bindings.size());
-    vertex_input_info.pVertexAttributeDescriptions = config.m_vtx_attributes.data();
-    vertex_input_info.pVertexBindingDescriptions = config.m_vtx_bindings.data();
+    vertex_input_info.vertexAttributeDescriptionCount = static_cast<uint32_t>(config.m_vertex_attributes.size());
+    vertex_input_info.vertexBindingDescriptionCount = static_cast<uint32_t>(config.m_vertex_bindings.size());
+    vertex_input_info.pVertexAttributeDescriptions = config.m_vertex_attributes.data();
+    vertex_input_info.pVertexBindingDescriptions = config.m_vertex_bindings.data();
 
     VkGraphicsPipelineCreateInfo pipeline_info{};
     pipeline_info.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
