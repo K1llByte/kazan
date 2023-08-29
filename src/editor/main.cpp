@@ -9,6 +9,7 @@
 #include "vk/cmd_buffer.hpp"
 #include "vk/utils.hpp"
 #include "vk/buffer.hpp"
+#include "vk/dset.hpp"
 #include "graphics/renderer.hpp"
 
 #include <cmath>
@@ -87,6 +88,12 @@ vk::Pipeline triangle_pipeline(vk::RenderPass& render_pass) {
 struct Vertex {
     glm::vec2 position;
     glm::vec3 color;
+};
+
+struct Pvm {
+    glm::mat4 projection;
+    glm::mat4 view;
+    glm::mat4 model;
 };
 
 int main() try {
