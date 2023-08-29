@@ -114,18 +114,23 @@ int main() try {
     });
 
     const std::vector<Vertex> vertices = {
-        {{0.0f, -0.5f}, {0.984, 0.286, 0.203}},
-        {{0.5f,  0.5f},  {0.556, 0.752, 0.486}},
-        {{-0.5f, 0.5f}, {0.513, 0.647, 0.596}}
+        {{-0.5f, -0.5f}, {1.0f, 0.0f, 0.0f}},
+        {{0.5f, -0.5f}, {0.0f, 1.0f, 0.0f}},
+        {{0.5f, 0.5f}, {0.0f, 0.0f, 1.0f}},
+        {{-0.5f, 0.5f}, {1.0f, 1.0f, 1.0f}}
     };
+    const std::vector<uint32_t> indices = {
+        0, 1, 2, 2, 3, 0
+    };
+
     auto vertex_buffer = vk::VertexBuffer(device, sizeof(Vertex) * vertices.size());
+    vertex_buffer.upload(reinterpret_cast<const float*>(vertices.data()));
+    auto index_buffer = vk::IndexBuffer(device, sizeof(uint32_t) * indices.size());
+    index_buffer.upload(indices.data());
 
     size_t frame_counter = 0;
     while(!window.is_closed()) {
         window.poll_events();
-        
-        // Update
-        vertex_buffer.upload(reinterpret_cast<const float*>(vertices.data()));
 
         // Render
         renderer.render_frame([&](auto& cmd_buffer) {
@@ -155,7 +160,9 @@ int main() try {
             
             pipeline.bind(cmd_buffer);
             vertex_buffer.bind(cmd_buffer);
-            vkCmdDraw(cmd_buffer.vk_cmd_buffer(), 3, 1, 0, 0);
+            index_buffer.bind(cmd_buffer);
+            vkCmdDrawIndexed(cmd_buffer.vk_cmd_buffer(), static_cast<uint32_t>(indices.size()), 1, 0, 0, 0);
+            // vkCmdDraw(cmd_buffer.vk_cmd_buffer(), 3, 1, 0, 0);
             render_pass.end(cmd_buffer);
         });
 

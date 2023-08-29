@@ -30,4 +30,28 @@ private:
     VmaAllocation m_allocation;
 };
 
+
+class IndexBuffer {
+public:
+    // Ctor
+    IndexBuffer(Device& device, VkDeviceSize buffer_size);
+    // Copy
+    IndexBuffer(const IndexBuffer&) = delete;
+    IndexBuffer& operator=(const IndexBuffer&) = delete;
+    // Move
+    IndexBuffer(IndexBuffer&&) = delete;
+    IndexBuffer& operator=(IndexBuffer&&) = delete;
+    // Dtor
+    ~IndexBuffer();
+
+    void upload(const uint32_t* indices);
+    void bind(CommandBuffer& cmd_buffer);
+    
+private:
+    Device&       m_device;
+    VkBuffer      m_buffer;
+    size_t        m_buffer_size;
+    VmaAllocation m_allocation;
+};
+
 } // namespace kzn::vk
