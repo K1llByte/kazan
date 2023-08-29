@@ -8,6 +8,7 @@
 #include "vk/render_pass.hpp"
 #include "vk/cmd_buffer.hpp"
 #include "vk/utils.hpp"
+#include "vk/buffer.hpp"
 #include "graphics/renderer.hpp"
 
 #include <cmath>
@@ -75,12 +76,18 @@ vk::Pipeline triangle_pipeline(vk::RenderPass& render_pass) {
     return vk::Pipeline(
         render_pass.device(),
         vk::PipelineStages{
-            .vertex = "assets/shaders/triangle/triangle.vert.spv",
-            .fragment = "assets/shaders/triangle/triangle.frag.spv",
+            .vertex = "assets/shaders/triangle_input/triangle.vert.spv",
+            .fragment = "assets/shaders/triangle_input/triangle.frag.spv",
         },
         vk::PipelineConfig(render_pass)
+            .set_vertex_input<glm::vec2, glm::vec3>()
     );
 }
+
+struct Vertex {
+    glm::vec2 position;
+    glm::vec3 color;
+};
 
 int main() try {
     auto window = Window("Kazan Engine", 1000, 800);
@@ -106,10 +113,20 @@ int main() try {
         framebuffers = create_swapchain_framebuffers(render_pass, swapchain);
     });
 
+    const std::vector<Vertex> vertices = {
+        {{0.0f, -0.5f}, {0.984, 0.286, 0.203}},
+        {{0.5f,  0.5f},  {0.556, 0.752, 0.486}},
+        {{-0.5f, 0.5f}, {0.513, 0.647, 0.596}}
+    };
+    auto vertex_buffer = vk::VertexBuffer(device, sizeof(Vertex) * vertices.size());
+
     size_t frame_counter = 0;
     while(!window.is_closed()) {
         window.poll_events();
         
+        // Update
+        vertex_buffer.upload(reinterpret_cast<const float*>(vertices.data()));
+
         // Render
         renderer.render_frame([&](auto& cmd_buffer) {
             // Render pass
@@ -137,6 +154,7 @@ int main() try {
             vkCmdSetScissor(cmd_buffer.vk_cmd_buffer(), 0, 1, &scissor);
             
             pipeline.bind(cmd_buffer);
+            vertex_buffer.bind(cmd_buffer);
             vkCmdDraw(cmd_buffer.vk_cmd_buffer(), 3, 1, 0, 0);
             render_pass.end(cmd_buffer);
         });

@@ -1,6 +1,8 @@
 #pragma once
 
-#include <glm/fwd.hpp>
+#include <array>
+
+#include <glm/glm.hpp>
 
 #include "vk/device.hpp"
 #include "vk/error.hpp"
