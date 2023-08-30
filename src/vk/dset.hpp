@@ -1,12 +1,6 @@
 #pragma once
 
 #include "device.hpp"
-// #include "vk/cmd_buffers.hpp"
-// #include "core/log.hpp"
-
-// #include <initializer_list>
-// #include <unordered_map>
-// #include <span>
 
 namespace kzn::vk {
 
