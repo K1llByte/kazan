@@ -1,5 +1,7 @@
 #include "dset.hpp"
 
+#include "core/log.hpp"
+
 namespace kzn::vk {
 
 DescriptorSetAllocator::DescriptorSetAllocator(Device& device)
@@ -18,6 +20,7 @@ DescriptorSetAllocator::DescriptorSetAllocator(Device& device)
         { VK_DESCRIPTOR_TYPE_INPUT_ATTACHMENT, 0.5f }
     }
 {
+    Log::trace("Created DSet Allocator!");
     m_used_pools.reserve(5);
     m_free_pools.reserve(5);
 }
@@ -31,7 +34,7 @@ DescriptorSetAllocator::~DescriptorSetAllocator() {
     for(auto pool : m_used_pools) {
         vkDestroyDescriptorPool(m_device.vk_device(), pool, nullptr);
     }
-    
+    Log::trace("Destroyed DSet Allocator!");
 }
 
 

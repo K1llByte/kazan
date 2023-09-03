@@ -114,6 +114,8 @@ int main() try {
     auto pipeline = triangle_pipeline(render_pass);
     auto framebuffers = create_swapchain_framebuffers(render_pass, swapchain);
 
+    auto dset_allocator = vk::DescriptorSetAllocator(device);
+
     auto renderer = Renderer(device, swapchain, window);
 
     renderer.on_swapchain_resize([&] {
