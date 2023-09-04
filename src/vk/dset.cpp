@@ -50,24 +50,25 @@ void DescriptorSetAllocator::reset_pools() {
 }
 
 
-DescriptorSet DescriptorSetAllocator::allocate(const VkDescriptorSetLayout& layout) {
+DescriptorSet DescriptorSetAllocator::allocate(DescriptorSetLayout&& layout) {
     if(m_current_pool == VK_NULL_HANDLE) {
         m_current_pool = grab_pool();
         m_used_pools.push_back(m_current_pool);
     }
 
+    const auto vk_layout = layout.vk_layout();
     VkDescriptorSetAllocateInfo alloc_info{
         .sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO,
         .descriptorPool = m_current_pool,
         .descriptorSetCount = 1,
-        .pSetLayouts = &layout,
+        .pSetLayouts = &vk_layout,
     };
     
-    VkDescriptorSet set;
-    auto result = vkAllocateDescriptorSets(m_device.vk_device(), &alloc_info, &set);
+    VkDescriptorSet dset;
+    auto result = vkAllocateDescriptorSets(m_device.vk_device(), &alloc_info, &dset);
 
     if(result == VK_SUCCESS) [[likely]] {
-        return DescriptorSet(m_device, set, layout);
+        return DescriptorSet(m_device, dset, std::move(layout));
     }
     else [[unlikely]] {
         if(result == VK_ERROR_FRAGMENTED_POOL
@@ -78,9 +79,9 @@ DescriptorSet DescriptorSetAllocator::allocate(const VkDescriptorSetLayout& layo
             m_current_pool = grab_pool();
             m_used_pools.push_back(m_current_pool);
 
-            result = vkAllocateDescriptorSets(m_device.vk_device(), &alloc_info, &set);
+            result = vkAllocateDescriptorSets(m_device.vk_device(), &alloc_info, &dset);
             VK_CHECK_MSG(result, "DescriptorSet allocation failed on new pool");
-            return DescriptorSet(m_device, set, layout);
+            return DescriptorSet(m_device, dset, std::move(layout));
         }
     }
 
@@ -130,12 +131,70 @@ VkDescriptorPool DescriptorSetAllocator::grab_pool() {
 DescriptorSet::DescriptorSet(
     Device&               device,
     VkDescriptorSet       descriptor_set,
-    VkDescriptorSetLayout layout)
+    DescriptorSetLayout&& layout)
     : m_device{device}
     , m_vk_descriptor_set{descriptor_set}
-    , m_layout{layout}
+    , m_layout{std::move(layout)}
 {
     
+}
+
+
+void DescriptorSet::bind(vk::CommandBuffer& cmd_buffer, VkPipelineLayout pipeline_layout) const {
+    vkCmdBindDescriptorSets(
+        cmd_buffer.vk_cmd_buffer(),
+        VK_PIPELINE_BIND_POINT_GRAPHICS,
+        pipeline_layout,
+        0,
+        1,
+        &m_vk_descriptor_set,
+        0,
+        nullptr);
+}
+
+
+void DescriptorSet::update(std::initializer_list<DescriptorInfo> descriptor_infos) {
+    auto bindings = m_layout.bindings();
+    // Create allocated array of VkWriteDescriptorSet
+    auto writes = std::vector<VkWriteDescriptorSet>(bindings.size());
+
+    size_t i = 0;
+    for(auto& desc_info : descriptor_infos) {
+        // If binding is combined image sampler
+        if(bindings[i].descriptorType == VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER) {
+            // Add image_info VkWriteDescriptorSet
+            writes[i] = VkWriteDescriptorSet{
+                .sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
+                .dstSet = m_vk_descriptor_set,
+                .dstBinding = bindings[i].binding,
+                // .dstArrayElement = 0,
+                .descriptorCount = 1,
+                .descriptorType = bindings[i].descriptorType,
+                .pImageInfo = &desc_info.image_info,
+            };
+        }
+        else {
+            // Add buffer_info VkWriteDescriptorSet
+            writes[i] = VkWriteDescriptorSet{
+                .sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
+                .dstSet = m_vk_descriptor_set,
+                .dstBinding = bindings[i].binding,
+                // .dstArrayElement = 0,
+                .descriptorCount = 1,
+                .descriptorType = bindings[i].descriptorType,
+                .pBufferInfo = &desc_info.buffer_info,
+            };
+        }
+        ++i;
+    }
+    
+    vkUpdateDescriptorSets(
+        m_device.vk_device(),
+        static_cast<uint32_t>(bindings.size()),
+        writes.data(),
+        0,
+        nullptr
+    );
 }
 
 } // namespace kzn::vk

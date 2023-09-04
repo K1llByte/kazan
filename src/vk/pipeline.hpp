@@ -83,6 +83,8 @@ public:
     // Dtor
     ~Pipeline();
 
+    constexpr VkPipelineLayout layout() const { return m_pipeline_layout; }
+
     void bind(vk::CommandBuffer& cmd_buffer);
 
 private:

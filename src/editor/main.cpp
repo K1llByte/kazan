@@ -10,6 +10,7 @@
 #include "vk/utils.hpp"
 #include "vk/buffer.hpp"
 #include "vk/dset.hpp"
+#include "vk/dset_layout.hpp"
 #include "graphics/renderer.hpp"
 
 #include <cmath>
@@ -77,8 +78,8 @@ vk::Pipeline triangle_pipeline(vk::RenderPass& render_pass) {
     return vk::Pipeline(
         render_pass.device(),
         vk::PipelineStages{
-            .vertex = "assets/shaders/triangle_input/triangle.vert.spv",
-            .fragment = "assets/shaders/triangle_input/triangle.frag.spv",
+            .vertex = "assets/shaders/triangle_ubo/triangle.vert.spv",
+            .fragment = "assets/shaders/triangle_ubo/triangle.frag.spv",
         },
         vk::PipelineConfig(render_pass)
             .set_vertex_input<glm::vec2, glm::vec3>()
@@ -91,9 +92,7 @@ struct Vertex {
 };
 
 struct Pvm {
-    glm::mat4 projection;
-    glm::mat4 view;
-    glm::mat4 model;
+    glm::vec2 shift;
 };
 
 int main() try {
@@ -115,6 +114,17 @@ int main() try {
     auto framebuffers = create_swapchain_framebuffers(render_pass, swapchain);
 
     auto dset_allocator = vk::DescriptorSetAllocator(device);
+    auto dset_cache = vk::DescriptorSetLayoutCache(device);
+    auto dset_0 = dset_allocator.allocate(
+        dset_cache.create_layout({
+            vk::uniform_binding(0),
+        })
+    );
+
+    auto pvm_ubo = vk::UniformBuffer(device, sizeof(Pvm));
+    auto pvm = Pvm{ glm::vec2{1.f} };
+    pvm_ubo.upload(&pvm);
+    dset_0.update({ pvm_ubo.info() });
 
     auto renderer = Renderer(device, swapchain, window);
 
@@ -170,6 +180,7 @@ int main() try {
             pipeline.bind(cmd_buffer);
             vertex_buffer.bind(cmd_buffer);
             index_buffer.bind(cmd_buffer);
+            dset_0.bind(cmd_buffer, pipeline.layout());
             vkCmdDrawIndexed(cmd_buffer.vk_cmd_buffer(), static_cast<uint32_t>(indices.size()), 1, 0, 0, 0);
             // vkCmdDraw(cmd_buffer.vk_cmd_buffer(), 3, 1, 0, 0);
             render_pass.end(cmd_buffer);

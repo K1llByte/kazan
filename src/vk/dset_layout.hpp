@@ -1,6 +1,7 @@
 #pragma once
 
 #include <unordered_map>
+#include <span>
 
 #include "device.hpp"
 
@@ -10,6 +11,36 @@ using DescriptorSetBindings = std::vector<VkDescriptorSetLayoutBinding>;
 
 VkDescriptorSetLayoutBinding uniform_binding(uint32_t binding, VkShaderStageFlags stage_flags = VK_SHADER_STAGE_ALL_GRAPHICS);
 VkDescriptorSetLayoutBinding sampler_binding(uint32_t binding, VkShaderStageFlags stage_flags = VK_SHADER_STAGE_ALL_GRAPHICS);
+
+class DescriptorSetLayoutCache;
+
+class DescriptorSetLayout {
+public:
+    friend class DescriptorSetLayoutCache;
+
+    // Copy
+    DescriptorSetLayout(const DescriptorSetLayout&) = delete;
+    DescriptorSetLayout& operator=(const DescriptorSetLayout&) = delete;
+    // Move
+    DescriptorSetLayout(DescriptorSetLayout&&) = default;
+    DescriptorSetLayout& operator=(DescriptorSetLayout&&) = default;
+    // Dtor
+    ~DescriptorSetLayout() = default;
+
+    std::span<const VkDescriptorSetLayoutBinding> bindings() const { return m_layout_bindings; };
+    VkDescriptorSetLayout vk_layout() const { return m_layout; }
+
+private:
+    DescriptorSetBindings m_layout_bindings;
+    VkDescriptorSetLayout m_layout;
+
+private:
+    // Ctor
+    DescriptorSetLayout(
+        DescriptorSetBindings&& layout_bindings,
+        VkDescriptorSetLayout layout);
+};
+
 
 class DescriptorSetLayoutCache {
 public:
@@ -32,11 +63,11 @@ public:
     // Dtor
     ~DescriptorSetLayoutCache();
 
-    VkDescriptorSetLayout create_layout(const DescriptorSetBindings& info);
+    DescriptorSetLayout create_layout(const DescriptorSetBindings& info);
 
 private:
     struct DescriptorLayoutHash {
-        constexpr size_t operator()(const DescriptorLayoutInfo& info) const { 
+        size_t operator()(const DescriptorLayoutInfo& info) const { 
             return info.hash();
         }
     };

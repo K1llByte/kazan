@@ -1,12 +1,7 @@
 #pragma once
 
-#include "device.hpp"
-// #include "vk/cmd_buffers.hpp"
-// #include "core/log.hpp"
-
-// #include <initializer_list>
-// #include <unordered_map>
-// #include <span>
+#include "dset_layout.hpp"
+#include "cmd_buffer.hpp"
 
 namespace kzn::vk {
 
@@ -30,7 +25,7 @@ public:
     ~DescriptorSetAllocator();
 
     void reset_pools();
-    DescriptorSet allocate(const VkDescriptorSetLayout& layout);
+    DescriptorSet allocate(DescriptorSetLayout&& layout);
 
 private:
     Device&                       m_device;
@@ -41,6 +36,12 @@ private:
 
 private:
     VkDescriptorPool grab_pool();
+};
+
+
+union DescriptorInfo {
+    VkDescriptorBufferInfo buffer_info;
+    VkDescriptorImageInfo image_info;
 };
 
 
@@ -55,22 +56,22 @@ public:
     DescriptorSet(DescriptorSetAllocator&&) = delete;
     DescriptorSet& operator=(DescriptorSetAllocator&&) = delete;
     // Dtor
-    ~DescriptorSet();
+    ~DescriptorSet() = default;
 
-    // void bind(vk::CommandBuffer& cmd_buffer, VkPipelineLayout pipeline_layout) const;
-    // void update(std::initializer_list<DescriptorInfo> descriptor_infos);
+    void bind(vk::CommandBuffer& cmd_buffer, VkPipelineLayout pipeline_layout) const;
+    void update(std::initializer_list<DescriptorInfo> descriptor_infos);
 
 private:
-    Device&               m_device;
-    VkDescriptorSet       m_vk_descriptor_set;
-    VkDescriptorSetLayout m_layout;
+    Device&             m_device;
+    VkDescriptorSet     m_vk_descriptor_set;
+    DescriptorSetLayout m_layout;
 
 private:
     // Ctor
     DescriptorSet(
         Device&               device,
         VkDescriptorSet       descriptor_set,
-        VkDescriptorSetLayout layout);
+        DescriptorSetLayout&& layout);
 };
 
 } // namespace kzn::vk
