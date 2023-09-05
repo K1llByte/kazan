@@ -110,38 +110,6 @@ PipelineConfig::PipelineConfig(const vk::RenderPass& render_pass)
 }
 
 
-// ShaderModule::ShaderModule(Device& device, std::string_view file_path)
-//     : m_device{device}
-// {
-//     // 1. Read code from file and store it in a vector
-//     std::ifstream file{file_path.data(), std::ios::ate | std::ios::binary};
-//     if(!file.is_open()) {
-//         Log::error("Failed to open file '{}'", file_path);
-//         throw 1; // TODO: Error handling
-//         //throw FileError();
-//     }
-
-//     const size_t file_size = static_cast<size_t>(file.tellg());
-//     std::vector<char> code(file_size);
-//     file.seekg(0);
-//     file.read(code.data(), file_size);
-//     file.close();
-
-//     // 2. Create shader module from the code
-//     VkShaderModuleCreateInfo create_info{};
-//     create_info.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
-//     create_info.codeSize = code.size();
-//     create_info.pCode = reinterpret_cast<const uint32_t*>(code.data());
-
-//     auto result = vkCreateShaderModule(m_device.vk_device(), &create_info, nullptr, &m_shader_module);
-//     VK_CHECK_MSG(result, "Failed to load shader module!");
-// }
-
-
-// ShaderModule::~ShaderModule() {
-//     vkDestroyShaderModule(m_device.vk_device(), m_shader_module, nullptr);
-// }
-
 VkShaderModule create_shader_module(Device& device, std::string_view file_path) {
     // 1. Read code from file and store it in a vector
     std::ifstream file{file_path.data(), std::ios::ate | std::ios::binary};
@@ -184,16 +152,21 @@ Pipeline::Pipeline(
         .pPushConstantRanges = nullptr,
     };
 
+    // Create pipeline layout
+    VkPipelineLayoutCreateInfo pipeline_layout_info{
+        .sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO,
+        .setLayoutCount = static_cast<uint32_t>(config.m_pipeline_layout.descriptor_sets.size()),
+        .pSetLayouts = config.m_pipeline_layout.descriptor_sets.data(),
+        .pushConstantRangeCount = static_cast<uint32_t>(config.m_pipeline_layout.push_constants.size()),
+        .pPushConstantRanges = config.m_pipeline_layout.push_constants.data(),
+    };
+
     auto result = vkCreatePipelineLayout(m_device.vk_device(), &pipeline_layout_info, nullptr, &m_pipeline_layout);
     VK_CHECK_MSG(result, "Failed to create pipeline layout!");
-        
     
     auto vertex_shader_mod = create_shader_module(device, stages.vertex);
     auto fragment_shader_mod = create_shader_module(device, stages.fragment);
     m_shader_modules = { vertex_shader_mod, fragment_shader_mod };
-    // pipeline_layout = config.m_pipeline_layout.pipeline_layout;
-    // descriptor_sets_layouts = config.m_pipeline_layout.descriptor_sets_layouts;
-
 
     VkPipelineShaderStageCreateInfo shader_stages[2];
     // Vertex Shader

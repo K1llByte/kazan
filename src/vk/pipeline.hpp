@@ -7,6 +7,11 @@
 
 namespace kzn::vk {
 
+struct PipelineLayout {
+    std::vector<VkPushConstantRange> push_constants;
+    std::vector<VkDescriptorSetLayout> descriptor_sets;
+};
+
 class PipelineConfig {
     friend class Pipeline;
 public:
@@ -21,7 +26,10 @@ public:
     // Dtor
     ~PipelineConfig() = default;
 
-    // // VertexInput
+    // Pipeline layout
+    PipelineConfig& set_layout(PipelineLayout&& layout) { m_pipeline_layout = std::move(layout); return *this; }
+
+    // VertexInput
     template<typename ...Ts>
     PipelineConfig& set_vertex_input();
     // template<typename T>
@@ -52,7 +60,7 @@ private:
     VkPipelineDepthStencilStateCreateInfo          m_depth_stencil_info;
     std::vector<VkDynamicState>                    m_dynamic_state_enables;
     VkPipelineDynamicStateCreateInfo               m_dynamic_state_info;
-    VkPipelineLayout                               m_pipeline_layout = VK_NULL_HANDLE;
+    PipelineLayout                                 m_pipeline_layout = VK_NULL_HANDLE;
     VkRenderPass                                   m_render_pass = VK_NULL_HANDLE;
     uint32_t                                       m_subpass = 0;
 };

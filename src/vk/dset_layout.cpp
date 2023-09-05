@@ -16,6 +16,7 @@ VkDescriptorSetLayoutBinding uniform_binding(uint32_t binding, VkShaderStageFlag
     };
 }
 
+
 VkDescriptorSetLayoutBinding sampler_binding(uint32_t binding, VkShaderStageFlags stage_flags) {
     return VkDescriptorSetLayoutBinding{
         .binding = binding,
@@ -72,11 +73,13 @@ DescriptorSetLayoutCache::DescriptorSetLayoutCache(Device& device)
 
 }
 
+
 DescriptorSetLayoutCache::~DescriptorSetLayoutCache() {
     for (auto& [_, layout] : m_layout_cache) {
         vkDestroyDescriptorSetLayout(m_device.vk_device(), layout, nullptr);
     }
 }
+
 
 DescriptorSetLayout DescriptorSetLayoutCache::create_layout(const DescriptorSetBindings& bindings) {
     DescriptorLayoutInfo layout_info{
