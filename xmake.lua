@@ -127,4 +127,4 @@ target("kazui")
     add_deps("kazan")
     -- Binary
     set_kind("binary")
-    add_files("src/editor/*.cpp")
+    add_files("src/editor/editor_test.cpp")

@@ -98,7 +98,7 @@ int main() try {
 
             vk::cmd_set_viewport(cmd_buffer, vk::create_viewport(swapchain.extent()));
             vk::cmd_set_scissor(cmd_buffer, vk::create_scissor(swapchain.extent()));
-            
+
             pipeline.bind(cmd_buffer);
             vertex_buffer.bind(cmd_buffer);
             index_buffer.bind(cmd_buffer);
