@@ -23,7 +23,7 @@ public:
     constexpr VkSwapchainKHR vk_swapchain() { return m_vk_swapchain; }
     constexpr VkFormat image_format() const { return m_surface_format.format; }
     constexpr VkExtent2D extent() const { return m_extent; }
-    constexpr std::span<VkImage> image() { return std::span{m_images.data(), m_images.size()}; }
+    constexpr std::span<VkImage> images() { return std::span{m_images.data(), m_images.size()}; }
     constexpr std::span<VkImageView> image_views() { return std::span{m_image_views.data(), m_image_views.size()}; }
     constexpr size_t current_index() const { return m_current_index; }
 

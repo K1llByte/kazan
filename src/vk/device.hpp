@@ -6,6 +6,7 @@
 
 #include <optional>
 #include <vector>
+#include <functional>
 #include <vulkan/vulkan.h>
 
 namespace kzn::vk {
@@ -50,6 +51,7 @@ public:
 
     // Getters
     VkDevice vk_device() { return m_vk_device; }
+    VkPhysicalDevice vk_physical_device() { return m_vk_physical_device; }
     constexpr VkQueue graphics_queue() { return m_vk_graphics_queue; }
     constexpr VkQueue present_queue() { return m_vk_present_queue; }
     const SwapchainSupport& swapchain_support() const { return m_swapchain_support; }
@@ -59,6 +61,7 @@ public:
     const SwapchainSupport& find_swapchain_support(VkSurfaceKHR surface);
 
     void wait_idle() { vkDeviceWaitIdle(m_vk_device); }
+    // void immediate_submit(std::function<void(vk::CommandBuffer&)>&& func);
 
 private:
     vk::Instance&    m_instance;

@@ -363,6 +363,7 @@ Device::Device(
     VK_CHECK_MSG(result, "Failed to create Vma allocator");
 }
 
+
 Device::~Device() {
     // Destroy Vma Allocator
     vmaDestroyAllocator(m_vma_allocator);
@@ -371,9 +372,38 @@ Device::~Device() {
     Log::trace("Device destroyed");
 }
 
+
 const SwapchainSupport& Device::find_swapchain_support(VkSurfaceKHR surface) {
     m_swapchain_support = get_swapchain_support(m_vk_physical_device, surface);
     return m_swapchain_support;
 }
+
+
+// void Device::immediate_submit(std::function<void(vk::CommandBuffer&)>&& func) {
+//     // TODO: avoid creating cmd pool and buffer i nthis method
+//     // make one buffer device global and reset it at the end
+    
+//     // Create a cmd pool
+//     auto cmd_pool = vk::CommandPool(this);
+//     // Allocate a cmd buffer from that pool
+//     auto cmd_buffer = cmd_pool.allocate();
+
+//     // Begin the command buffer recording with one time submit usage
+//     cmd_buffer.begin(VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT);
+//     // Record commands
+//     func(cmd_buffer);
+//     // End recording
+//     cmd_buffer.end();
+
+//     // When work is completed on the GPU this single use fence will be signaled
+//     auto immediate_fence = create_fence(*this, false);
+//     // Submit command buffer to the queue.
+//     graphics_queue_submit(cmd_buffer, immediate_fence);
+//     // Wait
+//     vkWaitForFences(vkdevice, 1, &immediate_fence, true, 9999999999);
+
+//     // Destroy single use fence
+//     destroy_fence(*this, immediate_fence);
+// }
 
 } // namespace kzn::vk
