@@ -74,7 +74,7 @@ vk::RenderPass simple_pass(vk::Device& device, VkFormat color_format) {
     );
 }
 
-vk::Pipeline triangle_pipeline(vk::RenderPass& render_pass) {
+vk::Pipeline triangle_pipeline(vk::RenderPass& render_pass, const vk::DescriptorSetLayout& dset_layout) {
     return vk::Pipeline(
         render_pass.device(),
         vk::PipelineStages{
@@ -83,6 +83,9 @@ vk::Pipeline triangle_pipeline(vk::RenderPass& render_pass) {
         },
         vk::PipelineConfig(render_pass)
             .set_vertex_input<glm::vec2, glm::vec3>()
+            .set_layout({
+                .descriptor_sets = { dset_layout.vk_layout() }
+            })
     );
 }
 
@@ -110,17 +113,16 @@ int main() try {
     auto swapchain = vk::Swapchain(device, surface, window.extent());
 
     auto render_pass = simple_pass(device, swapchain.image_format());
-    auto pipeline = triangle_pipeline(render_pass);
     auto framebuffers = create_swapchain_framebuffers(render_pass, swapchain);
 
     auto dset_allocator = vk::DescriptorSetAllocator(device);
     auto dset_cache = vk::DescriptorSetLayoutCache(device);
-    auto dset_0 = dset_allocator.allocate(
-        dset_cache.create_layout({
-            vk::uniform_binding(0),
-        })
-    );
+    auto dset_layout_0 = dset_cache.create_layout({
+        vk::uniform_binding(0),
+    });
+    auto pipeline = triangle_pipeline(render_pass, dset_layout_0);
 
+    auto dset_0 = dset_allocator.allocate(std::move(dset_layout_0));
     auto pvm_ubo = vk::UniformBuffer(device, sizeof(Pvm));
     auto pvm = Pvm{ glm::vec2{1.f} };
     pvm_ubo.upload(&pvm);

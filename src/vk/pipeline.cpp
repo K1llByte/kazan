@@ -144,14 +144,6 @@ Pipeline::Pipeline(
     const PipelineConfig& config)
     : m_device{device}
 {
-    VkPipelineLayoutCreateInfo pipeline_layout_info{
-        .sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO,
-        .setLayoutCount = 0,
-        .pSetLayouts = nullptr,
-        .pushConstantRangeCount = 0,
-        .pPushConstantRanges = nullptr,
-    };
-
     // Create pipeline layout
     VkPipelineLayoutCreateInfo pipeline_layout_info{
         .sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO,
@@ -164,6 +156,7 @@ Pipeline::Pipeline(
     auto result = vkCreatePipelineLayout(m_device.vk_device(), &pipeline_layout_info, nullptr, &m_pipeline_layout);
     VK_CHECK_MSG(result, "Failed to create pipeline layout!");
     
+    // Create shader stages
     auto vertex_shader_mod = create_shader_module(device, stages.vertex);
     auto fragment_shader_mod = create_shader_module(device, stages.fragment);
     m_shader_modules = { vertex_shader_mod, fragment_shader_mod };

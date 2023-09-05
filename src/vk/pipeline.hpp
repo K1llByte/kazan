@@ -60,7 +60,7 @@ private:
     VkPipelineDepthStencilStateCreateInfo          m_depth_stencil_info;
     std::vector<VkDynamicState>                    m_dynamic_state_enables;
     VkPipelineDynamicStateCreateInfo               m_dynamic_state_info;
-    PipelineLayout                                 m_pipeline_layout = VK_NULL_HANDLE;
+    PipelineLayout                                 m_pipeline_layout;
     VkRenderPass                                   m_render_pass = VK_NULL_HANDLE;
     uint32_t                                       m_subpass = 0;
 };
