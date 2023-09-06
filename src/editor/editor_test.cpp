@@ -205,11 +205,6 @@ int main() try {
     // - Remember that in C/C++ if you want to include a backslash \ in a string literal you need to write a double backslash \\ !
     io.Fonts->AddFontFromFileTTF("assets/fonts/ruda.bold.ttf", 16.0f);
 
-    // TODO: Implement immediate_submit
-    // device.immediate_submit([&](auto& cmd_buffer){
-    //     ImGui_ImplVulkan_CreateFontsTexture(cmd_buffer.vk_command_buffer());
-    // });
-
     // Setup Dear ImGui style
     ImGui::StyleColorsDark();
 
