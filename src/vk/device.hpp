@@ -36,6 +36,11 @@ struct DeviceParams {
     VkSurfaceKHR             surface = VK_NULL_HANDLE;
 };
 
+struct Queue {
+    Device& device;
+    VkQueue vk_queue;
+};
+
 class Device {
 public:
     // Ctor
@@ -52,8 +57,8 @@ public:
     // Getters
     VkDevice vk_device() { return m_vk_device; }
     VkPhysicalDevice vk_physical_device() { return m_vk_physical_device; }
-    constexpr VkQueue graphics_queue() { return m_vk_graphics_queue; }
-    constexpr VkQueue present_queue() { return m_vk_present_queue; }
+    constexpr Queue graphics_queue() { return Queue{*this, m_vk_graphics_queue}; }
+    constexpr Queue present_queue() { return Queue{*this, m_vk_present_queue}; }
     const SwapchainSupport& swapchain_support() const { return m_swapchain_support; }
     const QueueFamilies& queue_families() const { return m_queue_families; }
     VmaAllocator allocator() { return m_vma_allocator; }

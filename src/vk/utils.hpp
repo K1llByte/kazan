@@ -18,6 +18,7 @@ inline VkSemaphore create_semaphore(Device& device) {
     return semaphore;
 }
 
+
 inline VkFence create_fence(Device& device, VkFenceCreateFlags flags = {}) {
     VkFenceCreateInfo fence_info{};
     fence_info.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
@@ -27,6 +28,35 @@ inline VkFence create_fence(Device& device, VkFenceCreateFlags flags = {}) {
     VK_CHECK_MSG(result, "Failed to created synchronization fence!");
     return fence;
 }
+
+
+inline void immediate_submit(vk::Queue queue, std::function<void(vk::CommandBuffer&)>&& func) {
+    // // TODO: avoid creating cmd pool and buffer i nthis method
+    // // make one buffer device global and reset it at the end
+    
+    // // Create a cmd pool
+    // auto cmd_pool = vk::CommandPool(this);
+    // // Allocate a cmd buffer from that pool
+    // auto cmd_buffer = cmd_pool.allocate();
+
+    // // Begin the command buffer recording with one time submit usage
+    // cmd_buffer.begin(VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT);
+    // // Record commands
+    // func(cmd_buffer);
+    // // End recording
+    // cmd_buffer.end();
+
+    // // When work is completed on the GPU this single use fence will be signaled
+    // auto immediate_fence = create_fence(*this, false);
+    // // Submit command buffer to the queue.
+    // this->graphics_queue_submit(cmd_buffer, immediate_fence);
+    // // Wait
+    // vkWaitForFences(vkdevice, 1, &immediate_fence, true, 9999999999);
+
+    // // Destroy single use fence
+    // destroy_fence(*this, immediate_fence);
+}
+
 
 inline void destroy_semaphore(Device& device, VkSemaphore semaphore) {
     vkDestroySemaphore(device.vk_device(), semaphore, nullptr);

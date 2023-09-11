@@ -111,6 +111,7 @@ void Renderer::render_frame(const RenderFrameFunc& render_func) {
     submit_info.signalSemaphoreCount = 1;
     submit_info.pSignalSemaphores = &finished_render;
 
+    vkQueueSubmit(m_device.graphics_queue() , 1, &submit_info, in_flight_fence);
     auto result = vkQueueSubmit(m_device.graphics_queue() , 1, &submit_info, in_flight_fence);
     VK_CHECK_MSG(result, "Failed to submit command buffer!");
     
