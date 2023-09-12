@@ -36,6 +36,8 @@ struct DeviceParams {
     VkSurfaceKHR             surface = VK_NULL_HANDLE;
 };
 
+class Device;
+
 struct Queue {
     Device& device;
     VkQueue vk_queue;

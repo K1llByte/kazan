@@ -20,8 +20,7 @@ vk::Pipeline triangle_pipeline(vk::RenderPass& render_pass) {
     );
 }
 
-void set_theme()
-{
+void set_theme() {
     ImGuiStyle* style = &ImGui::GetStyle();
 
     // SRGB Palette
@@ -187,7 +186,7 @@ int main() try {
     init_info.Instance = instance.vk_instance();
     init_info.PhysicalDevice = device.vk_physical_device();
     init_info.Device = device.vk_device();
-    init_info.Queue = device.graphics_queue();
+    init_info.Queue = device.graphics_queue().vk_queue;
     init_info.DescriptorPool = imgui_pool;
     const uint32_t img_count = swapchain.images().size();
     init_info.MinImageCount = img_count;
@@ -206,12 +205,14 @@ int main() try {
     io.Fonts->AddFontFromFileTTF("assets/fonts/ruda.bold.ttf", 16.0f);
 
     // TODO: Implement immediate_submit
-    // device.immediate_submit([&](auto& cmd_buffer){
-    //     ImGui_ImplVulkan_CreateFontsTexture(cmd_buffer.vk_command_buffer());
-    // });
+    vk::immediate_submit(device.graphics_queue(), [&](auto& cmd_buffer) {
+        ImGui_ImplVulkan_CreateFontsTexture(cmd_buffer.vk_cmd_buffer());
+    });
 
     // Setup Dear ImGui style
     ImGui::StyleColorsDark();
+
+    set_theme();
 
     // Todo render texture
 
@@ -246,6 +247,9 @@ int main() try {
     }
 
     device.wait_idle();
+
+    vkDestroyDescriptorPool(device.vk_device(), imgui_pool, nullptr);
+    ImGui_ImplVulkan_Shutdown();
 }
 catch(vk::ResultError re) {
     Log::error("{}", re.message());

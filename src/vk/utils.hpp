@@ -4,7 +4,7 @@
 
 #include <glm/glm.hpp>
 
-#include "vk/device.hpp"
+#include "vk/cmd_buffer.hpp"
 #include "vk/error.hpp"
 
 namespace kzn::vk {
@@ -30,34 +30,6 @@ inline VkFence create_fence(Device& device, VkFenceCreateFlags flags = {}) {
 }
 
 
-inline void immediate_submit(vk::Queue queue, std::function<void(vk::CommandBuffer&)>&& func) {
-    // // TODO: avoid creating cmd pool and buffer i nthis method
-    // // make one buffer device global and reset it at the end
-    
-    // // Create a cmd pool
-    // auto cmd_pool = vk::CommandPool(this);
-    // // Allocate a cmd buffer from that pool
-    // auto cmd_buffer = cmd_pool.allocate();
-
-    // // Begin the command buffer recording with one time submit usage
-    // cmd_buffer.begin(VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT);
-    // // Record commands
-    // func(cmd_buffer);
-    // // End recording
-    // cmd_buffer.end();
-
-    // // When work is completed on the GPU this single use fence will be signaled
-    // auto immediate_fence = create_fence(*this, false);
-    // // Submit command buffer to the queue.
-    // this->graphics_queue_submit(cmd_buffer, immediate_fence);
-    // // Wait
-    // vkWaitForFences(vkdevice, 1, &immediate_fence, true, 9999999999);
-
-    // // Destroy single use fence
-    // destroy_fence(*this, immediate_fence);
-}
-
-
 inline void destroy_semaphore(Device& device, VkSemaphore semaphore) {
     vkDestroySemaphore(device.vk_device(), semaphore, nullptr);
 }
@@ -65,6 +37,43 @@ inline void destroy_semaphore(Device& device, VkSemaphore semaphore) {
 
 inline void destroy_fence(Device& device, VkFence fence) {
     vkDestroyFence(device.vk_device(), fence, nullptr);
+}
+
+
+inline void immediate_submit(vk::Queue queue, std::function<void(vk::CommandBuffer&)>&& func) {
+    // TODO: avoid creating cmd pool and buffer i nthis method
+    // make one buffer device global and reset it at the end
+    
+    // Create a cmd pool
+    auto cmd_pool = vk::CommandPool(queue.device);
+    // Allocate a cmd buffer from that pool
+    auto cmd_buffer = cmd_pool.allocate();
+
+    // Begin the command buffer recording with one time submit usage
+    cmd_buffer.begin(VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT);
+    // Record commands
+    func(cmd_buffer);
+    // End recording
+    cmd_buffer.end();
+
+    // When work is completed on the GPU this single use fence will be signaled
+    auto immediate_fence = create_fence(queue.device, false);
+    // Submit command buffer to the queue.
+    
+    VkCommandBuffer cmd_buffers[] = { cmd_buffer.vk_cmd_buffer() };
+    VkSubmitInfo submit_info{};
+    submit_info.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+    submit_info.commandBufferCount = 1;
+    submit_info.pCommandBuffers = cmd_buffers;
+
+    auto result = vkQueueSubmit(queue.vk_queue, 1, &submit_info, immediate_fence);
+    VK_CHECK_MSG(result, "Failed to submit command buffer!");
+
+    // Wait
+    vkWaitForFences(queue.device.vk_device(), 1, &immediate_fence, true, 9999999999);
+
+    // Destroy single use fence
+    destroy_fence(queue.device, immediate_fence);
 }
 
 
