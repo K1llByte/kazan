@@ -20,8 +20,12 @@
 #include "vk/functions.hpp"
 
 // Graphics
+#include "graphics/graphics_context.hpp"
 #include "graphics/renderer.hpp"
 #include "graphics/utils.hpp"
+
+// Ecs
+#include "ecs/entity.hpp"
 
 
 #endif // KAZAN_HPP

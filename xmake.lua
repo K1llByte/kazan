@@ -6,6 +6,7 @@ add_requires("vulkan-headers")
 add_requires("glm")
 add_requires("glfw")
 add_requires("fmt")
+add_requires("entt")
 -- glslangValidator
 add_requires("glslang", {configs = {binaryonly = true}})
 
@@ -23,6 +24,7 @@ end
 function kazan_deps()
     -- Dependencies
     add_packages("glm")
+    add_packages("entt")
     add_packages("fmt")
     add_packages("glfw")
     use_vulkan()

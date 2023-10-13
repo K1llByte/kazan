@@ -11,10 +11,9 @@ std::vector<vk::Framebuffer> create_swapchain_framebuffers(
     framebuffers.reserve(imgs_count);
 
     for(size_t i = 0; i < imgs_count; ++i) {
-        auto image_views = std::vector{ swapchain.image_views()[i] };
         framebuffers.emplace_back(
             render_pass,
-            std::move(image_views),
+            std::vector{ swapchain.image_views()[i] },
             swapchain.extent()
         );
     }

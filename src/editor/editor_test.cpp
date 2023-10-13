@@ -118,7 +118,15 @@ void draw_ui(vk::CommandBuffer& cmd_buffer) {
     ImGui_ImplVulkan_RenderDrawData(ImGui::GetDrawData(), cmd_buffer.vk_cmd_buffer());
 }
 
+struct Transform2DComponent {
+    int a = 1;
+};
+
 int main() try {
+    Entity player = Registry::create();
+    player.add_component<Transform2DComponent>(1);
+    Registry::destroy(player);
+
     auto window = Window("Kazan Engine", 1000, 800);
 
     auto instance = vk::Instance({
