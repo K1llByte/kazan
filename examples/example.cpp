@@ -17,6 +17,7 @@ struct ExampleApp: public App {
     void run() override {
         while(!m_window.is_closed()) {
             m_window.poll_events();
+            
         }
     }
 
