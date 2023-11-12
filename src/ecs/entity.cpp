@@ -8,6 +8,8 @@ Entity Registry::create() {
 
 void Registry::destroy(Entity& entity) {
     registry.destroy(entity.m_entity);
+    // TODO: Check if destroy already does this 
+    entity.m_entity = entt::null;
 }
 
 Entity::Entity(entt::entity raw_entity)

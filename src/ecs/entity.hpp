@@ -8,7 +8,7 @@ namespace kzn {
 
 class Entity;
 
-//! Singleton wrapper class for managing entities lifetime.
+//! Singleton wrapper class for managing entities.
 class Registry {
 public:
     friend class Entity;
@@ -20,7 +20,7 @@ private:
     static inline entt::registry registry;
 };
 
-//! An identifier that represents a entity
+//! An identifier class that represents a entity
 class Entity {
 public:
     friend class Registry;
@@ -48,7 +48,7 @@ public:
     bool is_valid() const;
 
 private:
-    entt::entity m_entity;
+    entt::entity m_entity = entt::null;
 };
 
 //////////////// Implementation ////////////////

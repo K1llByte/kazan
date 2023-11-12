@@ -12,8 +12,8 @@ public:
     Surface(const Surface&) = delete;
     Surface& operator=(const Surface&) = delete;
     // Move
-    Surface(Surface&&) = delete;
-    Surface& operator=(Surface&&) = delete;
+    Surface(Surface&&);
+    Surface& operator=(Surface&&) = default;
     // Dtor
     ~Surface();
 
@@ -21,7 +21,7 @@ public:
     VkSurfaceKHR vk_surface() { return m_surface; }
 
 private:
-    Instance*    m_instance;
+    Instance&    m_instance;
     VkSurfaceKHR m_surface;
     // VkSurfaceFormatKHR
     // SurfaceCapabilities

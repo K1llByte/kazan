@@ -4,6 +4,7 @@
 // Core
 #include "core/log.hpp"
 #include "core/window.hpp"
+#include "core/app.hpp"
 
 // Vulkan
 #include "vk/device.hpp"

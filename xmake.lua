@@ -119,7 +119,7 @@ target("imgui")
     add_packages("vulkan-headers")
     add_files("lib/imgui_docking/src/**.cpp")
 
--- Target Demo using Kazan Lib
+-- Target Kazan Editor
 target("kazui")
     -- Compiler Settings
     compilation_settings()
@@ -131,3 +131,16 @@ target("kazui")
     set_kind("binary")
     add_files("src/editor/editor_test.cpp")
     -- add_files("src/editor/main.cpp")
+
+
+-- Target Demo using Kazan Lib
+target("example")
+    -- Compiler Settings
+    compilation_settings()
+    -- Dependencies
+    kazan_deps()
+    add_deps("imgui")
+    add_deps("kazan")
+    -- Binary
+    set_kind("binary")
+    add_files("examples/example.cpp")
