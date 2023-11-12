@@ -27,6 +27,7 @@
 
 // Ecs
 #include "ecs/entity.hpp"
+#include "ecs/system.hpp"
 
 
 #endif // KAZAN_HPP
