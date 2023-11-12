@@ -18,11 +18,13 @@ struct ExampleApp: public App {
         while(!m_window.is_closed()) {
             m_window.poll_events();
             
+            m_systems.update(0.f);
         }
     }
 
 private:
-    Window m_window;
+    Window        m_window;
+    SystemManager m_systems;
 };
 
 KZN_CREATE_APP(ExampleApp)
