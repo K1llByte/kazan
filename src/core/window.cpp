@@ -1,8 +1,7 @@
-#include "core/window.hpp"
+#include "window.hpp"
 
-#include "core/log.hpp"
+#include "log.hpp"
 // #include "vk/utils.hpp"
-
 
 namespace kzn {
 
@@ -14,22 +13,23 @@ void framebuffer_resized(GLFWwindow* window, int width, int height) {
 }
 
 Window::Window(const std::string_view& name, int _width, int _height)
-    : m_width(_width), m_height(_height)
-{
+  : m_width(_width)
+  , m_height(_height) {
     // Initialize glfw
     glfwInit();
     // Turn off OpenGL context initialization
     glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
-    
+
     // Turn off resizable window
     glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
     // Create window
-    m_glfw_window = glfwCreateWindow(m_width, m_height, name.data(), nullptr, nullptr);
+    m_glfw_window =
+      glfwCreateWindow(m_width, m_height, name.data(), nullptr, nullptr);
     glfwSetWindowUserPointer(m_glfw_window, this);
-    
+
     // On framebuffer resize callback
     glfwSetFramebufferSizeCallback(m_glfw_window, framebuffer_resized);
-    
+
     // Hide mouse cursor
     // glfwSetInputMode(m_glfw_window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
 
@@ -43,7 +43,7 @@ Window::~Window() {
     glfwTerminate();
     m_glfw_window = nullptr;
     Log::trace("Window destroyed");
-} 
+}
 
 bool Window::is_closed() const {
     return glfwWindowShouldClose(m_glfw_window);
@@ -63,7 +63,8 @@ void Window::set_resized(bool resized) {
 
 vk::Surface Window::create_surface(vk::Instance& instance) {
     VkSurfaceKHR surface;
-    auto result = glfwCreateWindowSurface(instance.vk_instance(), m_glfw_window, nullptr, &surface);
+    auto result = glfwCreateWindowSurface(
+      instance.vk_instance(), m_glfw_window, nullptr, &surface);
     VK_CHECK_MSG(result, "Failed to create window surface!");
     return vk::Surface(instance, surface);
 }
@@ -75,10 +76,10 @@ float Window::aspect_ratio() const {
 std::vector<const char*> Window::required_extensions() {
     uint32_t glfw_extension_count = 0;
     // const char** glfw_extensions;
-    auto glfw_extensions = glfwGetRequiredInstanceExtensions(&glfw_extension_count);
-    return std::vector<const char*>(
-        glfw_extensions,
-        glfw_extensions + glfw_extension_count);
+    auto glfw_extensions =
+      glfwGetRequiredInstanceExtensions(&glfw_extension_count);
+    return std::vector<const char*>(glfw_extensions,
+                                    glfw_extensions + glfw_extension_count);
 }
 
 VkExtent2D Window::extent() {
@@ -88,10 +89,8 @@ VkExtent2D Window::extent() {
         glfwGetFramebufferSize(m_glfw_window, &m_width, &m_height);
         glfwWaitEvents();
     }
-    return VkExtent2D {
-        static_cast<uint32_t>(m_width),
-        static_cast<uint32_t>(m_height)
-    };
+    return VkExtent2D{ static_cast<uint32_t>(m_width),
+                       static_cast<uint32_t>(m_height) };
 }
 
 bool Window::was_resized() {

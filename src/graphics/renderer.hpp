@@ -1,9 +1,9 @@
 #pragma once
 
-#include "vk/device.hpp"
-#include "vk/swapchain.hpp"
-#include "vk/cmd_buffer.hpp"
-#include "core/window.hpp"
+#include <core/window.hpp>
+#include <vk/cmd_buffer.hpp>
+#include <vk/device.hpp>
+#include <vk/swapchain.hpp>
 
 #include <functional>
 
@@ -12,9 +12,9 @@ namespace kzn {
 struct PerFrameData {
 public:
     vk::CommandBuffer cmd_buffer;
-    VkSemaphore       img_available;
-    VkSemaphore       finished_render;
-    VkFence           in_flight_fence;
+    VkSemaphore img_available;
+    VkSemaphore finished_render;
+    VkFence in_flight_fence;
 
     // Ctor
     PerFrameData(vk::Device& device, vk::CommandPool& cmd_pool);
@@ -36,10 +36,7 @@ public:
     using RenderFrameFunc = std::function<void(vk::CommandBuffer&)>;
 
     // Ctor
-    Renderer(
-        vk::Device& device,
-        vk::Swapchain& swapchain,
-        Window& window);
+    Renderer(vk::Device& device, vk::Swapchain& swapchain, Window& window);
     // Copy
     Renderer(const Renderer&) = delete;
     Renderer& operator=(const Renderer&) = delete;
@@ -56,17 +53,17 @@ public:
     void on_swapchain_resize(F&& callback) {
         m_on_swapchain_resize = std::move(callback);
     }
-    
+
 private:
-    vk::Device&       m_device;
-    vk::Swapchain&    m_swapchain;
-    vk::CommandPool   m_cmd_pool;
-    Window&           m_window;
+    vk::Device& m_device;
+    vk::Swapchain& m_swapchain;
+    vk::CommandPool m_cmd_pool;
+    Window& m_window;
     // Sync
-    constexpr static size_t   MAX_FRAMES_IN_FLIGHT = 2;
-    size_t                    m_frame_idx = 0;
+    constexpr static size_t MAX_FRAMES_IN_FLIGHT = 2;
+    size_t m_frame_idx = 0;
     std::vector<PerFrameData> m_frame_data;
-    std::function<void()>     m_on_swapchain_resize;
+    std::function<void()> m_on_swapchain_resize;
 };
 
 } // namespace kzn
