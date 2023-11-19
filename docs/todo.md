@@ -8,7 +8,18 @@ kazan.hpp include with all public API includes
 
 ## In Progress
 
-## Todo
+## Todo (Refactor)
+
+- [ ] CMake setup shader compiler
+- [ ] CMake setup vulkan fetch and install SDK
+- [ ] Tweak identation of clang-format
+- [ ] Disable some clang-tidy warnings
+    - Magic numbers
+    - Virtual dtors
+    - backslash-newline
+
+___
+## Todo (Old)
 
 [priority:high]
 - Redesign ...Renderer
@@ -53,8 +64,6 @@ kazan.hpp include with all public API includes
 
 [priority:low]
 - docs generation with hdoc
-
-- debug, release and dev build modes
 
 - Make staged submition for Vertex Buffers
     - For now vertex buffers are in a host visible region on the GPU

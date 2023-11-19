@@ -34,3 +34,5 @@ CheckOptions:
     value:           'NULL'
   - key:             misc-unused-parameters
     value:           IgnoreVirtual
+  # - key:             cppcoreguidelines-avoid-magic-numbers.IgnoredIntegerValues
+  #   value:           '1'

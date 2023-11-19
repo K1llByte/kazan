@@ -1,9 +1,13 @@
 #pragma once
 
+#include <memory>
+#include <vector>
+
 namespace kzn {
 
 //! Base class for systems implementations.
 struct System {
+    virtual ~System() = default;
     virtual void update(float delta_time) = 0;
 };
 
@@ -23,22 +27,19 @@ public:
     ~SystemManager() = default;
 
     void update(float delta_time) {
-        for(auto& system : m_systems) {
+        for (auto& system : m_systems) {
             system->update(delta_time);
         }
     }
 
-    template<typename S, typename ...Args>
+    template<typename S, typename... Args>
     // TODO: S has to derive from System
     void emplace(Args&&... args) {
-        m_systems.push_back(
-            std::make_unique<S>(std::forward<Args>(args)...)
-        );
+        m_systems.push_back(std::make_unique<S>(std::forward<Args>(args)...));
     }
 
 private:
     std::vector<std::unique_ptr<System>> m_systems;
 };
-
 
 } // namespace kzn

@@ -10,7 +10,6 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 ##################################### Paths #####################################
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${PROJECT_SOURCE_DIR}/bin")
-# set(INCLUDE_PATH "${PROJECT_SOURCE_DIR}/include")
 
 ################################# Dependencies ##################################
 include(FetchContent)
@@ -84,9 +83,8 @@ target_compile_definitions(KazanLib
       $<$<CONFIG:MinSizeRel>:RELEASE>
 )
 
-add_executable(KazanEditor src/editor/editor_test.cpp)
+add_executable(KazanEditor "src/editor/editor_app.cpp")
 target_link_libraries(KazanEditor PUBLIC KazanLib CustomImgui)
-target_include_directories(KazanEditor PUBLIC ${KAZAN_INCLUDE_PATH} ${imgui_SOURCE_DIR})
 target_compile_definitions(KazanEditor
     PUBLIC
       $<$<CONFIG:Debug>:DEBUG>
