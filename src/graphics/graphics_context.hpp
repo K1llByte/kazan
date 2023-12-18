@@ -3,6 +3,7 @@
 #include "core/window.hpp"
 #include "vk/dset.hpp"
 #include "vk/swapchain.hpp"
+#include <cassert>
 #include <cstddef>
 #include <memory>
 
@@ -12,9 +13,13 @@ namespace kzn {
 class GraphicsContext {
 public:
     static void create(Window& window) {
+        assert(m_context == nullptr);
         m_context = std::make_unique<GraphicsContext>(window);
     }
-    static void destroy() { m_context.reset(); }
+    static void destroy() {
+        assert(m_context != nullptr);
+        m_context.reset();
+    }
     static bool exists() { return m_context != nullptr; }
 
     static vk::Instance& instance() { return m_context->m_instance; }

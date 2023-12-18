@@ -73,13 +73,12 @@ float Window::aspect_ratio() const {
     return static_cast<float>(m_width) / static_cast<float>(m_height);
 }
 
-std::vector<const char*> Window::required_extensions() {
+std::vector<const char*> Window::required_extensions() const {
     uint32_t glfw_extension_count = 0;
     // const char** glfw_extensions;
     auto glfw_extensions =
       glfwGetRequiredInstanceExtensions(&glfw_extension_count);
-    return std::vector<const char*>(glfw_extensions,
-                                    glfw_extensions + glfw_extension_count);
+    return { glfw_extensions, glfw_extensions + glfw_extension_count };
 }
 
 VkExtent2D Window::extent() {

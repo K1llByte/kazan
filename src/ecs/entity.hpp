@@ -12,11 +12,12 @@ class Entity;
 class Registry {
 public:
     friend class Entity;
-    
+
     static Entity create();
     static void destroy(Entity& entity);
 
-private:
+    // FIXME: Make this private back private:
+public:
     static inline entt::registry registry;
 };
 
@@ -36,16 +37,16 @@ public:
     // Dtor
     ~Entity() = default;
 
-    template<typename Component, typename ...Args>
+    template<typename Component, typename... Args>
     Component& add_component(Args&&... args);
     template<typename Component>
-    void       remove_component();
+    void remove_component();
     template<typename Component>
     Component& get_component();
     template<typename Component>
     Component* try_get_component();
 
-    bool is_valid() const;
+    [[nodiscard]] bool is_valid() const;
 
 private:
     entt::entity m_entity = entt::null;
@@ -53,12 +54,10 @@ private:
 
 //////////////// Implementation ////////////////
 
-template<typename Component, typename ...Args>
+template<typename Component, typename... Args>
 Component& Entity::add_component(Args&&... args) {
-    return Registry::registry.emplace<Component>(
-        m_entity,
-        std::forward<Args>(args)...
-    );
+    return Registry::registry.emplace<Component>(m_entity,
+                                                 std::forward<Args>(args)...);
 }
 
 template<typename Component>

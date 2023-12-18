@@ -12,7 +12,10 @@ kazan.hpp include with all public API includes
 
 - [ ] CMake setup shader compiler
 - [ ] CMake setup vulkan fetch and install SDK
+- [ ] Github Actions setup CI/CD
 - [ ] Tweak identation of clang-format
+    - On ctors
+    - Break line indentation
 - [ ] Disable some clang-tidy warnings
     - Magic numbers
     - Virtual dtors

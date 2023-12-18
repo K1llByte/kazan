@@ -13,7 +13,7 @@
 
 namespace kzn {
 
-class Window {        
+class Window {
     friend void framebuffer_resized(GLFWwindow*, int, int);
 
 public:
@@ -28,23 +28,25 @@ public:
     // Dtor
     ~Window();
 
-    bool is_closed() const;
+    [[nodiscard]] bool is_closed() const;
     void poll_events() const;
     void set_title(const std::string_view& name);
-    void set_resized(bool resized); // TODO: Remove when event system is implemented
+    // TODO: Remove when event system is implemented
+    void set_resized(bool resized);
     vk::Surface create_surface(vk::Instance& instance);
 
-    VkExtent2D               extent();
-    GLFWwindow*              glfw_ptr() const { return m_glfw_window; }
-    bool                     was_resized(); // TODO: Remove when event system is implemented
-    float                    aspect_ratio() const;
-    std::vector<const char*> required_extensions();
+    VkExtent2D extent();
+    [[nodiscard]] GLFWwindow* glfw_ptr() const { return m_glfw_window; }
+    // TODO: Remove when event system is implemented
+    [[nodiscard]] bool was_resized();
+    [[nodiscard]] float aspect_ratio() const;
+    [[nodiscard]] std::vector<const char*> required_extensions() const;
 
 private:
-    GLFWwindow*  m_glfw_window;
-    int          m_width = 800;
-    int          m_height = 600;
-    bool         m_has_resized; // TODO: Remove when event system is implemented
+    GLFWwindow* m_glfw_window;
+    int m_width = 800;
+    int m_height = 600;
+    bool m_has_resized; // TODO: Remove when event system is implemented
 };
 
 } // namespace kzn
