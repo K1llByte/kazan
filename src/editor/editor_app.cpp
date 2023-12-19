@@ -1,7 +1,7 @@
-#include "events/event_manager.hpp"
 #include "glm/fwd.hpp"
 #include "kazan.hpp"
 #include <thread>
+#include <type_traits>
 
 using namespace kzn;
 
@@ -44,14 +44,21 @@ void on_foo(const FooEvent&) {
     Log::info("on_foo!");
 }
 
+struct Foo {
+    template<typename E>
+        requires std::is_base_of_v<Event, E>
+    void operator()(const E&) {
+        Log::info("void (const E&)");
+    }
+};
+
 class DummyApp : public App {
 public:
     void run() override {
+        // KZN_REGISTER_EVENT_HANDLER(on_foo);
         EventManager::attach<FooEvent>(EventHandler(on_foo));
-
         EventManager::submit(FooEvent{});
 
-        // Hello World!
         Log::info("Hello World!");
     }
 };

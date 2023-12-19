@@ -26,7 +26,7 @@ protected:
 
         // For each managed_handler attach to EventManager
         for (auto& [type_idx, handler] : _auto_handlers) {
-            managed_handlers.emplace_back(type_idx, handler.get_id());
+            managed_handlers.emplace_back(type_idx, handler.id());
             EventManager::attach(type_idx, handler);
         }
     }
@@ -50,7 +50,7 @@ private:
 //     template<typename Handler>
 //     void tmp() {
 //         auto [type_idx, handler] = register_event_handler(this, &Handler);
-//         managed_handlers.emplace_back(type_idx, handler.get_id());
+//         managed_handlers.emplace_back(type_idx, handler.id());
 //         EventManager::attach(type_idx, handler);
 //     }
 

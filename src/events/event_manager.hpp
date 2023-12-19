@@ -24,14 +24,14 @@ public:
     template<typename T, typename E>
         requires std::is_base_of_v<Event, E>
     explicit EventHandler(T* instance, void (T::*func)(const E&))
-      : handler_id(id_counter++)
-      , handler{ bind_event_handler(instance, func) } {}
+      : m_handler_id(id_counter++)
+      , m_handler{ bind_event_handler(instance, func) } {}
 
     template<typename E>
         requires std::is_base_of_v<Event, E>
     explicit EventHandler(void (*func)(const E&))
-      : handler_id(id_counter++)
-      , handler{ bind_event_handler(func) } {}
+      : m_handler_id(id_counter++)
+      , m_handler{ bind_event_handler(func) } {}
 
     EventHandler(EventHandler&&) = default;
     EventHandler& operator=(EventHandler&&) = default;
@@ -40,19 +40,19 @@ public:
 
     ~EventHandler() = default;
 
-    [[nodiscard]] constexpr HandlerID get_id() const { return handler_id; }
-    [[nodiscard]] constexpr HandlerID get_id() { return handler_id; }
+    [[nodiscard]] constexpr HandlerID id() const { return m_handler_id; }
+    [[nodiscard]] constexpr HandlerID id() { return m_handler_id; }
 
-    // FIXME: Call operator
     template<typename E>
-    void operator()(const E& e) {
-        handler(e);
+        requires std::is_base_of_v<Event, E>
+    void operator()(const E& e) const {
+        m_handler(e);
     }
 
-    // private:
+private:
     static inline HandlerID id_counter = 0;
-    HandlerID handler_id = 0;
-    std::function<void(const Event&)> handler;
+    HandlerID m_handler_id = 0;
+    std::function<void(const Event&)> m_handler;
 };
 
 ////////////////////////////////////////////////
@@ -68,9 +68,10 @@ public:
         E e = event;
         auto it = std::ranges::find_if(
           m_handlers, [](const auto& p) { return p.first == typeid(E); });
+
         if (it != m_handlers.end()) {
             for (const auto& event_handler : it->second) {
-                event_handler.handler(e);
+                event_handler(e);
             }
         }
     }
@@ -80,6 +81,7 @@ public:
         auto it = std::ranges::find_if(m_handlers, [type_idx](const auto& p) {
             return p.first == type_idx;
         });
+
         if (it != m_handlers.end()) {
             it->second.push_back(event_handler);
         }
@@ -102,7 +104,7 @@ public:
 
         auto rmit = std::remove_if(
           it->second.begin(), it->second.end(), [handler_id](EventHandler& eh) {
-              return handler_id == eh.get_id();
+              return handler_id == eh.id();
           });
         it->second.erase(rmit, it->second.end());
     }
