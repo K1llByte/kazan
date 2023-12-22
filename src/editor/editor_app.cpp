@@ -1,3 +1,4 @@
+#include "events/event.hpp"
 #include "glm/fwd.hpp"
 #include "kazan.hpp"
 #include <thread>
@@ -8,12 +9,11 @@ using namespace kzn;
 class EditorApp : public App {
 public:
     EditorApp()
-      : m_window("Kazan Editor", 800, 600) {
+        : m_window("Kazan Editor", 800, 600) {
         m_systems.emplace<RenderSystem>(m_window);
         auto square = Registry::create();
         auto& square_transform = square.add_component<Transform2DComponent>();
-        // auto& square_sprite =
-        // square.add_component<SpriteComponent>();
+        // auto& square_sprite = square.add_component<SpriteComponent>();
     }
 
     ~EditorApp() = default;
@@ -36,7 +36,7 @@ private:
     SystemManager m_systems;
 };
 
-///////////////////////////////////////////////////////
+//////////////////////////////////////////////////////
 
 struct FooEvent : Event {};
 
@@ -45,8 +45,7 @@ void on_foo(const FooEvent&) {
 }
 
 struct Foo {
-    template<typename E>
-        requires std::is_base_of_v<Event, E>
+    template<IsEvent E>
     void operator()(const E&) {
         Log::info("void (const E&)");
     }
@@ -55,9 +54,8 @@ struct Foo {
 class DummyApp : public App {
 public:
     void run() override {
-        // KZN_REGISTER_EVENT_HANDLER(on_foo);
-        EventManager::attach<FooEvent>(EventHandler(on_foo));
-        EventManager::submit(FooEvent{});
+        EventManager::listen<FooEvent>(EventHandler(on_foo));
+        EventManager::send(FooEvent{});
 
         Log::info("Hello World!");
     }
@@ -65,4 +63,4 @@ public:
 
 ///////////////////////////////////////////////////////
 
-KZN_CREATE_APP(DummyApp)
+KZN_CREATE_APP(EditorApp)

@@ -1,20 +1,25 @@
 #pragma once
 
-namespace kzn
-{
-    ////////////////////////////////////////////////
-    //               Event Base                   //
-    ////////////////////////////////////////////////
+#include <type_traits>
 
-    struct Event {};
+namespace kzn {
 
-    ////////////////////////////////////////////////
-    //               Core Events                  //
-    ////////////////////////////////////////////////
+////////////////////////////////////////////////
+//               Event Base                   //
+////////////////////////////////////////////////
 
-    struct ResizeEvent: public Event {
-        // int width;
-        // int height;
-    };
+struct Event {};
+
+template<typename E>
+concept IsEvent = std::is_base_of_v<Event, E>;
+
+////////////////////////////////////////////////
+//               Core Events                  //
+////////////////////////////////////////////////
+
+struct ResizeEvent : public Event {
+    // int width;
+    // int height;
+};
 
 } // namespace kzn

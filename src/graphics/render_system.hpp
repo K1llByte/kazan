@@ -17,6 +17,7 @@ struct SpriteComponent {
     // TODO: Texture
 };
 
+//! RAII Swapper for creating and destroying graphics context.
 struct ScopedGraphicsContext {
     // Ctor
     ScopedGraphicsContext(Window& window) { GraphicsContext::create(window); }
@@ -30,6 +31,7 @@ struct ScopedGraphicsContext {
     ~ScopedGraphicsContext() { GraphicsContext::destroy(); }
 };
 
+//! ECS System for rendering
 class RenderSystem : public System {
 public:
     // Ctor
@@ -45,6 +47,8 @@ public:
 
     void update(float delta_time) override;
 
+    void on_swapchain_resize(const SwapchainResize&);
+
 private:
     ScopedGraphicsContext m_scoped_gfx_context;
     Renderer m_renderer;
@@ -53,4 +57,4 @@ private:
     vk::Pipeline m_pipeline;
 };
 
-}
+} // namespace kzn

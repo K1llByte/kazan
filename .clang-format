@@ -6,11 +6,15 @@ BraceWrapping:
   BeforeElse: true
   BeforeCatch: true
 IndentWidth: 4
+ContinuationIndentWidth: 4
+ConstructorInitializerIndentWidth: 4
 AccessModifierOffset: -4
 AlwaysBreakAfterDefinitionReturnType: None
 AlwaysBreakAfterReturnType: None
 ColumnLimit: 80
 AllowShortIfStatementsOnASingleLine: false
+FixNamespaceComments: true
+AlignAfterOpenBracket: BlockIndent
 # BeforeElse: false
 # UseTab: Never
 # TabWidth: 8

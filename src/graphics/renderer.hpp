@@ -1,6 +1,7 @@
 #pragma once
 
 #include <core/window.hpp>
+#include <events/event_manager.hpp>
 #include <vk/cmd_buffer.hpp>
 #include <vk/device.hpp>
 #include <vk/swapchain.hpp>
@@ -31,6 +32,9 @@ private:
     vk::Device& m_device;
 };
 
+//! Renderer events
+struct SwapchainResize : Event {};
+
 class Renderer {
 public:
     using RenderFrameFunc = std::function<void(vk::CommandBuffer&)>;
@@ -48,22 +52,15 @@ public:
 
     void render_frame(const RenderFrameFunc& render_func);
 
-    // Callbacks
-    template<typename F>
-    void on_swapchain_resize(F&& callback) {
-        m_on_swapchain_resize = std::move(callback);
-    }
-
 private:
     vk::Device& m_device;
     vk::Swapchain& m_swapchain;
     vk::CommandPool m_cmd_pool;
     Window& m_window;
     // Sync
-    constexpr static size_t MAX_FRAMES_IN_FLIGHT = 2;
+    static constexpr size_t MAX_FRAMES_IN_FLIGHT = 2;
     size_t m_frame_idx = 0;
     std::vector<PerFrameData> m_frame_data;
-    std::function<void()> m_on_swapchain_resize;
 };
 
 } // namespace kzn

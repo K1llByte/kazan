@@ -10,12 +10,13 @@ using namespace kzn;
 
 vk::Pipeline triangle_pipeline(vk::RenderPass& render_pass) {
     return vk::Pipeline(
-      render_pass.device(),
-      vk::PipelineStages{
-        .vertex = "assets/shaders/triangle/triangle.vert.spv",
-        .fragment = "assets/shaders/triangle/triangle.frag.spv",
-      },
-      vk::PipelineConfig(render_pass));
+        render_pass.device(),
+        vk::PipelineStages{
+            .vertex = "assets/shaders/triangle/triangle.vert.spv",
+            .fragment = "assets/shaders/triangle/triangle.frag.spv",
+        },
+        vk::PipelineConfig(render_pass)
+    );
 }
 
 void set_theme() {
@@ -26,11 +27,11 @@ void set_theme() {
     // 689d6a
     // const auto DEBUG = ImVec4(1.00f, 0.00f, 0.00f, 1.00f); // ff0000
     const auto DARK_GREY =
-      ImVec4(0.004753f, 0.004006f, 0.006017f, 1.00f); // 0f0d12
+        ImVec4(0.004753f, 0.004006f, 0.006017f, 1.00f); // 0f0d12
     const auto DARK_GREY_HOVER = ImVec4(0.046964f, 0.043233f, 0.068384f, 1.00f);
     const auto GREY = ImVec4(0.010022f, 0.008540f, 0.013411f, 1.00f); // 1a171f
     const auto GREY_HOVER =
-      ImVec4(0.019606f, 0.015325f, 0.027211f, 1.00f); // 8f8f94
+        ImVec4(0.019606f, 0.015325f, 0.027211f, 1.00f); // 8f8f94
     const auto GREY_ACTIVE = ImVec4(0.603827f, 0.603827f, 0.655930f, 0.31f);
 
     style->WindowPadding = ImVec2(15, 15);
@@ -51,19 +52,19 @@ void set_theme() {
     style->Colors[ImGuiCol_ChildBg] = ImVec4(0.07f, 0.07f, 0.09f, 1.00f);
     style->Colors[ImGuiCol_PopupBg] = ImVec4(0.07f, 0.07f, 0.09f, 1.00f);
     style->Colors[ImGuiCol_Border] =
-      GREY; // ImVec4(0.80f, 0.80f, 0.83f, 0.88f);
+        GREY; // ImVec4(0.80f, 0.80f, 0.83f, 0.88f);
     style->Colors[ImGuiCol_BorderShadow] = ImVec4(0.92f, 0.91f, 0.88f, 0.00f);
     style->Colors[ImGuiCol_FrameBg] = GREY;
     style->Colors[ImGuiCol_FrameBgHovered] = DARK_GREY_HOVER;
     style->Colors[ImGuiCol_FrameBgActive] = GREY_HOVER;
     style->Colors[ImGuiCol_TitleBg] = GREY;
     style->Colors[ImGuiCol_TitleBgCollapsed] =
-      ImVec4(1.00f, 0.98f, 0.95f, 0.75f);
+        ImVec4(1.00f, 0.98f, 0.95f, 0.75f);
     style->Colors[ImGuiCol_TitleBgActive] = ImVec4(0.07f, 0.07f, 0.09f, 1.00f);
     style->Colors[ImGuiCol_MenuBarBg] = GREY;
     style->Colors[ImGuiCol_ScrollbarBg] = GREY;
     style->Colors[ImGuiCol_ScrollbarGrab] =
-      GREY_HOVER; // ImVec4(0.80f, 0.80f, 0.83f, 0.31f);
+        GREY_HOVER; // ImVec4(0.80f, 0.80f, 0.83f, 0.31f);
     style->Colors[ImGuiCol_ScrollbarGrabHovered] = DARK_GREY_HOVER;
     style->Colors[ImGuiCol_ScrollbarGrabActive] = GREY_ACTIVE; // DARK_GREY;
     style->Colors[ImGuiCol_CheckMark] = ImVec4(0.80f, 0.80f, 0.83f, 0.31f);
@@ -97,10 +98,10 @@ void set_theme() {
     // 0.39f, 0.38f, 1.00f);
     style->Colors[ImGuiCol_PlotLines] = ImVec4(0.40f, 0.39f, 0.38f, 0.63f);
     style->Colors[ImGuiCol_PlotLinesHovered] =
-      ImVec4(0.25f, 1.00f, 0.00f, 1.00f);
+        ImVec4(0.25f, 1.00f, 0.00f, 1.00f);
     style->Colors[ImGuiCol_PlotHistogram] = ImVec4(0.40f, 0.39f, 0.38f, 0.63f);
     style->Colors[ImGuiCol_PlotHistogramHovered] =
-      ImVec4(0.25f, 1.00f, 0.00f, 1.00f);
+        ImVec4(0.25f, 1.00f, 0.00f, 1.00f);
     style->Colors[ImGuiCol_TextSelectedBg] = ImVec4(0.25f, 1.00f, 0.00f, 0.43f);
     // style->Colors[ImGuiCol_ModalWindowDarkening] = ImVec4(1.00f, 0.98f,
     // 0.95f, 0.73f);
@@ -123,8 +124,9 @@ void draw_ui(vk::CommandBuffer& cmd_buffer) {
     ImGui::Render();
 
     // Submit draw commands
-    ImGui_ImplVulkan_RenderDrawData(ImGui::GetDrawData(),
-                                    cmd_buffer.vk_cmd_buffer());
+    ImGui_ImplVulkan_RenderDrawData(
+        ImGui::GetDrawData(), cmd_buffer.vk_cmd_buffer()
+    );
 }
 
 struct Transform2DComponent {
@@ -139,14 +141,15 @@ int main() try {
     auto window = Window("Kazan Engine", 1000, 800);
 
     auto instance = vk::Instance({
-      .extensions = window.required_extensions(),
-      .with_validation = true,
+        .extensions = window.required_extensions(),
+        .with_validation = true,
     });
     auto surface = window.create_surface(instance);
-    auto device =
-      vk::Device(instance,
-                 { .extensions = { VK_KHR_SWAPCHAIN_EXTENSION_NAME },
-                   .surface = surface.vk_surface() });
+    auto device = vk::Device(
+        instance,
+        { .extensions = { VK_KHR_SWAPCHAIN_EXTENSION_NAME },
+          .surface = surface.vk_surface() }
+    );
     auto swapchain = vk::Swapchain(device, surface, window.extent());
 
     auto render_pass = simple_pass(device, swapchain.image_format());
@@ -156,9 +159,9 @@ int main() try {
 
     auto renderer = Renderer(device, swapchain, window);
 
-    renderer.on_swapchain_resize([&] {
-        framebuffers = create_swapchain_framebuffers(render_pass, swapchain);
-    });
+    // renderer.on_swapchain_resize([&] {
+    //     framebuffers = create_swapchain_framebuffers(render_pass, swapchain);
+    // });
 
     //////////////////
     //  ImGui Setup //
@@ -188,7 +191,8 @@ int main() try {
     // Create ImGui descriptor pool
     VkDescriptorPool imgui_pool;
     auto res = vkCreateDescriptorPool(
-      device.vk_device(), &pool_info, nullptr, &imgui_pool);
+        device.vk_device(), &pool_info, nullptr, &imgui_pool
+    );
     VK_CHECK_MSG(res, "Error creating ImGui descriptor pool");
 
     // Setup Dear ImGui context
@@ -255,9 +259,10 @@ int main() try {
         renderer.render_frame([&](auto& cmd_buffer) {
             // Render pass
             render_pass.begin(
-              cmd_buffer,
-              framebuffers[swapchain.current_index()],
-              { VkClearValue{ { { 0.01f, 0.01f, 0.01f, 1.0f } } } });
+                cmd_buffer,
+                framebuffers[swapchain.current_index()],
+                { VkClearValue{ { { 0.01f, 0.01f, 0.01f, 1.0f } } } }
+            );
 
             // vk::cmd_set_viewport(cmd_buffer,
             // vk::create_viewport(swapchain.extent()));

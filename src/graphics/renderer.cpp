@@ -1,53 +1,47 @@
 #include "renderer.hpp"
 
+#include "events/event.hpp"
+#include "events/event_manager.hpp"
 #include "vk/utils.hpp"
 
 namespace kzn {
 
 PerFrameData::PerFrameData(vk::Device& device, vk::CommandPool& cmd_pool)
-    : m_device{device}
-    , cmd_buffer(cmd_pool.allocate())
-{
+    : m_device{ device }
+    , cmd_buffer(cmd_pool.allocate()) {
     img_available = vk::create_semaphore(m_device);
     finished_render = vk::create_semaphore(m_device);
     in_flight_fence = vk::create_fence(m_device, VK_FENCE_CREATE_SIGNALED_BIT);
 }
 
 PerFrameData::PerFrameData(PerFrameData&& other)
-    : cmd_buffer{std::move(other.cmd_buffer)}
-    , img_available{other.img_available}
-    , finished_render{other.finished_render}
-    , in_flight_fence{other.in_flight_fence}
-    , m_device{other.m_device}
-{
+    : cmd_buffer{ std::move(other.cmd_buffer) }
+    , img_available{ other.img_available }
+    , finished_render{ other.finished_render }
+    , in_flight_fence{ other.in_flight_fence }
+    , m_device{ other.m_device } {
     other.in_flight_fence = VK_NULL_HANDLE;
 }
 
 PerFrameData::~PerFrameData() {
-    if(in_flight_fence != VK_NULL_HANDLE) {
+    if (in_flight_fence != VK_NULL_HANDLE) {
         vk::destroy_semaphore(m_device, img_available);
         vk::destroy_semaphore(m_device, finished_render);
         vk::destroy_fence(m_device, in_flight_fence);
     }
 }
 
-
-Renderer::Renderer(
-    vk::Device& device,
-    vk::Swapchain& swapchain,
-    Window& window)
-    : m_device{device}
-    , m_swapchain{swapchain}
+Renderer::Renderer(vk::Device& device, vk::Swapchain& swapchain, Window& window)
+    : m_device{ device }
+    , m_swapchain{ swapchain }
     , m_cmd_pool(device)
-    , m_window{window}
-{
+    , m_window{ window } {
     // Per frame data
     m_frame_data.reserve(MAX_FRAMES_IN_FLIGHT);
-    for(size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; ++i) {
+    for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; ++i) {
         m_frame_data.emplace_back(m_device, m_cmd_pool);
     }
 }
-
 
 void Renderer::render_frame(const RenderFrameFunc& render_func) {
 
@@ -61,24 +55,19 @@ void Renderer::render_frame(const RenderFrameFunc& render_func) {
     auto& in_flight_fence = m_frame_data[m_frame_idx].in_flight_fence;
 
     // Wait for previous frame
-    vkWaitForFences(m_device.vk_device(), 1, &in_flight_fence, VK_TRUE, UINT64_MAX);
+    vkWaitForFences(
+        m_device.vk_device(), 1, &in_flight_fence, VK_TRUE, UINT64_MAX
+    );
 
     // Acquire next frame
     auto opt_image_index = m_swapchain.acquire_next(img_available);
-    if(!opt_image_index.has_value()) {
-        // FIXME: Temporary
-        // int width = 0, height = 0;
-        // glfwGetFramebufferSize(m_window.glfw_ptr(), &width, &height);
-        // while (width == 0 || height == 0) {
-        //     glfwGetFramebufferSize(m_window.glfw_ptr(), &width, &height);
-        //     glfwWaitEvents();
-        // }
+    if (!opt_image_index.has_value()) {
         m_swapchain.recreate(m_window.extent());
-        m_on_swapchain_resize();
+        EventManager::send(SwapchainResize{});
         return;
     }
     uint32_t image_index = opt_image_index.value();
-    
+
     // Only reset the fence if we are submitting work
     vkResetFences(m_device.vk_device(), 1, &in_flight_fence);
 
@@ -101,7 +90,9 @@ void Renderer::render_frame(const RenderFrameFunc& render_func) {
     // Submit command buffer
     VkSubmitInfo submit_info{};
     submit_info.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
-    VkPipelineStageFlags wait_stages[] = { VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT };
+    VkPipelineStageFlags wait_stages[] = {
+        VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT
+    };
     submit_info.waitSemaphoreCount = 1;
     submit_info.pWaitSemaphores = &img_available;
     submit_info.pWaitDstStageMask = wait_stages;
@@ -111,9 +102,11 @@ void Renderer::render_frame(const RenderFrameFunc& render_func) {
     submit_info.signalSemaphoreCount = 1;
     submit_info.pSignalSemaphores = &finished_render;
 
-    auto result = vkQueueSubmit(m_device.graphics_queue().vk_queue , 1, &submit_info, in_flight_fence);
+    auto result = vkQueueSubmit(
+        m_device.graphics_queue().vk_queue, 1, &submit_info, in_flight_fence
+    );
     VK_CHECK_MSG(result, "Failed to submit command buffer!");
-    
+
     // Preset frame
     VkPresentInfoKHR present_info{};
     present_info.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
@@ -124,18 +117,12 @@ void Renderer::render_frame(const RenderFrameFunc& render_func) {
     present_info.pSwapchains = swapchains;
     present_info.pImageIndices = &image_index;
 
-
-    result = vkQueuePresentKHR(m_device.present_queue().vk_queue, &present_info);
-    if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR || m_window.was_resized()) {
-        // FIXME: Temporary
-        // int width = 0, height = 0;
-        // glfwGetFramebufferSize(m_window.glfw_ptr(), &width, &height);
-        // while (width == 0 || height == 0) {
-        //     glfwGetFramebufferSize(m_window.glfw_ptr(), &width, &height);
-        //     glfwWaitEvents();
-        // }
+    result =
+        vkQueuePresentKHR(m_device.present_queue().vk_queue, &present_info);
+    if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR ||
+        m_window.was_resized()) {
         m_swapchain.recreate(m_window.extent());
-        m_on_swapchain_resize();
+        EventManager::send(SwapchainResize{});
     }
     else if (result != VK_SUCCESS) {
         throw vk::ResultError(result);

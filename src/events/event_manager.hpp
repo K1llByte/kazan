@@ -24,14 +24,14 @@ public:
     template<typename T, typename E>
         requires std::is_base_of_v<Event, E>
     explicit EventHandler(T* instance, void (T::*func)(const E&))
-      : m_handler_id(id_counter++)
-      , m_handler{ bind_event_handler(instance, func) } {}
+        : m_handler_id(id_counter++)
+        , m_handler{ bind_event_handler(instance, func) } {}
 
     template<typename E>
         requires std::is_base_of_v<Event, E>
     explicit EventHandler(void (*func)(const E&))
-      : m_handler_id(id_counter++)
-      , m_handler{ bind_event_handler(func) } {}
+        : m_handler_id(id_counter++)
+        , m_handler{ bind_event_handler(func) } {}
 
     EventHandler(EventHandler&&) = default;
     EventHandler& operator=(EventHandler&&) = default;
@@ -64,10 +64,11 @@ public:
 
     template<typename E>
         requires std::is_base_of_v<Event, E>
-    static void submit(const E& event) {
+    static void send(const E& event) {
         E e = event;
-        auto it = std::ranges::find_if(
-          m_handlers, [](const auto& p) { return p.first == typeid(E); });
+        auto it = std::ranges::find_if(m_handlers, [](const auto& p) {
+            return p.first == typeid(E);
+        });
 
         if (it != m_handlers.end()) {
             for (const auto& event_handler : it->second) {
@@ -76,8 +77,8 @@ public:
         }
     }
 
-    static void attach(std::type_index type_idx,
-                       const EventHandler& event_handler) {
+    static void
+    listen(std::type_index type_idx, const EventHandler& event_handler) {
         auto it = std::ranges::find_if(m_handlers, [type_idx](const auto& p) {
             return p.first == type_idx;
         });
@@ -92,26 +93,27 @@ public:
 
     template<typename E>
         requires std::is_base_of_v<Event, E>
-    static void attach(EventHandler&& event_handler) {
-        attach(typeid(E), std::move(event_handler));
+    static void listen(EventHandler&& event_handler) {
+        listen(typeid(E), std::move(event_handler));
     }
 
-    static void detach(std::type_index type_idx,
-                       EventHandler::HandlerID handler_id) {
+    static void
+    unlisten(std::type_index type_idx, EventHandler::HandlerID handler_id) {
         auto it = std::ranges::find_if(m_handlers, [type_idx](const auto& p) {
             return p.first == type_idx;
         });
 
         auto rmit = std::remove_if(
-          it->second.begin(), it->second.end(), [handler_id](EventHandler& eh) {
-              return handler_id == eh.id();
-          });
+            it->second.begin(),
+            it->second.end(),
+            [handler_id](EventHandler& eh) { return handler_id == eh.id(); }
+        );
         it->second.erase(rmit, it->second.end());
     }
 
 private:
     using EventToHandlers =
-      std::pair<std::type_index, std::vector<EventHandler>>;
+        std::pair<std::type_index, std::vector<EventHandler>>;
     static inline std::vector<EventToHandlers> m_handlers = {};
 };
 
@@ -121,9 +123,8 @@ private:
 
 template<typename T, typename E>
     requires std::is_base_of_v<Event, E>
-constexpr std::function<void(const Event&)> bind_event_handler(
-  T* instance,
-  void (T::*func)(const E&)) {
+constexpr std::function<void(const Event&)>
+bind_event_handler(T* instance, void (T::*func)(const E&)) {
     return [instance, func](const Event& event) {
         return (instance->*func)(static_cast<const E&>(event));
     };
@@ -132,7 +133,8 @@ constexpr std::function<void(const Event&)> bind_event_handler(
 template<typename E>
     requires std::is_base_of_v<Event, E>
 constexpr std::function<void(const Event&)> bind_event_handler(
-  void (*func)(const E&)) {
+    void (*func)(const E&)
+) {
     return [func](const Event& event) {
         return (*func)(static_cast<const E&>(event));
     };
