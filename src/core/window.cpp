@@ -13,8 +13,8 @@ void framebuffer_resized(GLFWwindow* window, int width, int height) {
 }
 
 Window::Window(const std::string_view& name, int _width, int _height)
-  : m_width(_width)
-  , m_height(_height) {
+    : m_width(_width)
+    , m_height(_height) {
     // Initialize glfw
     glfwInit();
     // Turn off OpenGL context initialization
@@ -24,7 +24,7 @@ Window::Window(const std::string_view& name, int _width, int _height)
     glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
     // Create window
     m_glfw_window =
-      glfwCreateWindow(m_width, m_height, name.data(), nullptr, nullptr);
+        glfwCreateWindow(m_width, m_height, name.data(), nullptr, nullptr);
     glfwSetWindowUserPointer(m_glfw_window, this);
 
     // On framebuffer resize callback
@@ -53,6 +53,7 @@ void Window::poll_events() const {
     glfwPollEvents();
 }
 
+//! FIXME: This crashes the engine
 void Window::set_title(const std::string_view& name) {
     glfwSetWindowTitle(m_glfw_window, name.data());
 }
@@ -64,7 +65,8 @@ void Window::set_resized(bool resized) {
 vk::Surface Window::create_surface(vk::Instance& instance) {
     VkSurfaceKHR surface;
     auto result = glfwCreateWindowSurface(
-      instance.vk_instance(), m_glfw_window, nullptr, &surface);
+        instance.vk_instance(), m_glfw_window, nullptr, &surface
+    );
     VK_CHECK_MSG(result, "Failed to create window surface!");
     return vk::Surface(instance, surface);
 }
@@ -77,7 +79,7 @@ std::vector<const char*> Window::required_extensions() const {
     uint32_t glfw_extension_count = 0;
     // const char** glfw_extensions;
     auto glfw_extensions =
-      glfwGetRequiredInstanceExtensions(&glfw_extension_count);
+        glfwGetRequiredInstanceExtensions(&glfw_extension_count);
     return { glfw_extensions, glfw_extensions + glfw_extension_count };
 }
 
@@ -98,4 +100,4 @@ bool Window::was_resized() {
     return was_resized;
 }
 
-}
+} // namespace kzn

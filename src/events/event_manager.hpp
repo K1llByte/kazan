@@ -21,14 +21,12 @@ public:
 
     EventHandler() = default;
 
-    template<typename T, typename E>
-        requires std::is_base_of_v<Event, E>
+    template<typename T, IsEvent E>
     explicit EventHandler(T* instance, void (T::*func)(const E&))
         : m_handler_id(id_counter++)
         , m_handler{ bind_event_handler(instance, func) } {}
 
-    template<typename E>
-        requires std::is_base_of_v<Event, E>
+    template<IsEvent E>
     explicit EventHandler(void (*func)(const E&))
         : m_handler_id(id_counter++)
         , m_handler{ bind_event_handler(func) } {}
@@ -43,8 +41,7 @@ public:
     [[nodiscard]] constexpr HandlerID id() const { return m_handler_id; }
     [[nodiscard]] constexpr HandlerID id() { return m_handler_id; }
 
-    template<typename E>
-        requires std::is_base_of_v<Event, E>
+    template<IsEvent E>
     void operator()(const E& e) const {
         m_handler(e);
     }
@@ -62,8 +59,7 @@ class EventManager {
 public:
     EventManager() = delete;
 
-    template<typename E>
-        requires std::is_base_of_v<Event, E>
+    template<IsEvent E>
     static void send(const E& event) {
         E e = event;
         auto it = std::ranges::find_if(m_handlers, [](const auto& p) {
@@ -91,8 +87,7 @@ public:
         }
     }
 
-    template<typename E>
-        requires std::is_base_of_v<Event, E>
+    template<IsEvent E>
     static void listen(EventHandler&& event_handler) {
         listen(typeid(E), std::move(event_handler));
     }
@@ -121,8 +116,7 @@ private:
 //        Event handle binding helpers        //
 ////////////////////////////////////////////////
 
-template<typename T, typename E>
-    requires std::is_base_of_v<Event, E>
+template<typename T, IsEvent E>
 constexpr std::function<void(const Event&)>
 bind_event_handler(T* instance, void (T::*func)(const E&)) {
     return [instance, func](const Event& event) {
@@ -130,8 +124,7 @@ bind_event_handler(T* instance, void (T::*func)(const E&)) {
     };
 }
 
-template<typename E>
-    requires std::is_base_of_v<Event, E>
+template<IsEvent E>
 constexpr std::function<void(const Event&)> bind_event_handler(
     void (*func)(const E&)
 ) {

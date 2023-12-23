@@ -51,6 +51,8 @@ auto create_foo();
 ```c++
 // Regular
 int counter;
+// Global
+int g_counter;
 
 // Arguments
 void foo(bool bar);
@@ -67,4 +69,6 @@ class Foo {
 __________________________________________________
 ## Error handling
 
-- Always use exceptions (To be consistent and avoid ignoring exceptions)
+- Always use exceptions (To be consistent and avoid ignoring exceptions).
+- However exceptions are not to be spammed everywhere, their usage must be kept to a minimal.
+- Use simple bool or std::optional as return values when possible and where it makes sense.

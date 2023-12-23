@@ -29,15 +29,3 @@
 
 - glm
 - stl
-
-## Renderer design
-
-```cpp
-auto renderer = Renderer();
-// Renderer() // initializes
-// ~Renderer() 
-renderer.begin_frame()
-renderer.end_frame()
-```
-
-## 

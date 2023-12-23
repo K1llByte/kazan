@@ -26,8 +26,8 @@ public:
             // FIXME: This crashes the engine
             // m_window.set_title(
             //   fmt::format("FPS: {:.0f}", 1.f / prev_frame_time));
+            // Log::trace("FPS: {:.0f}", 1.f / prev_frame_time);
             m_systems.update(prev_frame_time);
-            Log::trace("FPS: {:.0f}", 1.f / prev_frame_time);
         }
     }
 
