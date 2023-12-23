@@ -84,7 +84,10 @@ target_compile_definitions(KazanLib
       $<$<CONFIG:MinSizeRel>:RELEASE>
 )
 
-add_executable(KazanEditor "src/editor/editor_app.cpp")
+file(GLOB KAZAN_EDITOR_SOURCES
+    "src/editor/**.cpp"
+)
+add_executable(KazanEditor ${KAZAN_EDITOR_SOURCES})
 target_link_libraries(KazanEditor PUBLIC KazanLib CustomImgui)
 target_compile_definitions(KazanEditor
     PUBLIC

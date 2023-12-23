@@ -6,15 +6,15 @@
 namespace kzn {
 
 void framebuffer_resized(GLFWwindow* window, int width, int height) {
-    auto app = reinterpret_cast<Window*>(glfwGetWindowUserPointer(window));
+    auto app = static_cast<Window*>(glfwGetWindowUserPointer(window));
     app->m_has_resized = true;
     app->m_width = width;
     app->m_height = height;
 }
 
-Window::Window(const std::string_view& name, int _width, int _height)
-    : m_width(_width)
-    , m_height(_height) {
+Window::Window(std::string_view name, int width, int height)
+    : m_width(width)
+    , m_height(height) {
     // Initialize glfw
     glfwInit();
     // Turn off OpenGL context initialization
@@ -53,8 +53,7 @@ void Window::poll_events() const {
     glfwPollEvents();
 }
 
-//! FIXME: This crashes the engine
-void Window::set_title(const std::string_view& name) {
+void Window::set_title(std::string_view name) {
     glfwSetWindowTitle(m_glfw_window, name.data());
 }
 
@@ -84,7 +83,6 @@ std::vector<const char*> Window::required_extensions() const {
 }
 
 VkExtent2D Window::extent() {
-    // glfwGetFramebufferSize(m_glfw_window, &m_width, &m_height);
     // Special case for minimized window
     while (m_width == 0 || m_height == 0) {
         glfwGetFramebufferSize(m_glfw_window, &m_width, &m_height);

@@ -1,8 +1,12 @@
-#include "events/event.hpp"
 #include "glm/fwd.hpp"
+#include "graphics/graphics_context.hpp"
 #include "kazan.hpp"
+#include <chrono>
 #include <thread>
 #include <type_traits>
+
+#include "editor_render_system.hpp"
+#include "editor_window.hpp"
 
 using namespace kzn;
 
@@ -10,55 +14,47 @@ class EditorApp : public App {
 public:
     EditorApp()
         : m_window("Kazan Editor", 800, 600) {
-        m_systems.emplace<RenderSystem>(m_window);
-        auto square = Registry::create();
-        auto& square_transform = square.add_component<Transform2DComponent>();
-        // auto& square_sprite = square.add_component<SpriteComponent>();
+
+        // Initialize systems
+        m_systems.emplace<EditorRenderSystem>(m_window);
+
+        // NOTE: Has to be done after initializing EditorRenderSystem.
+        m_window.set_theme();
+
+        // Create entities
+        // auto square = Registry::create();
+        // auto& square_transform =
+        // square.add_component<Transform2DComponent>();
     }
 
     ~EditorApp() = default;
 
     void run() override {
+        // Game loop
+        float accum_time = 0.f;
         while (!m_window.is_closed()) {
-            float prev_frame_time = delta_time();
+            // Update systems
+            float frame_time = delta_time();
+            accum_time += frame_time;
+
+            // Update window events
             m_window.poll_events();
 
-            // FIXME: This crashes the engine
-            // m_window.set_title(
-            //   fmt::format("FPS: {:.0f}", 1.f / prev_frame_time));
-            // Log::trace("FPS: {:.0f}", 1.f / prev_frame_time);
-            m_systems.update(prev_frame_time);
+            // Update FPS in window title every seconds
+            if (accum_time > 1.f) {
+                auto title = fmt::format("FPS: {:.0f}", 1.f / frame_time);
+                m_window.set_title(title);
+                accum_time = 0.f;
+            }
+
+            // Update systems
+            m_systems.update(frame_time);
         }
     }
 
 private:
-    Window m_window;
+    EditorWindow m_window;
     SystemManager m_systems;
-};
-
-//////////////////////////////////////////////////////
-
-struct FooEvent : Event {};
-
-void on_foo(const FooEvent&) {
-    Log::info("on_foo!");
-}
-
-struct Foo {
-    template<IsEvent E>
-    void operator()(const E&) {
-        Log::info("void (const E&)");
-    }
-};
-
-class DummyApp : public App {
-public:
-    void run() override {
-        EventManager::listen<FooEvent>(EventHandler(on_foo));
-        EventManager::send(FooEvent{});
-
-        Log::info("Hello World!");
-    }
 };
 
 ///////////////////////////////////////////////////////

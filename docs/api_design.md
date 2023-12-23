@@ -2,6 +2,27 @@
 
 This document is used as a auxiliary file for todo.md where the API design choices are made.
 
+
+## Editor
+
+Maybe it would be worth creating a RenderTarget interface that could contain these methods:
+- was_resized()
+- extent()
+- image_format()
+
+```cpp
+auto editor = EditorWindow("Kazan Editor", 800, 600);
+editor.add_panel(ViewportPanel(render_image));
+editor.add_panel(PropertiesPanel());
+editor.add_panel(ScenePanel());
+editor.add_panel(ConsolePanel());
+
+auto render_system = m_systems.emplace<RenderSystem>(
+    GeometrySubsystem(render_image),
+    EditorSubsystem(editor)
+);
+```
+
 ## Modules example
 
 - Required default ctor

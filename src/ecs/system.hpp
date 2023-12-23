@@ -33,7 +33,7 @@ public:
     }
 
     template<typename S, typename... Args>
-    // TODO: S has to derive from System
+        requires std::is_base_of_v<System, S>
     void emplace(Args&&... args) {
         m_systems.push_back(std::make_unique<S>(std::forward<Args>(args)...));
     }

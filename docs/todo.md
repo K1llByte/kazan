@@ -2,14 +2,12 @@
 
 ## In Progress
 
-- 
+- [Plan simple editor architecture](api_design.md)
 
 ## Todo
 
-- [Plan simple editor architecture](api_design.md)
-- Plan offscreen renderer
 - Core algebra header math/algebra.hpp with aliases (Vec3, Mat34, ...)
-- Fix set_title
+- Plan offscreen renderer
 
 - [Create Texture and vk::Image abstractions](api_design.md)
 

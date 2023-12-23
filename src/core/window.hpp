@@ -18,7 +18,7 @@ class Window {
 
 public:
     // Ctor
-    Window(const std::string_view& name, int width, int height);
+    Window(std::string_view name, int width, int height);
     // Copy
     Window(const Window&) = delete;
     Window& operator=(const Window&) = delete;
@@ -30,7 +30,7 @@ public:
 
     [[nodiscard]] bool is_closed() const;
     void poll_events() const;
-    void set_title(const std::string_view& name);
+    void set_title(std::string_view name);
     // TODO: Remove when event system is implemented
     void set_resized(bool resized);
     vk::Surface create_surface(vk::Instance& instance);

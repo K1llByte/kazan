@@ -33,17 +33,19 @@ public:
     }
 
     GraphicsContext(Window& window)
-      : m_instance({
-          .extensions = window.required_extensions(),
-          .with_validation = true,
-        })
-      , m_surface(window.create_surface(m_instance))
-      , m_device(m_instance,
-                 { .extensions = { VK_KHR_SWAPCHAIN_EXTENSION_NAME },
-                   .surface = m_surface.vk_surface() })
-      , m_swapchain(m_device, m_surface, window.extent())
-      , m_dset_allocator(m_device)
-      , m_dset_layout_cache(m_device) {}
+        : m_instance({
+              .extensions = window.required_extensions(),
+              .with_validation = true,
+          })
+        , m_surface(window.create_surface(m_instance))
+        , m_device(
+              m_instance,
+              { .extensions = { VK_KHR_SWAPCHAIN_EXTENSION_NAME },
+                .surface = m_surface.vk_surface() }
+          )
+        , m_swapchain(m_device, m_surface, window.extent())
+        , m_dset_allocator(m_device)
+        , m_dset_layout_cache(m_device) {}
 
     ~GraphicsContext() = default;
 
@@ -58,4 +60,21 @@ private:
     vk::DescriptorSetLayoutCache m_dset_layout_cache;
 };
 
-}
+//! RAII Swapper for creating and destroying graphics context.
+struct ScopedGraphicsContext {
+    // Ctor
+    template<typename... Args>
+    ScopedGraphicsContext(Args&&... args) {
+        GraphicsContext::create(std::forward<Args>(args)...);
+    }
+    // Copy
+    ScopedGraphicsContext(const ScopedGraphicsContext&) = delete;
+    ScopedGraphicsContext& operator=(const ScopedGraphicsContext&) = delete;
+    // Move
+    ScopedGraphicsContext(ScopedGraphicsContext&&) = delete;
+    ScopedGraphicsContext& operator=(ScopedGraphicsContext&&) = delete;
+    // Dtor
+    ~ScopedGraphicsContext() { GraphicsContext::destroy(); }
+};
+
+} // namespace kzn
