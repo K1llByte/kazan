@@ -2,6 +2,8 @@
 
 - [Programming patterns](#programming-patterns)
 - [Naming convention](#naming-convention)
+- [Error handling](#error-handling)
+
 
 __________________________________________________
 ## Programming patterns
@@ -10,9 +12,10 @@ __________________________________________________
 
 Pros:  
 - Less verbose than a builder pattern  
-- named arguments
+- named arguments  
+
 Cons:  
-- 
+- ...
 
 TBD: Choose a consistent name for the struct (CreateInfo or Params)
 ```c++

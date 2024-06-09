@@ -43,25 +43,31 @@ VkExtent2D SwapchainSupport::select_extent(VkExtent2D extent) const {
         return capabilities.currentExtent;
     }
     else {
-        extent.width = std::clamp(extent.width,
-                                  capabilities.minImageExtent.width,
-                                  capabilities.maxImageExtent.width);
-        extent.height = std::clamp(extent.height,
-                                   capabilities.minImageExtent.height,
-                                   capabilities.maxImageExtent.height);
+        extent.width = std::clamp(
+            extent.width,
+            capabilities.minImageExtent.width,
+            capabilities.maxImageExtent.width
+        );
+        extent.height = std::clamp(
+            extent.height,
+            capabilities.minImageExtent.height,
+            capabilities.maxImageExtent.height
+        );
         return extent;
     }
 }
 
-QueueFamilies get_queue_families(VkPhysicalDevice physical_device,
-                                 VkSurfaceKHR surface) {
+QueueFamilies
+get_queue_families(VkPhysicalDevice physical_device, VkSurfaceKHR surface) {
     // Logic to find queue family indices to populate struct with
     uint32_t queue_family_count = 0;
     vkGetPhysicalDeviceQueueFamilyProperties(
-      physical_device, &queue_family_count, nullptr);
+        physical_device, &queue_family_count, nullptr
+    );
     std::vector<VkQueueFamilyProperties> queue_families(queue_family_count);
     vkGetPhysicalDeviceQueueFamilyProperties(
-      physical_device, &queue_family_count, queue_families.data());
+        physical_device, &queue_family_count, queue_families.data()
+    );
 
     QueueFamilies indices;
     for (size_t i = 0; i < queue_families.size(); ++i) {
@@ -74,7 +80,8 @@ QueueFamilies get_queue_families(VkPhysicalDevice physical_device,
         // Graphics and Present
         VkBool32 present_support = VK_FALSE;
         vkGetPhysicalDeviceSurfaceSupportKHR(
-          physical_device, static_cast<uint32_t>(i), surface, &present_support);
+            physical_device, static_cast<uint32_t>(i), surface, &present_support
+        );
 
         if (present_support)
             indices.present_family = static_cast<uint32_t>(i);
@@ -86,65 +93,79 @@ QueueFamilies get_queue_families(VkPhysicalDevice physical_device,
     return indices;
 }
 
-bool supports_extensions(VkPhysicalDevice physical_device,
-                         std::vector<char const*> const& extensions) {
+bool supports_extensions(
+    VkPhysicalDevice physical_device,
+    std::vector<char const*> const& extensions
+) {
     uint32_t extension_count;
     vkEnumerateDeviceExtensionProperties(
-      physical_device, nullptr, &extension_count, nullptr);
+        physical_device, nullptr, &extension_count, nullptr
+    );
     std::vector<VkExtensionProperties> available_extensions(extension_count);
     vkEnumerateDeviceExtensionProperties(
-      physical_device, nullptr, &extension_count, available_extensions.data());
+        physical_device, nullptr, &extension_count, available_extensions.data()
+    );
 
     // TODO: Change set creation for a faster check
-    std::unordered_set<std::string> required_extensions(extensions.begin(),
-                                                        extensions.end());
+    std::unordered_set<std::string> required_extensions(
+        extensions.begin(), extensions.end()
+    );
     for (auto const& extension : available_extensions) {
         required_extensions.erase(extension.extensionName);
     }
     return required_extensions.empty();
 }
 
-SwapchainSupport get_swapchain_support(VkPhysicalDevice vk_physical_device,
-                                       VkSurfaceKHR surface) {
+SwapchainSupport get_swapchain_support(
+    VkPhysicalDevice vk_physical_device,
+    VkSurfaceKHR surface
+) {
     SwapchainSupport support;
 
     // 1. Get Surface capabilities
     vkGetPhysicalDeviceSurfaceCapabilitiesKHR(
-      vk_physical_device, surface, &support.capabilities);
+        vk_physical_device, surface, &support.capabilities
+    );
 
     // 2. Get Surface possible formats
     uint32_t formats_count;
     vkGetPhysicalDeviceSurfaceFormatsKHR(
-      vk_physical_device, surface, &formats_count, nullptr);
+        vk_physical_device, surface, &formats_count, nullptr
+    );
     if (formats_count != 0) {
         support.formats.resize(formats_count);
         vkGetPhysicalDeviceSurfaceFormatsKHR(
-          vk_physical_device, surface, &formats_count, support.formats.data());
+            vk_physical_device, surface, &formats_count, support.formats.data()
+        );
     }
 
     // 3. Get Surface possible present modes
     uint32_t present_modes_count;
     vkGetPhysicalDeviceSurfacePresentModesKHR(
-      vk_physical_device, surface, &present_modes_count, nullptr);
+        vk_physical_device, surface, &present_modes_count, nullptr
+    );
     if (present_modes_count != 0) {
         support.present_modes.resize(present_modes_count);
-        vkGetPhysicalDeviceSurfacePresentModesKHR(vk_physical_device,
-                                                  surface,
-                                                  &present_modes_count,
-                                                  support.present_modes.data());
+        vkGetPhysicalDeviceSurfacePresentModesKHR(
+            vk_physical_device,
+            surface,
+            &present_modes_count,
+            support.present_modes.data()
+        );
     }
 
     return support;
 }
 
 using SelectedDevice =
-  std::tuple<VkPhysicalDevice, QueueFamilies, SwapchainSupport>;
+    std::tuple<VkPhysicalDevice, QueueFamilies, SwapchainSupport>;
 
 SelectedDevice select_device(
-  vk::Instance& instance,
-  std::vector<VkPhysicalDevice> const& available_devices,
-  const std::vector<const char*>& required_extensions,
-  VkSurfaceKHR surface) {
+    vk::Instance& instance,
+    std::vector<VkPhysicalDevice> const& available_devices,
+    const std::vector<const char*>& required_extensions,
+    VkSurfaceKHR surface
+) {
     VkPhysicalDevice vk_physical_device;
     QueueFamilies queue_families;
     SwapchainSupport swapchain_support;
@@ -165,8 +186,9 @@ SelectedDevice select_device(
 
         // 2. Require to have all needed queue families
         queue_families = get_queue_families(
-          device,
-          surface); // TODO: later pass the surface handle instead 'surface'
+            device,
+            surface
+        ); // TODO: later pass the surface handle instead 'surface'
         if (!queue_families.is_complete()) {
             continue;
         }
@@ -197,15 +219,19 @@ SelectedDevice select_device(
         Log::info("Selected GPU: {}", device_properties.deviceName);
     }
 
-    return std::make_tuple(vk_physical_device,
-                           std::move(queue_families),
-                           std::move(swapchain_support));
+    return std::make_tuple(
+        vk_physical_device,
+        std::move(queue_families),
+        std::move(swapchain_support)
+    );
 }
 
-VkDevice create_device(VkPhysicalDevice vk_physical_device,
-                       QueueFamilies const& queue_families,
-                       VkPhysicalDeviceFeatures const& features,
-                       std::vector<char const*> const& extensions) {
+VkDevice create_device(
+    VkPhysicalDevice vk_physical_device,
+    QueueFamilies const& queue_families,
+    VkPhysicalDeviceFeatures const& features,
+    std::vector<char const*> const& extensions
+) {
     // TODO: Refactor this, there's no need to create
     // an auxiliar structure, elaborate the
     // QueueFamilies class to provide an iterator
@@ -215,7 +241,8 @@ VkDevice create_device(VkPhysicalDevice vk_physical_device,
     };
 
     std::vector<VkDeviceQueueCreateInfo> queue_create_infos(
-      unique_queue_families.size());
+        unique_queue_families.size()
+    );
 
     float queue_priority = 1.0f;
     // for (size_t i = 0; i < unique_queue_families.size(); ++i) {
@@ -233,10 +260,10 @@ VkDevice create_device(VkPhysicalDevice vk_physical_device,
     create_info.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
     create_info.pQueueCreateInfos = queue_create_infos.data();
     create_info.queueCreateInfoCount =
-      static_cast<uint32_t>(queue_create_infos.size());
+        static_cast<uint32_t>(queue_create_infos.size());
     create_info.pEnabledFeatures = &features;
     create_info.enabledExtensionCount =
-      static_cast<uint32_t>(extensions.size());
+        static_cast<uint32_t>(extensions.size());
     create_info.ppEnabledExtensionNames = extensions.data();
 
     if (!extensions.empty()) {
@@ -248,7 +275,7 @@ VkDevice create_device(VkPhysicalDevice vk_physical_device,
 
     VkDevice vk_device;
     auto result =
-      vkCreateDevice(vk_physical_device, &create_info, nullptr, &vk_device);
+        vkCreateDevice(vk_physical_device, &create_info, nullptr, &vk_device);
     VK_CHECK_MSG(result, "Failed to create logical device!");
     Log::trace("Device created");
 
@@ -256,25 +283,29 @@ VkDevice create_device(VkPhysicalDevice vk_physical_device,
 }
 
 Device::Device(Instance& instance, DeviceParams&& params)
-  : m_instance(instance) {
+    : m_instance(instance) {
 
     // 1. Select physical device //
     auto available_devices = m_instance.available_devices();
     auto [vk_physical_device, indices, swapchain_support] = select_device(
-      m_instance, available_devices, params.extensions, params.surface);
+        m_instance, available_devices, params.extensions, params.surface
+    );
 
     // 2. Create device //
     m_vk_physical_device = vk_physical_device;
     m_swapchain_support = swapchain_support;
     m_queue_families = indices;
     m_vk_device = create_device(
-      vk_physical_device, indices, params.features, params.extensions);
+        vk_physical_device, indices, params.features, params.extensions
+    );
 
     // 2.1. Get device queues //
     vkGetDeviceQueue(
-      m_vk_device, indices.graphics_family.value(), 0, &m_vk_graphics_queue);
+        m_vk_device, indices.graphics_family.value(), 0, &m_vk_graphics_queue
+    );
     vkGetDeviceQueue(
-      m_vk_device, indices.present_family.value(), 0, &m_vk_present_queue);
+        m_vk_device, indices.present_family.value(), 0, &m_vk_present_queue
+    );
 
     // 3. Create Vma Allocator //
     VmaAllocatorCreateInfo allocator_info{};

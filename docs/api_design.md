@@ -12,10 +12,11 @@ Maybe it would be worth creating a RenderTarget interface that could contain the
 
 ```cpp
 auto editor = EditorWindow("Kazan Editor", 800, 600);
-editor.add_panel(ViewportPanel(render_image));
-editor.add_panel(PropertiesPanel());
-editor.add_panel(ScenePanel());
-editor.add_panel(ConsolePanel());
+auto render_image = RenderImage(viewport_extent);
+editor.add_panel<ViewportPanel>(std::move(render_image));
+editor.add_panel<PropertiesPanel>();
+editor.add_panel<ScenePanel>();
+editor.add_panel<ConsolePanel>();
 
 auto render_system = m_systems.emplace<RenderSystem>(
     GeometrySubsystem(render_image),
@@ -79,6 +80,8 @@ using ResizeEvents = MultipleEvents<
 >;
 
 void on_swapchain_resize(const ComponentAdded& event);
+
+
 void on_resize_events(const ResizeEvents& event) {
     event.visit(
         [](const SwapchainResized&) {},
@@ -96,6 +99,33 @@ using FooListener = EventListener<
 // Will automatically register/unregister event handlers
 struct Foo: FooListener {
 };
+
+
+struct FooListener {
+public:
+    FooListener() = default;
+    ~FooListener() {
+        for(auto& handler : m_handler_ptrs) {
+            EventManager::unlister(handler.event_type_idx, handler.id);
+        }
+    }
+
+    void listen();
+    void unlisten();
+
+
+privcate:
+struct GuardaEventTypeAndHandlerPtr {
+    // Event type index
+    std::type_index         event_type_idx;
+    // Id generated from pointer
+    EventHandler::HandlerID id;
+}
+
+std::vector<GuardaEventTypeAndHandlerPtr> m_handler_ptrs;
+
+}
+
 
 // Will automatically register/unregister event handlers
 struct Foo: FooListener {

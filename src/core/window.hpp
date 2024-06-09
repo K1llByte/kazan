@@ -28,7 +28,8 @@ public:
     // Dtor
     ~Window();
 
-    [[nodiscard]] bool is_closed() const;
+    [[nodiscard]]
+    bool is_closed() const;
     void poll_events() const;
     void set_title(std::string_view name);
     // TODO: Remove when event system is implemented
@@ -36,11 +37,17 @@ public:
     vk::Surface create_surface(vk::Instance& instance);
 
     VkExtent2D extent();
-    [[nodiscard]] GLFWwindow* glfw_ptr() const { return m_glfw_window; }
+    [[nodiscard]]
+    GLFWwindow* glfw_ptr() const {
+        return m_glfw_window;
+    }
     // TODO: Remove when event system is implemented
-    [[nodiscard]] bool was_resized();
-    [[nodiscard]] float aspect_ratio() const;
-    [[nodiscard]] std::vector<const char*> required_extensions() const;
+    [[nodiscard]]
+    bool was_resized();
+    [[nodiscard]]
+    float aspect_ratio() const;
+    [[nodiscard]]
+    std::vector<const char*> required_extensions() const;
 
 private:
     GLFWwindow* m_glfw_window;

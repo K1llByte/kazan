@@ -6,6 +6,7 @@
 
 ## Todo
 
+- Improve EventManager for better event type deduction (EventManager::listen(on_foo)) and make EventListener class that registers event handlers at runtime 
 - Core algebra header math/algebra.hpp with aliases (Vec3, Mat34, ...)
 - Plan offscreen renderer
 

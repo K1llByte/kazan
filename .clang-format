@@ -1,6 +1,5 @@
 Language: Cpp
 BasedOnStyle: Mozilla
-# BreakBeforeBraces: Attach
 BreakBeforeBraces: Custom
 BraceWrapping: 
   BeforeElse: true
@@ -15,14 +14,10 @@ ColumnLimit: 80
 AllowShortIfStatementsOnASingleLine: false
 FixNamespaceComments: true
 AlignAfterOpenBracket: BlockIndent
-# BeforeElse: false
-# UseTab: Never
-# TabWidth: 8
-# PointerAlignment: Right
-# DerivePointerAlignment: true
-# AllowShortFunctionsOnASingleLine: Empty
-# AllowShortIfStatementsOnASingleLine: false
-# AllowShortLoopsOnASingleLine: false
-# AllowShortBlocksOnASingleLine: false
-# AlwaysBreakTemplateDeclarations: true
-# AlignAfterOpenBracket: TODO
+Cpp11BracedListStyle: true
+PointerAlignment: Left
+BreakBeforeConceptDeclarations: Always
+BreakBeforeTernaryOperators: true
+AllowShortFunctionsOnASingleLine: InlineOnly
+BreakAfterAttributes: Always
+PenaltyReturnTypeOnItsOwnLine: 100000

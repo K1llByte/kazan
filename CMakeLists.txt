@@ -60,13 +60,13 @@ FetchContent_Declare(vma
 FetchContent_MakeAvailable(vma)
 
 ################################## Main Target ##################################
+# Kazan Library
 file(GLOB KAZAN_SOURCES
     "src/core/**.cpp"
     "src/ecs/**.cpp"
     "src/graphics/**.cpp"
     "src/vk/**.cpp"
 )
-set(KAZAN_INCLUDE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/src)
 add_library(KazanLib STATIC ${KAZAN_SOURCES})
 target_link_libraries(KazanLib PUBLIC
     fmt
@@ -75,6 +75,7 @@ target_link_libraries(KazanLib PUBLIC
     EnTT::EnTT
     GPUOpen::VulkanMemoryAllocator
 )
+set(KAZAN_INCLUDE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/src)
 target_include_directories(KazanLib PUBLIC ${KAZAN_INCLUDE_PATH})
 target_compile_definitions(KazanLib
     PUBLIC
@@ -83,7 +84,7 @@ target_compile_definitions(KazanLib
       $<$<CONFIG:Release>:RELEASE>
       $<$<CONFIG:MinSizeRel>:RELEASE>
 )
-
+# Kazan Editor
 file(GLOB KAZAN_EDITOR_SOURCES
     "src/editor/**.cpp"
 )

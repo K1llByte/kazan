@@ -24,12 +24,12 @@ public:
     template<typename T, IsEvent E>
     explicit EventHandler(T* instance, void (T::*func)(const E&))
         : m_handler_id(id_counter++)
-        , m_handler{ bind_event_handler(instance, func) } {}
+        , m_handler{bind_event_handler(instance, func)} {}
 
     template<IsEvent E>
     explicit EventHandler(void (*func)(const E&))
         : m_handler_id(id_counter++)
-        , m_handler{ bind_event_handler(func) } {}
+        , m_handler{bind_event_handler(func)} {}
 
     EventHandler(EventHandler&&) = default;
     EventHandler& operator=(EventHandler&&) = default;
@@ -38,8 +38,14 @@ public:
 
     ~EventHandler() = default;
 
-    [[nodiscard]] constexpr HandlerID id() const { return m_handler_id; }
-    [[nodiscard]] constexpr HandlerID id() { return m_handler_id; }
+    [[nodiscard]]
+    constexpr HandlerID id() const {
+        return m_handler_id;
+    }
+    [[nodiscard]]
+    constexpr HandlerID id() {
+        return m_handler_id;
+    }
 
     template<IsEvent E>
     void operator()(const E& e) const {
@@ -73,8 +79,10 @@ public:
         }
     }
 
-    static void
-    listen(std::type_index type_idx, const EventHandler& event_handler) {
+    static void listen(
+        std::type_index type_idx,
+        const EventHandler& event_handler
+    ) {
         auto it = std::ranges::find_if(m_handlers, [type_idx](const auto& p) {
             return p.first == type_idx;
         });
@@ -83,7 +91,7 @@ public:
             it->second.push_back(event_handler);
         }
         else {
-            m_handlers.emplace_back(type_idx, std::vector{ event_handler });
+            m_handlers.emplace_back(type_idx, std::vector{event_handler});
         }
     }
 
@@ -92,8 +100,10 @@ public:
         listen(typeid(E), std::move(event_handler));
     }
 
-    static void
-    unlisten(std::type_index type_idx, EventHandler::HandlerID handler_id) {
+    static void unlisten(
+        std::type_index type_idx,
+        EventHandler::HandlerID handler_id
+    ) {
         auto it = std::ranges::find_if(m_handlers, [type_idx](const auto& p) {
             return p.first == type_idx;
         });
@@ -116,18 +126,20 @@ private:
 //        Event handle binding helpers        //
 ////////////////////////////////////////////////
 
+using EventHandlerFunction = std::function<void(const Event&)>;
+
 template<typename T, IsEvent E>
-constexpr std::function<void(const Event&)>
-bind_event_handler(T* instance, void (T::*func)(const E&)) {
+EventHandlerFunction bind_event_handler(
+    T* instance,
+    void (T::*func)(const E&)
+) {
     return [instance, func](const Event& event) {
         return (instance->*func)(static_cast<const E&>(event));
     };
 }
 
 template<IsEvent E>
-constexpr std::function<void(const Event&)> bind_event_handler(
-    void (*func)(const E&)
-) {
+std::function<void(const Event&)> bind_event_handler(void (*func)(const E&)) {
     return [func](const Event& event) {
         return (*func)(static_cast<const E&>(event));
     };

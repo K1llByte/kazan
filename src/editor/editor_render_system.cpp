@@ -1,5 +1,6 @@
 #include "editor_render_system.hpp"
 
+#include "core/log.hpp"
 #include "ecs/entity.hpp"
 #include "events/event_manager.hpp"
 #include "graphics/renderer.hpp"
@@ -10,6 +11,7 @@
 #include <backends/imgui_impl_glfw.h>
 #include <backends/imgui_impl_vulkan.h>
 #include <imgui.h>
+#include <vulkan/vulkan_core.h>
 
 namespace kzn {
 
@@ -20,6 +22,7 @@ EditorRenderSystem::EditorRenderSystem(EditorWindow& window)
           GraphicsContext::swapchain(),
           window
       )
+    , m_render_target(GraphicsContext::device(), VkExtent3D{800, 600, 1})
     , m_main_render_pass(simple_pass(
           GraphicsContext::device(),
           GraphicsContext::swapchain().image_format()
@@ -42,17 +45,17 @@ EditorRenderSystem::EditorRenderSystem(EditorWindow& window)
     auto& swapchain = GraphicsContext::swapchain();
 
     VkDescriptorPoolSize pool_sizes[] = {
-        { VK_DESCRIPTOR_TYPE_SAMPLER, 1000 },
-        { VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1000 },
-        { VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE, 1000 },
-        { VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, 1000 },
-        { VK_DESCRIPTOR_TYPE_UNIFORM_TEXEL_BUFFER, 1000 },
-        { VK_DESCRIPTOR_TYPE_STORAGE_TEXEL_BUFFER, 1000 },
-        { VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 1000 },
-        { VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 1000 },
-        { VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC, 1000 },
-        { VK_DESCRIPTOR_TYPE_STORAGE_BUFFER_DYNAMIC, 1000 },
-        { VK_DESCRIPTOR_TYPE_INPUT_ATTACHMENT, 1000 }
+        {VK_DESCRIPTOR_TYPE_SAMPLER, 1000},
+        {VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1000},
+        {VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE, 1000},
+        {VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, 1000},
+        {VK_DESCRIPTOR_TYPE_UNIFORM_TEXEL_BUFFER, 1000},
+        {VK_DESCRIPTOR_TYPE_STORAGE_TEXEL_BUFFER, 1000},
+        {VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 1000},
+        {VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 1000},
+        {VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC, 1000},
+        {VK_DESCRIPTOR_TYPE_STORAGE_BUFFER_DYNAMIC, 1000},
+        {VK_DESCRIPTOR_TYPE_INPUT_ATTACHMENT, 1000}
     };
 
     VkDescriptorPoolCreateInfo pool_info{};
@@ -63,9 +66,8 @@ EditorRenderSystem::EditorRenderSystem(EditorWindow& window)
     pool_info.pPoolSizes = pool_sizes;
 
     // Create ImGui descriptor pool
-    VkDescriptorPool imgui_pool;
     auto res = vkCreateDescriptorPool(
-        device.vk_device(), &pool_info, nullptr, &imgui_pool
+        device.vk_device(), &pool_info, nullptr, &m_imgui_pool
     );
     VK_CHECK_MSG(res, "Error creating ImGui descriptor pool");
 
@@ -83,13 +85,15 @@ EditorRenderSystem::EditorRenderSystem(EditorWindow& window)
     init_info.PhysicalDevice = device.vk_physical_device();
     init_info.Device = device.vk_device();
     init_info.Queue = device.graphics_queue().vk_queue;
-    init_info.DescriptorPool = imgui_pool;
+    init_info.DescriptorPool = m_imgui_pool;
+    init_info.RenderPass = m_main_render_pass.vk_render_pass();
+
     const uint32_t img_count = swapchain.images().size();
     init_info.MinImageCount = img_count;
     init_info.ImageCount = img_count;
     init_info.MSAASamples = VK_SAMPLE_COUNT_1_BIT;
 
-    ImGui_ImplVulkan_Init(&init_info, m_main_render_pass.vk_render_pass());
+    ImGui_ImplVulkan_Init(&init_info);
 
     // Load Fonts
     // - If no fonts are loaded, dear imgui will use the default font. You
@@ -116,22 +120,27 @@ EditorRenderSystem::EditorRenderSystem(EditorWindow& window)
 
     // Setup Dear ImGui style
     ImGui::StyleColorsDark();
+
+    EventManager::send(RenderSystemInit{});
 }
 
 EditorRenderSystem::~EditorRenderSystem() {
     GraphicsContext::device().wait_idle();
+
+    ImGui_ImplVulkan_Shutdown();
+    vkDestroyDescriptorPool(
+        GraphicsContext::device().vk_device(), m_imgui_pool, nullptr
+    );
 }
 
 void EditorRenderSystem::update(float delta_time) {
     auto& swapchain = GraphicsContext::swapchain();
 
-    const VkClearValue clear_color{ { { 0.01f, 0.01f, 0.01f, 1.0f } } };
+    const VkClearValue clear_color{{{0.01f, 0.01f, 0.01f, 1.0f}}};
     m_renderer.render_frame([&](auto& cmd_buffer) {
         // Begin Render Pass
         m_main_render_pass.begin(
-            cmd_buffer,
-            m_framebuffers[swapchain.current_index()],
-            { clear_color }
+            cmd_buffer, m_framebuffers[swapchain.current_index()], {clear_color}
         );
 
         // Draw Commands
