@@ -60,23 +60,29 @@ public:
     // Getters
     VkDevice vk_device() { return m_vk_device; }
     VkPhysicalDevice vk_physical_device() { return m_vk_physical_device; }
-    [[nodiscard]] constexpr Queue graphics_queue() {
-        return Queue{ *this, m_vk_graphics_queue };
+    [[nodiscard]]
+    constexpr Queue graphics_queue() {
+        return Queue{*this, m_vk_graphics_queue};
     }
-    [[nodiscard]] constexpr Queue present_queue() {
-        return Queue{ *this, m_vk_present_queue };
+    [[nodiscard]]
+    constexpr Queue present_queue() {
+        return Queue{*this, m_vk_present_queue};
     }
-    [[nodiscard]] const SwapchainSupport& swapchain_support() const {
+    [[nodiscard]]
+    const SwapchainSupport& swapchain_support() const {
         return m_swapchain_support;
     }
-    [[nodiscard]] const QueueFamilies& queue_families() const {
+    [[nodiscard]]
+    const QueueFamilies& queue_families() const {
         return m_queue_families;
     }
-    [[nodiscard]] VmaAllocator allocator() { return m_vma_allocator; }
+    [[nodiscard]]
+    VmaAllocator allocator() {
+        return m_vma_allocator;
+    }
 
-    [[nodiscard]] const SwapchainSupport& find_swapchain_support(
-        VkSurfaceKHR surface
-    );
+    [[nodiscard]]
+    const SwapchainSupport& find_swapchain_support(VkSurfaceKHR surface);
 
     void wait_idle() { vkDeviceWaitIdle(m_vk_device); }
     // void immediate_submit(std::function<void(vk::CommandBuffer&)>&& func);

@@ -1,6 +1,88 @@
 #include "editor_window.hpp"
+#include "backends/imgui_impl_vulkan.h"
+#include "core/log.hpp"
+#include "graphics/renderer.hpp"
 
 namespace kzn {
+
+ViewportPanel::ViewportPanel()
+    : m_render_image(
+          Renderer::device(),
+          {1280, 720},
+          Renderer::swapchain().image_format()
+      ) {
+    Log::error("After render image ctor");
+    m_render_image_tex_id = ImGui_ImplVulkan_AddTexture(
+        m_render_image.sampler(),
+        m_render_image.image_view(),
+        VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL
+    );
+    Log::error("After imgui dset setup");
+}
+
+ViewportPanel::~ViewportPanel() {
+    ImGui_ImplVulkan_RemoveTexture(
+        static_cast<VkDescriptorSet>(m_render_image_tex_id)
+    );
+}
+
+void ViewportPanel::render() {
+    ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
+    ImGui::Begin("Viewport");
+
+    const auto region = ImGui::GetContentRegionAvail();
+    ImGui::Image(m_render_image_tex_id, region);
+
+    ImGui::PopStyleVar();
+    ImGui::End();
+}
+
+EditorWindow::EditorWindow(Window& window)
+    : m_window(window) {
+
+    // Load Fonts
+    // - If no fonts are loaded, dear imgui will use the default font. You
+    // can also load multiple fonts and use ImGui::PushFont()/PopFont() to
+    // select them.
+    // - AddFontFromFileTTF() will return the ImFont* so you can store it if
+    // you need to select the font among multiple.
+    // - If the file cannot be loaded, the function will return NULL. Please
+    // handle those errors in your application (e.g. use an assertion, or
+    // display an error and quit).
+    // - The fonts will be rasterized at a given size (w/ oversampling) and
+    // stored into a texture when calling
+    // ImFontAtlas::Build()/GetTexDataAsXXXX(), which
+    // ImGui_ImplXXXX_NewFrame below will call.
+    // - Read 'docs/FONTS.md' for more instructions and details.
+    // - Remember that in C/C++ if you want to include a backslash \ in a
+    // string literal you need to write a double backslash \\ !
+    IMGUI_CHECKVERSION();
+    ImGui::CreateContext();
+    ImGuiIO& io = ImGui::GetIO();
+    io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
+    io.Fonts->AddFontFromFileTTF("assets/fonts/ruda.bold.ttf", 16.0f);
+
+    // TODO: Implement immediate_submit
+    // vk::immediate_submit(device.graphics_queue(), [&](auto& cmd_buffer) {
+    //     ImGui_ImplVulkan_CreateFontsTexture(cmd_buffer.vk_cmd_buffer());
+    // });
+
+    // Setup Dear ImGui style
+    ImGui::StyleColorsDark();
+
+    set_theme();
+}
+
+void EditorWindow::render() {
+
+    // Draw commands
+    ImGui::DockSpaceOverViewport();
+    ImGui::ShowDemoWindow();
+
+    for (const auto& panel_ptr : m_panels) {
+        panel_ptr->render();
+    }
+}
 
 void EditorWindow::set_theme() {
     ImGuiStyle* style = &ImGui::GetStyle();
@@ -12,8 +94,8 @@ void EditorWindow::set_theme() {
     const auto DARK_GREY =
         ImVec4(0.004753f, 0.004006f, 0.006017f, 1.00f); // 0f0d12
     const auto DARK_GREY_HOVER = ImVec4(0.046964f, 0.043233f, 0.068384f, 1.00f);
-    const auto GREY = ImVec4(0.010022f, 0.008540f, 1.0f, 1.00f); // 1a171f
-    // const auto GREY = ImVec4(0.010022f, 0.008540f, 0.013411f, 1.00f); //
+    // const auto GREY = ImVec4(0.010022f, 0.008540f, 1.0f, 1.00f); // 1a171f
+    const auto GREY = ImVec4(0.010022f, 0.008540f, 0.013411f, 1.00f); //
     // 1a171f
     const auto GREY_HOVER =
         ImVec4(0.019606f, 0.015325f, 0.027211f, 1.00f); // 8f8f94
@@ -91,24 +173,6 @@ void EditorWindow::set_theme() {
     style->Colors[ImGuiCol_TextSelectedBg] = ImVec4(0.25f, 1.00f, 0.00f, 0.43f);
     // style->Colors[ImGuiCol_ModalWindowDarkening] = ImVec4(1.00f, 0.98f,
     // 0.95f, 0.73f);
-}
-
-void EditorWindow::update(float delta_time) {
-    // Draw commands
-    ImGui::DockSpaceOverViewport();
-    ImGui::ShowDemoWindow();
-
-    ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
-    ImGui::Begin("Viewport");
-    ImGui::PopStyleVar();
-
-    // m_render_image_tex_id = ImGui_ImplVulkan_AddTexture(
-    //     m_render_image.sampler(),
-    //     m_render_image.image_view(),
-    //     VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL
-    // );
-
-    ImGui::End();
 }
 
 } // namespace kzn

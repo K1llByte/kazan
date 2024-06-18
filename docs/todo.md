@@ -21,6 +21,8 @@
     - Virtual dtors
     - backslash-newline
 
+- Move create_sampler/create_image_view utils from render_image.cpp to the vk abstraction layer
+
 ## Planned
 
 - Loader classes for loading data from files (PngTextureLoader, ObjMeshLoader)

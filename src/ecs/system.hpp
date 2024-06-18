@@ -34,8 +34,9 @@ public:
 
     template<typename S, typename... Args>
         requires std::is_base_of_v<System, S>
-    void emplace(Args&&... args) {
+    S& emplace(Args&&... args) {
         m_systems.push_back(std::make_unique<S>(std::forward<Args>(args)...));
+        return static_cast<S&>(*m_systems.back());
     }
 
 private:

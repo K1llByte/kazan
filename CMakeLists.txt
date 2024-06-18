@@ -65,6 +65,7 @@ file(GLOB KAZAN_SOURCES
     "src/core/**.cpp"
     "src/ecs/**.cpp"
     "src/graphics/**.cpp"
+    "src/graphics/passes/**.cpp"
     "src/vk/**.cpp"
 )
 add_library(KazanLib STATIC ${KAZAN_SOURCES})
@@ -114,5 +115,5 @@ check_ipo_supported(RESULT LTO_SUPPORTED OUTPUT USE_LTO_ERROR)
 
 if(LTO_SUPPORTED)
     message(STATUS "Enabled Link Time Optimization (LTO)")
-    set_property(TARGET Hello PROPERTY INTERPROCEDURAL_OPTIMIZATION TRUE)
+    set_property(TARGET KazanEditor PROPERTY INTERPROCEDURAL_OPTIMIZATION TRUE)
 endif()

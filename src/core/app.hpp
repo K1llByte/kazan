@@ -11,7 +11,12 @@ struct App {
 
 #define KZN_CREATE_APP(class_name)                                             \
     int main() {                                                               \
-        class_name app;                                                        \
-        app.run();                                                             \
+        try {                                                                  \
+            class_name app;                                                    \
+            app.run();                                                         \
+        }                                                                      \
+        catch (const vk::ResultError& re) {                                    \
+            Log::error("{}", re.message());                                    \
+        }                                                                      \
         return EXIT_SUCCESS;                                                   \
     }

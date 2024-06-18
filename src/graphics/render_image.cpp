@@ -1,6 +1,8 @@
 #include "render_image.hpp"
 
 #include "core/log.hpp"
+#include "vk/cmd_buffer.hpp"
+#include <vulkan/vulkan_core.h>
 
 namespace kzn {
 
@@ -72,7 +74,7 @@ void destroy_sampler(vk::Device& device, VkSampler sampler) {
 
 /////////////////////////////////////////////
 
-RenderImage::RenderImage(vk::Device& device, VkExtent3D extent)
+RenderImage::RenderImage(vk::Device& device, VkExtent2D extent, VkFormat format)
     : m_device(device)
     , m_extent(extent) {
     Log::trace("Created RenderImage");
@@ -81,16 +83,15 @@ RenderImage::RenderImage(vk::Device& device, VkExtent3D extent)
     VkImageCreateInfo image_info{};
     image_info.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
     image_info.imageType = VK_IMAGE_TYPE_2D;
-    image_info.format = VK_FORMAT_B8G8R8A8_SRGB;
-    image_info.extent = extent;
+    image_info.format = format;
+    image_info.extent = VkExtent3D{extent.width, extent.height, 1};
     image_info.mipLevels = 1;
     image_info.arrayLayers = 1;
     image_info.samples = VK_SAMPLE_COUNT_1_BIT;
     image_info.tiling = VK_IMAGE_TILING_OPTIMAL;
     image_info.usage =
         VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT | VK_IMAGE_USAGE_SAMPLED_BIT;
-    image_info.initialLayout =
-        VK_IMAGE_LAYOUT_UNDEFINED; // VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL
+    image_info.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
 
     VmaAllocationCreateInfo img_alloc_info{};
     img_alloc_info.usage = VMA_MEMORY_USAGE_GPU_ONLY;
@@ -108,15 +109,53 @@ RenderImage::RenderImage(vk::Device& device, VkExtent3D extent)
 
     // 3. Create VkImageView
     m_image_view = vk::create_image_view(
-        m_device, m_image, VK_FORMAT_B8G8R8A8_SRGB, VK_IMAGE_ASPECT_COLOR_BIT
+        m_device, m_image, format, VK_IMAGE_ASPECT_COLOR_BIT
     );
 
     // 4. Create VkSampler
     m_sampler = vk::create_sampler(m_device);
+
+    // 5. Transition the layout of this image to
+    // VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL
+    vk::immediate_submit(
+        device.graphics_queue(),
+        [this](vk::CommandBuffer& cmd_buffer) {
+            std::array image_barrier{
+                VkImageMemoryBarrier{
+                    .sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER,
+                    .srcAccessMask = VK_ACCESS_TRANSFER_WRITE_BIT,
+                    .dstAccessMask = VK_ACCESS_SHADER_READ_BIT,
+                    .oldLayout = VK_IMAGE_LAYOUT_UNDEFINED,
+                    .newLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
+                    .srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED,
+                    .dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED,
+                    .image = m_image,
+                    .subresourceRange =
+                        {
+                            .aspectMask = VK_IMAGE_ASPECT_COLOR_BIT,
+                            .levelCount = 1,
+                            .layerCount = 1,
+                        }
+                },
+            };
+
+            vkCmdPipelineBarrier(
+                cmd_buffer.vk_cmd_buffer(),
+                VK_PIPELINE_STAGE_TRANSFER_BIT,
+                VK_PIPELINE_STAGE_FRAGMENT_SHADER_BIT,
+                0,
+                0,
+                nullptr,
+                0,
+                nullptr,
+                image_barrier.size(),
+                image_barrier.data()
+            );
+        }
+    );
 }
 
 RenderImage::~RenderImage() {
-    Log::trace("Destroyed RenderImage");
     // 1. Destroy VkImage
     vmaDestroyImage(m_device.allocator(), m_image, m_allocation);
 

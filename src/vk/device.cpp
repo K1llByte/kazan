@@ -57,8 +57,10 @@ VkExtent2D SwapchainSupport::select_extent(VkExtent2D extent) const {
     }
 }
 
-QueueFamilies
-get_queue_families(VkPhysicalDevice physical_device, VkSurfaceKHR surface) {
+QueueFamilies get_queue_families(
+    VkPhysicalDevice physical_device,
+    VkSurfaceKHR surface
+) {
     // Logic to find queue family indices to populate struct with
     uint32_t queue_family_count = 0;
     vkGetPhysicalDeviceQueueFamilyProperties(

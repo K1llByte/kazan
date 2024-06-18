@@ -1,11 +1,12 @@
 #pragma once
 
 #include "ecs/system.hpp"
-#include "graphics/graphics_context.hpp"
+#include "graphics/passes/test_pass.hpp"
 #include "graphics/renderer.hpp"
 #include "graphics/utils.hpp"
 #include "vk/functions.hpp"
 #include "vk/pipeline.hpp"
+#include <memory>
 
 namespace kzn {
 
@@ -14,10 +15,14 @@ struct SpriteComponent {
 };
 
 //! ECS System for rendering
+//! This system owns the RenderGraph of passes that will present to screen
 class RenderSystem : public System {
 public:
+    std::vector<std::unique_ptr<Pass>> passes;
+
+public:
     // Ctor
-    RenderSystem(Window& window);
+    RenderSystem(Window& window, Renderer& renderer);
     // Copy
     RenderSystem(const RenderSystem&) = delete;
     RenderSystem& operator=(const RenderSystem&) = delete;
@@ -29,14 +34,8 @@ public:
 
     void update(float delta_time) override;
 
-    void on_swapchain_resize(const SwapchainResize&);
-
 private:
-    ScopedGraphicsContext m_scoped_gfx_context;
-    Renderer m_renderer;
-    vk::RenderPass m_main_render_pass;
-    std::vector<vk::Framebuffer> m_framebuffers;
-    vk::Pipeline m_pipeline;
+    Renderer& m_renderer;
 };
 
 } // namespace kzn

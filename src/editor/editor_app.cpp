@@ -1,30 +1,38 @@
-#include "glm/fwd.hpp"
-#include "graphics/graphics_context.hpp"
+#include "editor/editor_pass.hpp"
+#include "editor/editor_window.hpp"
+#include "graphics/passes/offscreen_pass.hpp"
+#include "graphics/renderer.hpp"
 #include "kazan.hpp"
-#include <chrono>
-#include <thread>
-#include <type_traits>
 
-#include "editor_render_system.hpp"
-#include "editor_window.hpp"
+#include "fmt/base.h"
+#include "glm/fwd.hpp"
 
 using namespace kzn;
 
 class EditorApp : public App {
 public:
     EditorApp()
-        : m_window("Kazan Editor", 800, 600) {
-
+        : m_window("Kazan Editor", 800, 600)
+        , m_renderer(m_window)
+        , m_editor_window(m_window) {
         // Initialize systems
-        m_systems.emplace<EditorRenderSystem>(m_window);
+        auto& render_system =
+            m_systems.emplace<RenderSystem>(m_window, m_renderer);
+        // render_system.passes.push_back(std::make_unique<OffscreenPass>(render_image));
+        render_system.passes.push_back(
+            std::make_unique<EditorPass>(m_editor_window)
+        );
 
-        // NOTE: Has to be done after initializing EditorRenderSystem.
-        m_window.set_theme();
+        // Initialize editor
+        auto& viewport_panel = m_editor_window.add_panel<ViewportPanel>();
+        render_system.passes.insert(
+            render_system.passes.begin(),
+            std::make_unique<OffscreenPass>(viewport_panel.render_image())
+        );
 
         // Create entities
-        // auto square = Registry::create();
-        // auto& square_transform =
-        // square.add_component<Transform2DComponent>();
+        auto square = Registry::create();
+        square.add_component<Transform2DComponent>();
     }
 
     ~EditorApp() = default;
@@ -53,7 +61,9 @@ public:
     }
 
 private:
-    EditorWindow m_window;
+    Window m_window;
+    Renderer m_renderer;
+    EditorWindow m_editor_window;
     SystemManager m_systems;
 };
 

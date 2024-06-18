@@ -24,6 +24,20 @@ auto render_system = m_systems.emplace<RenderSystem>(
 );
 ```
 
+
+## Renderer
+
+```c++
+auto renderer = Renderer(window);
+assert(Renderer::exists());
+```
+
+Renderer::device()
+GraphicsContext::device();
+Renderer {
+    GraphicsContext m_context;    
+}
+
 ## Modules example
 
 - Required default ctor
