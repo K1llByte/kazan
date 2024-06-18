@@ -1,6 +1,8 @@
 #pragma once
 
+#include "ecs/entity.hpp"
 #include "events/event_manager.hpp"
+#include "glm/fwd.hpp"
 #include "graphics/renderer.hpp"
 #include "graphics/utils.hpp"
 #include "vk/render_pass.hpp"
@@ -21,6 +23,18 @@ namespace kzn {
 
 struct Panel {
     virtual void render() = 0;
+};
+
+class InspectorPanel : public Panel {
+public:
+    InspectorPanel(glm::vec3& tmp)
+        : m_tmp(tmp) {}
+    ~InspectorPanel() = default;
+
+    void render() override;
+
+private:
+    glm::vec3& m_tmp;
 };
 
 class ViewportPanel : public Panel {
@@ -69,7 +83,7 @@ public:
     template<typename P, typename... Args>
         requires std::is_base_of_v<Panel, P>
     P& add_panel(Args&&... args) {
-        m_panels.push_back(std::make_unique<P>(std::forward(args)...));
+        m_panels.push_back(std::make_unique<P>(std::forward<Args>(args)...));
         return static_cast<P&>(*m_panels.back());
     }
 

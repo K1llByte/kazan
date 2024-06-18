@@ -2,8 +2,17 @@
 #include "backends/imgui_impl_vulkan.h"
 #include "core/log.hpp"
 #include "graphics/renderer.hpp"
+#include "imgui.h"
 
 namespace kzn {
+
+void InspectorPanel::render() {
+    ImGui::Begin("Inspector");
+    ImGui::PushItemWidth(-1);
+    ImGui::DragFloat3("", &m_tmp.x, 0.01f, 0.0f, 1.0f);
+    ImGui::PopItemWidth();
+    ImGui::End();
+}
 
 ViewportPanel::ViewportPanel()
     : m_render_image(
@@ -77,7 +86,7 @@ void EditorWindow::render() {
 
     // Draw commands
     ImGui::DockSpaceOverViewport();
-    ImGui::ShowDemoWindow();
+    // ImGui::ShowDemoWindow();
 
     for (const auto& panel_ptr : m_panels) {
         panel_ptr->render();

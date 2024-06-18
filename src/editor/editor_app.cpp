@@ -23,12 +23,20 @@ public:
             std::make_unique<EditorPass>(m_editor_window)
         );
 
-        // Initialize editor
+        // FIXME: Fix this editor panels initialization fiasco.
+        // Possibily, when editor is initialized, the render context should be
+        // initialized too Initialize editor.
+        glm::vec3 clear_color{0.01f, 0.01f, 0.01f};
+
         auto& viewport_panel = m_editor_window.add_panel<ViewportPanel>();
         render_system.passes.insert(
             render_system.passes.begin(),
-            std::make_unique<OffscreenPass>(viewport_panel.render_image())
+            std::make_unique<OffscreenPass>(
+                viewport_panel.render_image(), clear_color
+            )
         );
+
+        m_editor_window.add_panel<InspectorPanel>(clear_color);
 
         // Create entities
         auto square = Registry::create();

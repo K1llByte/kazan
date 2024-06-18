@@ -19,8 +19,9 @@ inline vk::Pipeline triangle_pipeline(vk::RenderPass& render_pass) {
     );
 }
 
-OffscreenPass::OffscreenPass(RenderImage& render_image)
+OffscreenPass::OffscreenPass(RenderImage& render_image, glm::vec3& clear_color)
     : m_render_image{render_image}
+    , m_clear_color(clear_color)
     , m_offscreen_render_pass(
           // TODO: Grab format from image handle
           simple_offscreen_pass(
@@ -37,7 +38,11 @@ OffscreenPass::OffscreenPass(RenderImage& render_image)
 }
 
 void OffscreenPass::render(vk::CommandBuffer& cmd_buffer) {
-    VkClearValue clear_color{{{0.01f, 0.01f, 0.01f, 1.0f}}};
+
+    VkClearValue clear_color{
+        {{m_clear_color.r, m_clear_color.y, m_clear_color.z, 1.0f}}
+    };
+    // VkClearValue clear_color{{{0.01f, 0.01f, 0.01f, 1.0f}}};
 
     // Begin Render Pass
     m_offscreen_render_pass.begin(cmd_buffer, m_framebuffer, {clear_color});
