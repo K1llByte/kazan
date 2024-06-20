@@ -76,7 +76,8 @@ void destroy_sampler(vk::Device& device, VkSampler sampler) {
 
 RenderImage::RenderImage(vk::Device& device, VkExtent2D extent, VkFormat format)
     : m_device(device)
-    , m_extent(extent) {
+    , m_extent(extent)
+    , m_format(format) {
     Log::trace("Created RenderImage");
 
     // 1. Create VkImage

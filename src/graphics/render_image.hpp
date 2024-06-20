@@ -34,6 +34,10 @@ public:
         return m_image_view;
     }
     [[nodiscard]]
+    VkFormat format() const {
+        return m_format;
+    }
+    [[nodiscard]]
     VkSampler sampler() const {
         return m_sampler;
     }

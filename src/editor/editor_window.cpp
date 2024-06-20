@@ -2,6 +2,8 @@
 #include "backends/imgui_impl_vulkan.h"
 #include "core/log.hpp"
 #include "core/window.hpp"
+#include "ecs/entity.hpp"
+#include "graphics/passes/offscreen_pass.hpp"
 #include "graphics/renderer.hpp"
 #include "imgui.h"
 
@@ -9,9 +11,30 @@ namespace kzn {
 
 void InspectorPanel::render() {
     ImGui::Begin("Inspector");
-    ImGui::PushItemWidth(-1);
-    ImGui::DragFloat3("", &m_tmp.x, 0.01f, 0.0f, 1.0f);
-    ImGui::PopItemWidth();
+    ImGui::DragFloat3(
+        "Clear color", static_cast<float*>(&m_tmp.x), 0.01f, 0.0f, 1.0f
+    );
+
+    if (m_entity.has_value()) {
+        auto sprite_comp =
+            Registry::registry.try_get<SpriteComponent>(m_entity.value().raw());
+        if (sprite_comp != nullptr) {
+            ImGui::DragFloat2(
+                "Shift",
+                static_cast<float*>(&(sprite_comp->params.shift.x)),
+                0.01f,
+                -1.0f,
+                1.0f
+            );
+            ImGui::DragFloat2(
+                "Size",
+                static_cast<float*>(&(sprite_comp->params.size.x)),
+                0.01f,
+                0.0f,
+                10.0f
+            );
+        }
+    }
     ImGui::End();
 }
 

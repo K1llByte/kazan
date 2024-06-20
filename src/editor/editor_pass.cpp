@@ -12,53 +12,7 @@ EditorPass::EditorPass(EditorWindow& editor_window)
           m_editor_window.render_context().render_pass(),
           Renderer::swapchain()
       )) {
-    // ImGui_ImplGlfw_InitForVulkan(editor_window.root_window().glfw_ptr(),
-    // true);
-
-    // VkDescriptorPoolSize pool_sizes[] = {
-    //     {VK_DESCRIPTOR_TYPE_SAMPLER, 1024},
-    //     {VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1024},
-    //     {VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE, 1024},
-    //     {VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, 1024},
-    //     {VK_DESCRIPTOR_TYPE_UNIFORM_TEXEL_BUFFER, 1024},
-    //     {VK_DESCRIPTOR_TYPE_STORAGE_TEXEL_BUFFER, 1024},
-    //     {VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 1024},
-    //     {VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 1024},
-    //     {VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC, 1024},
-    //     {VK_DESCRIPTOR_TYPE_STORAGE_BUFFER_DYNAMIC, 1024},
-    //     {VK_DESCRIPTOR_TYPE_INPUT_ATTACHMENT, 1024}
-    // };
-
-    // VkDescriptorPoolCreateInfo pool_info{};
-    // pool_info.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
-    // pool_info.flags = VK_DESCRIPTOR_POOL_CREATE_FREE_DESCRIPTOR_SET_BIT;
-    // pool_info.maxSets = 1000;
-    // pool_info.poolSizeCount = std::size(pool_sizes);
-    // pool_info.pPoolSizes = pool_sizes;
-
-    // auto& device = Renderer::device();
-
-    // // Create ImGui descriptor pool
-    // auto res = vkCreateDescriptorPool(
-    //     device.vk_device(), &pool_info, nullptr, &m_imgui_pool
-    // );
-    // VK_CHECK_MSG(res, "Error creating ImGui descriptor pool");
-
-    // // This initializes ImGui for Vulkan
-    // ImGui_ImplVulkan_InitInfo init_info{};
-    // init_info.Instance = Renderer::instance().vk_instance();
-    // init_info.PhysicalDevice = device.vk_physical_device();
-    // init_info.Device = device.vk_device();
-    // init_info.Queue = device.graphics_queue().vk_queue;
-    // init_info.DescriptorPool = m_imgui_pool;
-    // init_info.RenderPass = m_editor_render_pass.vk_render_pass();
-
-    // const uint32_t img_count = Renderer::swapchain().images().size();
-    // init_info.MinImageCount = img_count;
-    // init_info.ImageCount = img_count;
-    // init_info.MSAASamples = VK_SAMPLE_COUNT_1_BIT;
-
-    // ImGui_ImplVulkan_Init(&init_info);
+    Log::debug("Created EditorPass");
 
     // Register listener to resize framebuffers
     EventManager::listen<SwapchainResize>(

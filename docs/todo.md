@@ -31,7 +31,6 @@
     - Also coordinate system math opeartions spherical_to_cartesian, cartesian_to_spherical
 - StringHash constexpr type
 - Pseudo RenderGraph
-- Fix editor panels initialization fiasco.
 
 ## Planned
 

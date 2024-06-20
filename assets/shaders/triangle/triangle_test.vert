@@ -2,10 +2,10 @@
 
 layout(location = 0) out vec3 vert_color;
 
-layout(set = 0, binding = 0) uniform Tmp {
-    vec3 bias1;
-    vec3 bias2;
-} tmp;
+layout(set = 0, binding = 0) uniform Params {
+    vec2 size;
+    vec2 shift;
+} params;
 
 // Triangle
 const vec2 position[] = vec2[] (
@@ -24,6 +24,7 @@ const vec3 colors[] = vec3[](
 
 void main()
 {
-    gl_Position = vec4(position[gl_VertexIndex], 0.0, 1.0);
-    vert_color = tmp.bias1; //colors[gl_VertexIndex];
+    vec2 pos = position[gl_VertexIndex] * params.size;
+    gl_Position = vec4(pos + params.shift, 0.0, 1.0);
+    vert_color = colors[gl_VertexIndex];
 }

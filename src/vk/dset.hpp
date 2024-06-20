@@ -1,17 +1,17 @@
 #pragma once
 
-#include "dset_layout.hpp"
 #include "cmd_buffer.hpp"
+#include "dset_layout.hpp"
 
 namespace kzn::vk {
 
 class DescriptorSet;
 
-// DescriptorSetAllocator is a manager of DescriptorSetPool's which creates new pools
-// when its needed.
+// DescriptorSetAllocator is a manager of DescriptorSetPool's which creates new
+// pools when its needed.
 class DescriptorSetAllocator {
 public:
-    using PoolSizes = std::vector<std::pair<VkDescriptorType,float>>;
+    using PoolSizes = std::vector<std::pair<VkDescriptorType, float>>;
 
     // Ctor
     DescriptorSetAllocator(Device& device);
@@ -28,9 +28,9 @@ public:
     DescriptorSet allocate(DescriptorSetLayout&& layout);
 
 private:
-    Device&                       m_device;
-    VkDescriptorPool              m_current_pool = VK_NULL_HANDLE;
-    PoolSizes                     m_descriptor_sizes;
+    Device& m_device;
+    VkDescriptorPool m_current_pool = VK_NULL_HANDLE;
+    PoolSizes m_descriptor_sizes;
     std::vector<VkDescriptorPool> m_used_pools;
     std::vector<VkDescriptorPool> m_free_pools;
 
@@ -38,12 +38,10 @@ private:
     VkDescriptorPool grab_pool();
 };
 
-
 union DescriptorInfo {
     VkDescriptorBufferInfo buffer_info;
     VkDescriptorImageInfo image_info;
 };
-
 
 class DescriptorSet {
 public:
@@ -58,20 +56,24 @@ public:
     // Dtor
     ~DescriptorSet() = default;
 
-    void bind(vk::CommandBuffer& cmd_buffer, VkPipelineLayout pipeline_layout) const;
+    const DescriptorSetLayout& layout() const { return m_layout; }
+
+    void bind(vk::CommandBuffer& cmd_buffer, VkPipelineLayout pipeline_layout)
+        const;
     void update(std::initializer_list<DescriptorInfo> descriptor_infos);
 
 private:
-    Device&             m_device;
-    VkDescriptorSet     m_vk_descriptor_set;
+    Device& m_device;
+    VkDescriptorSet m_vk_descriptor_set;
     DescriptorSetLayout m_layout;
 
 private:
     // Ctor
     DescriptorSet(
-        Device&               device,
-        VkDescriptorSet       descriptor_set,
-        DescriptorSetLayout&& layout);
+        Device& device,
+        VkDescriptorSet descriptor_set,
+        DescriptorSetLayout&& layout
+    );
 };
 
 } // namespace kzn::vk

@@ -46,7 +46,13 @@ public:
     template<typename Component>
     Component* try_get_component();
 
-    [[nodiscard]] bool is_valid() const;
+    [[nodiscard]]
+    constexpr entt::entity raw() const {
+        return m_entity;
+    };
+
+    [[nodiscard]]
+    bool is_valid() const;
 
 private:
     entt::entity m_entity = entt::null;
@@ -56,8 +62,9 @@ private:
 
 template<typename Component, typename... Args>
 Component& Entity::add_component(Args&&... args) {
-    return Registry::registry.emplace<Component>(m_entity,
-                                                 std::forward<Args>(args)...);
+    return Registry::registry.emplace<Component>(
+        m_entity, std::forward<Args>(args)...
+    );
 }
 
 template<typename Component>

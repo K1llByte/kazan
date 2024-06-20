@@ -4,6 +4,7 @@
 #include "ecs/entity.hpp"
 #include "events/event_manager.hpp"
 #include "glm/fwd.hpp"
+#include "graphics/passes/offscreen_pass.hpp"
 #include "graphics/renderer.hpp"
 #include "graphics/utils.hpp"
 #include "vk/render_pass.hpp"
@@ -11,6 +12,7 @@
 #include <cstddef>
 #include <graphics/render_image.hpp>
 #include <memory>
+#include <optional>
 #include <string_view>
 
 #include <backends/imgui_impl_glfw.h>
@@ -34,10 +36,13 @@ public:
         : m_tmp(tmp) {}
     ~InspectorPanel() = default;
 
+    void inspect(Entity entity) { m_entity = entity; }
+
     void render() override;
 
 private:
     glm::vec3& m_tmp;
+    std::optional<Entity> m_entity = std::nullopt;
 };
 
 //! Viewport panel for rendering the scene

@@ -16,25 +16,27 @@ public:
         : m_window("Kazan Editor", 800, 600)
         , m_renderer(m_window)
         , m_editor_window(m_window) {
-        // Initialize systems
-
-        glm::vec3 clear_color{0.01f, 0.01f, 0.01f};
-
+        // Initialize panels
         auto& viewport_panel = m_editor_window.add_panel<ViewportPanel>();
+        auto& inspector_panel =
+            m_editor_window.add_panel<InspectorPanel>(m_clear_color);
 
+        // Initialize systems
         auto& render_system = m_systems.emplace<RenderSystem>();
         render_system.passes.push_back(std::make_unique<OffscreenPass>(
-            viewport_panel.render_image(), clear_color
+            viewport_panel.render_image(), m_clear_color
         ));
         render_system.passes.push_back(
             std::make_unique<EditorPass>(m_editor_window)
         );
 
-        m_editor_window.add_panel<InspectorPanel>(clear_color);
-
         // Create entities
+        // Registry::create().add_component<SpriteComponent>();
+
         auto square = Registry::create();
         square.add_component<Transform2DComponent>();
+        square.add_component<SpriteComponent>();
+        inspector_panel.inspect(square);
     }
 
     ~EditorApp() = default;
@@ -67,6 +69,7 @@ private:
     Renderer m_renderer;
     EditorWindow m_editor_window;
     SystemManager m_systems;
+    glm::vec3 m_clear_color{0.01f, 0.01f, 0.01f};
 };
 
 ///////////////////////////////////////////////////////

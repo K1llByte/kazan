@@ -10,10 +10,6 @@
 
 namespace kzn {
 
-struct SpriteComponent {
-    // TODO: Texture
-};
-
 //! ECS System for rendering
 //! This system owns the RenderGraph of passes that will present to screen
 class RenderSystem : public System {

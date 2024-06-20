@@ -1,7 +1,7 @@
 #pragma once
 
-#include <unordered_map>
 #include <span>
+#include <unordered_map>
 
 #include "device.hpp"
 
@@ -9,8 +9,14 @@ namespace kzn::vk {
 
 using DescriptorSetBindings = std::vector<VkDescriptorSetLayoutBinding>;
 
-VkDescriptorSetLayoutBinding uniform_binding(uint32_t binding, VkShaderStageFlags stage_flags = VK_SHADER_STAGE_ALL_GRAPHICS);
-VkDescriptorSetLayoutBinding sampler_binding(uint32_t binding, VkShaderStageFlags stage_flags = VK_SHADER_STAGE_ALL_GRAPHICS);
+VkDescriptorSetLayoutBinding uniform_binding(
+    uint32_t binding,
+    VkShaderStageFlags stage_flags = VK_SHADER_STAGE_ALL_GRAPHICS
+);
+VkDescriptorSetLayoutBinding sampler_binding(
+    uint32_t binding,
+    VkShaderStageFlags stage_flags = VK_SHADER_STAGE_ALL_GRAPHICS
+);
 
 class DescriptorSetLayoutCache;
 
@@ -27,8 +33,13 @@ public:
     // Dtor
     ~DescriptorSetLayout() = default;
 
-    std::span<const VkDescriptorSetLayoutBinding> bindings() const { return m_layout_bindings; };
-    VkDescriptorSetLayout vk_layout() const { return m_layout; }
+    std::span<const VkDescriptorSetLayoutBinding> bindings() const {
+        return m_layout_bindings;
+    };
+    [[nodiscard]]
+    VkDescriptorSetLayout vk_layout() const {
+        return m_layout;
+    }
 
 private:
     DescriptorSetBindings m_layout_bindings;
@@ -38,9 +49,9 @@ private:
     // Ctor
     DescriptorSetLayout(
         DescriptorSetBindings&& layout_bindings,
-        VkDescriptorSetLayout layout);
+        VkDescriptorSetLayout layout
+    );
 };
-
 
 class DescriptorSetLayoutCache {
 public:
@@ -56,7 +67,8 @@ public:
     DescriptorSetLayoutCache(Device& device);
     // Copy
     DescriptorSetLayoutCache(const DescriptorSetLayoutCache&) = delete;
-    DescriptorSetLayoutCache& operator=(const DescriptorSetLayoutCache&) = delete;
+    DescriptorSetLayoutCache& operator=(const DescriptorSetLayoutCache&) =
+        delete;
     // Move
     DescriptorSetLayoutCache(DescriptorSetLayoutCache&&) = delete;
     DescriptorSetLayoutCache& operator=(DescriptorSetLayoutCache&&) = delete;
@@ -67,7 +79,7 @@ public:
 
 private:
     struct DescriptorLayoutHash {
-        size_t operator()(const DescriptorLayoutInfo& info) const { 
+        size_t operator()(const DescriptorLayoutInfo& info) const {
             return info.hash();
         }
     };
@@ -75,8 +87,9 @@ private:
 private:
     using Key = DescriptorLayoutInfo;
     using Value = VkDescriptorSetLayout;
-    using DescriptorSetLayoutMap = std::unordered_map<Key, Value, DescriptorLayoutHash>;
-    Device&                m_device;
+    using DescriptorSetLayoutMap =
+        std::unordered_map<Key, Value, DescriptorLayoutHash>;
+    Device& m_device;
     DescriptorSetLayoutMap m_layout_cache;
 };
 
