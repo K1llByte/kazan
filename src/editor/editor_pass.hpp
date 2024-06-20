@@ -2,6 +2,7 @@
 
 #include "editor/editor_window.hpp"
 #include "graphics/passes/test_pass.hpp"
+#include "graphics/render_image.hpp"
 
 namespace kzn {
 
@@ -18,9 +19,9 @@ public:
 
 private:
     EditorWindow& m_editor_window;
-    vk::RenderPass m_editor_render_pass;
+    // vk::RenderPass m_editor_render_pass;
     std::vector<vk::Framebuffer> m_framebuffers;
-    VkDescriptorPool m_imgui_pool = VK_NULL_HANDLE;
+    // VkDescriptorPool m_imgui_pool = VK_NULL_HANDLE;
 };
 
 } // namespace kzn

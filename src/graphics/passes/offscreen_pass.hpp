@@ -1,5 +1,6 @@
 #pragma once
 
+#include "core/log.hpp"
 #include "core/window.hpp"
 #include "ecs/entity.hpp"
 #include "glm/fwd.hpp"
@@ -18,7 +19,7 @@ public:
     // Ctor
     OffscreenPass(RenderImage& render_image, glm::vec3& clear_color);
     // Dtor
-    ~OffscreenPass() = default;
+    ~OffscreenPass() override = default;
 
     void render(vk::CommandBuffer& cmd_buffer) override;
 

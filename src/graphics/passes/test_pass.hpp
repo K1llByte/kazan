@@ -1,5 +1,6 @@
 #pragma once
 
+#include "core/log.hpp"
 #include "core/window.hpp"
 #include "ecs/entity.hpp"
 #include "graphics/renderer.hpp"
@@ -20,7 +21,7 @@ public:
     // Ctor
     TestPass(Window& window);
     // Dtor
-    ~TestPass() = default;
+    ~TestPass() override = default;
 
     void render(vk::CommandBuffer& cmd_buffer) override;
 

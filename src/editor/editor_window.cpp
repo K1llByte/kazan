@@ -1,6 +1,7 @@
 #include "editor_window.hpp"
 #include "backends/imgui_impl_vulkan.h"
 #include "core/log.hpp"
+#include "core/window.hpp"
 #include "graphics/renderer.hpp"
 #include "imgui.h"
 
@@ -20,13 +21,11 @@ ViewportPanel::ViewportPanel()
           {1280, 720},
           Renderer::swapchain().image_format()
       ) {
-    Log::error("After render image ctor");
     m_render_image_tex_id = ImGui_ImplVulkan_AddTexture(
         m_render_image.sampler(),
         m_render_image.image_view(),
         VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL
     );
-    Log::error("After imgui dset setup");
 }
 
 ViewportPanel::~ViewportPanel() {
@@ -46,8 +45,75 @@ void ViewportPanel::render() {
     ImGui::End();
 }
 
+EditorRenderContext::EditorRenderContext(Window& window)
+    : m_editor_render_pass(
+          simple_pass(Renderer::device(), Renderer::swapchain().image_format())
+      ) {
+    // Create base imgui context
+    IMGUI_CHECKVERSION();
+    ImGui::CreateContext();
+
+    ImGui_ImplGlfw_InitForVulkan(window.glfw_ptr(), true);
+
+    // Initialize ImGui descriptor pool
+    const VkDescriptorPoolSize pool_sizes[] = {
+        {VK_DESCRIPTOR_TYPE_SAMPLER, 1024},
+        {VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1024},
+        {VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE, 1024},
+        {VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, 1024},
+        {VK_DESCRIPTOR_TYPE_UNIFORM_TEXEL_BUFFER, 1024},
+        {VK_DESCRIPTOR_TYPE_STORAGE_TEXEL_BUFFER, 1024},
+        {VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 1024},
+        {VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 1024},
+        {VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC, 1024},
+        {VK_DESCRIPTOR_TYPE_STORAGE_BUFFER_DYNAMIC, 1024},
+        {VK_DESCRIPTOR_TYPE_INPUT_ATTACHMENT, 1024}
+    };
+
+    VkDescriptorPoolCreateInfo pool_info{};
+    pool_info.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
+    pool_info.flags = VK_DESCRIPTOR_POOL_CREATE_FREE_DESCRIPTOR_SET_BIT;
+    pool_info.maxSets = 1024;
+    pool_info.poolSizeCount = std::size(pool_sizes);
+    pool_info.pPoolSizes = pool_sizes;
+
+    auto& device = Renderer::device();
+    auto res = vkCreateDescriptorPool(
+        device.vk_device(), &pool_info, nullptr, &m_imgui_pool
+    );
+    VK_CHECK_MSG(res, "Error creating ImGui descriptor pool");
+
+    // This initializes ImGui for Vulkan
+    ImGui_ImplVulkan_InitInfo init_info{};
+    init_info.Instance = Renderer::instance().vk_instance();
+    init_info.PhysicalDevice = device.vk_physical_device();
+    init_info.Device = device.vk_device();
+    init_info.Queue = device.graphics_queue().vk_queue;
+    init_info.DescriptorPool = m_imgui_pool;
+    init_info.RenderPass = m_editor_render_pass.vk_render_pass();
+
+    const uint32_t img_count = Renderer::swapchain().images().size();
+    init_info.MinImageCount = img_count;
+    init_info.ImageCount = img_count;
+    init_info.MSAASamples = VK_SAMPLE_COUNT_1_BIT;
+
+    ImGui_ImplVulkan_Init(&init_info);
+}
+
+EditorRenderContext::~EditorRenderContext() {
+    // Need to wait for the device to finish any work before shutting down ImGui
+    // context.
+    Renderer::device().wait_idle();
+
+    ImGui_ImplVulkan_Shutdown();
+    vkDestroyDescriptorPool(
+        Renderer::device().vk_device(), m_imgui_pool, nullptr
+    );
+}
+
 EditorWindow::EditorWindow(Window& window)
-    : m_window(window) {
+    : m_window(window)
+    , m_render_context(window) {
 
     // Load Fonts
     // - If no fonts are loaded, dear imgui will use the default font. You
@@ -65,8 +131,7 @@ EditorWindow::EditorWindow(Window& window)
     // - Read 'docs/FONTS.md' for more instructions and details.
     // - Remember that in C/C++ if you want to include a backslash \ in a
     // string literal you need to write a double backslash \\ !
-    IMGUI_CHECKVERSION();
-    ImGui::CreateContext();
+
     ImGuiIO& io = ImGui::GetIO();
     io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
     io.Fonts->AddFontFromFileTTF("assets/fonts/ruda.bold.ttf", 16.0f);

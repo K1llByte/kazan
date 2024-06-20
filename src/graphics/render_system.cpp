@@ -7,16 +7,12 @@
 
 namespace kzn {
 
-RenderSystem::RenderSystem(Window& window, Renderer& renderer)
-    : m_renderer(renderer) {
-}
-
 RenderSystem::~RenderSystem() {
     Renderer::device().wait_idle();
 }
 
 void RenderSystem::update(float delta_time) {
-    m_renderer.render_frame([&](auto& cmd_buffer) {
+    Renderer::singleton().render_frame([&](auto& cmd_buffer) {
         for (auto& pass : passes) {
             pass->render(cmd_buffer);
         }

@@ -1,6 +1,7 @@
 #include "editor/editor_pass.hpp"
 #include "editor/editor_window.hpp"
 #include "graphics/passes/offscreen_pass.hpp"
+#include "graphics/render_image.hpp"
 #include "graphics/renderer.hpp"
 #include "kazan.hpp"
 
@@ -16,24 +17,17 @@ public:
         , m_renderer(m_window)
         , m_editor_window(m_window) {
         // Initialize systems
-        auto& render_system =
-            m_systems.emplace<RenderSystem>(m_window, m_renderer);
-        // render_system.passes.push_back(std::make_unique<OffscreenPass>(render_image));
-        render_system.passes.push_back(
-            std::make_unique<EditorPass>(m_editor_window)
-        );
 
-        // FIXME: Fix this editor panels initialization fiasco.
-        // Possibily, when editor is initialized, the render context should be
-        // initialized too Initialize editor.
         glm::vec3 clear_color{0.01f, 0.01f, 0.01f};
 
         auto& viewport_panel = m_editor_window.add_panel<ViewportPanel>();
-        render_system.passes.insert(
-            render_system.passes.begin(),
-            std::make_unique<OffscreenPass>(
-                viewport_panel.render_image(), clear_color
-            )
+
+        auto& render_system = m_systems.emplace<RenderSystem>();
+        render_system.passes.push_back(std::make_unique<OffscreenPass>(
+            viewport_panel.render_image(), clear_color
+        ));
+        render_system.passes.push_back(
+            std::make_unique<EditorPass>(m_editor_window)
         );
 
         m_editor_window.add_panel<InspectorPanel>(clear_color);

@@ -22,7 +22,7 @@ public:
 
 public:
     // Ctor
-    RenderSystem(Window& window, Renderer& renderer);
+    RenderSystem() = default;
     // Copy
     RenderSystem(const RenderSystem&) = delete;
     RenderSystem& operator=(const RenderSystem&) = delete;
@@ -30,12 +30,9 @@ public:
     RenderSystem(RenderSystem&&) = delete;
     RenderSystem& operator=(RenderSystem&&) = delete;
     // Dtor
-    ~RenderSystem() override;
+    ~RenderSystem();
 
     void update(float delta_time) override;
-
-private:
-    Renderer& m_renderer;
 };
 
 } // namespace kzn
