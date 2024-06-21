@@ -7,8 +7,6 @@
 ## Todo
 
 - Improve EventManager for better event type deduction (EventManager::listen(on_foo)) and make EventListener class that registers event handlers at runtime 
-- Core algebra header math/algebra.hpp with aliases (Vec3, Mat34, ...)
-- Plan offscreen renderer
 
 - [Create Texture and vk::Image abstractions](api_design.md)
 
@@ -21,23 +19,19 @@
     - Virtual dtors
     - backslash-newline
 
-- Core algebra types (Vec3, Vec4, Mat4, Mat43, Mat34) in math.hpp
-    - Also coordinate system math opeartions spherical_to_cartesian, cartesian_to_spherical
-    
+- Create Entities panel (list of selectable entities)
+- Move vk folder to graphics folder
 - Test uniforms without struct
 - Move create_sampler/create_image_view utils from render_image.cpp to the vk abstraction layer
 - Crude opeartions for SystemManager
 - Crude opeartions for RenderGraph
-- Implicir vk abstraction convertion to vulkan handles, vk::Device decays to VkDevice and VkPhysicalDevice
-    - Then remove the getter everywhere 
-- StringHash constexpr type
+- StringHash constexpr type for instant string comparison and string matching with switch case
 - Pseudo RenderGraph
 - Improve pipeline layout
 
-- Vulkan shader reflection to generate pipeline layout
-
 ## Planned
 
+- Vulkan shader reflection to generate pipeline layout
 - Loader classes for loading data from files (PngTextureLoader, ObjMeshLoader)
 - Make staged submition for Vertex Buffers
     - For now vertex buffers are in a host visible region on the GPU

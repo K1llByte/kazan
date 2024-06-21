@@ -3,13 +3,42 @@
 #include "core/log.hpp"
 #include "core/window.hpp"
 #include "ecs/entity.hpp"
+#include "entt/entity/entity.hpp"
+#include "entt/entity/fwd.hpp"
+#include "events/event_manager.hpp"
+#include "fmt/format.h"
 #include "graphics/passes/offscreen_pass.hpp"
 #include "graphics/renderer.hpp"
 #include "imgui.h"
 #include "math/transform.hpp"
 #include <limits>
+#include <optional>
 
 namespace kzn {
+
+void EntityListPanel::render() {
+    ImGui::Begin("Entities List");
+    const ImVec2 button_size = ImVec2(-FLT_MIN, 0.0f);
+    if (ImGui::Button("Create Entity", button_size)) {
+        Registry::create();
+    }
+
+    ImGui::Spacing();
+
+    static entt::entity selected_entity = entt::null;
+    for (auto entity : Registry::registry.view<entt::entity>()) {
+        auto entity_name = fmt::format("Entity {}", std::uint32_t(entity));
+
+        if (ImGui::Selectable(entity_name.c_str(), selected_entity == entity)) {
+            selected_entity = entity;
+            EventManager::send(EntitySelectedEvent{
+                .entity = Entity(entity),
+            });
+        }
+    }
+
+    ImGui::End();
+}
 
 void render_component(Transform2DComponent& component) {
     if (ImGui::CollapsingHeader(
@@ -51,17 +80,19 @@ void render_component(SpriteComponent& component) {
     }
 }
 
-void render_component(auto component) {
-    return;
-}
-
 void InspectorPanel::render() {
     ImGui::ShowDemoWindow();
     ImGui::Begin("Inspector");
+
     ImGui::ColorEdit3("Clear color", &m_tmp.x);
+    ImGui::Spacing();
     // ImGui::DragFloat3("Clear color", &m_tmp.x, 0.01f, 0.0f, 1.0f);
 
     if (m_entity.has_value()) {
+        const auto entity_name =
+            fmt::format("Entity {}", std::uint32_t(m_entity->raw()));
+        ImGui::Text(entity_name.c_str());
+        ImGui::Spacing();
         auto transform2d_comp =
             Registry::registry.try_get<Transform2DComponent>(
                 m_entity.value().raw()

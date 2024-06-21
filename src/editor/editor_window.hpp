@@ -2,6 +2,7 @@
 
 #include "core/log.hpp"
 #include "ecs/entity.hpp"
+#include "events/event.hpp"
 #include "events/event_manager.hpp"
 #include "glm/fwd.hpp"
 #include "graphics/passes/offscreen_pass.hpp"
@@ -30,23 +31,44 @@ struct Panel {
     virtual void render() = 0;
 };
 
-//! Inspector of entities, allows to modify entity data
+struct EntitySelectedEvent : public Event {
+    Entity entity;
+};
+
+//! Inspector of entities, allows to modify the entity components data.
+class EntityListPanel : public Panel {
+public:
+    EntityListPanel() = default;
+    ~EntityListPanel() = default;
+
+    void render() override;
+};
+
+//! Inspector of entities, allows to modify the entity components data.
 class InspectorPanel : public Panel {
 public:
     InspectorPanel(Vec3& tmp)
-        : m_tmp(tmp) {}
+        : m_tmp(tmp) {
+        EventManager::listen<EntitySelectedEvent>(
+            EventHandler(this, &InspectorPanel::on_entity_selected)
+        );
+    }
     ~InspectorPanel() = default;
 
     void inspect(Entity entity) { m_entity = entity; }
 
     void render() override;
 
+    void on_entity_selected(const EntitySelectedEvent& event) {
+        inspect(event.entity);
+    }
+
 private:
     Vec3& m_tmp;
     std::optional<Entity> m_entity = std::nullopt;
 };
 
-//! Viewport panel for rendering the scene
+//! Viewport panel for rendering the scene.
 class ViewportPanel : public Panel {
 public:
     ViewportPanel();

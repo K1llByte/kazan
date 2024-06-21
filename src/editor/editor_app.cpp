@@ -20,9 +20,11 @@ public:
         auto& viewport_panel = m_editor_window.add_panel<ViewportPanel>();
         auto& inspector_panel =
             m_editor_window.add_panel<InspectorPanel>(m_clear_color);
+        m_editor_window.add_panel<EntityListPanel>();
 
         // Initialize systems
         auto& render_system = m_systems.emplace<RenderSystem>();
+        // Build RenderGraph
         render_system.passes.push_back(std::make_unique<OffscreenPass>(
             viewport_panel.render_image(), m_clear_color
         ));
