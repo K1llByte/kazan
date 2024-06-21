@@ -43,8 +43,8 @@ Renderer::Renderer(Window& window)
     , m_surface(window.create_surface(m_instance))
     , m_device(
           m_instance,
-          {.extensions = {VK_KHR_SWAPCHAIN_EXTENSION_NAME},
-           .surface = m_surface.vk_surface()}
+          {.extensions = {VK_KHR_SWAPCHAIN_EXTENSION_NAME}, .surface = m_surface
+          }
       )
     , m_swapchain(m_device, m_surface, window.extent())
     , m_dset_allocator(m_device)
@@ -69,9 +69,7 @@ void Renderer::render_frame(const RenderFrameFunc& render_func) {
     auto& in_flight_fence = m_frame_data[m_frame_idx].in_flight_fence;
 
     // Wait for previous frame
-    vkWaitForFences(
-        device().vk_device(), 1, &in_flight_fence, VK_TRUE, UINT64_MAX
-    );
+    vkWaitForFences(device(), 1, &in_flight_fence, VK_TRUE, UINT64_MAX);
 
     // Acquire next frame
     auto opt_image_index = swapchain().acquire_next(img_available);
@@ -83,7 +81,7 @@ void Renderer::render_frame(const RenderFrameFunc& render_func) {
     uint32_t image_index = opt_image_index.value();
 
     // Only reset the fence if we are submitting work
-    vkResetFences(device().vk_device(), 1, &in_flight_fence);
+    vkResetFences(device(), 1, &in_flight_fence);
 
     cmd_buffer.reset();
     cmd_buffer.begin();

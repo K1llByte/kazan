@@ -6,33 +6,73 @@
 #include "graphics/passes/offscreen_pass.hpp"
 #include "graphics/renderer.hpp"
 #include "imgui.h"
+#include "math/transform.hpp"
+#include <limits>
 
 namespace kzn {
 
+void render_component(Transform2DComponent& component) {
+    if (ImGui::CollapsingHeader(
+            "Transform Component", ImGuiTreeNodeFlags_DefaultOpen
+        )) {
+        ImGui::DragFloat2(
+            "Position",
+            &component.position.x,
+            0.01f,
+            -std::numeric_limits<float>::max(),
+            std::numeric_limits<float>::max()
+        );
+        ImGui::DragFloat(
+            "Rotation",
+            &component.rotation,
+            0.01f,
+            -std::numeric_limits<float>::max(),
+            std::numeric_limits<float>::max()
+        );
+        ImGui::DragFloat2(
+            "Scale",
+            &component.scale.x,
+            0.01f,
+            -std::numeric_limits<float>::max(),
+            std::numeric_limits<float>::max()
+        );
+    }
+}
+
+void render_component(SpriteComponent& component) {
+    if (ImGui::CollapsingHeader(
+            "Sprite Component", ImGuiTreeNodeFlags_DefaultOpen
+        )) {
+
+        ImGui::DragFloat2(
+            "Shift", &component.params.shift.x, 0.01f, -1.0f, 1.0f
+        );
+        ImGui::DragFloat2("Size", &component.params.size.x, 0.01f, 0.0f, 10.0f);
+    }
+}
+
+void render_component(auto component) {
+    return;
+}
+
 void InspectorPanel::render() {
+    ImGui::ShowDemoWindow();
     ImGui::Begin("Inspector");
-    ImGui::DragFloat3(
-        "Clear color", static_cast<float*>(&m_tmp.x), 0.01f, 0.0f, 1.0f
-    );
+    ImGui::ColorEdit3("Clear color", &m_tmp.x);
+    // ImGui::DragFloat3("Clear color", &m_tmp.x, 0.01f, 0.0f, 1.0f);
 
     if (m_entity.has_value()) {
+        auto transform2d_comp =
+            Registry::registry.try_get<Transform2DComponent>(
+                m_entity.value().raw()
+            );
+        if (transform2d_comp != nullptr) {
+            render_component(*transform2d_comp);
+        }
         auto sprite_comp =
             Registry::registry.try_get<SpriteComponent>(m_entity.value().raw());
         if (sprite_comp != nullptr) {
-            ImGui::DragFloat2(
-                "Shift",
-                static_cast<float*>(&(sprite_comp->params.shift.x)),
-                0.01f,
-                -1.0f,
-                1.0f
-            );
-            ImGui::DragFloat2(
-                "Size",
-                static_cast<float*>(&(sprite_comp->params.size.x)),
-                0.01f,
-                0.0f,
-                10.0f
-            );
+            render_component(*sprite_comp);
         }
     }
     ImGui::End();
@@ -101,19 +141,18 @@ EditorRenderContext::EditorRenderContext(Window& window)
     pool_info.pPoolSizes = pool_sizes;
 
     auto& device = Renderer::device();
-    auto res = vkCreateDescriptorPool(
-        device.vk_device(), &pool_info, nullptr, &m_imgui_pool
-    );
+    auto res =
+        vkCreateDescriptorPool(device, &pool_info, nullptr, &m_imgui_pool);
     VK_CHECK_MSG(res, "Error creating ImGui descriptor pool");
 
     // This initializes ImGui for Vulkan
     ImGui_ImplVulkan_InitInfo init_info{};
-    init_info.Instance = Renderer::instance().vk_instance();
-    init_info.PhysicalDevice = device.vk_physical_device();
-    init_info.Device = device.vk_device();
+    init_info.Instance = Renderer::instance();
+    init_info.PhysicalDevice = device;
+    init_info.Device = device;
     init_info.Queue = device.graphics_queue().vk_queue;
     init_info.DescriptorPool = m_imgui_pool;
-    init_info.RenderPass = m_editor_render_pass.vk_render_pass();
+    init_info.RenderPass = m_editor_render_pass;
 
     const uint32_t img_count = Renderer::swapchain().images().size();
     init_info.MinImageCount = img_count;
@@ -129,9 +168,7 @@ EditorRenderContext::~EditorRenderContext() {
     Renderer::device().wait_idle();
 
     ImGui_ImplVulkan_Shutdown();
-    vkDestroyDescriptorPool(
-        Renderer::device().vk_device(), m_imgui_pool, nullptr
-    );
+    vkDestroyDescriptorPool(Renderer::device(), m_imgui_pool, nullptr);
 }
 
 EditorWindow::EditorWindow(Window& window)

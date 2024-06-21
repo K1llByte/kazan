@@ -7,6 +7,7 @@
 #include "graphics/passes/offscreen_pass.hpp"
 #include "graphics/renderer.hpp"
 #include "graphics/utils.hpp"
+#include "math/types.hpp"
 #include "vk/render_pass.hpp"
 #include <core/window.hpp>
 #include <cstddef>
@@ -32,7 +33,7 @@ struct Panel {
 //! Inspector of entities, allows to modify entity data
 class InspectorPanel : public Panel {
 public:
-    InspectorPanel(glm::vec3& tmp)
+    InspectorPanel(Vec3& tmp)
         : m_tmp(tmp) {}
     ~InspectorPanel() = default;
 
@@ -41,7 +42,7 @@ public:
     void render() override;
 
 private:
-    glm::vec3& m_tmp;
+    Vec3& m_tmp;
     std::optional<Entity> m_entity = std::nullopt;
 };
 

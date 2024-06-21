@@ -313,7 +313,7 @@ Device::Device(Instance& instance, DeviceParams&& params)
     VmaAllocatorCreateInfo allocator_info{};
     allocator_info.physicalDevice = m_vk_physical_device;
     allocator_info.device = m_vk_device;
-    allocator_info.instance = m_instance.vk_instance();
+    allocator_info.instance = m_instance;
     auto result = vmaCreateAllocator(&allocator_info, &m_vma_allocator);
     VK_CHECK_MSG(result, "Failed to create Vma allocator");
 }

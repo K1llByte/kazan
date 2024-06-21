@@ -27,8 +27,7 @@ VkImageView create_image_view(
     view_info.subresourceRange.layerCount = 1;
 
     VkImageView image_view;
-    auto result =
-        vkCreateImageView(device.vk_device(), &view_info, nullptr, &image_view);
+    auto result = vkCreateImageView(device, &view_info, nullptr, &image_view);
     VK_CHECK_MSG(result, "Failed to create image view");
     return image_view;
 }
@@ -44,7 +43,7 @@ VkSampler create_sampler(vk::Device& device) {
     sampler_info.anisotropyEnable = VK_FALSE;
     // Get PhysicalDeviceProperties
     VkPhysicalDeviceProperties properties{};
-    vkGetPhysicalDeviceProperties(device.vk_physical_device(), &properties);
+    vkGetPhysicalDeviceProperties(device, &properties);
     sampler_info.maxAnisotropy = properties.limits.maxSamplerAnisotropy;
     sampler_info.borderColor = VK_BORDER_COLOR_INT_OPAQUE_BLACK;
     sampler_info.unnormalizedCoordinates = VK_FALSE;
@@ -56,18 +55,17 @@ VkSampler create_sampler(vk::Device& device) {
     sampler_info.maxLod = 0.0f;
 
     VkSampler sampler;
-    auto result =
-        vkCreateSampler(device.vk_device(), &sampler_info, nullptr, &sampler);
+    auto result = vkCreateSampler(device, &sampler_info, nullptr, &sampler);
     VK_CHECK_MSG(result, "Failed to create sampler");
     return sampler;
 }
 
 void destroy_image_view(vk::Device& device, VkImageView image_view) {
-    vkDestroyImageView(device.vk_device(), image_view, nullptr);
+    vkDestroyImageView(device, image_view, nullptr);
 }
 
 void destroy_sampler(vk::Device& device, VkSampler sampler) {
-    vkDestroySampler(device.vk_device(), sampler, nullptr);
+    vkDestroySampler(device, sampler, nullptr);
 }
 
 } // namespace vk

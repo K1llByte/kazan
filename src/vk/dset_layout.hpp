@@ -36,10 +36,8 @@ public:
     std::span<const VkDescriptorSetLayoutBinding> bindings() const {
         return m_layout_bindings;
     };
-    [[nodiscard]]
-    VkDescriptorSetLayout vk_layout() const {
-        return m_layout;
-    }
+
+    operator VkDescriptorSetLayout() const { return m_layout; }
 
 private:
     DescriptorSetBindings m_layout_bindings;

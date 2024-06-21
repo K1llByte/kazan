@@ -63,9 +63,8 @@ void Window::set_resized(bool resized) {
 
 vk::Surface Window::create_surface(vk::Instance& instance) {
     VkSurfaceKHR surface;
-    auto result = glfwCreateWindowSurface(
-        instance.vk_instance(), m_glfw_window, nullptr, &surface
-    );
+    auto result =
+        glfwCreateWindowSurface(instance, m_glfw_window, nullptr, &surface);
     VK_CHECK_MSG(result, "Failed to create window surface!");
     return vk::Surface(instance, surface);
 }
@@ -79,7 +78,7 @@ std::vector<const char*> Window::required_extensions() const {
     // const char** glfw_extensions;
     auto glfw_extensions =
         glfwGetRequiredInstanceExtensions(&glfw_extension_count);
-    return { glfw_extensions, glfw_extensions + glfw_extension_count };
+    return {glfw_extensions, glfw_extensions + glfw_extension_count};
 }
 
 VkExtent2D Window::extent() {
@@ -88,8 +87,9 @@ VkExtent2D Window::extent() {
         glfwGetFramebufferSize(m_glfw_window, &m_width, &m_height);
         glfwWaitEvents();
     }
-    return VkExtent2D{ static_cast<uint32_t>(m_width),
-                       static_cast<uint32_t>(m_height) };
+    return VkExtent2D{
+        static_cast<uint32_t>(m_width), static_cast<uint32_t>(m_height)
+    };
 }
 
 bool Window::was_resized() {

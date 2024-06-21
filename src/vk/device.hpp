@@ -58,8 +58,6 @@ public:
     ~Device();
 
     // Getters
-    VkDevice vk_device() { return m_vk_device; }
-    VkPhysicalDevice vk_physical_device() { return m_vk_physical_device; }
     [[nodiscard]]
     constexpr Queue graphics_queue() {
         return Queue{*this, m_vk_graphics_queue};
@@ -80,6 +78,9 @@ public:
     VmaAllocator allocator() {
         return m_vma_allocator;
     }
+
+    operator VkDevice() const { return m_vk_device; }
+    operator VkPhysicalDevice() const { return m_vk_physical_device; }
 
     [[nodiscard]]
     const SwapchainSupport& find_swapchain_support(VkSurfaceKHR surface);

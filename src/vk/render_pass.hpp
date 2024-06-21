@@ -55,7 +55,8 @@ public:
     ~RenderPass();
 
     constexpr Device& device() { return m_device; }
-    constexpr VkRenderPass vk_render_pass() const { return m_vk_render_pass; }
+
+    operator VkRenderPass() const { return m_vk_render_pass; }
 
     void begin(
         CommandBuffer& cmd_buffer,

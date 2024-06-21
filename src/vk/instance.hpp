@@ -25,12 +25,12 @@ public:
     ~Instance();
 
 public:
-    VkInstance vk_instance() { return m_vk_instance; }
+    operator VkInstance() const { return m_vk_instance; }
 
     std::vector<VkPhysicalDevice> available_devices() const;
 
 private:
-    VkInstance               m_vk_instance = VK_NULL_HANDLE;
+    VkInstance m_vk_instance = VK_NULL_HANDLE;
     VkDebugUtilsMessengerEXT m_debug_messenger = VK_NULL_HANDLE;
 };
 

@@ -4,6 +4,7 @@
 
 #include <glm/glm.hpp>
 
+#include "math/types.hpp"
 #include "vk/cmd_buffer.hpp"
 #include "vk/error.hpp"
 
@@ -13,37 +14,37 @@ inline VkSemaphore create_semaphore(Device& device) {
     VkSemaphoreCreateInfo semaphore_info{};
     semaphore_info.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
     VkSemaphore semaphore;
-    auto result = vkCreateSemaphore(device.vk_device(), &semaphore_info, nullptr, &semaphore);
+    auto result =
+        vkCreateSemaphore(device, &semaphore_info, nullptr, &semaphore);
     VK_CHECK_MSG(result, "Failed to created synchronization semaphore!");
     return semaphore;
 }
-
 
 inline VkFence create_fence(Device& device, VkFenceCreateFlags flags = {}) {
     VkFenceCreateInfo fence_info{};
     fence_info.sType = VK_STRUCTURE_TYPE_FENCE_CREATE_INFO;
     fence_info.flags = flags;
     VkFence fence;
-    auto result = vkCreateFence(device.vk_device(), &fence_info, nullptr, &fence);
+    auto result = vkCreateFence(device, &fence_info, nullptr, &fence);
     VK_CHECK_MSG(result, "Failed to created synchronization fence!");
     return fence;
 }
 
-
 inline void destroy_semaphore(Device& device, VkSemaphore semaphore) {
-    vkDestroySemaphore(device.vk_device(), semaphore, nullptr);
+    vkDestroySemaphore(device, semaphore, nullptr);
 }
-
 
 inline void destroy_fence(Device& device, VkFence fence) {
-    vkDestroyFence(device.vk_device(), fence, nullptr);
+    vkDestroyFence(device, fence, nullptr);
 }
 
-
-inline void immediate_submit(vk::Queue queue, std::function<void(vk::CommandBuffer&)>&& func) {
+inline void immediate_submit(
+    vk::Queue queue,
+    std::function<void(vk::CommandBuffer&)>&& func
+) {
     // TODO: avoid creating cmd pool and buffer i nthis method
     // make one buffer device global and reset it at the end
-    
+
     // Create a cmd pool
     auto cmd_pool = vk::CommandPool(queue.device);
     // Allocate a cmd buffer from that pool
@@ -59,23 +60,23 @@ inline void immediate_submit(vk::Queue queue, std::function<void(vk::CommandBuff
     // When work is completed on the GPU this single use fence will be signaled
     auto immediate_fence = create_fence(queue.device, false);
     // Submit command buffer to the queue.
-    
-    VkCommandBuffer cmd_buffers[] = { cmd_buffer.vk_cmd_buffer() };
+
+    VkCommandBuffer cmd_buffers[] = {cmd_buffer.vk_cmd_buffer()};
     VkSubmitInfo submit_info{};
     submit_info.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
     submit_info.commandBufferCount = 1;
     submit_info.pCommandBuffers = cmd_buffers;
 
-    auto result = vkQueueSubmit(queue.vk_queue, 1, &submit_info, immediate_fence);
+    auto result =
+        vkQueueSubmit(queue.vk_queue, 1, &submit_info, immediate_fence);
     VK_CHECK_MSG(result, "Failed to submit command buffer!");
 
     // Wait
-    vkWaitForFences(queue.device.vk_device(), 1, &immediate_fence, true, 9999999999);
+    vkWaitForFences(queue.device, 1, &immediate_fence, true, 9999999999);
 
     // Destroy single use fence
     destroy_fence(queue.device, immediate_fence);
 }
-
 
 // template<typename T>
 // constexpr VkVertexInputBindingDescription vertex_binding(
@@ -90,10 +91,10 @@ inline void immediate_submit(vk::Queue queue, std::function<void(vk::CommandBuff
 // }
 
 constexpr VkVertexInputBindingDescription vertex_binding(
-    uint32_t          stride,
-    uint32_t          binding,
-    VkVertexInputRate rate = VK_VERTEX_INPUT_RATE_VERTEX) noexcept
-{
+    uint32_t stride,
+    uint32_t binding,
+    VkVertexInputRate rate = VK_VERTEX_INPUT_RATE_VERTEX
+) noexcept {
     return VkVertexInputBindingDescription{
         .binding = binding,
         .stride = stride,
@@ -102,46 +103,42 @@ constexpr VkVertexInputBindingDescription vertex_binding(
 }
 
 // Usage: vtx_attributes<vec3, vec3, vec2>();
-template<typename ...Ts, std::size_t N = sizeof...(Ts)>
+template<typename... Ts, std::size_t N = sizeof...(Ts)>
 constexpr std::array<VkVertexInputAttributeDescription, N> vertex_attributes(
-    uint32_t binding = 0)
-{
+    uint32_t binding = 0
+) {
     uint32_t location = 0;
     uint32_t offset = 0;
     std::array<VkVertexInputAttributeDescription, N> attributes{};
-    auto foo = [&]<typename T>() -> void
-    {
+    auto foo = [&]<typename T>() -> void {
         VkFormat format;
-        if(std::is_same_v<T, float>)
+        if constexpr (std::is_same_v<T, float>)
             format = VK_FORMAT_R32_SFLOAT;
-        else if(std::is_same_v<T, glm::vec2>)
+        else if constexpr (std::is_same_v<T, Vec2>)
             format = VK_FORMAT_R32G32_SFLOAT;
-        else if(std::is_same_v<T, glm::vec3>)
+        else if constexpr (std::is_same_v<T, Vec3>)
             format = VK_FORMAT_R32G32B32_SFLOAT;
-        else if(std::is_same_v<T, glm::vec4>)
+        else if constexpr (std::is_same_v<T, Vec4>)
             format = VK_FORMAT_R32G32B32A32_SFLOAT;
-        else if(std::is_same_v<T, glm::ivec2>)
+        else if constexpr (std::is_same_v<T, Vec2i>)
             format = VK_FORMAT_R64_SFLOAT;
         else
             throw "Invalid vertex input attribute";
 
-        attributes[location] =
-            VkVertexInputAttributeDescription{
-                .location = location,
-                .binding = binding,
-                .format = format,
-                .offset = offset,
-            };
+        attributes[location] = VkVertexInputAttributeDescription{
+            .location = location,
+            .binding = binding,
+            .format = format,
+            .offset = offset,
+        };
         ++location;
         offset += sizeof(T);
     };
-    if constexpr (N > 0)
-    {
+    if constexpr (N > 0) {
         (foo.template operator()<Ts>(), ...);
     }
 
     return attributes;
 }
-
 
 } // namespace kzn::vk

@@ -6,7 +6,10 @@
 
 namespace kzn::vk {
 
-VkDescriptorSetLayoutBinding uniform_binding(uint32_t binding, VkShaderStageFlags stage_flags) {
+VkDescriptorSetLayoutBinding uniform_binding(
+    uint32_t binding,
+    VkShaderStageFlags stage_flags
+) {
     return VkDescriptorSetLayoutBinding{
         .binding = binding,
         .descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
@@ -16,8 +19,10 @@ VkDescriptorSetLayoutBinding uniform_binding(uint32_t binding, VkShaderStageFlag
     };
 }
 
-
-VkDescriptorSetLayoutBinding sampler_binding(uint32_t binding, VkShaderStageFlags stage_flags) {
+VkDescriptorSetLayoutBinding sampler_binding(
+    uint32_t binding,
+    VkShaderStageFlags stage_flags
+) {
     return VkDescriptorSetLayoutBinding{
         .binding = binding,
         .descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
@@ -27,19 +32,22 @@ VkDescriptorSetLayoutBinding sampler_binding(uint32_t binding, VkShaderStageFlag
     };
 }
 
-
-bool DescriptorSetLayoutCache::DescriptorLayoutInfo::operator==(const DescriptorLayoutInfo& other) const {
+bool DescriptorSetLayoutCache::DescriptorLayoutInfo::operator==(
+    const DescriptorLayoutInfo& other
+) const {
     if (other.bindings.size() != bindings.size()) {
         return false;
     }
     else {
-        // Compare each of the bindings is the same. Bindings are sorted so they will match
-        for(size_t i = 0; i < bindings.size(); i++) {
-            if(other.bindings[i].binding != bindings[i].binding
-                || other.bindings[i].descriptorType != bindings[i].descriptorType
-                || other.bindings[i].descriptorCount != bindings[i].descriptorCount
-                || other.bindings[i].stageFlags != bindings[i].stageFlags)
-            {
+        // Compare each of the bindings is the same. Bindings are sorted so they
+        // will match
+        for (size_t i = 0; i < bindings.size(); i++) {
+            if (other.bindings[i].binding != bindings[i].binding ||
+                other.bindings[i].descriptorType !=
+                    bindings[i].descriptorType ||
+                other.bindings[i].descriptorCount !=
+                    bindings[i].descriptorCount ||
+                other.bindings[i].stageFlags != bindings[i].stageFlags) {
                 return false;
             }
         }
@@ -47,17 +55,14 @@ bool DescriptorSetLayoutCache::DescriptorLayoutInfo::operator==(const Descriptor
     }
 }
 
-
-size_t DescriptorSetLayoutCache::DescriptorLayoutInfo::hash() const
-{
+size_t DescriptorSetLayoutCache::DescriptorLayoutInfo::hash() const {
     size_t result = std::hash<std::size_t>()(bindings.size());
 
-    for(const auto& b : bindings) {
-        // Pack the binding data into a single int64. Not fully correct but its ok
-        size_t binding_hash = b.binding
-            | b.descriptorType << 8
-            | b.descriptorCount << 16
-            | b.stageFlags << 24;
+    for (const auto& b : bindings) {
+        // Pack the binding data into a single int64. Not fully correct but its
+        // ok
+        size_t binding_hash = b.binding | b.descriptorType << 8 |
+                              b.descriptorCount << 16 | b.stageFlags << 24;
 
         // Shuffle the packed binding data and xor it with the main hash
         result ^= std::hash<size_t>()(binding_hash);
@@ -66,22 +71,19 @@ size_t DescriptorSetLayoutCache::DescriptorLayoutInfo::hash() const
     return result;
 }
 
-
 DescriptorSetLayoutCache::DescriptorSetLayoutCache(Device& device)
-    : m_device{device}
-{
-
+    : m_device{device} {
 }
-
 
 DescriptorSetLayoutCache::~DescriptorSetLayoutCache() {
     for (auto& [_, layout] : m_layout_cache) {
-        vkDestroyDescriptorSetLayout(m_device.vk_device(), layout, nullptr);
+        vkDestroyDescriptorSetLayout(m_device, layout, nullptr);
     }
 }
 
-
-DescriptorSetLayout DescriptorSetLayoutCache::create_layout(const DescriptorSetBindings& bindings) {
+DescriptorSetLayout DescriptorSetLayoutCache::create_layout(
+    const DescriptorSetBindings& bindings
+) {
     DescriptorLayoutInfo layout_info{
         .bindings = bindings,
     };
@@ -89,16 +91,13 @@ DescriptorSetLayout DescriptorSetLayoutCache::create_layout(const DescriptorSetB
     std::sort(
         layout_info.bindings.begin(),
         layout_info.bindings.end(),
-        [](const auto& a, const auto& b ) {
-            return a.binding < b.binding;
-        }
+        [](const auto& a, const auto& b) { return a.binding < b.binding; }
     );
 
     auto it = m_layout_cache.find(layout_info);
     if (it != m_layout_cache.end()) {
         return DescriptorSetLayout(
-            DescriptorSetBindings(it->first.bindings),
-            it->second
+            DescriptorSetBindings(it->first.bindings), it->second
         );
     }
     else {
@@ -109,27 +108,26 @@ DescriptorSetLayout DescriptorSetLayoutCache::create_layout(const DescriptorSetB
             .bindingCount = static_cast<uint32_t>(bindings.size()),
             .pBindings = bindings.data(),
         };
-        auto result = vkCreateDescriptorSetLayout(m_device.vk_device(), &layout_create_info, nullptr, &layout);
+        auto result = vkCreateDescriptorSetLayout(
+            m_device, &layout_create_info, nullptr, &layout
+        );
         VK_CHECK_MSG(result, "Failed to create descriptor set layout");
 
         // Add layout to cache
-        const auto [it, _] = m_layout_cache.insert({ layout_info, layout });
-        
+        const auto [it, _] = m_layout_cache.insert({layout_info, layout});
+
         return DescriptorSetLayout(
-            DescriptorSetBindings(it->first.bindings),
-            layout
+            DescriptorSetBindings(it->first.bindings), layout
         );
     }
 }
 
-
 DescriptorSetLayout::DescriptorSetLayout(
     DescriptorSetBindings&& layout_bindings,
-    VkDescriptorSetLayout layout)
+    VkDescriptorSetLayout layout
+)
     : m_layout_bindings{std::move(layout_bindings)}
-    , m_layout{layout}
-{
-
+    , m_layout{layout} {
 }
 
 } // namespace kzn::vk

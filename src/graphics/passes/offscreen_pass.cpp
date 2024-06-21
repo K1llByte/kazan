@@ -8,7 +8,7 @@
 
 namespace kzn {
 
-OffscreenPass::OffscreenPass(RenderImage& render_image, glm::vec3& clear_color)
+OffscreenPass::OffscreenPass(RenderImage& render_image, Vec3& clear_color)
     : m_clear_color(clear_color)
     , m_render_image{render_image}
     , m_offscreen_render_pass(
@@ -32,9 +32,9 @@ OffscreenPass::OffscreenPass(RenderImage& render_image, glm::vec3& clear_color)
               .fragment = "assets/shaders/triangle/triangle.frag.spv",
           },
           vk::PipelineConfig(m_offscreen_render_pass)
-              .set_layout(vk::PipelineLayout{
-                  .descriptor_sets = {m_dset.layout().vk_layout()}
-              })
+              .set_layout(
+                  vk::PipelineLayout{.descriptor_sets = {m_dset.layout()}}
+              )
       ) {
     Log::debug("Created OffscreenPass");
     // Update all descriptor sets with

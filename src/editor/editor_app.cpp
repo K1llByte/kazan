@@ -31,12 +31,14 @@ public:
         );
 
         // Create entities
-        // Registry::create().add_component<SpriteComponent>();
-
         auto square = Registry::create();
         square.add_component<Transform2DComponent>();
         square.add_component<SpriteComponent>();
         inspector_panel.inspect(square);
+
+        for (const auto& [id, storage] : Registry::registry.storage()) {
+            Log::error("Foo");
+        }
     }
 
     ~EditorApp() = default;
@@ -69,7 +71,7 @@ private:
     Renderer m_renderer;
     EditorWindow m_editor_window;
     SystemManager m_systems;
-    glm::vec3 m_clear_color{0.01f, 0.01f, 0.01f};
+    Vec3 m_clear_color{0.01f, 0.01f, 0.01f};
 };
 
 ///////////////////////////////////////////////////////

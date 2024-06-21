@@ -21,16 +21,20 @@
     - Virtual dtors
     - backslash-newline
 
+- Core algebra types (Vec3, Vec4, Mat4, Mat43, Mat34) in math.hpp
+    - Also coordinate system math opeartions spherical_to_cartesian, cartesian_to_spherical
+    
+- Test uniforms without struct
 - Move create_sampler/create_image_view utils from render_image.cpp to the vk abstraction layer
 - Crude opeartions for SystemManager
 - Crude opeartions for RenderGraph
-- Solve editor render context lifetime problem
 - Implicir vk abstraction convertion to vulkan handles, vk::Device decays to VkDevice and VkPhysicalDevice
     - Then remove the getter everywhere 
-- Core algebra types (Vec3, Vec4, Mat4, Mat43, Mat34) in math.hpp
-    - Also coordinate system math opeartions spherical_to_cartesian, cartesian_to_spherical
 - StringHash constexpr type
 - Pseudo RenderGraph
+- Improve pipeline layout
+
+- Vulkan shader reflection to generate pipeline layout
 
 ## Planned
 

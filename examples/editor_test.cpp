@@ -147,8 +147,7 @@ int main() try {
     auto surface = window.create_surface(instance);
     auto device = vk::Device(
         instance,
-        { .extensions = { VK_KHR_SWAPCHAIN_EXTENSION_NAME },
-          .surface = surface.vk_surface() }
+        {.extensions = {VK_KHR_SWAPCHAIN_EXTENSION_NAME}, .surface = surface}
     );
     auto swapchain = vk::Swapchain(device, surface, window.extent());
 
@@ -168,17 +167,17 @@ int main() try {
     //////////////////
 
     VkDescriptorPoolSize pool_sizes[] = {
-        { VK_DESCRIPTOR_TYPE_SAMPLER, 1000 },
-        { VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1000 },
-        { VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE, 1000 },
-        { VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, 1000 },
-        { VK_DESCRIPTOR_TYPE_UNIFORM_TEXEL_BUFFER, 1000 },
-        { VK_DESCRIPTOR_TYPE_STORAGE_TEXEL_BUFFER, 1000 },
-        { VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 1000 },
-        { VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 1000 },
-        { VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC, 1000 },
-        { VK_DESCRIPTOR_TYPE_STORAGE_BUFFER_DYNAMIC, 1000 },
-        { VK_DESCRIPTOR_TYPE_INPUT_ATTACHMENT, 1000 }
+        {VK_DESCRIPTOR_TYPE_SAMPLER, 1000},
+        {VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 1000},
+        {VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE, 1000},
+        {VK_DESCRIPTOR_TYPE_STORAGE_IMAGE, 1000},
+        {VK_DESCRIPTOR_TYPE_UNIFORM_TEXEL_BUFFER, 1000},
+        {VK_DESCRIPTOR_TYPE_STORAGE_TEXEL_BUFFER, 1000},
+        {VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, 1000},
+        {VK_DESCRIPTOR_TYPE_STORAGE_BUFFER, 1000},
+        {VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC, 1000},
+        {VK_DESCRIPTOR_TYPE_STORAGE_BUFFER_DYNAMIC, 1000},
+        {VK_DESCRIPTOR_TYPE_INPUT_ATTACHMENT, 1000}
     };
 
     VkDescriptorPoolCreateInfo pool_info{};
@@ -190,9 +189,7 @@ int main() try {
 
     // Create ImGui descriptor pool
     VkDescriptorPool imgui_pool;
-    auto res = vkCreateDescriptorPool(
-        device.vk_device(), &pool_info, nullptr, &imgui_pool
-    );
+    auto res = vkCreateDescriptorPool(device, &pool_info, nullptr, &imgui_pool);
     VK_CHECK_MSG(res, "Error creating ImGui descriptor pool");
 
     // Setup Dear ImGui context
@@ -206,8 +203,8 @@ int main() try {
     // This initializes ImGui for Vulkan
     ImGui_ImplVulkan_InitInfo init_info{};
     init_info.Instance = instance.vk_instance();
-    init_info.PhysicalDevice = device.vk_physical_device();
-    init_info.Device = device.vk_device();
+    init_info.PhysicalDevice = device;
+    init_info.Device = device;
     init_info.Queue = device.graphics_queue().vk_queue;
     init_info.DescriptorPool = imgui_pool;
     const uint32_t img_count = swapchain.images().size();
@@ -261,7 +258,7 @@ int main() try {
             render_pass.begin(
                 cmd_buffer,
                 framebuffers[swapchain.current_index()],
-                { VkClearValue{ { { 0.01f, 0.01f, 0.01f, 1.0f } } } }
+                {VkClearValue{{{0.01f, 0.01f, 0.01f, 1.0f}}}}
             );
 
             // vk::cmd_set_viewport(cmd_buffer,
@@ -282,7 +279,7 @@ int main() try {
 
     device.wait_idle();
 
-    vkDestroyDescriptorPool(device.vk_device(), imgui_pool, nullptr);
+    vkDestroyDescriptorPool(device, imgui_pool, nullptr);
     ImGui_ImplVulkan_Shutdown();
 }
 catch (vk::ResultError re) {
