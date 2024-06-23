@@ -1,5 +1,6 @@
 #pragma once
 
+#include "entt/entity/fwd.hpp"
 #include <entt/entt.hpp>
 
 #include <utility>
@@ -15,6 +16,11 @@ public:
 
     static Entity create();
     static void destroy(Entity& entity);
+    static void destroy_all() {
+        for (auto entity : registry.view<entt::entity>()) {
+            registry.destroy(entity);
+        }
+    }
 
     // FIXME: Make this private back private:
 public:

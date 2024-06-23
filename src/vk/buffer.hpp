@@ -1,7 +1,7 @@
 #pragma once
 
-#include "device.hpp"
 #include "cmd_buffer.hpp"
+#include "device.hpp"
 #include "dset.hpp"
 
 #include "vk_mem_alloc.h"
@@ -23,14 +23,13 @@ public:
 
     void upload(const float* vertices);
     void bind(CommandBuffer& cmd_buffer);
-    
+
 private:
-    Device&       m_device;
-    VkBuffer      m_buffer;
-    size_t        m_buffer_size;
+    Device& m_device;
+    VkBuffer m_buffer;
+    size_t m_buffer_size;
     VmaAllocation m_allocation;
 };
-
 
 class IndexBuffer {
 public:
@@ -47,14 +46,13 @@ public:
 
     void upload(const uint32_t* indices);
     void bind(CommandBuffer& cmd_buffer);
-    
+
 private:
-    Device&       m_device;
-    VkBuffer      m_buffer;
-    size_t        m_buffer_size;
+    Device& m_device;
+    VkBuffer m_buffer;
+    size_t m_buffer_size;
     VmaAllocation m_allocation;
 };
-
 
 class UniformBuffer {
 public:
@@ -62,14 +60,15 @@ public:
     ~UniformBuffer();
 
     template<typename T> // TODO: Is uniform trait check
-    void upload(const T* data);
+    void upload(const T& data);
 
+    [[nodiscard]]
     DescriptorInfo info() const;
 
 private:
-    Device&       m_device;
-    VkBuffer      m_buffer;
-    size_t        m_buffer_size;
+    Device& m_device;
+    VkBuffer m_buffer;
+    size_t m_buffer_size;
     VmaAllocation m_allocation;
 };
 
@@ -82,15 +81,15 @@ private:
 namespace kzn::vk {
 
 template<typename T>
-void UniformBuffer::upload(const T* new_data) {
+void UniformBuffer::upload(const T& new_data) {
     // NOTE: Can't be in template requires due to
     // pfr::for_each_field not being constexpr
     // if(glsl::is_uniform<T>()) {
-        // Copy uniform data to GPU
-        void* data;
-        vmaMapMemory(m_device.allocator(), m_allocation, &data);
-        memcpy(data, new_data, m_buffer_size);
-        vmaUnmapMemory(m_device.allocator(), m_allocation);
+    // Copy uniform data to GPU
+    void* data;
+    vmaMapMemory(m_device.allocator(), m_allocation, &data);
+    memcpy(data, &new_data, m_buffer_size);
+    vmaUnmapMemory(m_device.allocator(), m_allocation);
     // }
     // else {
     //     throw NotUniform();

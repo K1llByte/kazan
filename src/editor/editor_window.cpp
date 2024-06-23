@@ -73,10 +73,11 @@ void render_component(SpriteComponent& component) {
             "Sprite Component", ImGuiTreeNodeFlags_DefaultOpen
         )) {
 
-        ImGui::DragFloat2(
-            "Shift", &component.params.shift.x, 0.01f, -1.0f, 1.0f
-        );
-        ImGui::DragFloat2("Size", &component.params.size.x, 0.01f, 0.0f, 10.0f);
+        // ImGui::DragFloat2(
+        //     "Shift", &component.params.shift.x, 0.01f, -1.0f, 1.0f
+        // );
+        // ImGui::DragFloat2("Size", &component.params.size.x, 0.01f,
+        // 0.0f, 10.0f);
     }
 }
 

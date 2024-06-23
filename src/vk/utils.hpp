@@ -2,8 +2,6 @@
 
 #include <array>
 
-#include <glm/glm.hpp>
-
 #include "math/types.hpp"
 #include "vk/cmd_buffer.hpp"
 #include "vk/error.hpp"

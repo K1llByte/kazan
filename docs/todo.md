@@ -19,6 +19,10 @@
     - Virtual dtors
     - backslash-newline
 
+- Make Registry same singleton as Renderer (using the Singleton base class abstraction)
+- Remake ECS Registry abstraction
+- Info component with information about an entities
+- Fix alignment of single float  
 - Create Entities panel (list of selectable entities)
 - Move vk folder to graphics folder
 - Test uniforms without struct

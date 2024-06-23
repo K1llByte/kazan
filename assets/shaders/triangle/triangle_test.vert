@@ -1,11 +1,14 @@
 #version 450
 
+#extension GL_EXT_scalar_block_layout : enable
+
+#define M_PI 3.1415926535897932384626433832795
+
 layout(location = 0) out vec3 vert_color;
 
-layout(set = 0, binding = 0) uniform Params {
-    vec2 size;
-    vec2 shift;
-} params;
+layout(set = 0, binding = 0, scalar) uniform Transform {
+    mat3 mat;
+} transform;
 
 // Triangle
 const vec2 position[] = vec2[] (
@@ -24,7 +27,8 @@ const vec3 colors[] = vec3[](
 
 void main()
 {
-    vec2 pos = position[gl_VertexIndex] * params.size;
-    gl_Position = vec4(pos + params.shift, 0.0, 1.0);
+    const vec3 pos = transform.mat * vec3(position[gl_VertexIndex], 1);
+    gl_Position = vec4(pos.xy, 0.0, 1.0);
+
     vert_color = colors[gl_VertexIndex];
 }
