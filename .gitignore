@@ -1,7 +1,17 @@
 .vscode/
 .xmake/
 .cache/
+# Build folders
 bin/
 build/
-models/**.obj
+# Models and textures, to spare repo size
+assets/models/
+assets/textures/
+# ImGui state
 imgui.ini
+# Docs folder
+docs/
+# Renderdoc frame files
+*.rdc
+# Examples folder
+examples/
