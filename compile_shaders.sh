@@ -12,4 +12,3 @@ else
         glslangValidator -V $filename -o $filename.spv
     done
 fi
-

@@ -141,6 +141,9 @@ void Swapchain::recreate(VkExtent2D new_extent) {
     // Wait until device is idle
     m_device.wait_idle();
 
+    // Take advantage that the device is idle to delete resources
+    m_device.main_deletion_queue().flush();
+
     const auto& support = m_device.find_swapchain_support(m_surface);
 
     // Create new swapchain

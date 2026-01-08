@@ -1,4 +1,5 @@
 #include "utils.hpp"
+#include <vulkan/vulkan_core.h>
 
 namespace kzn {
 
@@ -47,6 +48,48 @@ vk::RenderPass simple_pass(vk::Device& device, VkFormat color_format) {
                 .dstStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT,
                 .srcAccessMask = 0,
                 .dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT,
+            }}
+        }
+    );
+}
+
+vk::RenderPass simple_depth_pass(vk::Device& device, VkFormat color_format) {
+    std::vector attachment_descs{
+        vk::AttachmentDesc{
+            .format = color_format,
+            .load_op = VK_ATTACHMENT_LOAD_OP_CLEAR,
+            .store_op = VK_ATTACHMENT_STORE_OP_STORE,
+            .final_layout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR,
+        },
+        vk::AttachmentDesc{
+            .format = VK_FORMAT_D32_SFLOAT,
+            .load_op = VK_ATTACHMENT_LOAD_OP_CLEAR,
+            .final_layout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL,
+        },
+    };
+    auto color_ref =
+        vk::AttachmentRef{0, VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL};
+    auto depth_ref =
+        vk::AttachmentRef{1, VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL};
+
+    return vk::RenderPass(
+        device,
+        vk::RenderPassParams{
+            .attachments = attachment_descs,
+            .subpasses = {vk::SubpassDesc{
+                .color_attachments = {color_ref},
+                .depth_stencil_attachment = {depth_ref}
+            }},
+            .dependencies = {VkSubpassDependency{
+                .srcSubpass = VK_SUBPASS_EXTERNAL,
+                .dstSubpass = 0,
+                .srcStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT |
+                                VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT,
+                .dstStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT |
+                                VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT,
+                .srcAccessMask = 0,
+                .dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT |
+                                 VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT,
             }}
         }
     );

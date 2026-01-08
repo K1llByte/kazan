@@ -1,74 +1,42 @@
 #pragma once
 
-// #define SINGLETON_USE_ASSERT
-
-#define SINGLETON_THROWS false
-#if defined(SINGLETON_USE_ASSERT)
-#define SINGLETON_CHECK(expr, msg) assert(expr&& msg)
-#elif defined(SINGLETON_USE_THROW)
-#define SINGLETON_CHECK(expr, msg)                                             \
-    if (!expr) {                                                               \
-        throw std::runtime_error(msg)                                          \
-    }
-#define SINGLETON_THROWS true
-#else
-#define SINGLETON_CHECK(expr, msg) (void)nullptr
-#endif
+#include <tuple>
+#include <type_traits>
 
 namespace kzn {
 
-struct NoCopy {
-    NoCopy() = default;
-    NoCopy(const NoCopy&) = delete;
-    NoCopy& operator=(const NoCopy&) = delete;
+template<typename T, typename... U>
+struct is_any_of : std::bool_constant<(std::is_same_v<T, U> || ...)> {};
+
+template<class T, class... U>
+constexpr bool is_any_of_v = is_any_of<T, U...>::value;
+
+//! Helper type trait struct that specifies return type and arguments of
+//! invocables.
+template<typename, typename = std::void_t<>>
+struct FunctionTraits {};
+
+template<typename Return, typename... Args>
+struct FunctionTraits<Return (*)(Args...)> {
+    using ReturnType = Return;
+    using ArgTypes = std::tuple<Args...>;
 };
 
-struct NoMove {
-    NoMove() = default;
-    NoMove(NoMove&&) = delete;
-    NoMove& operator=(NoMove&&) = delete;
+template<typename Return, typename Class, typename... Args>
+struct FunctionTraits<Return (Class::*)(Args...)> {
+    using ReturnType = Return;
+    using ArgTypes = std::tuple<Args...>;
 };
 
-struct NoCopyMove
-    : public NoCopy
-    , public NoMove {};
+template<typename Return, typename Class, typename... Args>
+struct FunctionTraits<Return (Class::*)(Args...) const> {
+    using ReturnType = Return;
+    using ArgTypes = std::tuple<Args...>;
+};
 
-template<typename T>
-class Singleton {
-public:
-    // Ctor
-    Singleton() noexcept(SINGLETON_THROWS) {
-        SINGLETON_CHECK(!exists(), "Instance can only be created once!");
-        s_singleton = static_cast<T*>(this);
-    }
-
-    // No Copy
-    Singleton(const Singleton&) = delete;
-    Singleton& operator=(const Singleton&) = delete;
-
-    // Move
-    Singleton(Singleton&&) { s_singleton = static_cast<T*>(this); }
-    Singleton& operator=(Singleton&&) { s_singleton = static_cast<T*>(this); }
-
-    // Dtor
-    ~Singleton() {
-        if (this == s_singleton) {
-            s_singleton = nullptr;
-        }
-    }
-
-    [[nodiscard]]
-    static bool exists() {
-        return s_singleton != nullptr;
-    }
-
-    [[nodiscard]]
-    static T& singleton() {
-        SINGLETON_CHECK(exists(), "Instance does not exist!");
-        return *s_singleton;
-    }
-
-private:
-    static inline T* s_singleton = nullptr;
+template<typename F>
+struct FunctionTraits<F, std::void_t<decltype(&F::operator())>> {
+    using ReturnType = FunctionTraits<decltype(&F::operator())>::ReturnType;
+    using ArgTypes = FunctionTraits<decltype(&F::operator())>::ArgTypes;
 };
 } // namespace kzn

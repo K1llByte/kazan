@@ -1,5 +1,6 @@
 #pragma once
 
+#include "ecs/context.hpp"
 #include <memory>
 #include <vector>
 
@@ -8,7 +9,14 @@ namespace kzn {
 //! Base class for systems implementations.
 struct System {
     virtual ~System() = default;
+
     virtual void update(float delta_time) = 0;
+
+    template<typename T>
+    [[nodiscard]]
+    T& context() {
+        return Context<T>::get();
+    }
 };
 
 //! System Manager class that owns and updates systems.

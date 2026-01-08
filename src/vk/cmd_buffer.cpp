@@ -1,8 +1,7 @@
 #include "cmd_buffer.hpp"
+#include "core/assert.hpp"
 
 #include <vk/error.hpp>
-
-#include <cassert>
 
 namespace kzn::vk {
 
@@ -39,7 +38,7 @@ void CommandBuffer::reset(VkCommandBufferResetFlags flags) {
 
 CommandPool::CommandPool(Device& device)
     : m_device{device} {
-    assert(device.queue_families().graphics_family.has_value());
+    KZN_ASSERT(device.queue_families().graphics_family.has_value());
     VkCommandPoolCreateInfo pool_info{};
     pool_info.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
     pool_info.flags = VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT;

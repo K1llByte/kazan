@@ -1,9 +1,12 @@
 #pragma once
 
 #include "cmd_buffer.hpp"
+#include "core/log.hpp"
 #include "device.hpp"
+#include "error.hpp"
 
 #include <functional>
+#include <ranges>
 #include <span>
 #include <vector>
 
@@ -74,9 +77,11 @@ private:
 class Framebuffer {
 public:
     // Ctor
+    template<typename C>
+        requires std::ranges::contiguous_range<C> && std::ranges::sized_range<C>
     Framebuffer(
         RenderPass& render_pass,
-        const std::vector<VkImageView>& attachments,
+        const C& attachments,
         VkExtent2D extent
     );
     // Copy
@@ -99,8 +104,35 @@ public:
 
 private:
     Device& m_device;
-    VkFramebuffer m_vk_framebuffer;
+    VkFramebuffer m_vk_framebuffer = VK_NULL_HANDLE;
     VkExtent2D m_extent;
 };
+
+/////////////////////////////////////////////////////////////////
+
+template<typename C>
+    requires std::ranges::contiguous_range<C> && std::ranges::sized_range<C>
+Framebuffer::Framebuffer(
+    RenderPass& render_pass,
+    const C& attachments,
+    VkExtent2D extent
+)
+    : m_device{render_pass.device()}
+    , m_extent{extent} {
+
+    VkFramebufferCreateInfo framebuffer_info{};
+    framebuffer_info.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
+    framebuffer_info.renderPass = render_pass;
+    framebuffer_info.attachmentCount = std::ranges::size(attachments);
+    framebuffer_info.pAttachments = std::ranges::data(attachments);
+    framebuffer_info.width = extent.width;
+    framebuffer_info.height = extent.height;
+    framebuffer_info.layers = 1;
+
+    auto result = vkCreateFramebuffer(
+        m_device, &framebuffer_info, nullptr, &m_vk_framebuffer
+    );
+    VK_CHECK_MSG(result, "Failed to create framebuffer!");
+}
 
 } // namespace kzn::vk

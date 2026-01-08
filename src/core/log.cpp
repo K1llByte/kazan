@@ -7,7 +7,7 @@ void Log::error(std::string_view text) {
 }
 
 void Log::warning(std::string_view text) {
-    fmt::print("[{}WARNING{}] {}\n", BLUE, RESET, text);
+    fmt::print("[{}WARNING{}] {}\n", YELLOW, RESET, text);
 }
 
 void Log::info(std::string_view text) {
@@ -15,7 +15,7 @@ void Log::info(std::string_view text) {
 }
 
 void Log::debug(std::string_view text) {
-    fmt::print("[{}DEBUG{}] {}\n", YELLOW, RESET, text);
+    fmt::print("[{}DEBUG{}] {}\n", BLUE, RESET, text);
 }
 
 void Log::trace(std::string_view text) {

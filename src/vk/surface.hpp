@@ -21,7 +21,7 @@ public:
     operator VkSurfaceKHR() const { return m_surface; }
 
 private:
-    Instance& m_instance;
+    Instance* m_instance_ptr;
     VkSurfaceKHR m_surface;
     // VkSurfaceFormatKHR
     // SurfaceCapabilities

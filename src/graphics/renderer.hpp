@@ -1,9 +1,9 @@
 #pragma once
 
-#include "core/traits.hpp"
+#include "core/assert.hpp"
+#include "core/singleton.hpp"
 #include "vk/dset.hpp"
 #include "vk/dset_layout.hpp"
-#include <cassert>
 #include <core/window.hpp>
 #include <events/event_manager.hpp>
 #include <optional>
@@ -34,15 +34,12 @@ public:
     ~PerFrameData();
 
 private:
-    vk::Device& m_device;
+    vk::Device* m_device_ptr;
 };
-
-//! Renderer events
-struct SwapchainResize : Event {};
 
 class Renderer : public Singleton<Renderer> {
 public:
-    using RenderFrameFunc = std::function<void(vk::CommandBuffer&)>;
+    using RenderFrameFn = std::function<void(vk::CommandBuffer&)>;
 
     // Ctor
     Renderer(Window& window);
@@ -55,32 +52,32 @@ public:
     // Dtor
     ~Renderer() = default;
 
-    void render_frame(const RenderFrameFunc& render_func);
+    void render_frame(const RenderFrameFn& render_func);
 
     // Singleton aware static functions //
     [[nodiscard]]
     static vk::Instance& instance() {
-        assert(exists());
+        KZN_ASSERT(exists());
         return singleton().m_instance;
     }
     [[nodiscard]]
     static vk::Device& device() {
-        assert(exists());
+        KZN_ASSERT(exists());
         return singleton().m_device;
     }
     [[nodiscard]]
     static vk::Swapchain& swapchain() {
-        assert(exists());
+        KZN_ASSERT(exists());
         return singleton().m_swapchain;
     }
     [[nodiscard]]
     static vk::DescriptorSetAllocator& dset_allocator() {
-        assert(exists());
+        KZN_ASSERT(exists());
         return singleton().m_dset_allocator;
     }
     [[nodiscard]]
     static vk::DescriptorSetLayoutCache& dset_layout_cache() {
-        assert(exists());
+        KZN_ASSERT(exists());
         return singleton().m_dset_layout_cache;
     }
 
@@ -96,7 +93,7 @@ private:
     vk::CommandPool m_cmd_pool;
 
     // Synchronization data
-    static constexpr size_t MAX_FRAMES_IN_FLIGHT = 2;
+    static constexpr size_t MAX_FRAMES_IN_FLIGHT = 1;
     size_t m_frame_idx = 0;
     std::vector<PerFrameData> m_frame_data;
 

@@ -1,9 +1,12 @@
 #include "device.hpp"
 
+#include "core/assert.hpp"
 #include "error.hpp"
 #include <core/log.hpp>
+#include <vulkan/vulkan_core.h>
 
 #define VMA_IMPLEMENTATION
+// #define VMA_NOT_
 #include "vk_mem_alloc.h"
 
 #include <tuple>
@@ -13,15 +16,13 @@ namespace kzn::vk {
 
 VkSurfaceFormatKHR SwapchainSupport::select_format() const {
     for (const auto& format : formats) {
-        // if(format.format == VK_FORMAT_R8G8B8A8_UNORM
-        //     && format.colorSpace == VK_COLOR_SPACE_SRGB_NONLINEAR_KHR)
         if (format.format == VK_FORMAT_B8G8R8A8_SRGB &&
             format.colorSpace == VK_COLOR_SPACE_SRGB_NONLINEAR_KHR) {
             return format;
         }
     }
 
-    assert(formats.size() > 0);
+    KZN_ASSERT(formats.size() > 0);
     return formats[0];
 }
 
@@ -319,6 +320,8 @@ Device::Device(Instance& instance, DeviceParams&& params)
 }
 
 Device::~Device() {
+    // Make sure every pending resource is destroye
+    m_main_deletion_queue.flush();
     // Destroy Vma Allocator
     vmaDestroyAllocator(m_vma_allocator);
     // Destroy logical device instance

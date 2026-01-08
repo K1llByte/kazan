@@ -1,10 +1,15 @@
 #pragma once
 
 #include "cmd_buffer.hpp"
+#include "core/assert.hpp"
 #include "device.hpp"
 #include "dset.hpp"
 
+#include "uniform.hpp"
 #include "vk_mem_alloc.h"
+#include <cassert>
+#include <cstdint>
+#include <vulkan/vulkan_core.h>
 
 namespace kzn::vk {
 
@@ -16,16 +21,17 @@ public:
     VertexBuffer(const VertexBuffer&) = delete;
     VertexBuffer& operator=(const VertexBuffer&) = delete;
     // Move
-    VertexBuffer(VertexBuffer&&) = delete;
-    VertexBuffer& operator=(VertexBuffer&&) = delete;
+    VertexBuffer(VertexBuffer&&);
+    VertexBuffer& operator=(VertexBuffer&&);
     // Dtor
     ~VertexBuffer();
 
-    void upload(const float* vertices);
+    void upload(const void* vertices);
+
     void bind(CommandBuffer& cmd_buffer);
 
 private:
-    Device& m_device;
+    Device* m_device_ptr;
     VkBuffer m_buffer;
     size_t m_buffer_size;
     VmaAllocation m_allocation;
@@ -39,34 +45,48 @@ public:
     IndexBuffer(const IndexBuffer&) = delete;
     IndexBuffer& operator=(const IndexBuffer&) = delete;
     // Move
-    IndexBuffer(IndexBuffer&&) = delete;
-    IndexBuffer& operator=(IndexBuffer&&) = delete;
+    IndexBuffer(IndexBuffer&&);
+    IndexBuffer& operator=(IndexBuffer&&);
     // Dtor
     ~IndexBuffer();
 
     void upload(const uint32_t* indices);
+
     void bind(CommandBuffer& cmd_buffer);
 
+    [[nodiscard]]
+    uint32_t size() const {
+        KZN_ASSERT(m_buffer_size % sizeof(uint32_t) == 0);
+        return m_buffer_size / sizeof(uint32_t);
+    }
+
 private:
-    Device& m_device;
+    Device* m_device_ptr;
     VkBuffer m_buffer;
-    size_t m_buffer_size;
+    VkDeviceSize m_buffer_size;
     VmaAllocation m_allocation;
 };
 
 class UniformBuffer {
 public:
+    // Ctor
     UniformBuffer(Device& device, VkDeviceSize buffer_size);
+    // Copy
+    UniformBuffer(const UniformBuffer&) = delete;
+    UniformBuffer& operator=(const UniformBuffer&) = delete;
+    // Move
+    UniformBuffer(UniformBuffer&&);
+    UniformBuffer& operator=(UniformBuffer&&);
+    // Dtor
     ~UniformBuffer();
 
-    template<typename T> // TODO: Is uniform trait check
-    void upload(const T& data);
+    void upload(const glsl::UniformBlock auto& data);
 
     [[nodiscard]]
     DescriptorInfo info() const;
 
 private:
-    Device& m_device;
+    Device* m_device_ptr;
     VkBuffer m_buffer;
     size_t m_buffer_size;
     VmaAllocation m_allocation;
@@ -80,20 +100,12 @@ private:
 
 namespace kzn::vk {
 
-template<typename T>
-void UniformBuffer::upload(const T& new_data) {
-    // NOTE: Can't be in template requires due to
-    // pfr::for_each_field not being constexpr
-    // if(glsl::is_uniform<T>()) {
+void UniformBuffer::upload(const glsl::UniformBlock auto& new_data) {
     // Copy uniform data to GPU
     void* data;
-    vmaMapMemory(m_device.allocator(), m_allocation, &data);
+    vmaMapMemory(m_device_ptr->allocator(), m_allocation, &data);
     memcpy(data, &new_data, m_buffer_size);
-    vmaUnmapMemory(m_device.allocator(), m_allocation);
-    // }
-    // else {
-    //     throw NotUniform();
-    // }
+    vmaUnmapMemory(m_device_ptr->allocator(), m_allocation);
 }
 
 } // namespace kzn::vk

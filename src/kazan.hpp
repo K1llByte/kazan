@@ -22,7 +22,6 @@
 #include "vk/utils.hpp"
 
 // Graphics
-// #include "graphics/graphics_context.hpp"
 #include "graphics/render_system.hpp"
 #include "graphics/renderer.hpp"
 #include "graphics/utils.hpp"
@@ -32,9 +31,8 @@
 #include "ecs/system.hpp"
 
 // Events
-#include "events/event.hpp"
-#include "events/event_handlers.hpp"
 #include "events/event_manager.hpp"
+#include "events/events.hpp"
 
 // Math
 #include "math/transform.hpp"

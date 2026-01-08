@@ -1,64 +1,57 @@
 #pragma once
 
-// #include <boost/pfr.hpp>
-
+#include "boost/pfr/core.hpp"
+#include "core/traits.hpp"
 #include "math/types.hpp"
+#include <type_traits>
 
 //! Helper namespace for GLSL std140 layout compliant algebra types.
 namespace kzn::glsl {
-template<class T, class... U>
-inline constexpr bool is_any_v = (std::is_same_v<T, U> || ...);
 
-// FIXME:
-// - Can't assign glsl::vec3 v = glsl::vec3{1,2,3};
-// - Can't use brace-enclosed initializer list glsl::vec3 v{1,2,3};
 template<typename T, size_t Align>
     requires(Align >= sizeof(T))
-class Uniform : public T {
+class AlignedUniformType : public T {
 public:
     using T::T;
-    Uniform() = default;
-    Uniform(const T& value)
+    AlignedUniformType() = default;
+    AlignedUniformType(const T& value)
         : T(value) {}
-    Uniform(T&& value)
+    AlignedUniformType(T&& value)
         : T(std::move(value)) {}
-    // operator T&() const { return *this; }
 
 private:
-    char padding[Align - sizeof(T)];
+    char m_padding[Align - sizeof(T)];
 };
 
-// Basic types
+// Fundamental types
 using Float = float;
 using Double = double;
 using Int = int;
 using Uint = uint;
 using Bool = bool;
 
-// float
-using Vec2 = Uniform<Vec2, sizeof(Vec2)>;
-using Vec3 = Uniform<Vec3, sizeof(Vec4)>;
-using Vec4 = Uniform<Vec4, sizeof(Vec4)>;
-// double
-using Vec2d = Uniform<Vec2d, sizeof(Vec2d)>;
-using Vec3d = Uniform<Vec3d, sizeof(Vec4d)>;
-using Vec4d = Uniform<Vec4d, sizeof(Vec4d)>;
-// int
-using Vec2i = Uniform<Vec2i, sizeof(Vec2i)>;
-using Vec3i = Uniform<Vec3i, sizeof(Vec4i)>;
-using Vec4i = Uniform<Vec4i, sizeof(Vec4i)>;
-// uint
-using Vec2u = Uniform<Vec2u, sizeof(Vec2u)>;
-using Vec3u = Uniform<Vec3u, sizeof(Vec4u)>;
-using Vec4u = Uniform<Vec4u, sizeof(Vec4u)>;
-// bool
-using Vec2b = Uniform<Vec2b, sizeof(Vec2b)>;
-using Vec3b = Uniform<Vec3b, sizeof(Vec4b)>;
-using Vec4b = Uniform<Vec4b, sizeof(Vec4b)>;
+// float vector types
+using Vec2 = AlignedUniformType<Vec2, sizeof(Vec2)>;
+using Vec3 = AlignedUniformType<Vec3, sizeof(Vec4)>;
+using Vec4 = AlignedUniformType<Vec4, sizeof(Vec4)>;
+// double vector types
+using Vec2d = Vec2d;
+using Vec3d = AlignedUniformType<Vec3d, sizeof(Vec4d)>;
+using Vec4d = AlignedUniformType<Vec4d, sizeof(Vec4d)>;
+// int vector types
+using Vec2i = AlignedUniformType<Vec2i, sizeof(Vec2i)>;
+using Vec3i = AlignedUniformType<Vec3i, sizeof(Vec4i)>;
+using Vec4i = AlignedUniformType<Vec4i, sizeof(Vec4i)>;
+// uint vector types
+using Vec2u = AlignedUniformType<Vec2u, sizeof(Vec2u)>;
+using Vec3u = AlignedUniformType<Vec3u, sizeof(Vec4u)>;
+using Vec4u = AlignedUniformType<Vec4u, sizeof(Vec4u)>;
+// bool vector types
+using Vec2b = AlignedUniformType<Vec2b, sizeof(Vec2b)>;
+using Vec3b = AlignedUniformType<Vec3b, sizeof(Vec4b)>;
+using Vec4b = AlignedUniformType<Vec4b, sizeof(Vec4b)>;
 
-// glm::mat<length_t C, length_t R, typename T>
-
-// float
+// float matrix types
 using Mat2 = Mat2;
 using Mat3 = Mat3;
 using Mat4 = Mat4;
@@ -71,7 +64,7 @@ using Mat34 = Mat34;
 using Mat42 = Mat42;
 using Mat43 = Mat43;
 using Mat44 = Mat44;
-// double
+// double matrix types
 using Mat2d = Mat2d;
 using Mat3d = Mat3d;
 using Mat4d = Mat4d;
@@ -84,58 +77,61 @@ using Mat34d = Mat34d;
 using Mat42d = Mat42d;
 using Mat43d = Mat43d;
 using Mat44d = Mat44d;
-// TODO: Finish this for all needed glsl primitive types
 
-// template<typename T>
-// constexpr bool is_uniform()
-//     requires(std::is_default_constructible_v<T>)
-// {
-//     bool res = true;
-//     boost::pfr::for_each_field(
-//         std::forward<T>(T{}),
-//         [&res]<typename Field>(Field&) {
-//             res = is_any_v<
-//                 Field,
-//                 glsl::Bool,
-//                 glsl::Int,
-//                 glsl::Uint,
-//                 glsl::Float,
-//                 glsl::Double,
-//                 glsl::bvec2,
-//                 glsl::bvec3,
-//                 glsl::bvec4,
-//                 glsl::ivec2,
-//                 glsl::ivec3,
-//                 glsl::ivec4,
-//                 glsl::uvec2,
-//                 glsl::uvec3,
-//                 glsl::uvec4,
-//                 glsl::vec2,
-//                 glsl::vec3,
-//                 glsl::vec4,
-//                 glsl::dvec2,
-//                 glsl::dvec3,
-//                 glsl::dvec4,
-//                 glsl::mat2,
-//                 glsl::mat3,
-//                 glsl::mat4,
-//                 glsl::mat2x3,
-//                 glsl::mat2x4,
-//                 glsl::mat3x2,
-//                 glsl::mat3x4,
-//                 glsl::mat4x2,
-//                 glsl::mat4x3,
-//                 glsl::dmat2,
-//                 glsl::dmat3,
-//                 glsl::dmat4,
-//                 glsl::dmat2x3,
-//                 glsl::dmat2x4,
-//                 glsl::dmat3x2,
-//                 glsl::dmat3x4,
-//                 glsl::dmat4x2,
-//                 glsl::dmat4x3>;
-//         }
-//     );
-//     return res;
-// }
+//! If T is a std140 layout compliant type, provides the member constant value
+//! equal to true. Otherwise value is false.
+template<class T>
+struct is_uniform
+    : is_any_of<
+          T,
+          // clang-format off
+          Float, Double, Int, Uint, Bool,
+          Vec2, Vec3, Vec4,
+          Vec2d, Vec3d, Vec4d,
+          Vec2i, Vec3i, Vec4i,
+          Vec2u, Vec3u, Vec4u,
+          Vec2b, Vec3b, Vec4b,
+          Mat2, Mat3, Mat4,
+          Mat22, Mat23, Mat24,
+          Mat32, Mat33, Mat34,
+          Mat42, Mat43, Mat44,
+          Mat2d, Mat3d, Mat4d,
+          Mat22d, Mat23d, Mat24d,
+          Mat32d, Mat33d, Mat34d,
+          Mat42d, Mat43d, Mat44d
+          // clang-format on
+          > {};
+
+template<class T>
+constexpr bool is_uniform_v = is_uniform<T>::value;
+
+//! Auxiliary function for UniformBlock concept requirements
+template<typename T>
+    requires std::is_default_constructible_v<T>
+[[nodiscard]]
+constexpr bool is_uniform_block() {
+    bool has_non_uniform = false;
+    boost::pfr::for_each_field(T{}, [&has_non_uniform](const auto& field) {
+        if (!glsl::is_uniform_v<std::decay_t<decltype(field)>>) {
+            has_non_uniform = true;
+            return;
+        }
+    });
+    return !has_non_uniform;
+}
+
+//! The concept UniformBlock<T> is satisfied if T is a struct that only contains
+//! std140 layout compliant data members.
+//! \b Example:
+//! \code
+//! struct FooBar {
+//!     glsl::Float foo;
+//!     glsl::Mat43 bar;
+//! };
+//! \endcode
+//! \note A current limitation is that T needs to be default
+//! constructible.
+template<typename T>
+concept UniformBlock = is_uniform_block<T>();
+
 } // namespace kzn::glsl

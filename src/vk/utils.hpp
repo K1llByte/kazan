@@ -2,6 +2,7 @@
 
 #include <array>
 
+#include "core/traits.hpp"
 #include "math/types.hpp"
 #include "vk/cmd_buffer.hpp"
 #include "vk/error.hpp"
@@ -121,7 +122,10 @@ constexpr std::array<VkVertexInputAttributeDescription, N> vertex_attributes(
         else if constexpr (std::is_same_v<T, Vec2i>)
             format = VK_FORMAT_R64_SFLOAT;
         else
-            throw "Invalid vertex input attribute";
+            static_assert(
+                kzn::is_any_of_v<T, float, Vec2, Vec3, Vec4, Vec2i>,
+                "Invalid vertex input attribute type"
+            );
 
         attributes[location] = VkVertexInputAttributeDescription{
             .location = location,

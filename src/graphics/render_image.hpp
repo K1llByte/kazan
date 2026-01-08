@@ -25,18 +25,22 @@ public:
     VkExtent2D extent() const {
         return m_extent;
     }
+
     [[nodiscard]]
     VkImage image() const {
         return m_image;
     }
+
     [[nodiscard]]
     VkImageView image_view() const {
         return m_image_view;
     }
+
     [[nodiscard]]
     VkFormat format() const {
         return m_format;
     }
+
     [[nodiscard]]
     VkSampler sampler() const {
         return m_sampler;

@@ -2,6 +2,7 @@
 
 #include "cmd_buffer.hpp"
 #include "dset_layout.hpp"
+#include <vulkan/vulkan_core.h>
 
 namespace kzn::vk {
 
@@ -58,8 +59,11 @@ public:
 
     const DescriptorSetLayout& layout() const { return m_layout; }
 
-    void bind(vk::CommandBuffer& cmd_buffer, VkPipelineLayout pipeline_layout)
-        const;
+    [[nodiscard]]
+    VkDescriptorSet vk_dset() const noexcept {
+        return m_vk_descriptor_set;
+    }
+
     void update(std::initializer_list<DescriptorInfo> descriptor_infos);
 
 private:

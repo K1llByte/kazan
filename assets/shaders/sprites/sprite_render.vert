@@ -1,24 +1,41 @@
 #version 450
 
-layout(location = 0) out vec3 vert_color;
+#extension GL_EXT_scalar_block_layout : enable
 
-// Triangle
-const vec2 position[] = vec2[] (
-    vec2( 0.0, -0.5),
-    vec2( 0.5,  0.5),
-    vec2(-0.5,  0.5)
-);
+layout(location = 0) in vec3 in_position;
+layout(location = 1) in vec2 in_tex_coords;
 
-// Triangle colors
-const vec3 colors[] = vec3[](
-    vec3(0.984, 0.286, 0.203),
-    vec3(0.556, 0.752, 0.486),
-    vec3(0.513, 0.647, 0.596)
-);
+layout(location = 0) out vec2 out_tex_coords;
 
+layout(set = 0, binding = 0) uniform Camera {
+    vec2 position;
+    float zoom;
+    float aspect_ratio;
+    float rotation;
+} camera;
 
-void main()
-{
-    gl_Position = vec4(position[gl_VertexIndex], 0.0, 1.0);
-    vert_color = colors[gl_VertexIndex];
+layout(push_constant) uniform Pvm {
+	mat4 matrix;
+} pvm;
+
+void main() {
+    // Projection matrix
+    mat4 proj_mat = mat4(1.0);
+    proj_mat[0].x = (1.0 / camera.aspect_ratio) * camera.zoom;
+    proj_mat[1].y = camera.zoom;
+
+    // View matrix
+    mat4 view_mat = mat4(1.0);
+    view_mat[0].xy = vec2(cos(camera.rotation), sin(camera.rotation));
+    view_mat[1].xy = vec2(-sin(camera.rotation), cos(camera.rotation));
+    view_mat[3].xy = vec2(-camera.position.x, camera.position.y);
+
+    gl_Position = proj_mat * view_mat * pvm.matrix * vec4(
+        in_position.x,
+        in_position.y,
+        in_position.z,
+        1.0
+    );
+
+    out_tex_coords = in_tex_coords;
 }

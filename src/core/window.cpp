@@ -1,12 +1,13 @@
 #include "window.hpp"
 
+#include "GLFW/glfw3.h"
 #include "log.hpp"
 // #include "vk/utils.hpp"
 
 namespace kzn {
 
-void framebuffer_resized(GLFWwindow* window, int width, int height) {
-    auto app = static_cast<Window*>(glfwGetWindowUserPointer(window));
+void framebuffer_resized(GLFWwindow* window_ptr, int width, int height) {
+    auto app = static_cast<Window*>(glfwGetWindowUserPointer(window_ptr));
     app->m_has_resized = true;
     app->m_width = width;
     app->m_height = height;
@@ -19,17 +20,16 @@ Window::Window(std::string_view name, int width, int height)
     glfwInit();
     // Turn off OpenGL context initialization
     glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
-
     // Turn off resizable window
     glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
+    // Specify that framebuffer should be SRGB capable
+    glfwWindowHint(GLFW_SRGB_CAPABLE, GLFW_TRUE);
     // Create window
     m_glfw_window =
         glfwCreateWindow(m_width, m_height, name.data(), nullptr, nullptr);
     glfwSetWindowUserPointer(m_glfw_window, this);
-
     // On framebuffer resize callback
     glfwSetFramebufferSizeCallback(m_glfw_window, framebuffer_resized);
-
     // Hide mouse cursor
     // glfwSetInputMode(m_glfw_window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
 

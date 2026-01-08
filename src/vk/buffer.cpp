@@ -1,5 +1,6 @@
 #include "buffer.hpp"
 
+#include "core/assert.hpp"
 #include "utils.hpp"
 
 #include <cstring>
@@ -7,8 +8,8 @@
 namespace kzn::vk {
 
 VertexBuffer::VertexBuffer(Device& device, VkDeviceSize buffer_size)
-    : m_device(device), m_buffer_size(buffer_size)
-{
+    : m_device_ptr{&device}
+    , m_buffer_size(buffer_size) {
     VkBufferCreateInfo buffer_info{};
     buffer_info.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
     buffer_info.size = m_buffer_size;
@@ -18,7 +19,7 @@ VertexBuffer::VertexBuffer(Device& device, VkDeviceSize buffer_size)
     vma_alloc_info.usage = VMA_MEMORY_USAGE_CPU_TO_GPU;
 
     auto result = vmaCreateBuffer(
-        m_device.allocator(),
+        m_device_ptr->allocator(),
         &buffer_info,
         &vma_alloc_info,
         &m_buffer,
@@ -28,32 +29,56 @@ VertexBuffer::VertexBuffer(Device& device, VkDeviceSize buffer_size)
     VK_CHECK_MSG(result, "Failed to create Vertex Buffer");
 }
 
+VertexBuffer::VertexBuffer(VertexBuffer&& other)
+    : m_device_ptr{other.m_device_ptr}
+    , m_buffer{other.m_buffer}
+    , m_buffer_size{other.m_buffer_size}
+    , m_allocation{other.m_allocation} {
+    // Invalidate other instance to avoid deallocation of moved resource.
+    other.m_device_ptr = nullptr;
+}
 
+VertexBuffer& VertexBuffer::operator=(VertexBuffer&& other) {
+    m_device_ptr = other.m_device_ptr;
+    m_buffer = other.m_buffer;
+    m_buffer_size = other.m_buffer_size;
+    m_allocation = other.m_allocation;
+    // Invalidate other instance to avoid deallocation of moved resource.
+    other.m_device_ptr = nullptr;
+    return *this;
+}
 
 VertexBuffer::~VertexBuffer() {
-    vmaDestroyBuffer(m_device.allocator(), m_buffer, m_allocation);
+    if (m_device_ptr != nullptr) {
+        m_device_ptr->main_deletion_queue().enqueue([buffer = m_buffer,
+                                                     allocation = m_allocation,
+                                                     device_ptr =
+                                                         m_device_ptr]() {
+            vmaDestroyBuffer(device_ptr->allocator(), buffer, allocation);
+            // Log::trace("VertexBuffer destroyed");
+        });
+    }
 }
 
-
-void VertexBuffer::upload(const float* vertices) {
+void VertexBuffer::upload(const void* vertices) {
     // Copy vertex data to GPU
     void* data;
-    vmaMapMemory(m_device.allocator(), m_allocation, &data);
+    vmaMapMemory(m_device_ptr->allocator(), m_allocation, &data);
     memcpy(data, vertices, m_buffer_size);
-    vmaUnmapMemory(m_device.allocator(), m_allocation);
+    vmaUnmapMemory(m_device_ptr->allocator(), m_allocation);
 }
-
 
 void VertexBuffer::bind(CommandBuffer& cmd_buffer) {
     // Bind Vertex Buffer
     VkDeviceSize offset = 0;
-    vkCmdBindVertexBuffers(cmd_buffer.vk_cmd_buffer(), 0, 1, &m_buffer, &offset);
+    vkCmdBindVertexBuffers(
+        cmd_buffer.vk_cmd_buffer(), 0, 1, &m_buffer, &offset
+    );
 }
 
-
 IndexBuffer::IndexBuffer(Device& device, VkDeviceSize buffer_size)
-    : m_device(device), m_buffer_size(buffer_size)
-{
+    : m_device_ptr{&device}
+    , m_buffer_size(buffer_size) {
     VkBufferCreateInfo buffer_info{};
     buffer_info.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
     buffer_info.size = m_buffer_size;
@@ -63,7 +88,7 @@ IndexBuffer::IndexBuffer(Device& device, VkDeviceSize buffer_size)
     vma_alloc_info.usage = VMA_MEMORY_USAGE_CPU_TO_GPU;
 
     auto result = vmaCreateBuffer(
-        m_device.allocator(),
+        m_device_ptr->allocator(),
         &buffer_info,
         &vma_alloc_info,
         &m_buffer,
@@ -73,46 +98,71 @@ IndexBuffer::IndexBuffer(Device& device, VkDeviceSize buffer_size)
     VK_CHECK_MSG(result, "Failed to create Index Buffer");
 }
 
-
-IndexBuffer::~IndexBuffer()
-{
-    vmaDestroyBuffer(m_device.allocator(), m_buffer, m_allocation);
+IndexBuffer::IndexBuffer(IndexBuffer&& other)
+    : m_device_ptr{other.m_device_ptr}
+    , m_buffer{other.m_buffer}
+    , m_buffer_size{other.m_buffer_size}
+    , m_allocation{other.m_allocation} {
+    // Invalidate other instance to avoid deallocation of moved resource.
+    other.m_device_ptr = nullptr;
 }
 
+IndexBuffer& IndexBuffer::operator=(IndexBuffer&& other) {
+    m_device_ptr = other.m_device_ptr;
+    m_buffer = other.m_buffer;
+    m_buffer_size = other.m_buffer_size;
+    m_allocation = other.m_allocation;
+    // Invalidate other instance to avoid deallocation of moved resource.
+    other.m_device_ptr = nullptr;
+    return *this;
+}
 
-void IndexBuffer::upload(const uint32_t* indices)
-{
+IndexBuffer::~IndexBuffer() {
+    if (m_device_ptr != nullptr) {
+        m_device_ptr->main_deletion_queue().enqueue([buffer = m_buffer,
+                                                     allocation = m_allocation,
+                                                     device_ptr =
+                                                         m_device_ptr]() {
+            vmaDestroyBuffer(device_ptr->allocator(), buffer, allocation);
+            // Log::trace("IndexBuffer destroyed");
+        });
+    }
+}
+
+void IndexBuffer::upload(const uint32_t* indices) {
     // Copy vertex data to GPU
     void* data;
-    vmaMapMemory(m_device.allocator(), m_allocation, &data);
+    vmaMapMemory(m_device_ptr->allocator(), m_allocation, &data);
     memcpy(data, indices, m_buffer_size);
-    vmaUnmapMemory(m_device.allocator(), m_allocation);
+    vmaUnmapMemory(m_device_ptr->allocator(), m_allocation);
 }
 
-
-void IndexBuffer::bind(CommandBuffer& cmd_buffer)
-{
+void IndexBuffer::bind(CommandBuffer& cmd_buffer) {
     // Bind Index Buffer
-    vkCmdBindIndexBuffer(cmd_buffer.vk_cmd_buffer(), m_buffer, 0, VK_INDEX_TYPE_UINT32);
+    vkCmdBindIndexBuffer(
+        cmd_buffer.vk_cmd_buffer(), m_buffer, 0, VK_INDEX_TYPE_UINT32
+    );
 }
-
 
 UniformBuffer::UniformBuffer(Device& device, VkDeviceSize buffer_size)
-    : m_device{device}, m_buffer_size(buffer_size)
-{
+    : m_device_ptr{&device}
+    , m_buffer_size(buffer_size) {
     VkBufferCreateInfo buffer_info{};
     buffer_info.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
     buffer_info.size = m_buffer_size;
-    buffer_info.usage = VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT;
+    buffer_info.usage =
+        VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT;
 
     VmaAllocationCreateInfo vma_alloc_info{};
-    vma_alloc_info.flags = VMA_ALLOCATION_CREATE_HOST_ACCESS_SEQUENTIAL_WRITE_BIT;
-    vma_alloc_info.usage = VMA_MEMORY_USAGE_AUTO_PREFER_DEVICE ;
+    vma_alloc_info.flags =
+        VMA_ALLOCATION_CREATE_HOST_ACCESS_SEQUENTIAL_WRITE_BIT;
+    vma_alloc_info.usage = VMA_MEMORY_USAGE_AUTO_PREFER_DEVICE;
     vma_alloc_info.requiredFlags = VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT;
-    // vma_alloc_info.usage = VMA_MEMORY_USAGE_AUTO; // VMA_MEMORY_USAGE_CPU_TO_GPU;
+    // vma_alloc_info.usage = VMA_MEMORY_USAGE_AUTO; //
+    // VMA_MEMORY_USAGE_CPU_TO_GPU;
 
     auto result = vmaCreateBuffer(
-        m_device.allocator(),
+        m_device_ptr->allocator(),
         &buffer_info,
         &vma_alloc_info,
         &m_buffer,
@@ -122,19 +172,45 @@ UniformBuffer::UniformBuffer(Device& device, VkDeviceSize buffer_size)
     VK_CHECK_MSG(result, "Failed to create Uniform Buffer");
 }
 
-UniformBuffer::~UniformBuffer()
-{
-    vmaDestroyBuffer(m_device.allocator(), m_buffer, m_allocation);
+UniformBuffer::UniformBuffer(UniformBuffer&& other)
+    : m_device_ptr{other.m_device_ptr}
+    , m_buffer{other.m_buffer}
+    , m_buffer_size{other.m_buffer_size}
+    , m_allocation{other.m_allocation} {
+    // Invalidate other instance to avoid deallocation of moved resource.
+    other.m_device_ptr = nullptr;
 }
 
+UniformBuffer& UniformBuffer::operator=(UniformBuffer&& other) {
+    m_device_ptr = other.m_device_ptr;
+    m_buffer = other.m_buffer;
+    m_buffer_size = other.m_buffer_size;
+    m_allocation = other.m_allocation;
+    // Invalidate other instance to avoid deallocation of moved resource.
+    other.m_device_ptr = nullptr;
+    return *this;
+}
+
+UniformBuffer::~UniformBuffer() {
+    if (m_device_ptr != nullptr) {
+        m_device_ptr->main_deletion_queue().enqueue([buffer = m_buffer,
+                                                     allocation = m_allocation,
+                                                     device_ptr =
+                                                         m_device_ptr]() {
+            vmaDestroyBuffer(device_ptr->allocator(), buffer, allocation);
+            // Log::trace("UniformBuffer destroyed");
+        });
+    }
+}
 
 DescriptorInfo UniformBuffer::info() const {
     return DescriptorInfo{
-        .buffer_info = VkDescriptorBufferInfo{
-            .buffer = m_buffer,
-            .offset = 0,
-            .range = static_cast<uint64_t>(m_buffer_size),
-        }
+        .buffer_info =
+            VkDescriptorBufferInfo{
+                .buffer = m_buffer,
+                .offset = 0,
+                .range = static_cast<uint64_t>(m_buffer_size),
+            }
     };
 }
 } // namespace kzn::vk

@@ -1,9 +1,25 @@
 #pragma once
 
 #include "math/types.hpp"
+
+#include <glm/geometric.hpp>
+
 #include <cmath>
 #include <type_traits>
+
 namespace kzn {
+
+//! Normalize a vector only if vector is non zero
+template<typename V>
+[[nodiscard]]
+constexpr V safe_normalize(V vec) {
+    if (std::fpclassify(glm::dot(vec, vec)) != FP_ZERO) {
+        return glm::normalize(vec);
+    }
+    else {
+        return V{0};
+    }
+}
 
 //! Converts a Vec3 from cartesian to spherical coordinates.
 //! \note Coordinate system is according to OpenGL standard.

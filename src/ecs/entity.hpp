@@ -1,5 +1,7 @@
 #pragma once
 
+#include "core/singleton.hpp"
+#include "entt/entity/entity.hpp"
 #include "entt/entity/fwd.hpp"
 #include <entt/entt.hpp>
 
@@ -10,21 +12,20 @@ namespace kzn {
 class Entity;
 
 //! Singleton wrapper class for managing entities.
-class Registry {
+class Registry : public Singleton<Registry> {
 public:
     friend class Entity;
+    Registry() = default;
+    ~Registry() = default;
+
+    static entt::registry& registry();
 
     static Entity create();
     static void destroy(Entity& entity);
-    static void destroy_all() {
-        for (auto entity : registry.view<entt::entity>()) {
-            registry.destroy(entity);
-        }
-    }
+    static void destroy_all();
 
-    // FIXME: Make this private back private:
-public:
-    static inline entt::registry registry;
+private:
+    entt::registry m_registry;
 };
 
 //! An identifier class that represents a entity
@@ -45,12 +46,21 @@ public:
 
     template<typename Component, typename... Args>
     Component& add_component(Args&&... args);
+
     template<typename Component>
     void remove_component();
+
     template<typename Component>
+    [[nodiscard]]
     Component& get_component();
+
     template<typename Component>
+    [[nodiscard]]
     Component* try_get_component();
+
+    template<typename Component>
+    [[nodiscard]]
+    bool contains_component() const;
 
     [[nodiscard]]
     constexpr entt::entity raw() const {
@@ -68,24 +78,32 @@ private:
 
 template<typename Component, typename... Args>
 Component& Entity::add_component(Args&&... args) {
-    return Registry::registry.emplace<Component>(
+    return Registry::registry().emplace<Component>(
         m_entity, std::forward<Args>(args)...
     );
 }
 
 template<typename Component>
 void Entity::remove_component() {
-    Registry::registry.remove<Component>(m_entity);
+    Registry::registry().remove<Component>(m_entity);
 }
 
 template<typename Component>
+[[nodiscard]]
 Component& Entity::get_component() {
-    return Registry::registry.get<Component>(m_entity);
+    return Registry::registry().get<Component>(m_entity);
 }
 
 template<typename Component>
+[[nodiscard]]
 Component* Entity::try_get_component() {
-    return Registry::registry.try_get<Component>(m_entity);
+    return Registry::registry().try_get<Component>(m_entity);
+}
+
+template<typename Component>
+[[nodiscard]]
+bool Entity::contains_component() const {
+    return Registry::registry().try_get<Component>(m_entity) != nullptr;
 }
 
 } // namespace kzn

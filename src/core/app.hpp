@@ -1,5 +1,7 @@
 #pragma once
 
+#include "vk/error.hpp"
+
 namespace kzn {
 
 //! Pure interface for implementing an app
@@ -9,14 +11,17 @@ struct App {
 
 } // namespace kzn
 
-#define KZN_CREATE_APP(class_name)                                             \
+#define KZN_CREATE_APP(app_type)                                               \
     int main() {                                                               \
         try {                                                                  \
-            class_name app;                                                    \
+            app_type app;                                                      \
             app.run();                                                         \
         }                                                                      \
-        catch (const vk::ResultError& re) {                                    \
-            Log::error("{}", re.message());                                    \
+        catch (const kzn::vk::ResultError& re) {                               \
+            kzn::Log::error("Fatal Error: {}", re.message());                  \
+        }                                                                      \
+        catch (const kzn::LoadingError& le) {                                  \
+            kzn::Log::error("Loading Error: {}", le.message);                  \
         }                                                                      \
         return EXIT_SUCCESS;                                                   \
     }

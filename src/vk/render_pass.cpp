@@ -106,28 +106,28 @@ void RenderPass::end(CommandBuffer& cmd_buffer) {
     vkCmdEndRenderPass(cmd_buffer.vk_cmd_buffer());
 }
 
-Framebuffer::Framebuffer(
-    RenderPass& render_pass,
-    const std::vector<VkImageView>& attachments,
-    VkExtent2D extent
-)
-    : m_device{render_pass.device()}
-    , m_extent{extent} {
+// Framebuffer::Framebuffer(
+//     RenderPass& render_pass,
+//     const std::span<VkImageView> attachments,
+//     VkExtent2D extent
+// )
+//     : m_device{render_pass.device()}
+//     , m_extent{extent} {
 
-    VkFramebufferCreateInfo framebuffer_info{};
-    framebuffer_info.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
-    framebuffer_info.renderPass = render_pass;
-    framebuffer_info.attachmentCount = attachments.size();
-    framebuffer_info.pAttachments = attachments.data();
-    framebuffer_info.width = extent.width;
-    framebuffer_info.height = extent.height;
-    framebuffer_info.layers = 1;
+//     VkFramebufferCreateInfo framebuffer_info{};
+//     framebuffer_info.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
+//     framebuffer_info.renderPass = render_pass;
+//     framebuffer_info.attachmentCount = attachments.size();
+//     framebuffer_info.pAttachments = attachments.data();
+//     framebuffer_info.width = extent.width;
+//     framebuffer_info.height = extent.height;
+//     framebuffer_info.layers = 1;
 
-    auto result = vkCreateFramebuffer(
-        m_device, &framebuffer_info, nullptr, &m_vk_framebuffer
-    );
-    VK_CHECK_MSG(result, "Failed to create framebuffer!");
-}
+//     auto result = vkCreateFramebuffer(
+//         m_device, &framebuffer_info, nullptr, &m_vk_framebuffer
+//     );
+//     VK_CHECK_MSG(result, "Failed to create framebuffer!");
+// }
 
 Framebuffer::Framebuffer(Framebuffer&& other)
     : m_device{other.m_device}

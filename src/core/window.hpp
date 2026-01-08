@@ -13,6 +13,8 @@
 
 namespace kzn {
 
+class Input;
+
 class Window {
     friend void framebuffer_resized(GLFWwindow*, int, int);
 
@@ -30,10 +32,14 @@ public:
 
     [[nodiscard]]
     bool is_closed() const;
+
     void poll_events() const;
+
     void set_title(std::string_view name);
+
     // TODO: Remove when event system is implemented
     void set_resized(bool resized);
+
     vk::Surface create_surface(vk::Instance& instance);
 
     VkExtent2D extent();
@@ -50,10 +56,21 @@ public:
     std::vector<const char*> required_extensions() const;
 
 private:
+    friend class Input;
+
+    [[nodiscard]]
+    Input* input() {
+        return m_input_ptr;
+    }
+
+    void set_input(Input* input_ptr) { m_input_ptr = input_ptr; }
+
+private:
     GLFWwindow* m_glfw_window;
     int m_width = 800;
     int m_height = 600;
     bool m_has_resized; // TODO: Remove when event system is implemented
+    Input* m_input_ptr = nullptr;
 };
 
 } // namespace kzn

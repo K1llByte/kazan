@@ -131,22 +131,6 @@ DescriptorSet::DescriptorSet(
     , m_layout{std::move(layout)} {
 }
 
-void DescriptorSet::bind(
-    vk::CommandBuffer& cmd_buffer,
-    VkPipelineLayout pipeline_layout
-) const {
-    vkCmdBindDescriptorSets(
-        cmd_buffer.vk_cmd_buffer(),
-        VK_PIPELINE_BIND_POINT_GRAPHICS,
-        pipeline_layout,
-        0,
-        1,
-        &m_vk_descriptor_set,
-        0,
-        nullptr
-    );
-}
-
 void DescriptorSet::update(
     std::initializer_list<DescriptorInfo> descriptor_infos
 ) {

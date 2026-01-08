@@ -7,9 +7,15 @@ This project is an experimental computer graphics engine for experimentation and
 ## Building
 
 ```sh
+# Clone repository
 git clone git@github.com:K1llByte/kazan.git
 cd kazan
-xmake build kazui
+
+# Build project
+cmake -Bbuild && cmake --build build
+
+# Compile shaders before using
+./compile_shaders.sh
 ```
 
 ___
