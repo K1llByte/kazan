@@ -32,6 +32,8 @@ public:
 
     [[nodiscard]]
     bool is_closed() const;
+    //! Sets the value of the close flag of the specified window.
+    void close() { glfwSetWindowShouldClose(m_glfw_window, GLFW_TRUE); }
 
     void poll_events() const;
 

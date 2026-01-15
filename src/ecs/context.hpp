@@ -1,7 +1,6 @@
 #pragma once
 
 #include "core/assert.hpp"
-#include "ecs/system.hpp"
 #include <typeindex>
 #include <unordered_map>
 #include <utility>

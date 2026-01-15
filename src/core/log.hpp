@@ -14,8 +14,7 @@
 
 namespace kzn {
 
-class Log {
-public:
+struct Log {
     // Simple string versions
     // Ex: Log::info("Hello World!") will write
     // [INFO] Hello World!

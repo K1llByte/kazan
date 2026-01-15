@@ -77,7 +77,7 @@ FetchContent_Declare(box2d
 )
 FetchContent_MakeAvailable(box2d)
 
-################################## Main Target ##################################
+################################## Kazan Target #################################
 
 # Kazan Library
 file(GLOB KAZAN_SOURCES
@@ -122,6 +122,23 @@ target_compile_definitions(KazanLib
 )
 set_target_properties(KazanLib PROPERTIES
     OUTPUT_NAME "kazan"
+)
+
+################################## Test Target ##################################
+
+add_executable(TestBin "src/test/main.cpp")
+target_link_libraries(TestBin PRIVATE KazanLib)
+
+target_include_directories(TestBin PUBLIC ${KAZAN_INCLUDE_PATH})
+target_compile_definitions(TestBin
+    PUBLIC
+      $<$<CONFIG:Debug>:DEBUG>
+      $<$<CONFIG:RelWithDebInfo>:DEBUG>
+      $<$<CONFIG:Release>:RELEASE>
+      $<$<CONFIG:MinSizeRel>:RELEASE>
+)
+set_target_properties(TestBin PROPERTIES
+    OUTPUT_NAME "kazantest"
 )
 
 ################################# Clang Options #################################

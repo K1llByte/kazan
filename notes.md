@@ -3,20 +3,24 @@
 - [x] Add versioned cmake dependencies
 - [x] Refactor CMakeLists.txt to allow adding kazan/paperlib as a submodule and write a simple application using engine
 - [x] Make BitMayhem compile again
-- [ ] Disable warnings for external libs
-- [ ] Deal with relative engine/app path
-- [ ] Study and integrate Vulkan dynamic rendering
+- [-] Disable warnings for external libs
+- [x] Unify paper and kazan into same lib
+- [ ] Test example that just displays a texture
+- [ ] Refactor Renderer into a non singleton
+    - [ ] Remove Singleton base class
+- [ ] Fix imgui dynamic rendering problem
+- [ ] BasicApp with override method update(float delta)
+- [ ] Brainstorm a way to costumize render stages in the RenderSystem
+- [ ] Brainstorm how to deal with relative engine/app path
 - [ ] Write small cli to create application and help
   - `kzn compile shaders`
   - `kzn create example_app`
   - `kzn clean`
   - `kzn build`
-- [ ] Brainstorm how to unify paper and kazan into same lib
+
 
 - Make SpriteGeometryCache work like a ref counted allocator, when theres no more references left, destroy the geometry
 - Current approach for default material is not working, brainstorm a MaterialCache that has a default material.
-
-
 
 - Hierarchy component
     - A way to parent entities to each other
