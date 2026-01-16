@@ -68,7 +68,6 @@ public:
             init_info.PipelineInfoMain.RenderPass = render_pass;
             init_info.PipelineInfoMain.MSAASamples = VK_SAMPLE_COUNT_1_BIT;
 
-
             ImGui_ImplVulkan_Init(&init_info);
         }
     }

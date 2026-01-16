@@ -3,15 +3,15 @@
 #include "editor/panel.hpp"
 #include "input/input.hpp"
 
-#include "imgui.h"
+#include <imgui.h>
 
 namespace kzn {
 
-class TestPanel
+class DemoPanel
     : public Panel
     , public EventListener {
 public:
-    TestPanel() { listen(&TestPanel::on_key_event); }
+    DemoPanel() { listen(&DemoPanel::on_key_event); }
 
     void update(float delta_time) override {
         if (m_enabled) {

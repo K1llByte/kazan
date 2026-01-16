@@ -6,7 +6,7 @@
 #include "ecs/system.hpp"
 #include "editor/console_panel.hpp"
 #include "editor/panel.hpp"
-#include "editor/test_panel.hpp"
+#include "editor/demo_panel.hpp"
 #include "input/input.hpp"
 #include "vk/cmd_buffer.hpp"
 
@@ -21,6 +21,8 @@
 
 namespace kzn {
 
+// Dependencies:
+// - Needs to be initialized before RenderSystem
 class EditorSystem : public System {
 public:
     // Ctor
@@ -53,12 +55,12 @@ public:
         // - Read 'docs/FONTS.md' for more instructions and details.
         io.Fonts->AddFontFromFileTTF("assets/fonts/ruda.bold.ttf", 18.0f);
 
-        // set_theme();
-        ImGui::StyleColorsDark();
+        set_theme();
+        // ImGui::StyleColorsDark();
 
         // Initialize default panels
         emplace_panel<ConsolePanel>(window, *m_console_ptr);
-        emplace_panel<TestPanel>();
+        emplace_panel<DemoPanel>();
     }
     // Copy
     EditorSystem(const EditorSystem&) = delete;
@@ -93,6 +95,8 @@ public:
     }
 
     void set_theme() {
+        ImVec4* colors = ImGui::GetStyle().Colors;
+        
         // auto& colors = ImGui::GetStyle().Colors;
         // colors[ImGuiCol_WindowBg] = ImVec4{0.1f, 0.1f, 0.13f, 1.0f};
         // colors[ImGuiCol_MenuBarBg] = ImVec4{0.16f, 0.16f, 0.21f, 1.0f};
@@ -176,7 +180,6 @@ public:
         // style.ChildRounding = 4;
 
         ImGuiStyle* style = &ImGui::GetStyle();
-        ImVec4* colors = style->Colors;
 
         auto debug_color = ImVec4(1.00, 0.00, 0.00, 1.00);
 
@@ -244,6 +247,11 @@ public:
         colors[ImGuiCol_NavWindowingHighlight] = ImVec4(1.00, 1.00, 1.00, 0.70);
         colors[ImGuiCol_NavWindowingDimBg] = ImVec4(0.60, 0.60, 0.60, 0.20);
         colors[ImGuiCol_ModalWindowDimBg] = ImVec4(0.60, 0.60, 0.60, 0.35);
+
+        /////////////////////////////////////////////////////////////////////////
+
+        colors[ImGuiCol_WindowBg]               = ImVec4(0.00f, 0.00f, 0.00f, 0.96f);
+        colors[ImGuiCol_FrameBg]                = ImVec4(0.00f, 0.00f, 0.00f, 0.20f);
     }
 
 private:

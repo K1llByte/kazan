@@ -1,3 +1,4 @@
+#include "core/app.hpp"
 #include "core/basic_app.hpp"
 #include "graphics/render_system.hpp"
 #include "graphics/sprite_component.hpp"
@@ -20,7 +21,7 @@ struct TestApp : public BasicApp {
     TestApp()
         : BasicApp() {
 
-        // Initialize systemsW
+        // Initialize systems
         m_systems.emplace<EditorSystem>(m_window, m_input, m_console);
         m_systems.emplace<RenderSystem>();
 
@@ -29,16 +30,4 @@ struct TestApp : public BasicApp {
     }
 };
 
-int main() {
-    try {
-        TestApp app;
-        app.run();
-    }
-    catch (const vk::ResultError& re) {
-        Log::error("Fatal Error: {}", re.message());
-    }
-    catch (const LoadingError& le) {
-        Log::error("Loading Error: {}", le.message);
-    }
-    return EXIT_SUCCESS;
-}
+KZN_CREATE_APP(TestApp)

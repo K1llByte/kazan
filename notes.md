@@ -8,10 +8,11 @@
 - [x] BasicApp base class
 - [x] Test example that just displays a texture
 - [ ] Refactor Renderer into a non singleton
-    - [ ] Remove Singleton base class
-- [ ] Fix imgui dynamic rendering problem
-- [ ] Brainstorm a way to costumize render stages in the RenderSystem
+- [ ] Refactor Registry into a non singleton
+- [ ] Remove Singleton base class
+- [ ] Reuse simple imgui overlay to display text information such as rendering info
 - [ ] Brainstorm how to deal with relative engine/app path
+- [ ] Brainstorm a way to costumize render stages in the RenderSystem
 - [ ] Write small cli to create application and help
   - `kzn compile shaders`
   - `kzn create example_app`
