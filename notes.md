@@ -5,11 +5,11 @@
 - [x] Make BitMayhem compile again
 - [-] Disable warnings for external libs
 - [x] Unify paper and kazan into same lib
-- [ ] Test example that just displays a texture
+- [x] BasicApp base class
+- [x] Test example that just displays a texture
 - [ ] Refactor Renderer into a non singleton
     - [ ] Remove Singleton base class
 - [ ] Fix imgui dynamic rendering problem
-- [ ] BasicApp with override method update(float delta)
 - [ ] Brainstorm a way to costumize render stages in the RenderSystem
 - [ ] Brainstorm how to deal with relative engine/app path
 - [ ] Write small cli to create application and help

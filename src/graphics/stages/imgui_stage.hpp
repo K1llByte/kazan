@@ -65,6 +65,9 @@ public:
                 static_cast<uint32_t>(Renderer::swapchain().images().size());
             init_info.MinImageCount = img_count;
             init_info.ImageCount = img_count;
+            init_info.PipelineInfoMain.RenderPass = render_pass;
+            init_info.PipelineInfoMain.MSAASamples = VK_SAMPLE_COUNT_1_BIT;
+
 
             ImGui_ImplVulkan_Init(&init_info);
         }

@@ -25,4 +25,4 @@ https://www.khronos.org/registry/vulkan/specs/1.0-wsi_extensions/pdf/vkspec.pdf
 https://www.khronos.org/files/vulkan11-reference-guide.pdf  
 https://vulkan-tutorial.com/Development_environment#page_Linux  
 https://vkguide.dev/  
-https://learnopengl.com/  
+https://learnopengl.com/

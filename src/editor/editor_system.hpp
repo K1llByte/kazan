@@ -10,9 +10,9 @@
 #include "input/input.hpp"
 #include "vk/cmd_buffer.hpp"
 
-#include "backends/imgui_impl_vulkan.h"
-#include "imgui.h"
-#include "imgui_internal.h"
+#include <backends/imgui_impl_vulkan.h>
+#include <imgui.h>
+#include <imgui_internal.h>
 #include <backends/imgui_impl_glfw.h>
 
 #include <memory>
@@ -51,8 +51,6 @@ public:
         // ImFontAtlas::Build()/GetTexDataAsXXXX(), which
         // ImGui_ImplXXXX_NewFrame below will call.
         // - Read 'docs/FONTS.md' for more instructions and details.
-        // - Remember that in C/C++ if you want to include a backslash \ in a
-        // string literal you need to write a double backslash \\ !
         io.Fonts->AddFontFromFileTTF("assets/fonts/ruda.bold.ttf", 18.0f);
 
         // set_theme();

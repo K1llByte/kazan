@@ -179,7 +179,7 @@ void RenderSystem::update(float delta_time) {
 
         m_sprite_stage.render(cmd_buffer);
         m_debug_stage.render(cmd_buffer);
-        // m_imgui_stage.render(cmd_buffer);
+        m_imgui_stage.render(cmd_buffer);
 
         m_screen_render_pass.end(cmd_buffer);
     });

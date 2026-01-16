@@ -1,10 +1,9 @@
 #include "core/basic_app.hpp"
 #include "graphics/render_system.hpp"
 #include "graphics/sprite_component.hpp"
+#include "editor/editor_system.hpp"
 
 using namespace kzn;
-
-namespace test {
 
 inline void create_test_level() {
     auto entity = Registry::create();
@@ -12,15 +11,17 @@ inline void create_test_level() {
     entity.add_component<SpriteComponent>();
 
     auto camera = Registry::create();
-    camera.add_component<Camera2DComponent>();
+    camera.add_component<Camera2DComponent>(
+        Camera2DComponent{.use_viewport_aspect_ratio = true,}
+    );
 }
 
-struct TestApp : public kzn::BasicApp {
+struct TestApp : public BasicApp {
     TestApp()
         : BasicApp() {
 
-        // Initialize systems
-        // m_systems.emplace<EditorSystem>(m_window, m_input, m_console);
+        // Initialize systemsW
+        m_systems.emplace<EditorSystem>(m_window, m_input, m_console);
         m_systems.emplace<RenderSystem>();
 
         // Load level entities
@@ -28,18 +29,16 @@ struct TestApp : public kzn::BasicApp {
     }
 };
 
-} // namespace test
-
 int main() {
     try {
-        test::TestApp app;
+        TestApp app;
         app.run();
     }
-    catch (const kzn::vk::ResultError& re) {
-        kzn::Log::error("Fatal Error: {}", re.message());
+    catch (const vk::ResultError& re) {
+        Log::error("Fatal Error: {}", re.message());
     }
-    catch (const kzn::LoadingError& le) {
-        kzn::Log::error("Loading Error: {}", le.message);
+    catch (const LoadingError& le) {
+        Log::error("Loading Error: {}", le.message);
     }
     return EXIT_SUCCESS;
 }
