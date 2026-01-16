@@ -30,6 +30,12 @@ public:
 
     void update(float delta_time) override {
         if (m_enabled) {
+            ImGui::PushStyleColor(
+                ImGuiCol_WindowBg, ImVec4(0.001f, 0.001f, 0.001f, 0.46f)
+            );
+            ImGui::PushStyleColor(
+                ImGuiCol_FrameBg, ImVec4(0.00f, 0.00f, 0.00f, 0.99f)
+            );
             ImGui::PushStyleVar(
                 ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f)
             );
@@ -144,8 +150,8 @@ public:
 
             ImGui::PopItemWidth();
             ImGui::End();
-            ImGui::PopStyleVar();
-            ImGui::PopStyleVar();
+            ImGui::PopStyleVar(2);
+            ImGui::PopStyleColor(2);
         }
     }
 
@@ -267,6 +273,13 @@ public:
             event.action == InputAction::Release) {
             set_enabled(!m_enabled);
         }
+    }
+
+    void set_theme() {
+        auto colors_ptr = ImGui::GetStyle().Colors;
+
+        colors_ptr[ImGuiCol_WindowBg] = ImVec4(0.00f, 0.00f, 0.00f, 0.96f);
+        colors_ptr[ImGuiCol_FrameBg] = ImVec4(0.00f, 0.00f, 0.00f, 0.20f);
     }
 
 private:

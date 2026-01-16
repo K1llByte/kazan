@@ -7,6 +7,7 @@
 - [x] Unify paper and kazan into same lib
 - [x] BasicApp base class
 - [x] Test example that just displays a texture
+- [ ] Change console colors
 - [ ] Refactor Renderer into a non singleton
 - [ ] Refactor Registry into a non singleton
 - [ ] Remove Singleton base class

@@ -1,8 +1,7 @@
 #pragma once
 
 #include "core/assert.hpp"
-#include <typeindex>
-#include <unordered_map>
+
 #include <utility>
 
 namespace kzn {
