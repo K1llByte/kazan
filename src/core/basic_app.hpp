@@ -4,6 +4,7 @@
 #include "core/window.hpp"
 #include "ecs/context.hpp"
 #include "ecs/entity.hpp"
+#include "ecs/scheduler.hpp"
 #include "ecs/system.hpp"
 #include "graphics/renderer.hpp"
 #include "input/input.hpp"
@@ -13,7 +14,10 @@ namespace kzn {
 class BasicApp : public App {
 public:
     BasicApp()
-        : m_window("test app", 800, 600)
+        : BasicApp("test app", 800, 600) {}
+
+    BasicApp(std::string_view name, int width, int height)
+        : m_window(name, width, height)
         , m_input(m_window)
         , m_renderer(m_window) {
 
@@ -24,6 +28,8 @@ public:
     ~BasicApp() {}
 
     void run() override {
+        auto executor = m_systems.build();
+
         // Game loop
         float accum_time = 0.f;
         while (!m_window.is_closed()) {
@@ -42,7 +48,7 @@ public:
             }
 
             // Update systems
-            m_systems.update(frame_time);
+            executor.update(frame_time);
         }
     }
 
@@ -52,7 +58,7 @@ protected:
     Context<Console> m_console;
     Renderer m_renderer;
     Registry m_registry;
-    SystemManager m_systems;
+    Scheduler m_systems;
 };
 
 } // namespace kzn

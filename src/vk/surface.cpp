@@ -10,7 +10,7 @@ Surface::Surface(Instance& instance, VkSurfaceKHR surface)
     : m_instance_ptr{&instance}
     , m_surface(surface) {
     KZN_ASSERT_MSG(
-        m_surface != VK_NULL_HANDLE, "Surface cannot be created with null!"
+        m_surface != VK_NULL_HANDLE, "Surface cannot be created with null"
     );
     // TODO: Get format and capabilities
     Log::trace("Surface created");

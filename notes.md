@@ -7,7 +7,10 @@
 - [x] Unify paper and kazan into same lib
 - [x] BasicApp base class
 - [x] Test example that just displays a texture
-- [ ] Change console colors
+- [x] Change console colors
+- [x] Simple system scheduler (DAG + topologycal sort)
+    - [ ] Express dependencies using associated type `using Before = TypeList<RenderSystem>`
+- [ ] Make EditorSystem only initialize after RenderSystem, since it depends on it and the renderer
 - [ ] Refactor Renderer into a non singleton
 - [ ] Refactor Registry into a non singleton
 - [ ] Remove Singleton base class

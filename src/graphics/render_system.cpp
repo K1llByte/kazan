@@ -1,29 +1,21 @@
 #include "render_system.hpp"
 
+#include "core/assert.hpp"
 #include "core/console.hpp"
 #include "core/log.hpp"
 #include "core/type.hpp"
 #include "ecs/entity.hpp"
-#include "entt/entity/entity.hpp"
-#include "events/event_manager.hpp"
+
 #include "events/events.hpp"
-#include "glm/matrix.hpp"
 #include "graphics/renderer.hpp"
-#include "graphics/sprite_geom_cache.hpp"
 #include "graphics/stages/imgui_stage.hpp"
 #include "graphics/utils.hpp"
-#include "imgui.h"
 #include "math/transform.hpp"
 #include "math/types.hpp"
-#include "sprite_component.hpp"
 #include "vk/buffer.hpp"
-#include "vk/cmd_buffer.hpp"
 #include "vk/dset_layout.hpp"
-#include "vk/functions.hpp"
 #include "vk/image.hpp"
-#include "vk/pipeline.hpp"
 #include "vk/uniform.hpp"
-#include "vk/utils.hpp"
 
 // clang-format off
 #include <backends/imgui_impl_glfw.h>
@@ -36,10 +28,6 @@
 #include <array>
 
 namespace kzn {
-
-// struct PvmPushData {
-//     glsl::Mat4 matrix = {};
-// };
 
 std::vector<vk::Framebuffer> create_framebuffers(
     vk::RenderPass& render_pass,
@@ -98,7 +86,7 @@ RenderSystem::RenderSystem()
       )}
     , m_sprite_stage(m_screen_render_pass, m_camera_dset)
     , m_debug_stage(m_screen_render_pass, m_camera_dset)
-    , m_imgui_stage(m_screen_render_pass) {
+    , m_imgui_stage_opt(std::nullopt) {
 
     context<Console>().create_cmd("debug_render", [this]() {
         m_debug_stage.enable(!m_debug_stage.is_enabled());
@@ -109,6 +97,7 @@ RenderSystem::RenderSystem()
 
     // Listen to renderer swapchain resize event
     listen(&RenderSystem::on_swapchain_resize);
+    listen(&RenderSystem::on_editor_init);
 }
 
 RenderSystem::~RenderSystem() {
@@ -121,7 +110,9 @@ void RenderSystem::update(float delta_time) {
     // Pre-render
     m_sprite_stage.pre_render();
     m_debug_stage.pre_render();
-    m_imgui_stage.pre_render();
+    if (m_imgui_stage_opt) {
+        m_imgui_stage_opt->pre_render();
+    }
 
     // Select rendering camera otherwise choose default camera params.
     entt::entity camera_entity = entt::null;
@@ -179,7 +170,9 @@ void RenderSystem::update(float delta_time) {
 
         m_sprite_stage.render(cmd_buffer);
         m_debug_stage.render(cmd_buffer);
-        m_imgui_stage.render(cmd_buffer);
+        if (m_imgui_stage_opt) {
+            m_imgui_stage_opt->render(cmd_buffer);
+        }
 
         m_screen_render_pass.end(cmd_buffer);
     });
@@ -196,6 +189,15 @@ void RenderSystem::on_swapchain_resize(const SwapchainResizeEvent&) {
         VK_IMAGE_ASPECT_DEPTH_BIT
     );
     m_framebuffers = create_framebuffers(m_screen_render_pass, m_depth_image);
+}
+
+void RenderSystem::on_editor_init(const EditorInitEvent&) {
+    KZN_ASSERT_MSG(
+        !m_imgui_stage_opt.has_value(),
+        "ImGuiStage already injected in RenderSystem"
+    );
+
+    m_imgui_stage_opt.emplace(m_screen_render_pass);
 }
 
 } // namespace kzn

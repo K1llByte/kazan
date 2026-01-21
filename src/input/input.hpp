@@ -89,7 +89,7 @@ public:
     [[nodiscard]]
     const Gamepad& gamepad(GamepadId gamepad_id) const {
         KZN_ASSERT_MSG(
-            static_cast<int>(gamepad_id) < gamepad_count, "Invalid GamepadId!"
+            static_cast<int>(gamepad_id) < gamepad_count, "Invalid GamepadId"
         );
         return m_gamepads[(static_cast<int>(gamepad_id))];
     }

@@ -1,19 +1,14 @@
 #pragma once
 
-#include "graphics/renderer.hpp"
 #include "graphics/sprite_geom_cache.hpp"
 #include "graphics/sprite_material.hpp"
-#include "graphics/texture.hpp"
-#include "math/types.hpp"
-#include "resources/resources.hpp"
-#include "vk/buffer.hpp"
-#include "vk/image.hpp"
 #include "vk/uniform.hpp"
-#include <filesystem>
+
 #include <memory>
 
 namespace kzn {
 
+// FIXME: Shouldn't load statically
 static inline auto s_default_material =
     std::make_shared<SpriteMaterial>("assets/textures/debug.png");
 

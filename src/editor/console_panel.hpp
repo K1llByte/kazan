@@ -1,16 +1,16 @@
 #pragma once
 
 #include "core/console.hpp"
-#include "core/log.hpp"
 #include "editor/panel.hpp"
 #include "events/event_manager.hpp"
-#include "fmt/format.h"
-#include "imgui.h"
-#include "input/input.hpp"
-#include "input/keyboard.hpp"
+
+#include <fmt/format.h>
+#include <imgui.h>
+#include <input/input.hpp>
+#include <input/keyboard.hpp>
+
 #include <algorithm>
 #include <cstring>
-#include <numeric>
 #include <ranges>
 #include <string_view>
 

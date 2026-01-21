@@ -3,31 +3,18 @@
 #include "ecs/system.hpp"
 #include "events/event_manager.hpp"
 #include "events/events.hpp"
-#include "graphics/debug_render.hpp"
-#include "graphics/renderer.hpp"
-#include "graphics/sprite_geom_cache.hpp"
 #include "graphics/stages/debug_stage.hpp"
 #include "graphics/stages/imgui_stage.hpp"
 #include "graphics/stages/sprite_stage.hpp"
-#include "graphics/texture.hpp"
-#include "math/transform.hpp"
 #include "math/types.hpp"
-#include "resources/resources.hpp"
 #include "vk/buffer.hpp"
 #include "vk/dset.hpp"
-#include "vk/dset_layout.hpp"
 #include "vk/image.hpp"
-#include "vk/pipeline.hpp"
 #include "vk/render_pass.hpp"
 #include "vk/uniform.hpp"
 
-#include "boost/pfr/core_name.hpp"
-
-#include <array>
-#include <cstdint>
-#include <memory>
-#include <span>
-#include <string_view>
+#include <boost/pfr/core_name.hpp>
+#include <optional>
 #include <vulkan/vulkan_core.h>
 
 #define KZN_ENABLE_EDITOR
@@ -89,10 +76,11 @@ private:
     // Stages
     SpriteStage m_sprite_stage;
     DebugStage m_debug_stage;
-    ImGuiStage m_imgui_stage;
+    std::optional<ImGuiStage> m_imgui_stage_opt;
 
 private:
     void on_swapchain_resize(const SwapchainResizeEvent&);
+    void on_editor_init(const EditorInitEvent&);
 };
 
 } // namespace kzn

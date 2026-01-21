@@ -3,6 +3,7 @@
 #ifndef KZN_DISABLE_ASSERT
 
 #include "core/log.hpp"
+
 #include <cassert>
 
 #define KZN_ASSERT_MSG(expression, msg, ...)                                   \
