@@ -6,7 +6,6 @@
 #include "vk/dset_layout.hpp"
 #include <core/window.hpp>
 #include <events/event_manager.hpp>
-#include <optional>
 #include <vk/cmd_buffer.hpp>
 #include <vk/device.hpp>
 #include <vk/swapchain.hpp>

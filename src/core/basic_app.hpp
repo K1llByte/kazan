@@ -5,7 +5,6 @@
 #include "ecs/context.hpp"
 #include "ecs/entity.hpp"
 #include "ecs/scheduler.hpp"
-#include "ecs/system.hpp"
 #include "graphics/renderer.hpp"
 #include "input/input.hpp"
 
@@ -40,15 +39,16 @@ public:
             // Update window events and input state
             m_window.poll_events();
             m_input.update_state();
+            
+            // Update systems
+            executor.update(frame_time);
+            
             // Update FPS in window title every seconds
             if (accum_time > 1.f) {
                 auto title = fmt::format("FPS: {:.0f}", 1.f / frame_time);
                 m_window.set_title(title);
                 accum_time = 0.f;
             }
-
-            // Update systems
-            executor.update(frame_time);
         }
     }
 
