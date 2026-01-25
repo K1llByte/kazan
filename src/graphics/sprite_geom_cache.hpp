@@ -2,6 +2,7 @@
 
 #include "core/log.hpp"
 #include "core/string_hash.hpp"
+#include "core/type.hpp"
 #include "graphics/renderer.hpp"
 #include "vk/buffer.hpp"
 #include <cstddef>
@@ -26,7 +27,7 @@ struct SpriteGeometry {
 class SpriteGeometryCache {
 public:
     // Ctor
-    SpriteGeometryCache() = default;
+    SpriteGeometryCache(Renderer& renderer) : m_renderer_ptr{&renderer} {}
     // Copy
     SpriteGeometryCache(const SpriteGeometryCache&) = delete;
     SpriteGeometryCache& operator=(const SpriteGeometryCache&) = delete;
@@ -63,7 +64,7 @@ public:
         else {
             // Create vertex buffer
             auto quad_vbo =
-                vk::VertexBuffer(Renderer::device(), sizeof(Vertex2D) * 4);
+                vk::VertexBuffer(m_renderer_ptr->device(), sizeof(Vertex2D) * 4);
 
             // Upload quad vertex data to vertex buffer in the Gpu
             const Vec3 centered_offset = {width / 2.f, height / 2.f, 0.f};
@@ -88,6 +89,7 @@ public:
     void clear() { m_geometry.clear(); }
 
 private:
+    Renderer* m_renderer_ptr;
     std::unordered_map<std::uint32_t, std::shared_ptr<SpriteGeometry>>
         m_geometry;
 };

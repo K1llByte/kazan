@@ -10,7 +10,7 @@
 - [x] Change console colors
 - [x] Simple system scheduler (DAG + topologycal sort)
     - [x] Express dependencies using associated type `using Before = TypeList<RenderSystem>`
-- [ ] Refactor Renderer into a non singleton
+- [x] Refactor Renderer into a non singleton
 - [ ] Refactor Registry into a non singleton
 - [ ] Make EditorSystem only initialize after RenderSystem, since it depends on it and the renderer
 - [ ] Remove Singleton base class

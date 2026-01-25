@@ -56,7 +56,7 @@ protected:
     Context<Window> m_window;
     Context<Input> m_input;
     Context<Console> m_console;
-    Renderer m_renderer;
+    Context<Renderer> m_renderer;
     Registry m_registry;
     Scheduler m_systems;
 };

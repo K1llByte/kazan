@@ -36,7 +36,7 @@ private:
     vk::Device* m_device_ptr;
 };
 
-class Renderer : public Singleton<Renderer> {
+class Renderer {
 public:
     using RenderFrameFn = std::function<void(vk::CommandBuffer&)>;
 
@@ -53,31 +53,25 @@ public:
 
     void render_frame(const RenderFrameFn& render_func);
 
-    // Singleton aware static functions //
     [[nodiscard]]
-    static vk::Instance& instance() {
-        KZN_ASSERT(exists());
-        return singleton().m_instance;
+    vk::Instance& instance() {
+        return m_instance;
     }
     [[nodiscard]]
-    static vk::Device& device() {
-        KZN_ASSERT(exists());
-        return singleton().m_device;
+    vk::Device& device() {
+        return m_device;
     }
     [[nodiscard]]
-    static vk::Swapchain& swapchain() {
-        KZN_ASSERT(exists());
-        return singleton().m_swapchain;
+    vk::Swapchain& swapchain() {
+        return m_swapchain;
     }
     [[nodiscard]]
-    static vk::DescriptorSetAllocator& dset_allocator() {
-        KZN_ASSERT(exists());
-        return singleton().m_dset_allocator;
+    vk::DescriptorSetAllocator& dset_allocator() {
+        return m_dset_allocator;
     }
     [[nodiscard]]
-    static vk::DescriptorSetLayoutCache& dset_layout_cache() {
-        KZN_ASSERT(exists());
-        return singleton().m_dset_layout_cache;
+    vk::DescriptorSetLayoutCache& dset_layout_cache() {
+        return m_dset_layout_cache;
     }
 
 private:

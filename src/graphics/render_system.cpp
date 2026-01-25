@@ -4,6 +4,7 @@
 #include "core/console.hpp"
 #include "core/log.hpp"
 #include "core/type.hpp"
+#include "ecs/context.hpp"
 #include "ecs/entity.hpp"
 
 #include "events/events.hpp"
@@ -30,20 +31,21 @@
 namespace kzn {
 
 std::vector<vk::Framebuffer> create_framebuffers(
+    Renderer& renderer,
     vk::RenderPass& render_pass,
     std::optional<Ref<vk::Image>> depth_opt = std::nullopt
 ) {
     // Get swapchain color attachment images
     const size_t num_swapchain_images =
-        Renderer::swapchain().image_views().size();
-    const auto swapchain_extent = Renderer::swapchain().extent();
+        renderer.swapchain().image_views().size();
+    const auto swapchain_extent = renderer.swapchain().extent();
 
     std::vector<vk::Framebuffer> framebuffers;
     framebuffers.reserve(num_swapchain_images);
 
     // Create framebuffers with depth attachment
     if (depth_opt.has_value()) {
-        for (auto image_view : Renderer::swapchain().image_views()) {
+        for (auto image_view : renderer.swapchain().image_views()) {
             framebuffers.emplace_back(
                 render_pass,
                 std::array{image_view, depth_opt->get().vk_image_view()},
@@ -53,7 +55,7 @@ std::vector<vk::Framebuffer> create_framebuffers(
     }
     // Create framebuffers without depth attachment
     else {
-        for (auto image_view : Renderer::swapchain().image_views()) {
+        for (auto image_view : renderer.swapchain().image_views()) {
             framebuffers.emplace_back(
                 render_pass, std::array{image_view}, swapchain_extent
             );
@@ -65,27 +67,27 @@ std::vector<vk::Framebuffer> create_framebuffers(
 
 RenderSystem::RenderSystem()
     : m_screen_render_pass(simple_depth_pass(
-          Renderer::device(),
-          Renderer::swapchain().image_format()
+          context<Renderer>().device(),
+          context<Renderer>().swapchain().image_format()
       ))
     , m_depth_image(
-          Renderer::device(),
-          {Renderer::swapchain().extent().width,
-           Renderer::swapchain().extent().height,
+          context<Renderer>().device(),
+          {context<Renderer>().swapchain().extent().width,
+           context<Renderer>().swapchain().extent().height,
            1},
           VK_FORMAT_D32_SFLOAT,
           VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT,
           VK_IMAGE_ASPECT_DEPTH_BIT
       )
-    , m_framebuffers{create_framebuffers(m_screen_render_pass, m_depth_image)}
-    , m_camera_ubo{Renderer::device(), sizeof(CameraUniformData)}
-    , m_camera_dset{Renderer::dset_allocator().allocate(
-          Renderer::dset_layout_cache().create_layout({
+    , m_framebuffers{create_framebuffers(context<Renderer>(), m_screen_render_pass, m_depth_image)}
+    , m_camera_ubo{context<Renderer>().device(), sizeof(CameraUniformData)}
+    , m_camera_dset{context<Renderer>().dset_allocator().allocate(
+          context<Renderer>().dset_layout_cache().create_layout({
               vk::uniform_binding(0),
           })
       )}
-    , m_sprite_stage(m_screen_render_pass, m_camera_dset)
-    , m_debug_stage(m_screen_render_pass, m_camera_dset)
+    , m_sprite_stage(context<Renderer>(), m_screen_render_pass, m_camera_dset)
+    , m_debug_stage(context<Renderer>(), m_screen_render_pass, m_camera_dset)
     , m_imgui_stage_opt(std::nullopt) {
 
     context<Console>().create_cmd("debug_render", [this]() {
@@ -103,10 +105,11 @@ RenderSystem::RenderSystem()
 RenderSystem::~RenderSystem() {
     context<Console>().delete_cmd("debug_render");
 
-    Renderer::device().wait_idle();
+    context<Renderer>().device().wait_idle();
 }
 
 void RenderSystem::update(float delta_time) {
+    auto& renderer = context<Renderer>();
     // Pre-render
     m_sprite_stage.pre_render();
     m_debug_stage.pre_render();
@@ -132,7 +135,7 @@ void RenderSystem::update(float delta_time) {
     }
     else {
         if (camera_ptr->use_viewport_aspect_ratio) {
-            auto extent = Renderer::swapchain().extent();
+            auto extent = renderer.swapchain().extent();
             camera_ptr->aspect_ratio =
                 float(extent.width) / float(extent.height);
         }
@@ -154,7 +157,8 @@ void RenderSystem::update(float delta_time) {
     }
 
     // Start rendering frame
-    Renderer::singleton().render_frame([&](auto& cmd_buffer) {
+    
+    renderer.render_frame([&](auto& cmd_buffer) {
         const VkClearValue clear_color{
             .color = {m_clear_color.r, m_clear_color.y, m_clear_color.z, 1.0f},
         };
@@ -164,7 +168,7 @@ void RenderSystem::update(float delta_time) {
 
         m_screen_render_pass.begin(
             cmd_buffer,
-            m_framebuffers[Renderer::swapchain().current_index()],
+            m_framebuffers[renderer.swapchain().current_index()],
             {clear_color, clear_depth}
         );
 
@@ -179,16 +183,16 @@ void RenderSystem::update(float delta_time) {
 }
 
 void RenderSystem::on_swapchain_resize(const SwapchainResizeEvent&) {
+    auto& renderer = context<Renderer>();
+    const auto extent = renderer.swapchain().extent();
     m_depth_image = vk::Image(
-        Renderer::device(),
-        {Renderer::swapchain().extent().width,
-         Renderer::swapchain().extent().height,
-         1},
+        renderer.device(),
+        {extent.width,extent.height, 1},
         VK_FORMAT_D32_SFLOAT,
         VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT,
         VK_IMAGE_ASPECT_DEPTH_BIT
     );
-    m_framebuffers = create_framebuffers(m_screen_render_pass, m_depth_image);
+    m_framebuffers = create_framebuffers(renderer, m_screen_render_pass, m_depth_image);
 }
 
 void RenderSystem::on_editor_init(const EditorInitEvent&) {
@@ -197,7 +201,7 @@ void RenderSystem::on_editor_init(const EditorInitEvent&) {
         "ImGuiStage already injected in RenderSystem"
     );
 
-    m_imgui_stage_opt.emplace(m_screen_render_pass);
+    m_imgui_stage_opt.emplace(context<Renderer>(), m_screen_render_pass);
 }
 
 } // namespace kzn

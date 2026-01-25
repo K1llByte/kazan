@@ -1,5 +1,6 @@
 #pragma once
 
+#include "core/type.hpp"
 #include "ecs/entity.hpp"
 #include "graphics/renderer.hpp"
 #include "graphics/sprite_component.hpp"
@@ -19,9 +20,11 @@ struct PvmPushData {
 class SpriteStage : public RenderStage {
 public:
     // Ctor
-    SpriteStage(vk::RenderPass& render_pass, vk::DescriptorSet& camera_dset)
-        : m_pipeline{
-              Renderer::device(),
+    SpriteStage(Renderer& renderer, vk::RenderPass& render_pass, vk::DescriptorSet& camera_dset)
+        : m_renderer_ptr{&renderer}
+        , m_sprite_geom_cache{renderer}
+        , m_pipeline{
+              renderer.device(),
               vk::PipelineStages{
                   .vertex = "assets/shaders/sprites/sprite_render.vert.spv",
                   .fragment = "assets/shaders/sprites/sprite_render.frag.spv",
@@ -33,9 +36,9 @@ public:
                       .push_constants = {vk::push_constant_range<PvmPushData>()
                       },
                       .descriptor_sets =
-                          {Renderer::dset_layout_cache()
+                          {renderer.dset_layout_cache()
                                .create_layout({vk::uniform_binding(0)}),
-                           Renderer::dset_layout_cache().create_layout(
+                           renderer.dset_layout_cache().create_layout(
                                {vk::sampler_binding(0), vk::uniform_binding(1)}
                            )}
                   })
@@ -69,7 +72,7 @@ public:
             }
 
             if (!sprite.material()->has_render_data()) {
-                sprite.material()->create_render_data();
+                sprite.material()->create_render_data(*m_renderer_ptr);
             }
 
             // Properties of materials can be changed multiple times per frame
@@ -84,10 +87,10 @@ public:
         m_pipeline.bind(cmd_buffer);
 
         vk::cmd_set_viewport(
-            cmd_buffer, vk::create_viewport(Renderer::swapchain().extent())
+            cmd_buffer, vk::create_viewport(m_renderer_ptr->swapchain().extent())
         );
         vk::cmd_set_scissor(
-            cmd_buffer, vk::create_scissor(Renderer::swapchain().extent())
+            cmd_buffer, vk::create_scissor(m_renderer_ptr->swapchain().extent())
         );
 
         // Render sprite components
@@ -124,6 +127,7 @@ public:
     }
 
 private:
+    Renderer* m_renderer_ptr;
     SpriteGeometryCache m_sprite_geom_cache;
     vk::Pipeline m_pipeline;
     Ref<vk::DescriptorSet> m_camera_dset;

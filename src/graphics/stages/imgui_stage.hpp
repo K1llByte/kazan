@@ -1,6 +1,7 @@
 #pragma once
 
 #include "core/assert.hpp"
+#include "core/type.hpp"
 #include "graphics/renderer.hpp"
 #include "render_stage.hpp"
 #include "vk/render_pass.hpp"
@@ -17,7 +18,8 @@ namespace kzn {
 class ImGuiStage : public RenderStage {
 public:
     // Ctor
-    ImGuiStage(vk::RenderPass& render_pass) {
+    ImGuiStage(Renderer& renderer, vk::RenderPass& render_pass)
+        : m_renderer_ptr{&renderer} {
         KZN_ASSERT(is_editor_initialized());
         // Naive pool size
         std::vector<VkDescriptorPoolSize> pool_sizes{
@@ -43,7 +45,7 @@ public:
 
         // Create ImGui descriptor pool
         auto res = vkCreateDescriptorPool(
-            Renderer::device(), &pool_info, nullptr, &m_imgui_pool
+            renderer.device(), &pool_info, nullptr, &m_imgui_pool
         );
         VK_CHECK_MSG(res, "Error creating ImGui descriptor pool");
 
@@ -57,13 +59,13 @@ public:
 
         // This initializes imgui for Vulkan
         ImGui_ImplVulkan_InitInfo init_info{};
-        init_info.Instance = Renderer::instance();
-        init_info.PhysicalDevice = Renderer::device();
-        init_info.Device = Renderer::device();
-        init_info.Queue = Renderer::device().graphics_queue().vk_queue;
+        init_info.Instance = renderer.instance();
+        init_info.PhysicalDevice = renderer.device();
+        init_info.Device = renderer.device();
+        init_info.Queue = renderer.device().graphics_queue().vk_queue;
         init_info.DescriptorPool = m_imgui_pool;
         const uint32_t img_count =
-            static_cast<uint32_t>(Renderer::swapchain().images().size());
+            static_cast<uint32_t>(renderer.swapchain().images().size());
         init_info.MinImageCount = img_count;
         init_info.ImageCount = img_count;
         init_info.PipelineInfoMain.RenderPass = render_pass;
@@ -83,7 +85,7 @@ public:
         ImGui_ImplVulkan_Shutdown();
         ImGui_ImplGlfw_Shutdown();
         ImGui::DestroyContext();
-        vkDestroyDescriptorPool(Renderer::device(), m_imgui_pool, nullptr);
+        vkDestroyDescriptorPool(m_renderer_ptr->device(), m_imgui_pool, nullptr);
     }
 
     void pre_render() override {
@@ -113,6 +115,7 @@ private:
     }
 
 private:
+    Renderer* m_renderer_ptr;
     VkDescriptorPool m_imgui_pool = VK_NULL_HANDLE;
 };
 

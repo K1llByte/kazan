@@ -1,5 +1,6 @@
 #pragma once
 
+#include "core/type.hpp"
 #include "ecs/context.hpp"
 #include "graphics/debug_render.hpp"
 #include "graphics/renderer.hpp"
@@ -16,9 +17,10 @@ namespace kzn {
 class DebugStage : public RenderStage {
 public:
     // Ctor
-    DebugStage(vk::RenderPass& render_pass, vk::DescriptorSet& camera_dset)
-        : m_debug_pipeline{
-              Renderer::device(),
+    DebugStage(Renderer& renderer, vk::RenderPass& render_pass, vk::DescriptorSet& camera_dset)
+        : m_renderer_ptr{&renderer}
+        , m_debug_pipeline{
+              renderer.device(),
               vk::PipelineStages{
                   .vertex = "assets/shaders/debug.vert.spv",
                   .fragment = "assets/shaders/debug.frag.spv",
@@ -30,10 +32,12 @@ public:
                       .push_constants = {vk::push_constant_range<PvmPushData>()
                       },
                       .descriptor_sets =
-                          {Renderer::dset_layout_cache()
+                          {renderer.dset_layout_cache()
                                .create_layout({vk::uniform_binding(0)})}
                   })
-          }, m_camera_dset{camera_dset} {}
+          }
+        , m_camera_dset{camera_dset}
+        , m_debug_render(renderer) {}
     // Copy
     DebugStage(const DebugStage&) = delete;
     DebugStage& operator=(const DebugStage&) = delete;
@@ -77,6 +81,7 @@ public:
     }
 
 private:
+    Renderer* m_renderer_ptr;
     vk::Pipeline m_debug_pipeline;
     bool m_use_debug_render = false;
     Ref<vk::DescriptorSet> m_camera_dset;

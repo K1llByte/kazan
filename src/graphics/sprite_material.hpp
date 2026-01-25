@@ -24,19 +24,20 @@ struct SpriteUniformData {
 
 struct SpriteMaterialRenderData {
     SpriteMaterialRenderData(
+        Renderer& renderer,
         std::shared_ptr<Texture>& texture_ptr,
         Vec2 slice_offset,
         Vec2 slice_size,
         Vec4 overlap_color
     )
-        : material_dset{Renderer::dset_allocator().allocate(
-              Renderer::dset_layout_cache().create_layout({
+        : material_dset{renderer.dset_allocator().allocate(
+              renderer.dset_layout_cache().create_layout({
                   vk::sampler_binding(0),
                   vk::uniform_binding(1),
               })
           )}
-        , albedo_image(Renderer::device(), texture_ptr->extent())
-        , material_ubo{Renderer::device(), sizeof(SpriteUniformData)} {
+        , albedo_image(renderer.device(), texture_ptr->extent())
+        , material_ubo{renderer.device(), sizeof(SpriteUniformData)} {
         // Upload texture data to gpu image memory
         albedo_image.upload(texture_ptr->data());
         // Update material dset and upload data
@@ -81,9 +82,9 @@ public:
         return m_render_data_opt.has_value();
     }
 
-    void create_render_data() {
+    void create_render_data(Renderer& renderer) {
         m_render_data_opt.emplace(
-            m_texture_ptr, m_slice_offset, m_slice_size, m_overlap_color
+            renderer, m_texture_ptr, m_slice_offset, m_slice_size, m_overlap_color
         );
         m_was_modified = false;
     }

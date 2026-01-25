@@ -1,5 +1,6 @@
 #pragma once
 
+#include "core/type.hpp"
 #include "graphics/renderer.hpp"
 #include "math/types.hpp"
 #include "vk/buffer.hpp"
@@ -17,7 +18,8 @@ struct LineDraw {
 class DebugRender {
 public:
     // Ctor
-    DebugRender() {
+    DebugRender(Renderer& renderer)
+        : m_renderer_ptr{&renderer} {
         constexpr std::size_t default_size = 64;
         m_line_draw_list.reserve(default_size);
     }
@@ -82,7 +84,7 @@ public:
             return std::nullopt;
         }
         auto vbo = vk::VertexBuffer(
-            Renderer::device(), sizeof(LineDraw) * m_line_draw_list.size()
+            m_renderer_ptr->device(), sizeof(LineDraw) * m_line_draw_list.size()
         );
         vbo.upload(static_cast<const void*>(m_line_draw_list.data()));
         return vbo;
@@ -94,6 +96,7 @@ public:
     }
 
 private:
+    Renderer* m_renderer_ptr;
     std::vector<LineDraw> m_line_draw_list;
     float m_width = 1.0f;
 };
