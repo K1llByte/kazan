@@ -25,6 +25,7 @@ namespace kzn {
 
 class EditorSystem : public System {
 public:
+    // Must update before RenderSystem
     using Before = TypeList<RenderSystem>;
 
 public:

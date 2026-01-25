@@ -9,7 +9,7 @@
 - [x] Test example that just displays a texture
 - [x] Change console colors
 - [x] Simple system scheduler (DAG + topologycal sort)
-    - [ ] Express dependencies using associated type `using Before = TypeList<RenderSystem>`
+    - [x] Express dependencies using associated type `using Before = TypeList<RenderSystem>`
 - [ ] Make EditorSystem only initialize after RenderSystem, since it depends on it and the renderer
 - [ ] Refactor Renderer into a non singleton
 - [ ] Refactor Registry into a non singleton

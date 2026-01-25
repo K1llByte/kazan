@@ -1,6 +1,7 @@
 #pragma once
 
 #include "core/assert.hpp"
+#include "core/type.hpp"
 #include "ecs/system.hpp"
 
 #include <cstddef>
@@ -145,6 +146,14 @@ public:
         m_systems[type_id] = std::move(ptr);
         // Add an entry in m_edges
         m_edges[type_id];
+
+        // If system type contains an associated type list Before, add those
+        // types as dependencies.
+        if constexpr (requires { typename S::Before; }) {
+            [this]<typename... Ts>(TypeList<Ts...>) {
+                (before<S, Ts>(), ...);
+            }(typename S::Before{});
+        }
 
         return ref;
     }

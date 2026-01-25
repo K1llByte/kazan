@@ -24,10 +24,8 @@ struct TestApp : public BasicApp {
 
         // Initialize systems
         m_systems.emplace<RenderSystem>();
+        // EditorSystem auto registers as dependency before RenderSystem
         m_systems.emplace<EditorSystem>(m_window, m_input, m_console);
-
-        // System update dependencies
-        m_systems.before<EditorSystem, RenderSystem>();
 
         // Load level entities
         create_test_level();
