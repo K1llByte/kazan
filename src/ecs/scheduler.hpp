@@ -10,6 +10,7 @@
 #include <stdexcept>
 #include <typeindex>
 #include <unordered_map>
+#include <algorithm>
 #include <vector>
 
 namespace kzn {

@@ -12,7 +12,7 @@
     }
 #define SINGLETON_THROWS true
 #else
-#define SINGLETON_CHECK(expr, msg) (void)nullptr
+#define SINGLETON_CHECK(expr, msg) (void) nullptr
 #endif
 
 namespace kzn {

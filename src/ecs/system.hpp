@@ -8,7 +8,7 @@ namespace kzn {
 struct System {
     virtual ~System() = default;
 
-    virtual void update(float delta_time) = 0;
+    virtual void update(float delta_time) {}
 
     template<typename T>
     [[nodiscard]]

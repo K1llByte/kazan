@@ -4,7 +4,7 @@
 #include "core/window.hpp"
 #include "ecs/context.hpp"
 #include "ecs/entity.hpp"
-#include "ecs/scheduler.hpp"
+#include "ecs/scheduler_vec.hpp"
 #include "graphics/renderer.hpp"
 #include "input/input.hpp"
 
@@ -27,7 +27,10 @@ public:
     ~BasicApp() {}
 
     void run() override {
+        const float scheduler_build_begin_time = delta_time();
         auto executor = m_systems.build();
+        const float scheduler_build_end_time = delta_time();
+        
 
         // Game loop
         float accum_time = 0.f;
@@ -58,7 +61,7 @@ protected:
     Context<Console> m_console;
     Context<Renderer> m_renderer;
     Registry m_registry;
-    Scheduler m_systems;
+    VectorScheduler m_systems;
 };
 
 } // namespace kzn

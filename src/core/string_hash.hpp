@@ -17,14 +17,14 @@ struct Fnv1Params;
 
 template<>
 struct Fnv1Params<std::uint32_t> {
-    static constexpr std::uint32_t offset = 2166136261;
-    static constexpr std::uint32_t prime = 16777619;
+    static constexpr std::uint32_t offset = 2166136261u;
+    static constexpr std::uint32_t prime = 16777619u;
 };
 
 template<>
 struct Fnv1Params<std::uint64_t> {
-    static constexpr std::uint64_t offset = 14695981039346656037ull;
-    static constexpr std::uint64_t prime = 1099511628211ull;
+    static constexpr std::uint64_t offset = 14695981039346656037ul;
+    static constexpr std::uint64_t prime = 1099511628211ul;
 };
 
 } // namespace internal

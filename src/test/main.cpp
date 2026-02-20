@@ -1,6 +1,5 @@
 #include "core/app.hpp"
 #include "core/basic_app.hpp"
-#include "ecs/scheduler.hpp"
 #include "editor/editor_system.hpp"
 #include "graphics/render_system.hpp"
 #include "graphics/sprite_component.hpp"
@@ -32,4 +31,4 @@ struct TestApp : public BasicApp {
     }
 };
 
-KZN_CREATE_APP(TestApp)
+// KZN_CREATE_APP(TestApp)

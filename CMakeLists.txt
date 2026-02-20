@@ -1,7 +1,9 @@
 cmake_minimum_required(VERSION 3.20)
 project(Kazan VERSION 1.0 LANGUAGES CXX)
 
-#################################### Options ####################################
+###############################################################################
+## Options
+###############################################################################
 
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 set(CMAKE_CXX_STANDARD 23)
@@ -10,10 +12,16 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(CMAKE_SYSTEM_INCLUDE_PATH "${CMAKE_SYSTEM_INCLUDE_PATH}")
 
-##################################### Paths #####################################
+###############################################################################
+## Paths
+###############################################################################
+
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${PROJECT_SOURCE_DIR}/bin")
 
-################################# Dependencies ##################################
+###############################################################################
+## Dependencies
+###############################################################################
+
 include(FetchContent)
 
 # - Vulkan
@@ -77,7 +85,9 @@ FetchContent_Declare(box2d
 )
 FetchContent_MakeAvailable(box2d)
 
-################################## Kazan Target #################################
+###############################################################################
+## Kazan Target
+###############################################################################
 
 # Kazan Library
 file(GLOB KAZAN_SOURCES
@@ -124,9 +134,11 @@ set_target_properties(KazanLib PROPERTIES
     OUTPUT_NAME "kazan"
 )
 
-################################## Test Target ##################################
+###############################################################################
+## Demo Targets
+###############################################################################
 
-add_executable(TestBin "src/test/main.cpp")
+add_executable(TestBin "src/test/scheduler_test.cpp")
 target_link_libraries(TestBin PRIVATE KazanLib)
 
 target_include_directories(TestBin PUBLIC ${KAZAN_INCLUDE_PATH})
@@ -141,13 +153,17 @@ set_target_properties(TestBin PROPERTIES
     OUTPUT_NAME "kazantest"
 )
 
-################################# Clang Options #################################
+###############################################################################
+## Clang Options
+###############################################################################
 
 if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-nullability-completeness")
 endif()
 
-################################## Mold Linker ##################################
+###############################################################################
+## Custom Linker
+###############################################################################
 
 find_program(MOLD_EXECUTABLE "mold")
 
@@ -157,7 +173,9 @@ if(MOLD_EXECUTABLE)
     set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -fuse-ld=mold")
 endif()
 
-############################ Link-Time-Optimization #############################
+###############################################################################
+## Link-Time-Optimization
+###############################################################################
 
 include(CheckIPOSupported)
 
