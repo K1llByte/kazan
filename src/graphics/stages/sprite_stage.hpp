@@ -86,11 +86,12 @@ public:
     void render(Scene& scene, vk::CommandBuffer& cmd_buffer) override {
         m_pipeline.bind(cmd_buffer);
 
+        const auto swapchain_extent = m_renderer_ptr->swapchain().extent();
         vk::cmd_set_viewport(
-            cmd_buffer, vk::create_viewport(m_renderer_ptr->swapchain().extent())
+            cmd_buffer, vk::create_viewport(swapchain_extent)
         );
         vk::cmd_set_scissor(
-            cmd_buffer, vk::create_scissor(m_renderer_ptr->swapchain().extent())
+            cmd_buffer, vk::create_scissor(swapchain_extent)
         );
 
         // Render sprite components

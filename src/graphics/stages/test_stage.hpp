@@ -25,15 +25,16 @@ public:
                 // .set_front_face(VK_FRONT_FACE_COUNTER_CLOCKWISE)
         }
     {}
-    // Copy
-    TestStage(const TestStage&) = delete;
-    TestStage& operator=(const TestStage&) = delete;
-    // Move
-    TestStage(TestStage&&) = delete;
-    TestStage& operator=(TestStage&&) = delete;
 
     void render(Scene& scene, vk::CommandBuffer& cmd_buffer) override {
         m_test_pipeline.bind(cmd_buffer);
+        const auto swapchain_extent = m_renderer_ptr->swapchain().extent();
+        vk::cmd_set_viewport(
+            cmd_buffer, vk::create_viewport(swapchain_extent)
+        );
+        vk::cmd_set_scissor(
+            cmd_buffer, vk::create_scissor(swapchain_extent)
+        );
         vk::cmd_draw(cmd_buffer, 4);
     }
 

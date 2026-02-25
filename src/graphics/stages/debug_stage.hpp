@@ -38,14 +38,6 @@ public:
           }
         , m_camera_dset{camera_dset}
         , m_debug_render(renderer) {}
-    // Copy
-    DebugStage(const DebugStage&) = delete;
-    DebugStage& operator=(const DebugStage&) = delete;
-    // Move
-    DebugStage(DebugStage&&) = delete;
-    DebugStage& operator=(DebugStage&&) = delete;
-    // Dtor
-    ~DebugStage() {}
 
     bool is_enabled() const { return m_use_debug_render; }
     void enable(bool enable) { m_use_debug_render = enable; }
@@ -60,6 +52,14 @@ public:
             auto& debug_render = m_debug_render.value();
             auto& debug_vbo = debug_vbo_opt.value();
             m_test_pipeline.bind(cmd_buffer);
+
+            const auto swapchain_extent = m_renderer_ptr->swapchain().extent();
+            vk::cmd_set_viewport(
+                cmd_buffer, vk::create_viewport(swapchain_extent)
+            );
+            vk::cmd_set_scissor(
+                cmd_buffer, vk::create_scissor(swapchain_extent)
+            );
 
             vk::cmd_set_line_width(cmd_buffer, debug_render.line_width());
             vk::cmd_bind_dset(

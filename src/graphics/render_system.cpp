@@ -4,7 +4,6 @@
 #include "core/console.hpp"
 #include "core/log.hpp"
 #include "core/type.hpp"
-#include "ecs/context.hpp"
 #include "ecs/entity.hpp"
 
 #include "ecs/scene.hpp"
@@ -86,14 +85,15 @@ RenderSystem::RenderSystem()
               vk::uniform_binding(0),
           })
       )}
-    , m_sprite_stage(context<Renderer>(), m_screen_render_pass, m_camera_dset)
-    , m_test_stage(context<Renderer>(), m_screen_render_pass)
-    , m_debug_stage(context<Renderer>(), m_screen_render_pass, m_camera_dset)
-    , m_imgui_stage_opt(std::nullopt) {
+    // , m_sprite_stage(context<Renderer>(), m_screen_render_pass, m_camera_dset)
+    // , m_test_stage(context<Renderer>(), m_screen_render_pass)
+    // , m_debug_stage(context<Renderer>(), m_screen_render_pass, m_camera_dset)
+    // , m_imgui_stage_opt(std::nullopt)
+{
 
-    context<Console>().create_cmd("debug_render", [this]() {
-        m_debug_stage.enable(!m_debug_stage.is_enabled());
-    });
+    // context<Console>().create_cmd("debug_render", [this]() {
+    //     m_debug_stage.enable(!m_debug_stage.is_enabled());
+    // });
 
     // Update camera descriptor set to use camera ubo
     m_camera_dset.update({m_camera_ubo.info()});
@@ -104,7 +104,7 @@ RenderSystem::RenderSystem()
 }
 
 RenderSystem::~RenderSystem() {
-    context<Console>().delete_cmd("debug_render");
+    // context<Console>().delete_cmd("debug_render");
 
     context<Renderer>().device().wait_idle();
 }
@@ -112,11 +112,8 @@ RenderSystem::~RenderSystem() {
 void RenderSystem::update(Scene& scene, float delta_time) {
     auto& renderer = context<Renderer>();
     // Pre-render
-    m_sprite_stage.pre_render(scene);
-    m_test_stage.pre_render(scene);
-    m_debug_stage.pre_render(scene);
-    if (m_imgui_stage_opt) {
-        m_imgui_stage_opt->pre_render(scene);
+    for(auto& render_stage_ptr : m_render_stages) {
+        render_stage_ptr->pre_render(scene);
     }
 
     // Select rendering camera otherwise choose default camera params.
@@ -174,23 +171,18 @@ void RenderSystem::update(Scene& scene, float delta_time) {
             {clear_color, clear_depth}
         );
 
-        m_sprite_stage.render(scene, cmd_buffer);
-        m_test_stage.render(scene, cmd_buffer);
-        m_debug_stage.render(scene, cmd_buffer);
-        if (m_imgui_stage_opt) {
-            m_imgui_stage_opt->render(scene, cmd_buffer);
+        for(auto& render_stage_ptr : m_render_stages) {
+            render_stage_ptr->render(scene, cmd_buffer);
         }
 
         m_screen_render_pass.end(cmd_buffer);
     });
 
     // Post-render
-    m_sprite_stage.post_render(scene);
-    m_test_stage.post_render(scene);
-    m_debug_stage.post_render(scene);
-    if (m_imgui_stage_opt) {
-        m_imgui_stage_opt->post_render(scene);
+    for(auto& render_stage_ptr : m_render_stages) {
+        render_stage_ptr->post_render(scene);
     }
+    
 }
 
 void RenderSystem::on_swapchain_resize(const SwapchainResizeEvent&) {
@@ -207,12 +199,18 @@ void RenderSystem::on_swapchain_resize(const SwapchainResizeEvent&) {
 }
 
 void RenderSystem::on_editor_init(const EditorInitEvent&) {
+    static bool missing_imgui_stage = true;
     KZN_ASSERT_MSG(
-        !m_imgui_stage_opt.has_value(),
+        missing_imgui_stage,
         "ImGuiStage already injected in RenderSystem"
     );
 
-    m_imgui_stage_opt.emplace(context<Renderer>(), m_screen_render_pass);
+    emplace_stage<ImGuiStage>(
+        context<Renderer>(),
+        m_screen_render_pass
+    );
+    missing_imgui_stage = false;
+
 }
 
 } // namespace kzn

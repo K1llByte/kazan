@@ -6,6 +6,7 @@
 #include "events/events.hpp"
 #include "graphics/stages/debug_stage.hpp"
 #include "graphics/stages/imgui_stage.hpp"
+#include "graphics/stages/render_stage.hpp"
 #include "graphics/stages/sprite_stage.hpp"
 #include "graphics/stages/test_stage.hpp"
 #include "math/types.hpp"
@@ -18,7 +19,8 @@
 #include <boost/pfr/core_name.hpp>
 #include <vulkan/vulkan_core.h>
 
-#include <optional>
+#include <utility>
+#include <memory>
 
 #define KZN_ENABLE_EDITOR
 
@@ -55,6 +57,23 @@ public:
     // Dtor
     ~RenderSystem() override;
 
+    [[nodiscard]]
+    vk::RenderPass& screen_render_pass() {
+        return m_screen_render_pass;
+    }
+
+    [[nodiscard]]
+    vk::DescriptorSet& camera_dset() {
+        return m_camera_dset;
+    }
+
+    template<typename T, typename ...Args>
+    void emplace_stage(Args&&... args) {
+        m_render_stages.push_back(
+            std::make_unique<T>(std::forward<Args>(args)...)
+        );
+    }
+
     void update(Scene& scene, float delta_time) override;
 
 private:
@@ -77,10 +96,7 @@ private:
     vk::DescriptorSet m_camera_dset;
 
     // Stages
-    SpriteStage m_sprite_stage;
-    TestStage m_test_stage;
-    DebugStage m_debug_stage;
-    std::optional<ImGuiStage> m_imgui_stage_opt;
+    std::vector<std::unique_ptr<RenderStage>> m_render_stages;
 
 private:
     void on_swapchain_resize(const SwapchainResizeEvent&);
