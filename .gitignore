@@ -1,8 +1,14 @@
+# Ignore dev folders
 .vscode/
-.xmake/
 .cache/
+
+# Ignore build folders
 bin/
 build/
-models/**.obj
-shaders/**.spv
+
+# Ignore some assets
+*.obj
+*.spv
+
+# Ignore config files
 imgui.ini
