@@ -1,6 +1,5 @@
 #include "texture.hpp"
 
-#include "core/log.hpp"
 #include <memory>
 
 #define STB_IMAGE_IMPLEMENTATION

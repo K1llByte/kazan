@@ -114,13 +114,13 @@ public:
         return insert(std::move(value));
     }
 
-    size_type erase(const Key& key) {
+    bool erase(const Key& key) {
         auto it = find(key);
         if (it == end()) {
-            return 0;
+            return false;
         }
         m_data.erase(it);
-        return 1;
+        return true;
     }
 
     void clear() noexcept {

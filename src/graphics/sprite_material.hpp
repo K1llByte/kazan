@@ -1,19 +1,16 @@
 #pragma once
 
-#include "core/assert.hpp"
 #include "graphics/renderer.hpp"
 #include "graphics/texture.hpp"
 #include "math/types.hpp"
 #include "resources/resources.hpp"
 #include "vk/buffer.hpp"
-#include "vk/cmd_buffer.hpp"
 #include "vk/dset.hpp"
-#include "vk/functions.hpp"
 #include "vk/image.hpp"
-#include "vk/pipeline.hpp"
 #include "vk/uniform.hpp"
-#include <filesystem>
+
 #include <optional>
+#include <string_view>
 
 namespace kzn {
 
@@ -61,8 +58,8 @@ struct SpriteMaterialRenderData {
 class SpriteMaterial {
 public:
     // Ctor
-    SpriteMaterial(const std::filesystem::path& albedo_path)
-        : m_texture_ptr(Resources::find_or_load<Texture>(albedo_path)) {}
+    SpriteMaterial(const std::string_view albedo_path)
+        : m_texture_ptr(g_resources.find_or_load<Texture>(albedo_path)) {}
     // Dtor
     ~SpriteMaterial() = default;
 

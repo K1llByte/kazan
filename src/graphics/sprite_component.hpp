@@ -8,9 +8,10 @@
 
 namespace kzn {
 
-// FIXME: Shouldn't load statically
-static inline auto s_default_material =
-    std::make_shared<SpriteMaterial>("assets/textures/debug.png");
+inline std::shared_ptr<SpriteMaterial> default_material() {
+    static auto s_default_material = std::make_shared<SpriteMaterial>("textures://debug.png");
+    return s_default_material;
+}
 
 class SpriteComponent {
 public:
@@ -22,7 +23,7 @@ public:
     SpriteComponent(
         float width = 1.f,
         float height = 1.f,
-        std::shared_ptr<SpriteMaterial> material_ptr = s_default_material,
+        std::shared_ptr<SpriteMaterial> material_ptr = default_material(),
         bool centered = true
     )
         : m_width{width}

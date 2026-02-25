@@ -1,15 +1,12 @@
 #include "core/app.hpp"
-#include "core/assert.hpp"
 #include "core/console.hpp"
 #include "core/timing.hpp"
 #include "core/window.hpp"
 #include "ecs/context.hpp"
-#include "ecs/entity.hpp"
 #include "ecs/scheduler.hpp"
 #include "graphics/renderer.hpp"
 #include "input/input.hpp"
-#include <memory>
-#include <optional>
+#include "resources/resources.hpp"
 
 namespace kzn {
 
@@ -22,6 +19,16 @@ public:
         : m_window(name, width, height)
         , m_input(m_window)
         , m_renderer(m_window) {
+
+        // Add some resource path aliases
+        const auto current_path = std::filesystem::current_path();
+        g_resources.path_aliases.add("engine", current_path);
+        g_resources.path_aliases.add("assets", current_path / "assets");
+        g_resources.path_aliases.add("shaders", current_path / "assets/shaders");
+        g_resources.path_aliases.add("textures", current_path / "assets/textures");
+        g_resources.path_aliases.add("models", current_path / "assets/models");
+        g_resources.path_aliases.add("fonts", current_path / "assets/fonts");
+        g_resources.path_aliases.add("tmp", "/tmp");
 
         // Create commands
         m_console.create_cmd("exit", [this]() { m_window.close(); });

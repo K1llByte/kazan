@@ -67,10 +67,6 @@ public:
         b2Body_SetUserData(m_body_id, static_cast<void*>(&m_entity_id));
     }
 
-    ~PhysicsComponent() {
-        // TODO: Delete body and remove user data
-    }
-
     void set_linear_velocity(Vec2 velocity) {
         b2Body_SetLinearVelocity(m_body_id, b2Vec2{velocity.x, velocity.y});
     }

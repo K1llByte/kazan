@@ -14,7 +14,7 @@ cd kazan
 # Build project
 cmake -Bbuild && cmake --build build
 
-# Compile shaders before using
+# Compile shaders before running executable
 ./compile_shaders.sh
 ```
 
