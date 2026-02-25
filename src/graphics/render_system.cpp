@@ -7,6 +7,7 @@
 #include "ecs/context.hpp"
 #include "ecs/entity.hpp"
 
+#include "ecs/scene.hpp"
 #include "events/events.hpp"
 #include "graphics/renderer.hpp"
 #include "graphics/stages/imgui_stage.hpp"
@@ -22,10 +23,9 @@
 #include <backends/imgui_impl_glfw.h>
 #include <backends/imgui_impl_vulkan.h>
 // clang-format on
-
-#include <optional>
 #include <vulkan/vulkan_core.h>
 
+#include <optional>
 #include <array>
 
 namespace kzn {
@@ -87,6 +87,7 @@ RenderSystem::RenderSystem()
           })
       )}
     , m_sprite_stage(context<Renderer>(), m_screen_render_pass, m_camera_dset)
+    , m_test_stage(context<Renderer>(), m_screen_render_pass)
     , m_debug_stage(context<Renderer>(), m_screen_render_pass, m_camera_dset)
     , m_imgui_stage_opt(std::nullopt) {
 
@@ -108,20 +109,21 @@ RenderSystem::~RenderSystem() {
     context<Renderer>().device().wait_idle();
 }
 
-void RenderSystem::update(float delta_time) {
+void RenderSystem::update(Scene& scene, float delta_time) {
     auto& renderer = context<Renderer>();
     // Pre-render
-    m_sprite_stage.pre_render();
-    m_debug_stage.pre_render();
+    m_sprite_stage.pre_render(scene);
+    m_test_stage.pre_render(scene);
+    m_debug_stage.pre_render(scene);
     if (m_imgui_stage_opt) {
-        m_imgui_stage_opt->pre_render();
+        m_imgui_stage_opt->pre_render(scene);
     }
 
     // Select rendering camera otherwise choose default camera params.
-    entt::entity camera_entity = entt::null;
+    EntityId camera_entity = entt::null;
     Camera2DComponent* camera_ptr = nullptr;
     for (auto [entity, camera] :
-         Registry::registry().view<Camera2DComponent>().each()) {
+         scene.registry.registry().view<Camera2DComponent>().each()) {
         camera_ptr = &camera;
         camera_entity = entity;
         break;
@@ -147,14 +149,14 @@ void RenderSystem::update(float delta_time) {
             .rotation = 0.f,
         };
         auto transform_ptr =
-            Registry::registry().try_get<Transform2DComponent>(camera_entity);
+            scene.registry.registry().try_get<Transform2DComponent>(camera_entity);
         if (transform_ptr != nullptr) {
             camera_data.rotation = transform_ptr->rotation;
             camera_data.position = transform_ptr->position;
         }
 
         m_camera_ubo.upload(camera_data);
-    }
+    } 
 
     // Start rendering frame
     
@@ -172,14 +174,23 @@ void RenderSystem::update(float delta_time) {
             {clear_color, clear_depth}
         );
 
-        m_sprite_stage.render(cmd_buffer);
-        m_debug_stage.render(cmd_buffer);
+        m_sprite_stage.render(scene, cmd_buffer);
+        m_test_stage.render(scene, cmd_buffer);
+        m_debug_stage.render(scene, cmd_buffer);
         if (m_imgui_stage_opt) {
-            m_imgui_stage_opt->render(cmd_buffer);
+            m_imgui_stage_opt->render(scene, cmd_buffer);
         }
 
         m_screen_render_pass.end(cmd_buffer);
     });
+
+    // Post-render
+    m_sprite_stage.post_render(scene);
+    m_test_stage.post_render(scene);
+    m_debug_stage.post_render(scene);
+    if (m_imgui_stage_opt) {
+        m_imgui_stage_opt->post_render(scene);
+    }
 }
 
 void RenderSystem::on_swapchain_resize(const SwapchainResizeEvent&) {

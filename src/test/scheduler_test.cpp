@@ -1,4 +1,5 @@
 #include "core/flat_map.hpp"
+#include "ecs/scene.hpp"
 #include "ecs/scheduler.hpp"
 
 #include <chrono>
@@ -24,7 +25,7 @@ public:
 
     ~FlatMapExecutor() = default;
 
-    void update(float delta_time) {
+    void update(Scene& scene, float delta_time) {
         for (System* sys : m_execution_order) {
             sys->update(delta_time);
         }
@@ -167,9 +168,9 @@ public:
     ~VectorExecutor() = default;
 
     //! Update all systems in order.
-    void update(float delta_time) {
+    void update(Scene& scene, float delta_time) {
         for (System* sys : m_execution_order) {
-            sys->update(delta_time);
+            sys->update(scene, delta_time);
         }
     }
 

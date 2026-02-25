@@ -1,29 +1,29 @@
 #include "entity.hpp"
 
+#include <entt/entity/registry.hpp>
+
 namespace kzn {
 
-entt::registry& Registry::registry() {
-    return singleton().m_registry;
+entt::basic_registry<EntityId>& Registry::registry() {
+    return m_registry;
 }
 
 Entity Registry::create() {
-    return registry().create();
+    return Entity{
+        this, 
+        registry().create()
+    };
 }
 
-void Registry::destroy(Entity& entity) {
-    registry().destroy(entity.m_entity);
-    // TODO: Check if destroy already does this
-    entity.m_entity = entt::null;
+void Registry::destroy(EntityId entity_id) {
+    m_registry.destroy(entity_id);
+    // entity.id = entt::null;
 }
 
 void Registry::destroy_all() {
-    for (auto entity : registry().view<entt::entity>()) {
-        registry().destroy(entity);
+    for (auto entity : m_registry.view<EntityId>()) {
+        m_registry.destroy(entity);
     }
-}
-
-Entity::Entity(entt::entity raw_entity)
-    : m_entity{raw_entity} {
 }
 
 } // namespace kzn

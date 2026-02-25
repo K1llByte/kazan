@@ -1,11 +1,13 @@
 #pragma once
 
+#include "ecs/scene.hpp"
 #include "ecs/system.hpp"
 #include "events/event_manager.hpp"
 #include "events/events.hpp"
 #include "graphics/stages/debug_stage.hpp"
 #include "graphics/stages/imgui_stage.hpp"
 #include "graphics/stages/sprite_stage.hpp"
+#include "graphics/stages/test_stage.hpp"
 #include "math/types.hpp"
 #include "vk/buffer.hpp"
 #include "vk/dset.hpp"
@@ -53,7 +55,7 @@ public:
     // Dtor
     ~RenderSystem() override;
 
-    void update(float delta_time) override;
+    void update(Scene& scene, float delta_time) override;
 
 private:
     struct CameraUniformData {
@@ -76,6 +78,7 @@ private:
 
     // Stages
     SpriteStage m_sprite_stage;
+    TestStage m_test_stage;
     DebugStage m_debug_stage;
     std::optional<ImGuiStage> m_imgui_stage_opt;
 

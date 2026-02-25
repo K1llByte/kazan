@@ -3,107 +3,106 @@
 #include "core/singleton.hpp"
 #include "entt/entity/entity.hpp"
 #include "entt/entity/fwd.hpp"
+#include "entt/entity/registry.hpp"
 #include <entt/entt.hpp>
 
 #include <utility>
 
 namespace kzn {
 
+enum class EntityId : std::uint32_t {};
+
 class Entity;
 
 //! Singleton wrapper class for managing entities.
-class Registry : public Singleton<Registry> {
+class Registry {
 public:
     friend class Entity;
     Registry() = default;
     ~Registry() = default;
 
-    static entt::registry& registry();
+    entt::basic_registry<EntityId>& registry();
 
-    static Entity create();
-    static void destroy(Entity& entity);
-    static void destroy_all();
+    [[nodiscard]]
+    Entity create();
+
+    void destroy(EntityId entity_id);
+
+    void destroy_all();
 
 private:
-    entt::registry m_registry;
+    entt::basic_registry<EntityId> m_registry;
 };
 
 //! An identifier class that represents a entity
-class Entity {
-public:
+struct Entity {
+    Registry* registry_ptr = nullptr;
+    EntityId id = entt::null;
+    
     friend class Registry;
 
-    // Ctor
-    Entity(entt::entity raw_entity);
-    // Copy
-    Entity(const Entity&) = default;
-    Entity& operator=(const Entity&) = default;
-    // Move
-    Entity(Entity&&) = default;
-    Entity& operator=(Entity&&) = default;
-    // Dtor
-    ~Entity() = default;
-
     template<typename Component, typename... Args>
-    Component& add_component(Args&&... args);
+    Component& emplace(Args&&... args);
 
     template<typename Component>
-    void remove_component();
+    Component& add(Component component);
 
     template<typename Component>
-    [[nodiscard]]
-    Component& get_component();
-
-    template<typename Component>
-    [[nodiscard]]
-    Component* try_get_component();
+    void remove();
 
     template<typename Component>
     [[nodiscard]]
-    bool contains_component() const;
+    Component& get();
+
+    template<typename Component>
+    [[nodiscard]]
+    Component* try_get();
+
+    template<typename Component>
+    [[nodiscard]]
+    bool contains() const;
 
     [[nodiscard]]
-    constexpr entt::entity raw() const {
-        return m_entity;
-    };
-
-    [[nodiscard]]
-    bool is_valid() const;
-
-private:
-    entt::entity m_entity = entt::null;
+    operator EntityId() {
+        return id;
+    }
 };
 
 //////////////// Implementation ////////////////
 
 template<typename Component, typename... Args>
-Component& Entity::add_component(Args&&... args) {
-    return Registry::registry().emplace<Component>(
-        m_entity, std::forward<Args>(args)...
+Component& Entity::emplace(Args&&... args) {
+    return registry_ptr->registry().emplace<Component>(
+        id, std::forward<Args>(args)...
     );
 }
 
 template<typename Component>
-void Entity::remove_component() {
-    Registry::registry().remove<Component>(m_entity);
+Component& Entity::add(Component component) {
+    return registry_ptr->registry().emplace<Component>(id, std::move(component));
+}
+
+template<typename Component>
+void Entity::remove() {
+    registry_ptr->registry().remove<Component>(id);
 }
 
 template<typename Component>
 [[nodiscard]]
-Component& Entity::get_component() {
-    return Registry::registry().get<Component>(m_entity);
+Component& Entity::get() {
+    return registry_ptr->registry().get<Component>(id);
 }
 
 template<typename Component>
 [[nodiscard]]
-Component* Entity::try_get_component() {
-    return Registry::registry().try_get<Component>(m_entity);
+Component* Entity::try_get() {
+    return registry_ptr->registry().try_get<Component>(id);
 }
 
 template<typename Component>
 [[nodiscard]]
-bool Entity::contains_component() const {
-    return Registry::registry().try_get<Component>(m_entity) != nullptr;
+bool Entity::contains() const {
+    return registry_ptr->registry().try_get<Component>(id) != nullptr;
 }
 
 } // namespace kzn

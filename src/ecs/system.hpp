@@ -1,6 +1,7 @@
 #pragma once
 
 #include "ecs/context.hpp"
+#include "ecs/scene.hpp"
 
 namespace kzn {
 
@@ -8,7 +9,7 @@ namespace kzn {
 struct System {
     virtual ~System() = default;
 
-    virtual void update(float delta_time) {}
+    virtual void update(Scene& scene, float delta_time) {}
 
     template<typename T>
     [[nodiscard]]

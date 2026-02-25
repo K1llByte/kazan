@@ -2,33 +2,29 @@
 #include "core/basic_app.hpp"
 #include "editor/editor_system.hpp"
 #include "graphics/render_system.hpp"
-#include "graphics/sprite_component.hpp"
 
 using namespace kzn;
 
-inline void create_test_level() {
-    auto entity = Registry::create();
-    entity.add_component<Transform2DComponent>();
-    entity.add_component<SpriteComponent>();
+inline void create_test_level(Scene& scene) {
+    auto entity = scene.registry.create();
+    entity.emplace<Transform2DComponent>();
 
-    auto camera = Registry::create();
-    camera.add_component<Camera2DComponent>(Camera2DComponent{
+    auto camera = scene.registry.create();
+    camera.add(Camera2DComponent{
         .use_viewport_aspect_ratio = true,
     });
 }
 
 struct TestApp : public BasicApp {
-    TestApp()
-        : BasicApp() {
-
+    TestApp() {
         // Initialize systems
         m_systems.emplace<RenderSystem>();
         // EditorSystem auto registers as dependency before RenderSystem
         m_systems.emplace<EditorSystem>(m_window, m_input, m_console);
 
         // Load level entities
-        create_test_level();
+        create_test_level(m_scene);
     }
 };
 
-// KZN_CREATE_APP(TestApp)
+KZN_CREATE_APP(TestApp)

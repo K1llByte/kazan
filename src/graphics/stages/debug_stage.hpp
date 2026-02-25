@@ -19,7 +19,7 @@ public:
     // Ctor
     DebugStage(Renderer& renderer, vk::RenderPass& render_pass, vk::DescriptorSet& camera_dset)
         : m_renderer_ptr{&renderer}
-        , m_debug_pipeline{
+        , m_test_pipeline{
               renderer.device(),
               vk::PipelineStages{
                   .vertex = "assets/shaders/debug.vert.spv",
@@ -50,7 +50,7 @@ public:
     bool is_enabled() const { return m_use_debug_render; }
     void enable(bool enable) { m_use_debug_render = enable; }
 
-    void render(vk::CommandBuffer& cmd_buffer) override {
+    void render(Scene& scene, vk::CommandBuffer& cmd_buffer) override {
         // Create debug line render vbo
         auto debug_vbo_opt = m_use_debug_render
                                  ? m_debug_render.create_debug_vbo()
@@ -59,15 +59,15 @@ public:
         if (m_use_debug_render && debug_vbo_opt.has_value()) {
             auto& debug_render = m_debug_render.value();
             auto& debug_vbo = debug_vbo_opt.value();
-            m_debug_pipeline.bind(cmd_buffer);
+            m_test_pipeline.bind(cmd_buffer);
 
             vk::cmd_set_line_width(cmd_buffer, debug_render.line_width());
             vk::cmd_bind_dset(
-                m_camera_dset, cmd_buffer, m_debug_pipeline.layout()
+                m_camera_dset, cmd_buffer, m_test_pipeline.layout()
             );
             vk::cmd_push_constants(
                 cmd_buffer,
-                m_debug_pipeline.layout(),
+                m_test_pipeline.layout(),
                 PvmPushData{
                     // Transform matrix to correct y position to be inverted
                     Mat4{1, 0, 0, 0, 0, -1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1}
@@ -82,7 +82,7 @@ public:
 
 private:
     Renderer* m_renderer_ptr;
-    vk::Pipeline m_debug_pipeline;
+    vk::Pipeline m_test_pipeline;
     bool m_use_debug_render = false;
     Ref<vk::DescriptorSet> m_camera_dset;
     // Debug render interface

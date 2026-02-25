@@ -138,7 +138,7 @@ set_target_properties(KazanLib PROPERTIES
 ## Demo Targets
 ###############################################################################
 
-add_executable(TestBin "src/test/scheduler_test.cpp")
+add_executable(TestBin "src/test/main.cpp")
 target_link_libraries(TestBin PRIVATE KazanLib)
 
 target_include_directories(TestBin PUBLIC ${KAZAN_INCLUDE_PATH})
@@ -150,7 +150,7 @@ target_compile_definitions(TestBin
       $<$<CONFIG:MinSizeRel>:RELEASE>
 )
 set_target_properties(TestBin PROPERTIES
-    OUTPUT_NAME "kazantest"
+    OUTPUT_NAME "kazan_demo"
 )
 
 ###############################################################################

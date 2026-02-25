@@ -53,13 +53,13 @@ public:
     // template<typename T>
     // PipelineConfig& set_type_vertex_input() noexcept;
 
-    //! Input Assemply >
+    // Input Assemply
     PipelineConfig& set_topology(VkPrimitiveTopology topology) {
         m_input_assembly_info.topology = topology;
         return *this;
     }
 
-    // // Rasterization Stage
+    // Rasterization Stage
     PipelineConfig& set_polygon_mode(VkPolygonMode polygon_mode) {
         m_rasterization_info.polygonMode = polygon_mode;
         return *this;

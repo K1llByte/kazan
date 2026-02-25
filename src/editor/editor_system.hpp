@@ -3,6 +3,7 @@
 #include "core/console.hpp"
 #include "core/window.hpp"
 #include "ecs/context.hpp"
+#include "ecs/scene.hpp"
 #include "ecs/system.hpp"
 #include "editor/console_panel.hpp"
 #include "editor/demo_panel.hpp"
@@ -76,7 +77,7 @@ public:
     // Dtor
     ~EditorSystem() = default;
 
-    void update(float delta_time) override {
+    void update(Scene& scene, float delta_time) override {
         // Start preparing Ui state for rendering
         ImGui_ImplVulkan_NewFrame();
         ImGui_ImplGlfw_NewFrame();

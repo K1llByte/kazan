@@ -1,12 +1,15 @@
 #include "core/app.hpp"
+#include "core/assert.hpp"
 #include "core/console.hpp"
 #include "core/timing.hpp"
 #include "core/window.hpp"
 #include "ecs/context.hpp"
 #include "ecs/entity.hpp"
-#include "ecs/scheduler_vec.hpp"
+#include "ecs/scheduler.hpp"
 #include "graphics/renderer.hpp"
 #include "input/input.hpp"
+#include <memory>
+#include <optional>
 
 namespace kzn {
 
@@ -44,7 +47,7 @@ public:
             m_input.update_state();
             
             // Update systems
-            executor.update(frame_time);
+            executor.update(m_scene, frame_time);
             
             // Update FPS in window title every seconds
             if (accum_time > 1.f) {
@@ -60,8 +63,8 @@ protected:
     Context<Input> m_input;
     Context<Console> m_console;
     Context<Renderer> m_renderer;
-    Registry m_registry;
-    VectorScheduler m_systems;
+    Scheduler m_systems;
+    Scene m_scene;
 };
 
 } // namespace kzn

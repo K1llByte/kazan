@@ -2,9 +2,12 @@
 
 #include "animation/sprite_animator.hpp"
 #include "ecs/entity.hpp"
+#include "ecs/scene.hpp"
 #include "ecs/system.hpp"
 #include "graphics/sprite_component.hpp"
+
 #include <cmath>
+
 namespace kzn {
 
 class AnimationSystem : public System {
@@ -20,9 +23,9 @@ public:
     // Dtor
     ~AnimationSystem() = default;
 
-    void update(float delta_time) override {
+    void update(Scene& scene, float delta_time) override {
         auto sprites_view =
-            Registry::registry().view<SpriteComponent, SpriteAnimatorComponent>(
+            scene.registry.registry().view<SpriteComponent, SpriteAnimatorComponent>(
             );
 
         for (auto [entity, sprite, animator] : sprites_view.each()) {

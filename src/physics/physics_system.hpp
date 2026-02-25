@@ -9,6 +9,7 @@
 #include "core/singleton.hpp"
 #include "ecs/context.hpp"
 #include "ecs/entity.hpp"
+#include "ecs/scene.hpp"
 #include "ecs/system.hpp"
 #include "events/event_manager.hpp"
 #include "graphics/debug_render.hpp"
@@ -121,12 +122,12 @@ public:
         b2DestroyWorld(m_physics_world.world_id);
     }
 
-    void update(float delta_time) override {
+    void update(Scene& scene, float delta_time) override {
         auto& input = context<Input>();
 
         if (m_simulate_physics) {
             // Pre physics transform component sync
-            auto view = Registry::registry()
+            auto view = scene.registry.registry()
                             .view<PhysicsComponent, Transform2DComponent>();
             for (auto [entity, physics, transform] : view.each()) {
                 b2Rot rotation = b2Body_GetRotation(physics.m_body_id);

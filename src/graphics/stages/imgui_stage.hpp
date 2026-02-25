@@ -88,12 +88,12 @@ public:
         vkDestroyDescriptorPool(m_renderer_ptr->device(), m_imgui_pool, nullptr);
     }
 
-    void pre_render() override {
+    void pre_render(Scene& scene) override {
         // Render dear imgui into screen
         ImGui::Render();
     }
 
-    void render(vk::CommandBuffer& cmd_buffer) override {
+    void render(Scene& scene, vk::CommandBuffer& cmd_buffer) override {
         KZN_ASSERT(is_editor_initialized());
 
         // Submit draw commands
@@ -101,8 +101,6 @@ public:
             ImGui::GetDrawData(), cmd_buffer.vk_cmd_buffer()
         );
     }
-
-    void post_render() override {}
 
 private:
     [[nodiscard]]

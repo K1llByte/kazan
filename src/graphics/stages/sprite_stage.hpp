@@ -55,17 +55,17 @@ public:
         // Make sure all resources are released
         // FIXME: This is only a problem because of default material, think of a
         // way to fix that
-        auto sprites_view = Registry::registry().view<SpriteComponent>();
-        for (auto [entity, sprite] : sprites_view->each()) {
-            sprite.material()->destroy_render_data();
-        }
+        // auto sprites_view = scene.registry.registry().view<SpriteComponent>();
+        // for (auto [entity, sprite] : sprites_view->each()) {
+        //     sprite.material()->destroy_render_data();
+        // }
 
         // Destroy all geometry data left
         m_sprite_geom_cache.clear();
     }
 
-    void pre_render() override {
-        auto sprites_view = Registry::registry().view<SpriteComponent>();
+    void pre_render(Scene& scene) override {
+        auto sprites_view = scene.registry.registry().view<SpriteComponent>();
         for (auto [entity, sprite] : sprites_view->each()) {
             if (sprite.geometry() == nullptr) {
                 sprite.create_geometry(m_sprite_geom_cache);
@@ -83,7 +83,7 @@ public:
         }
     }
 
-    void render(vk::CommandBuffer& cmd_buffer) override {
+    void render(Scene& scene, vk::CommandBuffer& cmd_buffer) override {
         m_pipeline.bind(cmd_buffer);
 
         vk::cmd_set_viewport(
@@ -94,13 +94,13 @@ public:
         );
 
         // Render sprite components
-        auto sprites_view = Registry::registry().view<SpriteComponent>();
+        auto sprites_view = scene.registry.registry().view<SpriteComponent>();
         for (auto [entity, sprite] : sprites_view.each()) {
             Mat4 transform_mat{};
 
             // If sprite has transform component, update pvm push constant.
             auto transform_ptr =
-                Registry::registry().try_get<Transform2DComponent>(entity);
+                scene.registry.registry().try_get<Transform2DComponent>(entity);
             if (transform_ptr != nullptr) {
                 transform_mat = transform_ptr->matrix();
             }
