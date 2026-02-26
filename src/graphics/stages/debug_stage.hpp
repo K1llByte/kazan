@@ -23,8 +23,8 @@ public:
         , m_debug_pipeline{
             renderer.device(),
             vk::PipelineStages{
-                .vertex = load_shader("assets/shaders/debug.vert.spv"),
-                .fragment = load_shader("assets/shaders/debug.frag.spv"),
+                .vertex = load_shader("shaders://debug.vert.spv"),
+                .fragment = load_shader("shaders://debug.frag.spv"),
             },
             vk::PipelineConfig(render_pass)
                 .set_vertex_input<Vec2, Vec3>()

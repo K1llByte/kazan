@@ -24,26 +24,27 @@ public:
         : m_renderer_ptr{&renderer}
         , m_sprite_geom_cache{renderer}
         , m_pipeline{
-              renderer.device(),
-              vk::PipelineStages{
-                  .vertex = load_shader("shaders://sprites/sprite_render.vert.spv"),
-                  .fragment = load_shader("shaders://sprites/sprite_render.frag.spv"),
-              },
-              vk::PipelineConfig(render_pass)
-                  .set_vertex_input<Vec3, Vec2>()
-                  .set_topology(VK_PRIMITIVE_TOPOLOGY_TRIANGLE_STRIP)
-                  .set_layout(vk::PipelineLayout{
-                      .push_constants = {vk::push_constant_range<PvmPushData>()
-                      },
-                      .descriptor_sets =
-                          {renderer.dset_layout_cache()
-                               .layout({vk::uniform_binding(0)}),
-                           renderer.dset_layout_cache().layout(
-                               {vk::sampler_binding(0), vk::uniform_binding(1)}
-                           )}
-                  })
+            renderer.device(),
+            vk::PipelineStages{
+                .vertex = load_shader("shaders://sprites/sprite_render.vert.spv"),
+                .fragment = load_shader("shaders://sprites/sprite_render.frag.spv"),
+            },
+            vk::PipelineConfig(render_pass)
+                .set_vertex_input<Vec3, Vec2>()
+                .set_topology(VK_PRIMITIVE_TOPOLOGY_TRIANGLE_STRIP)
+                .set_layout(vk::PipelineLayout{
+                    .push_constants = {vk::push_constant_range<PvmPushData>()},
+                    .descriptor_sets = {
+                        renderer.dset_layout_cache()
+                            .layout({vk::uniform_binding(0)}),
+                        renderer.dset_layout_cache().layout(
+                            {vk::sampler_binding(0), vk::uniform_binding(1)}
+                        )
+                    }
+                })
           }
-        , m_camera_dset_ptr{&camera_dset} {}
+        , m_camera_dset_ptr{&camera_dset}
+        {}
     // Copy
     SpriteStage(const SpriteStage&) = delete;
     SpriteStage& operator=(const SpriteStage&) = delete;

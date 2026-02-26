@@ -20,8 +20,8 @@ public:
         , m_test_pipeline{
             renderer.device(),
             vk::PipelineStages{
-                .vertex = load_shader("assets/shaders/planet/planet.vert.slang.spv"),
-                .fragment = load_shader("assets/shaders/planet/planet.frag.spv"),
+                .vertex = load_shader("shaders://planet/planet.vert.spv"),
+                .fragment = load_shader("shaders://planet/planet.frag.spv"),
             },
             vk::PipelineConfig(render_pass)
                 .set_topology(VK_PRIMITIVE_TOPOLOGY_TRIANGLE_STRIP)
@@ -35,7 +35,7 @@ public:
                 })
         }
         , m_camera_dset_ptr{&camera_dset}
-        , m_earth_tex_ptr{g_resources.find_or_load<Texture>("assets/textures/earth.jpg")}
+        , m_earth_tex_ptr{g_resources.find_or_load<Texture>("textures://earth.jpg")}
         // , m_earth_tex_ptr{g_resources.find_or_load<Texture>("textures://earth.jpg")}
         , m_earth_dset{renderer.dset_allocator().allocate(
             renderer.dset_layout_cache().layout({
@@ -53,22 +53,15 @@ public:
     void render(Scene& scene, vk::CommandBuffer& cmd_buffer) override {
         vk::cmd_bind_pipeline(cmd_buffer, m_test_pipeline);
         const auto swapchain_extent = m_renderer_ptr->swapchain().extent();
-        vk::cmd_set_viewport(
-            cmd_buffer, vk::create_viewport(swapchain_extent)
-        );
-        vk::cmd_set_scissor(
-            cmd_buffer, vk::create_scissor(swapchain_extent)
-        );
+        vk::cmd_set_viewport(cmd_buffer, vk::create_viewport(swapchain_extent));
+        vk::cmd_set_scissor(cmd_buffer, vk::create_scissor(swapchain_extent));
 
         vk::cmd_bind_dsets(
             cmd_buffer,
-            std::array{
-                m_camera_dset_ptr,
-                &m_earth_dset
-            },
+            std::array{m_camera_dset_ptr, &m_earth_dset},
             m_test_pipeline.layout()
         );
-        
+
         vk::cmd_draw(cmd_buffer, 4);
     }
 

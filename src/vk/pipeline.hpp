@@ -5,8 +5,6 @@
 #include "vk/shader_code.hpp"
 #include "vk/uniform.hpp"
 
-#include <optional>
-#include <string_view>
 #include <vulkan/vulkan_core.h>
 
 namespace kzn::vk {
@@ -128,8 +126,7 @@ public:
     Pipeline(const Pipeline&) = delete;
     Pipeline& operator=(const Pipeline&) = delete;
     // Move
-    Pipeline(Pipeline&&) = delete;
-    Pipeline& operator=(Pipeline&&) = delete;
+    Pipeline(Pipeline&& other) = default;
     // Dtor
     ~Pipeline();
 

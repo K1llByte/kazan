@@ -14,8 +14,7 @@ layout(set = 0, binding = 0) uniform Camera {
     float zoom;
     float aspect_ratio;
     float rotation;
-}
-camera;
+} camera;
 layout(set = 1, binding = 0) uniform sampler2D earth_sampler;
 
 vec3 ray_direction(

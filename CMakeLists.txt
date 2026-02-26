@@ -78,6 +78,13 @@ FetchContent_Declare(vma
     GIT_TAG v3.3.0
 )
 FetchContent_MakeAvailable(vma)
+# - SPIRV-Reflect
+set(SPIRV_REFLECT_STATIC_LIB ON CACHE BOOL "" FORCE)
+FetchContent_Declare(spirvreflect
+    GIT_REPOSITORY https://github.com/KhronosGroup/SPIRV-Reflect
+    GIT_TAG vulkan-sdk-1.4.341.0
+)
+FetchContent_MakeAvailable(spirvreflect)
 # - Box2D
 FetchContent_Declare(box2d
     GIT_REPOSITORY https://github.com/erincatto/box2d
@@ -119,8 +126,14 @@ target_link_libraries(KazanLib PUBLIC
     GPUOpen::VulkanMemoryAllocator
     box2d
     ${Vulkan_LIBRARIES}
+    spirv-reflect-static
 )
-set(KAZAN_INCLUDE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/src ${stb_SOURCE_DIR} ${imgui_SOURCE_DIR})
+set(KAZAN_INCLUDE_PATH
+    ${CMAKE_CURRENT_SOURCE_DIR}/src
+    ${stb_SOURCE_DIR}
+    ${imgui_SOURCE_DIR}
+    # ${spirvreflect_SOURCE_DIR}
+)
 target_include_directories(KazanLib PUBLIC ${KAZAN_INCLUDE_PATH})
 target_include_directories(KazanLib SYSTEM PUBLIC boost_pfr)
 target_compile_definitions(KazanLib
@@ -150,7 +163,7 @@ target_compile_definitions(TestBin
       $<$<CONFIG:MinSizeRel>:RELEASE>
 )
 set_target_properties(TestBin PROPERTIES
-    OUTPUT_NAME "kazan_demo"
+    OUTPUT_NAME "test"
 )
 
 ###############################################################################

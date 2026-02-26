@@ -7,7 +7,7 @@ compile_glsl_shaders_by_ext() {
     for ext in "$@"; do
         for filename in assets/shaders/**/*.${ext}; do
             echo -e "${BOLD_GREEN}Compiling GLSL ${filename}${RESET}"
-            glslangValidator -V "${filename}" -o "${filename}.spv"
+            glslangValidator -Os -V "${filename}" -o "${filename}.spv"
         done
     done
 }

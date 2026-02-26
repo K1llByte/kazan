@@ -14,7 +14,6 @@
 #include <unordered_map>
 #include <utility>
 
-
 namespace kzn {
 
 class ResourceCache {
@@ -36,10 +35,7 @@ public:
         const auto resolved_path_opt = path_aliases.resolve(path);
         // If path contains a path alias that wasn't registered.
         if (resolved_path_opt == std::nullopt) {
-            throw LoadingError{fmt::format(
-                "Unknown path alias '{}'",
-                path
-            )};
+            throw LoadingError{fmt::format("Unknown path alias '{}'", path)};
         }
 
         const auto& resolved_path = resolved_path_opt.value();
@@ -66,12 +62,9 @@ public:
         const auto resolved_path_opt = path_aliases.resolve(path);
         // If path contains a path alias that wasn't registered.
         if (resolved_path_opt == std::nullopt) {
-            throw LoadingError{fmt::format(
-                "Unknown path alias '{}'",
-                path
-            )};
+            throw LoadingError{fmt::format("Unknown path alias '{}'", path)};
         }
-        
+
         const auto& resolved_path = resolved_path_opt.value();
         auto it = m_resources.find(std::string_view{resolved_path.native()});
         if (it != m_resources.end()) {
@@ -88,11 +81,11 @@ public:
             {StringHash(resolved_path.native()),
              std::make_pair(
                  std::type_index(typeid(T)),
-                 std::static_pointer_cast<void>(T::load(path))
+                 std::static_pointer_cast<void>(T::load(resolved_path.native()))
              )}
         );
 
-        Log::info("Loaded '{}'", resolved_path.native());
+        Log::info("Loaded '{}'", path);
 
         return std::static_pointer_cast<T>(inserted_it->second.second);
     }
@@ -100,8 +93,8 @@ public:
 private:
     std::unordered_map<
         StringHash,
-        std::pair<std::type_index, std::shared_ptr<void>>
-    > m_resources;
+        std::pair<std::type_index, std::shared_ptr<void>>>
+        m_resources;
 };
 
 // NOTE: This will be a global for now, but in the future, application should

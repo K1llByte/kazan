@@ -1,8 +1,9 @@
 # Todo
 
-- [ ] Shader reflections
-- [ ] Add https://github.com/martinus/unordered_dense as dependency and benchmark performance differences
+
+- [ ] PipelineBuilder that uses spirv reflection data to deduce pipeline layout
 - [ ] Add volk meta loader as dependency
+- [ ] Add https://github.com/martinus/unordered_dense as dependency and benchmark performance differences
 - [ ] Remove Singleton base class
 - [ ] Reuse simple imgui overlay to display text information such as rendering info
 - [ ] Write small cli to create application and help

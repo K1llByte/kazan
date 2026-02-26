@@ -9,6 +9,7 @@
 
 namespace kzn {
 
+// FIXME: Temporary util function
 inline std::shared_ptr<vk::ShaderCode> load_shader(const std::string_view path) {
     return g_resources.find_or_load<vk::ShaderCode>(path);
 }
