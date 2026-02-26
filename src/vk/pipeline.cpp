@@ -2,7 +2,9 @@
 
 #include "core/log.hpp"
 #include "vk/error.hpp"
+#include "vk/shader_code.hpp"
 
+#include <array>
 #include <fstream>
 #include <vulkan/vulkan_core.h>
 
@@ -126,27 +128,13 @@ PipelineConfig::PipelineConfig(const vk::RenderPass& render_pass)
 
 VkShaderModule create_shader_module(
     Device& device,
-    std::string_view file_path
+    const ShaderCode& shader_code
 ) {
-    // 1. Read code from file and store it in a vector
-    std::ifstream file{file_path.data(), std::ios::ate | std::ios::binary};
-    if (!file.is_open()) {
-        Log::error("Failed to open file '{}'", file_path);
-        throw 1; // TODO: Error handling
-        // throw FileError();
-    }
-
-    const size_t file_size = static_cast<size_t>(file.tellg());
-    std::vector<char> code(file_size);
-    file.seekg(0);
-    file.read(code.data(), file_size);
-    file.close();
-
-    // 2. Create shader module from the code
+    // Create shader module from the code
     VkShaderModuleCreateInfo create_info{};
     create_info.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
-    create_info.codeSize = code.size();
-    create_info.pCode = reinterpret_cast<const uint32_t*>(code.data());
+    create_info.codeSize = shader_code.bytecode.size();
+    create_info.pCode = reinterpret_cast<const uint32_t*>(shader_code.bytecode.data());
 
     VkShaderModule shader_module;
     auto result =
@@ -160,7 +148,8 @@ Pipeline::Pipeline(
     const PipelineStages& stages,
     const PipelineConfig& config
 )
-    : m_device{device} {
+    : m_device{device}
+    , m_shader_modules{VK_NULL_HANDLE} {
     // Create pipeline layout
     VkPipelineLayoutCreateInfo pipeline_layout_info{
         .sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO,
@@ -180,29 +169,79 @@ Pipeline::Pipeline(
     VK_CHECK_MSG(result, "Failed to create pipeline layout!");
 
     // Create shader stages
-    auto vertex_shader_mod = create_shader_module(device, stages.vertex);
-    auto fragment_shader_mod = create_shader_module(device, stages.fragment);
-    m_shader_modules = {vertex_shader_mod, fragment_shader_mod};
-
-    VkPipelineShaderStageCreateInfo shader_stages[2];
+    VkPipelineShaderStageCreateInfo shader_stages[5];
+    size_t next_stage_idx = 0;
+    
     // Vertex Shader
-    shader_stages[0].sType =
+    KZN_ASSERT_MSG(stages.vertex != nullptr, "Vertex stage is not optional");
+    auto vertex_shader_mod = create_shader_module(device, *stages.vertex);
+    shader_stages[next_stage_idx].sType =
         VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
-    shader_stages[0].stage = VK_SHADER_STAGE_VERTEX_BIT;
-    shader_stages[0].module = vertex_shader_mod;
-    shader_stages[0].pName = "main";
-    shader_stages[0].flags = 0;
-    shader_stages[0].pNext = nullptr;
-    shader_stages[0].pSpecializationInfo = nullptr;
+    shader_stages[next_stage_idx].stage = VK_SHADER_STAGE_VERTEX_BIT;
+    shader_stages[next_stage_idx].module = vertex_shader_mod;
+    shader_stages[next_stage_idx].pName = "main";
+    shader_stages[next_stage_idx].flags = 0;
+    shader_stages[next_stage_idx].pNext = nullptr;
+    shader_stages[next_stage_idx].pSpecializationInfo = nullptr;
+    m_shader_modules[next_stage_idx] = vertex_shader_mod;
+    next_stage_idx += 1;
+
+    // Tesselation Control Shader
+    if(stages.tess_control != nullptr) {
+        auto tess_control_shader_mod = create_shader_module(device, *stages.tess_control);
+        shader_stages[next_stage_idx].sType =
+            VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
+        shader_stages[next_stage_idx].stage = VK_SHADER_STAGE_TESSELLATION_CONTROL_BIT;
+        shader_stages[next_stage_idx].module = tess_control_shader_mod;
+        shader_stages[next_stage_idx].pName = "main";
+        shader_stages[next_stage_idx].flags = 0;
+        shader_stages[next_stage_idx].pNext = nullptr;
+        shader_stages[next_stage_idx].pSpecializationInfo = nullptr;
+        m_shader_modules[next_stage_idx] = tess_control_shader_mod;
+        next_stage_idx += 1;
+    }
+    // Tesselation Evaluation Shader
+    if(stages.tess_evaluation != nullptr) {
+        auto tess_evaluation_shader_mod = create_shader_module(device, *stages.tess_evaluation);
+        shader_stages[next_stage_idx].sType =
+            VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
+        shader_stages[next_stage_idx].stage = VK_SHADER_STAGE_TESSELLATION_EVALUATION_BIT;
+        shader_stages[next_stage_idx].module = tess_evaluation_shader_mod;
+        shader_stages[next_stage_idx].pName = "main";
+        shader_stages[next_stage_idx].flags = 0;
+        shader_stages[next_stage_idx].pNext = nullptr;
+        shader_stages[next_stage_idx].pSpecializationInfo = nullptr;
+        m_shader_modules[next_stage_idx] = tess_evaluation_shader_mod;
+        next_stage_idx += 1;
+    }
+    // Geometry Shader
+    if(stages.geometry != nullptr) {
+        auto geometry_shader_mod = create_shader_module(device, *stages.geometry);
+        shader_stages[next_stage_idx].sType =
+            VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
+        shader_stages[next_stage_idx].stage = VK_SHADER_STAGE_GEOMETRY_BIT;
+        shader_stages[next_stage_idx].module = geometry_shader_mod;
+        shader_stages[next_stage_idx].pName = "main";
+        shader_stages[next_stage_idx].flags = 0;
+        shader_stages[next_stage_idx].pNext = nullptr;
+        shader_stages[next_stage_idx].pSpecializationInfo = nullptr;
+        m_shader_modules[next_stage_idx] = geometry_shader_mod;
+        next_stage_idx += 1;
+    }
     // Fragment Shader
-    shader_stages[1].sType =
-        VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
-    shader_stages[1].stage = VK_SHADER_STAGE_FRAGMENT_BIT;
-    shader_stages[1].module = fragment_shader_mod;
-    shader_stages[1].pName = "main";
-    shader_stages[1].flags = 0;
-    shader_stages[1].pNext = nullptr;
-    shader_stages[1].pSpecializationInfo = nullptr;
+    if(stages.fragment != nullptr) {
+        auto fragment_shader_mod = create_shader_module(device, *stages.fragment);
+        shader_stages[next_stage_idx].sType =
+            VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
+        shader_stages[next_stage_idx].stage = VK_SHADER_STAGE_FRAGMENT_BIT;
+        shader_stages[next_stage_idx].module = fragment_shader_mod;
+        shader_stages[next_stage_idx].pName = "main";
+        shader_stages[next_stage_idx].flags = 0;
+        shader_stages[next_stage_idx].pNext = nullptr;
+        shader_stages[next_stage_idx].pSpecializationInfo = nullptr;
+        m_shader_modules[next_stage_idx] = fragment_shader_mod;
+        next_stage_idx += 1;
+    }
 
     // Setup vertex input description
     VkPipelineVertexInputStateCreateInfo vertex_input_info{};
@@ -219,7 +258,7 @@ Pipeline::Pipeline(
 
     VkGraphicsPipelineCreateInfo pipeline_info{};
     pipeline_info.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
-    pipeline_info.stageCount = std::size(shader_stages);
+    pipeline_info.stageCount = next_stage_idx;
     pipeline_info.pStages = shader_stages;
     pipeline_info.pVertexInputState = &vertex_input_info;
     pipeline_info.pInputAssemblyState = &config.m_input_assembly_info;
@@ -246,7 +285,9 @@ Pipeline::Pipeline(
 
 Pipeline::~Pipeline() {
     for (auto shader_module : m_shader_modules) {
-        vkDestroyShaderModule(m_device, shader_module, nullptr);
+        if(shader_module != VK_NULL_HANDLE) {
+            vkDestroyShaderModule(m_device, shader_module, nullptr);
+        }
     }
     vkDestroyPipelineLayout(m_device, m_pipeline_layout, nullptr);
     vkDestroyPipeline(m_device, m_vk_pipeline, nullptr);

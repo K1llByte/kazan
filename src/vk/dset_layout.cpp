@@ -81,7 +81,7 @@ DescriptorSetLayoutCache::~DescriptorSetLayoutCache() {
     }
 }
 
-DescriptorSetLayout DescriptorSetLayoutCache::create_layout(
+DescriptorSetLayout DescriptorSetLayoutCache::layout(
     const DescriptorSetBindings& bindings
 ) {
     DescriptorLayoutInfo layout_info{

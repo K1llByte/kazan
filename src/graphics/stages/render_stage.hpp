@@ -1,9 +1,17 @@
 #pragma once
 
 #include "ecs/scene.hpp"
+#include "resources/resources.hpp"
 #include "vk/cmd_buffer.hpp"
+#include "vk/shader_code.hpp"
+
+#include <memory>
 
 namespace kzn {
+
+inline std::shared_ptr<ShaderCode> load_shader(const std::string_view path) {
+    return g_resources.find_or_load<ShaderCode>(path);
+}
 
 struct RenderStage {
     virtual ~RenderStage() {}

@@ -7,7 +7,7 @@ namespace kzn {
 
 //! Generic loading error
 struct LoadingError {
-    std::string_view message;
+    std::string message;
 };
 
 //! Concept for loadable resource types

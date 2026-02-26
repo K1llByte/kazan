@@ -25,9 +25,10 @@ inline void init_render_stages(RenderSystem& render_sys) {
     //     render_sys.screen_render_pass(),
     //     render_sys.camera_dset()
     // );
-    render_sys.emplace_stage<TestStage>(
+    render_sys.emplace_stage<GpuPlanetStage>(
         render_sys.context<Renderer>(),
-        render_sys.screen_render_pass()
+        render_sys.screen_render_pass(),
+        render_sys.camera_dset()
     );
     render_sys.emplace_stage<DebugStage>(
         render_sys.context<Renderer>(),

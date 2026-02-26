@@ -73,7 +73,7 @@ public:
     // Dtor
     ~DescriptorSetLayoutCache();
 
-    DescriptorSetLayout create_layout(const DescriptorSetBindings& info);
+    DescriptorSetLayout layout(const DescriptorSetBindings& info);
 
 private:
     struct DescriptorLayoutHash {

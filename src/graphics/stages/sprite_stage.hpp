@@ -26,8 +26,8 @@ public:
         , m_pipeline{
               renderer.device(),
               vk::PipelineStages{
-                  .vertex = "assets/shaders/sprites/sprite_render.vert.spv",
-                  .fragment = "assets/shaders/sprites/sprite_render.frag.spv",
+                  .vertex = load_shader("shaders://sprites/sprite_render.vert.spv"),
+                  .fragment = load_shader("shaders://sprites/sprite_render.frag.spv"),
               },
               vk::PipelineConfig(render_pass)
                   .set_vertex_input<Vec3, Vec2>()
@@ -37,8 +37,8 @@ public:
                       },
                       .descriptor_sets =
                           {renderer.dset_layout_cache()
-                               .create_layout({vk::uniform_binding(0)}),
-                           renderer.dset_layout_cache().create_layout(
+                               .layout({vk::uniform_binding(0)}),
+                           renderer.dset_layout_cache().layout(
                                {vk::sampler_binding(0), vk::uniform_binding(1)}
                            )}
                   })
@@ -52,14 +52,6 @@ public:
     SpriteStage& operator=(SpriteStage&&) = delete;
     // Dtor
     ~SpriteStage() {
-        // Make sure all resources are released
-        // FIXME: This is only a problem because of default material, think of a
-        // way to fix that
-        // auto sprites_view = scene.registry.registry().view<SpriteComponent>();
-        // for (auto [entity, sprite] : sprites_view->each()) {
-        //     sprite.material()->destroy_render_data();
-        // }
-
         // Destroy all geometry data left
         m_sprite_geom_cache.clear();
     }

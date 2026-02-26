@@ -81,7 +81,7 @@ RenderSystem::RenderSystem()
     , m_framebuffers{create_framebuffers(context<Renderer>(), m_screen_render_pass, m_depth_image)}
     , m_camera_ubo{context<Renderer>().device(), sizeof(CameraUniformData)}
     , m_camera_dset{context<Renderer>().dset_allocator().allocate(
-          context<Renderer>().dset_layout_cache().create_layout({
+          context<Renderer>().dset_layout_cache().layout({
               vk::uniform_binding(0),
           })
       )}

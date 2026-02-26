@@ -12,11 +12,13 @@ layout(set = 0, binding = 0) uniform Camera {
     float zoom;
     float aspect_ratio;
     float rotation;
-} camera;
+}
+camera;
 
 layout(push_constant) uniform Pvm {
-	mat4 matrix;
-} pvm;
+    mat4 matrix;
+}
+pvm;
 
 void main() {
     // Projection matrix
@@ -30,12 +32,7 @@ void main() {
     view_mat[1].xy = vec2(-sin(camera.rotation), cos(camera.rotation));
     view_mat[3].xy = vec2(-camera.position.x, camera.position.y);
 
-    
-    gl_Position = proj_mat * view_mat * pvm.matrix * vec4(
-        in_position.x,
-        in_position.y,
-        0.0,
-        1
-    );
+    gl_Position = proj_mat * view_mat * pvm.matrix *
+                  vec4(in_position.x, in_position.y, 0.0, 1);
     out_vtx_color = in_color;
 }

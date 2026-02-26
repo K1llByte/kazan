@@ -9,6 +9,7 @@
 #include "vk/image.hpp"
 #include "vk/uniform.hpp"
 
+#include <memory>
 #include <optional>
 #include <string_view>
 
@@ -28,7 +29,7 @@ struct SpriteMaterialRenderData {
         Vec4 overlap_color
     )
         : material_dset{renderer.dset_allocator().allocate(
-              renderer.dset_layout_cache().create_layout({
+              renderer.dset_layout_cache().layout({
                   vk::sampler_binding(0),
                   vk::uniform_binding(1),
               })
@@ -58,8 +59,8 @@ struct SpriteMaterialRenderData {
 class SpriteMaterial {
 public:
     // Ctor
-    SpriteMaterial(const std::string_view albedo_path)
-        : m_texture_ptr(g_resources.find_or_load<Texture>(albedo_path)) {}
+    SpriteMaterial(std::shared_ptr<Texture> albedo_ptr)
+        : m_texture_ptr(std::move(albedo_ptr)) {}
     // Dtor
     ~SpriteMaterial() = default;
 

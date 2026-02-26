@@ -19,22 +19,24 @@ public:
     // Ctor
     DebugStage(Renderer& renderer, vk::RenderPass& render_pass, vk::DescriptorSet& camera_dset)
         : m_renderer_ptr{&renderer}
-        , m_test_pipeline{
-              renderer.device(),
-              vk::PipelineStages{
-                  .vertex = "assets/shaders/debug.vert.spv",
-                  .fragment = "assets/shaders/debug.frag.spv",
-              },
-              vk::PipelineConfig(render_pass)
-                  .set_vertex_input<Vec2, Vec3>()
-                  .set_topology(VK_PRIMITIVE_TOPOLOGY_LINE_LIST)
-                  .set_layout(vk::PipelineLayout{
-                      .push_constants = {vk::push_constant_range<PvmPushData>()
-                      },
-                      .descriptor_sets =
-                          {renderer.dset_layout_cache()
-                               .create_layout({vk::uniform_binding(0)})}
-                  })
+        , m_debug_pipeline{
+            renderer.device(),
+            vk::PipelineStages{
+                .vertex = load_shader("assets/shaders/debug.vert.spv"),
+                .fragment = load_shader("assets/shaders/debug.frag.spv"),
+            },
+            vk::PipelineConfig(render_pass)
+                .set_vertex_input<Vec2, Vec3>()
+                .set_topology(VK_PRIMITIVE_TOPOLOGY_LINE_LIST)
+                .set_layout(vk::PipelineLayout{
+                    .push_constants = {
+                        vk::push_constant_range<PvmPushData>()
+                    },
+                    .descriptor_sets = {
+                        renderer.dset_layout_cache()
+                            .layout({vk::uniform_binding(0)})
+                    }
+                })
           }
         , m_camera_dset{camera_dset}
         , m_debug_render(renderer) {}
@@ -51,7 +53,7 @@ public:
         if (m_use_debug_render && debug_vbo_opt.has_value()) {
             auto& debug_render = m_debug_render.value();
             auto& debug_vbo = debug_vbo_opt.value();
-            m_test_pipeline.bind(cmd_buffer);
+            m_debug_pipeline.bind(cmd_buffer);
 
             const auto swapchain_extent = m_renderer_ptr->swapchain().extent();
             vk::cmd_set_viewport(
@@ -63,11 +65,11 @@ public:
 
             vk::cmd_set_line_width(cmd_buffer, debug_render.line_width());
             vk::cmd_bind_dset(
-                m_camera_dset, cmd_buffer, m_test_pipeline.layout()
+                m_camera_dset, cmd_buffer, m_debug_pipeline.layout()
             );
             vk::cmd_push_constants(
                 cmd_buffer,
-                m_test_pipeline.layout(),
+                m_debug_pipeline.layout(),
                 PvmPushData{
                     // Transform matrix to correct y position to be inverted
                     Mat4{1, 0, 0, 0, 0, -1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1}
@@ -82,7 +84,7 @@ public:
 
 private:
     Renderer* m_renderer_ptr;
-    vk::Pipeline m_test_pipeline;
+    vk::Pipeline m_debug_pipeline;
     bool m_use_debug_render = false;
     Ref<vk::DescriptorSet> m_camera_dset;
     // Debug render interface

@@ -2,8 +2,10 @@
 
 #include "render_pass.hpp"
 #include "utils.hpp"
+#include "vk/shader_code.hpp"
 #include "vk/uniform.hpp"
 
+#include <optional>
 #include <string_view>
 #include <vulkan/vulkan_core.h>
 
@@ -98,12 +100,20 @@ private:
     uint32_t m_subpass = 0;
 };
 
+// struct PipelineStages {
+//     std::string_view vertex;
+//     std::string_view tess_control;
+//     std::string_view tess_evaluation;
+//     std::string_view geometry;
+//     std::string_view fragment;
+// };
+
 struct PipelineStages {
-    std::string_view vertex;
-    std::string_view tess_control;
-    std::string_view tess_evaluation;
-    std::string_view geometry;
-    std::string_view fragment;
+    std::shared_ptr<ShaderCode> vertex = nullptr;
+    std::shared_ptr<ShaderCode> tess_control = nullptr;
+    std::shared_ptr<ShaderCode> tess_evaluation = nullptr;
+    std::shared_ptr<ShaderCode> geometry = nullptr;
+    std::shared_ptr<ShaderCode> fragment = nullptr;
 };
 
 class Pipeline {
@@ -134,7 +144,7 @@ private:
     Device& m_device;
     VkPipeline m_vk_pipeline;
     VkPipelineLayout m_pipeline_layout = VK_NULL_HANDLE;
-    std::vector<VkShaderModule> m_shader_modules;
+    std::array<VkShaderModule, 5> m_shader_modules;
 };
 
 //////////////////////////////////////////////////////////////

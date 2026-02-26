@@ -9,7 +9,9 @@
 namespace kzn {
 
 inline std::shared_ptr<SpriteMaterial> default_material() {
-    static auto s_default_material = std::make_shared<SpriteMaterial>("textures://debug.png");
+    static auto s_default_material = std::make_shared<SpriteMaterial>(
+        g_resources.find_or_load<Texture>("textures://debug.png")
+    );
     return s_default_material;
 }
 
