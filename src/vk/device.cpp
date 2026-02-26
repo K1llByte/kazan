@@ -269,6 +269,12 @@ VkDevice create_device(
         static_cast<uint32_t>(extensions.size());
     create_info.ppEnabledExtensionNames = extensions.data();
 
+    // FIXME: Make vulkan features configurable for any vulkan version
+    VkPhysicalDeviceVulkan11Features features_11{};
+    features_11.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_VULKAN_1_1_FEATURES;
+    features_11.shaderDrawParameters = VK_TRUE;
+    create_info.pNext = &features_11;
+
     if (!extensions.empty()) {
         Log::trace("Requested device extensions:");
         for (auto ext_name : extensions) {

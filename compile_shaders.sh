@@ -40,4 +40,5 @@ compile_glsl_shaders_by_ext "rcall"
 compile_glsl_shaders_by_ext "task"
 compile_glsl_shaders_by_ext "mesh"
 
+# Compile slang shaders
 compile_slang_shaders_by_ext "slang"

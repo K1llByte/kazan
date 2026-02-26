@@ -3,6 +3,7 @@ struct VertexOut {
     float4 position: SV_Position;
 };
 
+[shader("vertex")]
 VertexOut vs_main(uint vertex_idx: SV_VertexID) {
     const float2 positions[] = {
         float2( 0.0, -0.5),
@@ -22,6 +23,7 @@ VertexOut vs_main(uint vertex_idx: SV_VertexID) {
     return output;
 }
 
+[shader("fragment")]
 float4 fs_main(VertexOut input): SV_Target0 {
     return float4(input.color, 1.0);
 }

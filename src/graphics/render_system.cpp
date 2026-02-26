@@ -85,12 +85,7 @@ RenderSystem::RenderSystem()
               vk::uniform_binding(0),
           })
       )}
-    // , m_sprite_stage(context<Renderer>(), m_screen_render_pass, m_camera_dset)
-    // , m_test_stage(context<Renderer>(), m_screen_render_pass)
-    // , m_debug_stage(context<Renderer>(), m_screen_render_pass, m_camera_dset)
-    // , m_imgui_stage_opt(std::nullopt)
 {
-
     // context<Console>().create_cmd("debug_render", [this]() {
     //     m_debug_stage.enable(!m_debug_stage.is_enabled());
     // });

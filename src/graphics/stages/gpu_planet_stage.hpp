@@ -20,7 +20,7 @@ public:
         , m_test_pipeline{
             renderer.device(),
             vk::PipelineStages{
-                .vertex = load_shader("assets/shaders/planet/planet.vert.spv"),
+                .vertex = load_shader("assets/shaders/planet/planet.vert.slang.spv"),
                 .fragment = load_shader("assets/shaders/planet/planet.frag.spv"),
             },
             vk::PipelineConfig(render_pass)

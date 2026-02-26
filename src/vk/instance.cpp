@@ -101,11 +101,11 @@ Instance::Instance(InstanceParams&& params) {
     // 3. Enable validation layers //
     VkApplicationInfo app_info {};
     app_info.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
-    app_info.pApplicationName = "Unnamed";
+    app_info.pApplicationName = "KazanApp";
     app_info.applicationVersion = VK_MAKE_VERSION(1, 0, 0);
     app_info.pEngineName = "Kazan";
     app_info.engineVersion = VK_MAKE_VERSION(1, 0, 0);
-    app_info.apiVersion = VK_API_VERSION_1_2;
+    app_info.apiVersion = VK_API_VERSION_1_3;
 
     // Extensions get loaded from outside
     VkInstanceCreateInfo create_info {};

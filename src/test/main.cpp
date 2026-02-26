@@ -4,8 +4,7 @@
 #include "graphics/render_system.hpp"
 #include "graphics/renderer.hpp"
 #include "graphics/stages/debug_stage.hpp"
-#include "graphics/stages/sprite_stage.hpp"
-#include "graphics/stages/test_stage.hpp"
+#include "graphics/stages/gpu_planet_stage.hpp"
 
 using namespace kzn;
 

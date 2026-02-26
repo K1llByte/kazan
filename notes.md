@@ -1,5 +1,20 @@
 # Todo
 
+- [ ] Fix vkQueueSubmit warning
+- [ ] Shader reflections
+- [ ] Add https://github.com/martinus/unordered_dense as dependency and benchmark performance differences
+- [ ] Add volk meta loader as dependency
+- [ ] Remove Singleton base class
+- [ ] Reuse simple imgui overlay to display text information such as rendering info
+- [ ] Write small cli to create application and help
+  - `kzn compile shaders`
+  - `kzn create example_app`
+  - `kzn clean`
+  - `kzn build`
+- [ ] Modern cmake presets
+- [ ] Make vulkan features configurable for any vulkan version
+
+- [x] Slang shader support
 - [x] Add versioned cmake dependencies
 - [x] Refactor CMakeLists.txt to allow adding kazan/paperlib as a submodule and write a simple application using engine
 - [x] Make BitMayhem compile again
@@ -11,22 +26,10 @@
 - [x] Simple system scheduler (DAG + topologycal sort)
     - [x] Express dependencies using associated type `using Before = TypeList<RenderSystem>`
 - [x] Refactor Renderer into a non singleton
-- [ ] Add https://github.com/martinus/unordered_dense as dependency
-- [ ] Slang shader support
-- [ ] Shader reflection
-- [ ] Add volk meta loader as dependency
-- [ ] Refactor Registry into a non singleton
-- [ ] Make EditorSystem only initialize after RenderSystem, since it depends on it and the renderer
-- [ ] Remove Singleton base class
-- [ ] Reuse simple imgui overlay to display text information such as rendering info
-- [ ] Brainstorm how to deal with relative engine/app path
-- [ ] Brainstorm a way to costumize render stages in the RenderSystem
-- [ ] Write small cli to create application and help
-  - `kzn compile shaders`
-  - `kzn create example_app`
-  - `kzn clean`
-  - `kzn build`
-
+- [x] Refactor Registry into a non singleton
+- [x] Make EditorSystem only initialize after RenderSystem, since it depends on it and the renderer
+- [x] Brainstorm how to deal with relative engine/app path
+- [x] Brainstorm a way to costumize render stages in the RenderSystem
 
 - Make SpriteGeometryCache work like a ref counted allocator, when theres no more references left, destroy the geometry
 - Current approach for default material is not working, brainstorm a MaterialCache that has a default material.

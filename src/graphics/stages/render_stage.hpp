@@ -9,8 +9,8 @@
 
 namespace kzn {
 
-inline std::shared_ptr<ShaderCode> load_shader(const std::string_view path) {
-    return g_resources.find_or_load<ShaderCode>(path);
+inline std::shared_ptr<vk::ShaderCode> load_shader(const std::string_view path) {
+    return g_resources.find_or_load<vk::ShaderCode>(path);
 }
 
 struct RenderStage {
