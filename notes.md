@@ -1,6 +1,5 @@
 # Todo
 
-- [ ] Fix vkQueueSubmit warning
 - [ ] Shader reflections
 - [ ] Add https://github.com/martinus/unordered_dense as dependency and benchmark performance differences
 - [ ] Add volk meta loader as dependency
@@ -14,6 +13,7 @@
 - [ ] Modern cmake presets
 - [ ] Make vulkan features configurable for any vulkan version
 
+- [x] Fix vkQueueSubmit warning
 - [x] Slang shader support
 - [x] Add versioned cmake dependencies
 - [x] Refactor CMakeLists.txt to allow adding kazan/paperlib as a submodule and write a simple application using engine

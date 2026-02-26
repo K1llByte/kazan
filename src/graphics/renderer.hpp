@@ -1,7 +1,5 @@
 #pragma once
 
-#include "core/assert.hpp"
-#include "core/singleton.hpp"
 #include "vk/dset.hpp"
 #include "vk/dset_layout.hpp"
 #include <core/window.hpp>
@@ -85,7 +83,7 @@ private:
     vk::CommandPool m_cmd_pool;
 
     // Synchronization data
-    static constexpr size_t MAX_FRAMES_IN_FLIGHT = 2;
+    static constexpr size_t MAX_FRAMES_IN_FLIGHT = 1;
     size_t m_frame_idx = 0;
     // Size: MAX_FRAMES_IN_FLIGHT
     std::vector<PerFrameData> m_frame_data;
