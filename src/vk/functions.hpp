@@ -1,14 +1,14 @@
 #pragma once
 
 #include "cmd_buffer.hpp"
-#include "core/log.hpp"
 #include "core/type.hpp"
 #include "vk/buffer.hpp"
 #include "vk/dset.hpp"
 #include "vk/pipeline.hpp"
-#include <functional>
-#include <ranges>
+
 #include <vulkan/vulkan_core.h>
+
+#include <functional>
 
 namespace kzn::vk {
 
@@ -92,12 +92,34 @@ inline void cmd_bind_vtx_buffer(
 
 //! Vulkan command to bind an index buffer.
 //! \param cmd_buffer Command buffer used for this command.
+//! \param buffers Vertex buffers to bind.
+template<std::size_t N>
+inline void cmd_bind_vtx_buffers(
+    CommandBuffer& cmd_buffer,
+    std::array<VertexBuffer*, N> buffers
+) {
+    std::array<VkDescriptorSet, N> vk_buffers;
+    for (std::size_t i = 0; i < N; ++i) {
+        vk_buffers[i] = buffers[i]->vk_buffer();
+    }
+
+    VkDeviceSize offset = 0;
+    vkCmdBindVertexBuffers(
+        cmd_buffer.vk_cmd_buffer(),
+        0,
+        vk_buffers.size(),
+        vk_buffers.data(),
+        &offset
+    );
+}
+
+//! Vulkan command to bind an index buffer.
+//! \param cmd_buffer Command buffer used for this command.
 //! \param buffer Index buffer to bind.
-inline void cmd_bind_vtx_buffer(
+inline void cmd_bind_idx_buffer(
     CommandBuffer& cmd_buffer,
     IndexBuffer& buffer
 ) {
-    // Bind Vertex Buffer
     VkDeviceSize offset = 0;
     auto vk_buffer = buffer.vk_buffer();
     vkCmdBindIndexBuffer(
@@ -112,13 +134,13 @@ inline void cmd_bind_vtx_buffer(
 //! going to be bound.
 template<std::size_t N>
 inline void cmd_bind_dsets(
-    std::array<Ref<DescriptorSet>, N> dsets,
     CommandBuffer& cmd_buffer,
+    std::array<DescriptorSet*, N> dsets,
     VkPipelineLayout pipeline_layout
 ) {
     std::array<VkDescriptorSet, N> vk_dsets;
     for (std::size_t i = 0; i < N; ++i) {
-        vk_dsets[i] = dsets[i].get().vk_dset();
+        vk_dsets[i] = dsets[i]->vk_dset();
     }
 
     vkCmdBindDescriptorSets(
@@ -133,17 +155,28 @@ inline void cmd_bind_dsets(
     );
 }
 
-//! Vulkan command to bind a single descriptor set.
-//! \param dset Array of references to the descriptor sets to bind.
+//! Vulkan command to bind a descriptor set.
+//! \param dset Descriptor set to bind.
 //! \param cmd_buffer Command buffer used for this command.
-//! \param pipeline_layout Layout of the pipeline where descriptor sets are
+//! \param pipeline_layout Layout of the pipeline where descriptor set is
 //! going to be bound.
 inline void cmd_bind_dset(
-    DescriptorSet& dset,
     CommandBuffer& cmd_buffer,
+    DescriptorSet& dset,
     VkPipelineLayout pipeline_layout
 ) {
-    cmd_bind_dsets(std::array{Ref(dset)}, cmd_buffer, pipeline_layout);
+    const std::array vk_dsets = {dset.vk_dset()};
+
+    vkCmdBindDescriptorSets(
+        cmd_buffer.vk_cmd_buffer(),
+        VK_PIPELINE_BIND_POINT_GRAPHICS,
+        pipeline_layout,
+        0,
+        1,
+        vk_dsets.data(),
+        0,
+        nullptr
+    );
 }
 
 //! Vulkan command to upload push contants to a pipeline.

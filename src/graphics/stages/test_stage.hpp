@@ -9,7 +9,6 @@
 #include "vk/image.hpp"
 #include "vk/pipeline.hpp"
 #include "vk/render_pass.hpp"
-#include <vulkan/vulkan_core.h>
 
 namespace kzn {
 
@@ -35,7 +34,7 @@ public:
                     }
                 })
         }
-        , m_camera_dset{camera_dset}
+        , m_camera_dset_ptr{&camera_dset}
         , m_earth_tex_ptr{g_resources.find_or_load<Texture>("assets/textures/earth.jpg")}
         // , m_earth_tex_ptr{g_resources.find_or_load<Texture>("textures://earth.jpg")}
         , m_earth_dset{renderer.dset_allocator().allocate(
@@ -61,16 +60,12 @@ public:
             cmd_buffer, vk::create_scissor(swapchain_extent)
         );
 
-        // vk::cmd_bind_dset(
-        //     m_camera_dset, cmd_buffer, m_test_pipeline.layout()
-        // );
-
         vk::cmd_bind_dsets(
-            std::array{
-                Ref(m_camera_dset),
-                Ref(m_earth_dset)
-            },
             cmd_buffer,
+            std::array{
+                m_camera_dset_ptr,
+                &m_earth_dset
+            },
             m_test_pipeline.layout()
         );
         
@@ -80,7 +75,7 @@ public:
 private:
     Renderer* m_renderer_ptr;
     vk::Pipeline m_test_pipeline;
-    Ref<vk::DescriptorSet> m_camera_dset;
+    vk::DescriptorSet* m_camera_dset_ptr;
     std::shared_ptr<Texture> m_earth_tex_ptr;
     vk::DescriptorSet m_earth_dset;
     vk::Image m_earth_image;

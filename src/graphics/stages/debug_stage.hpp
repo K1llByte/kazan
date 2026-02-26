@@ -39,7 +39,7 @@ public:
                     }
                 })
           }
-        , m_camera_dset{camera_dset}
+        , m_camera_dset_ptr{&camera_dset}
         , m_debug_render(renderer) {}
 
     bool is_enabled() const { return m_use_debug_render; }
@@ -66,7 +66,7 @@ public:
 
             vk::cmd_set_line_width(cmd_buffer, debug_render.line_width());
             vk::cmd_bind_dset(
-                m_camera_dset, cmd_buffer, m_debug_pipeline.layout()
+                cmd_buffer, *m_camera_dset_ptr, m_debug_pipeline.layout()
             );
             vk::cmd_push_constants(
                 cmd_buffer,
@@ -87,7 +87,7 @@ private:
     Renderer* m_renderer_ptr;
     vk::Pipeline m_debug_pipeline;
     bool m_use_debug_render = false;
-    Ref<vk::DescriptorSet> m_camera_dset;
+    vk::DescriptorSet* m_camera_dset_ptr;
     // Debug render interface
     Context<DebugRender> m_debug_render;
 };

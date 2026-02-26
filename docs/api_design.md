@@ -217,7 +217,7 @@ catch(const SwapchainResized&) {
 if(window.was_resized())
 {
     auto win_extent = window.extent();
-    swapchain.recreate(win_extent);
+    swapchain.recreate(win_extenEt);
     // MUST BE INSIDE PIPELINE BIND
     // pipeline.set_viewport(cmd_buffer, create_viewport(win_extent));
     render_pass.recreate_framebuffers(swapchain);

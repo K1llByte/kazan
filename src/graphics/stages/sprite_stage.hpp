@@ -43,7 +43,7 @@ public:
                            )}
                   })
           }
-        , m_camera_dset{camera_dset} {}
+        , m_camera_dset_ptr{&camera_dset} {}
     // Copy
     SpriteStage(const SpriteStage&) = delete;
     SpriteStage& operator=(const SpriteStage&) = delete;
@@ -99,11 +99,11 @@ public:
             }
 
             vk::cmd_bind_dsets(
-                std::array{
-                    Ref(m_camera_dset),
-                    Ref(sprite.material()->render_data()->material_dset)
-                },
                 cmd_buffer,
+                std::array{
+                    m_camera_dset_ptr,
+                    &sprite.material()->render_data()->material_dset
+                },
                 m_pipeline.layout()
             );
 
@@ -123,7 +123,7 @@ private:
     Renderer* m_renderer_ptr;
     SpriteGeometryCache m_sprite_geom_cache;
     vk::Pipeline m_pipeline;
-    Ref<vk::DescriptorSet> m_camera_dset;
+    vk::DescriptorSet* m_camera_dset_ptr;
 };
 
 } // namespace kzn
