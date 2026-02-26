@@ -7,6 +7,7 @@
 #include "graphics/stages/render_stage.hpp"
 #include "graphics/stages/sprite_stage.hpp"
 #include "vk/dset.hpp"
+#include "vk/functions.hpp"
 #include "vk/pipeline.hpp"
 #include "vk/render_pass.hpp"
 
@@ -53,7 +54,7 @@ public:
         if (m_use_debug_render && debug_vbo_opt.has_value()) {
             auto& debug_render = m_debug_render.value();
             auto& debug_vbo = debug_vbo_opt.value();
-            m_debug_pipeline.bind(cmd_buffer);
+            vk::cmd_bind_pipeline(cmd_buffer, m_debug_pipeline);
 
             const auto swapchain_extent = m_renderer_ptr->swapchain().extent();
             vk::cmd_set_viewport(
@@ -75,7 +76,7 @@ public:
                     Mat4{1, 0, 0, 0, 0, -1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1}
                 }
             );
-            debug_vbo.bind(cmd_buffer);
+            vk::cmd_bind_vtx_buffer(cmd_buffer, debug_vbo);
             vk::cmd_draw(cmd_buffer, debug_render.lines().size());
 
             debug_render.clear();

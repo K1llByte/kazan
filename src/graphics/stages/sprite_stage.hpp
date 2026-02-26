@@ -76,7 +76,7 @@ public:
     }
 
     void render(Scene& scene, vk::CommandBuffer& cmd_buffer) override {
-        m_pipeline.bind(cmd_buffer);
+        vk::cmd_bind_pipeline(cmd_buffer, m_pipeline);
 
         const auto swapchain_extent = m_renderer_ptr->swapchain().extent();
         vk::cmd_set_viewport(
@@ -112,7 +112,7 @@ public:
             );
 
             // Bind vertex buffer
-            sprite.geometry()->quad_vbo.bind(cmd_buffer);
+            vk::cmd_bind_vtx_buffer(cmd_buffer, sprite.geometry()->quad_vbo);
 
             // Draw call
             vk::cmd_draw(cmd_buffer, 4);

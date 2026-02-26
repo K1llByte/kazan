@@ -138,7 +138,8 @@ public:
         return m_pipeline_layout;
     }
 
-    void bind(vk::CommandBuffer& cmd_buffer);
+    [[nodiscard]]
+    VkPipeline vk_pipeline() const { return m_vk_pipeline; }
 
 private:
     Device& m_device;

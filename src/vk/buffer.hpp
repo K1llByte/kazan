@@ -30,6 +30,11 @@ public:
 
     void bind(CommandBuffer& cmd_buffer);
 
+    [[nodiscard]]
+    VkBuffer vk_buffer() {
+        return m_buffer;
+    }
+
 private:
     Device* m_device_ptr;
     VkBuffer m_buffer;
@@ -52,7 +57,10 @@ public:
 
     void upload(const uint32_t* indices);
 
-    void bind(CommandBuffer& cmd_buffer);
+    [[nodiscard]]
+    VkBuffer vk_buffer() {
+        return m_buffer;
+    }
 
     [[nodiscard]]
     uint32_t size() const {

@@ -52,7 +52,7 @@ public:
     }
 
     void render(Scene& scene, vk::CommandBuffer& cmd_buffer) override {
-        m_test_pipeline.bind(cmd_buffer);
+        vk::cmd_bind_pipeline(cmd_buffer, m_test_pipeline);
         const auto swapchain_extent = m_renderer_ptr->swapchain().extent();
         vk::cmd_set_viewport(
             cmd_buffer, vk::create_viewport(swapchain_extent)

@@ -68,14 +68,6 @@ void VertexBuffer::upload(const void* vertices) {
     vmaUnmapMemory(m_device_ptr->allocator(), m_allocation);
 }
 
-void VertexBuffer::bind(CommandBuffer& cmd_buffer) {
-    // Bind Vertex Buffer
-    VkDeviceSize offset = 0;
-    vkCmdBindVertexBuffers(
-        cmd_buffer.vk_cmd_buffer(), 0, 1, &m_buffer, &offset
-    );
-}
-
 IndexBuffer::IndexBuffer(Device& device, VkDeviceSize buffer_size)
     : m_device_ptr{&device}
     , m_buffer_size(buffer_size) {
@@ -135,13 +127,6 @@ void IndexBuffer::upload(const uint32_t* indices) {
     vmaMapMemory(m_device_ptr->allocator(), m_allocation, &data);
     memcpy(data, indices, m_buffer_size);
     vmaUnmapMemory(m_device_ptr->allocator(), m_allocation);
-}
-
-void IndexBuffer::bind(CommandBuffer& cmd_buffer) {
-    // Bind Index Buffer
-    vkCmdBindIndexBuffer(
-        cmd_buffer.vk_cmd_buffer(), m_buffer, 0, VK_INDEX_TYPE_UINT32
-    );
 }
 
 UniformBuffer::UniformBuffer(Device& device, VkDeviceSize buffer_size)

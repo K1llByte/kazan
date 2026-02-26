@@ -3,7 +3,9 @@
 #include "cmd_buffer.hpp"
 #include "core/log.hpp"
 #include "core/type.hpp"
+#include "vk/buffer.hpp"
 #include "vk/dset.hpp"
+#include "vk/pipeline.hpp"
 #include <functional>
 #include <ranges>
 #include <vulkan/vulkan_core.h>
@@ -56,6 +58,50 @@ inline void cmd_draw(
         instance_count,
         first_vertex,
         first_instance
+    );
+}
+
+//! Vulkan command to bind a pipeline.
+//! \param cmd_buffer Command buffer used for this command.
+//! \param pipeline Pipeline to bind.
+inline void cmd_bind_pipeline(
+    CommandBuffer& cmd_buffer,
+    Pipeline& pipeline
+) {
+    vkCmdBindPipeline(
+        cmd_buffer.vk_cmd_buffer(),
+        VK_PIPELINE_BIND_POINT_GRAPHICS,
+        pipeline.vk_pipeline()
+    );
+}
+
+//! Vulkan command to bind a vertex buffer.
+//! \param cmd_buffer Command buffer used for this command.
+//! \param buffer Vertex buffer to bind.
+inline void cmd_bind_vtx_buffer(
+    CommandBuffer& cmd_buffer,
+    VertexBuffer& buffer
+) {
+    // Bind Vertex Buffer
+    VkDeviceSize offset = 0;
+    auto vk_buffer = buffer.vk_buffer();
+    vkCmdBindVertexBuffers(
+        cmd_buffer.vk_cmd_buffer(), 0, 1, &vk_buffer, &offset
+    );
+}
+
+//! Vulkan command to bind an index buffer.
+//! \param cmd_buffer Command buffer used for this command.
+//! \param buffer Index buffer to bind.
+inline void cmd_bind_vtx_buffer(
+    CommandBuffer& cmd_buffer,
+    IndexBuffer& buffer
+) {
+    // Bind Vertex Buffer
+    VkDeviceSize offset = 0;
+    auto vk_buffer = buffer.vk_buffer();
+    vkCmdBindIndexBuffer(
+        cmd_buffer.vk_cmd_buffer(), vk_buffer, 0, VK_INDEX_TYPE_UINT32
     );
 }
 
