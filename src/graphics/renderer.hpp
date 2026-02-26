@@ -17,8 +17,7 @@ namespace kzn {
 struct PerFrameData {
 public:
     vk::CommandBuffer cmd_buffer;
-    VkSemaphore img_available;
-    VkSemaphore finished_render;
+    VkSemaphore image_available;
     VkFence in_flight_fence;
 
     // Ctor
@@ -49,7 +48,7 @@ public:
     Renderer(Renderer&&) = delete;
     Renderer& operator=(Renderer&&) = delete;
     // Dtor
-    ~Renderer() = default;
+    ~Renderer();
 
     void render_frame(const RenderFrameFn& render_func);
 
@@ -86,9 +85,12 @@ private:
     vk::CommandPool m_cmd_pool;
 
     // Synchronization data
-    static constexpr size_t MAX_FRAMES_IN_FLIGHT = 1;
+    static constexpr size_t MAX_FRAMES_IN_FLIGHT = 2;
     size_t m_frame_idx = 0;
+    // Size: MAX_FRAMES_IN_FLIGHT
     std::vector<PerFrameData> m_frame_data;
+    // Size: swapchain image count
+    std::vector<VkSemaphore> m_render_finished;
 
 private:
     // Auxiliary function to ensure renderer is only initialized once.
