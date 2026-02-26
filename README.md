@@ -1,6 +1,6 @@
 # Kazan
 
-This project is an experimental computer graphics engine for experimentation and learning.
+Modern C++ 20 vulkan rendering engine.
 
 ![](https://i.imgur.com/miT8j6t.png)
 
@@ -16,8 +16,12 @@ cmake -Bbuild && cmake --build build
 
 # Compile shaders before running executable
 ./compile_shaders.sh
+
+# Run test executable
+./bin/test
 ```
 
+<!--
 ___
 ## References
 
@@ -26,3 +30,4 @@ https://www.khronos.org/files/vulkan11-reference-guide.pdf
 https://vulkan-tutorial.com/Development_environment#page_Linux  
 https://vkguide.dev/  
 https://learnopengl.com/
+-->
