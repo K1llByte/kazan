@@ -98,14 +98,6 @@ private:
     uint32_t m_subpass = 0;
 };
 
-// struct PipelineStages {
-//     std::string_view vertex;
-//     std::string_view tess_control;
-//     std::string_view tess_evaluation;
-//     std::string_view geometry;
-//     std::string_view fragment;
-// };
-
 struct PipelineStages {
     std::shared_ptr<ShaderCode> vertex = nullptr;
     std::shared_ptr<ShaderCode> tess_control = nullptr;
@@ -121,6 +113,10 @@ public:
         Device& device,
         const PipelineStages& stages,
         const PipelineConfig& config
+    );
+    Pipeline(
+        Device& device,
+        const VkGraphicsPipelineCreateInfo& create_info
     );
     // Copy
     Pipeline(const Pipeline&) = delete;
@@ -145,9 +141,9 @@ private:
     std::array<VkShaderModule, 5> m_shader_modules;
 };
 
-//////////////////////////////////////////////////////////////
-//                      Implementation                      //
-//////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
+// Implementation
+///////////////////////////////////////////////////////////////////////////////
 
 template<typename... Ts>
 PipelineConfig& PipelineConfig::set_vertex_input() {

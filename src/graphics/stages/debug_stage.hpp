@@ -1,6 +1,5 @@
 #pragma once
 
-#include "core/type.hpp"
 #include "ecs/context.hpp"
 #include "graphics/debug_render.hpp"
 #include "graphics/renderer.hpp"

@@ -279,16 +279,35 @@ Pipeline::Pipeline(
     result = vkCreateGraphicsPipelines(
         m_device, VK_NULL_HANDLE, 1, &pipeline_info, nullptr, &m_vk_pipeline
     );
-    VK_CHECK_MSG(result, "Failed to create graphics pipeline!");
-    Log::trace("Pipeline created");
-}
 
-Pipeline::~Pipeline() {
     for (auto shader_module : m_shader_modules) {
         if(shader_module != VK_NULL_HANDLE) {
             vkDestroyShaderModule(m_device, shader_module, nullptr);
         }
     }
+
+    VK_CHECK_MSG(result, "Failed to create graphics pipeline!");
+    Log::trace("Pipeline created");
+}
+
+Pipeline::Pipeline(
+    Device& device,
+    const VkGraphicsPipelineCreateInfo& create_info
+)
+    : m_device{device}
+    , m_shader_modules{VK_NULL_HANDLE}
+{
+    
+    m_pipeline_layout = create_info.layout;
+
+    auto result = vkCreateGraphicsPipelines(
+        m_device, VK_NULL_HANDLE, 1, &create_info, nullptr, &m_vk_pipeline
+    );
+    VK_CHECK_MSG(result, "Failed to create graphics pipeline!");
+    Log::trace("Pipeline created");
+}
+
+Pipeline::~Pipeline() {
     vkDestroyPipelineLayout(m_device, m_pipeline_layout, nullptr);
     vkDestroyPipeline(m_device, m_vk_pipeline, nullptr);
     Log::trace("Pipeline destroyed");
