@@ -35,8 +35,7 @@ public:
                 })
         }
         , m_camera_dset_ptr{&camera_dset}
-        , m_earth_tex_ptr{g_resources.find_or_load<Texture>("textures://earth.jpg")}
-        // , m_earth_tex_ptr{g_resources.find_or_load<Texture>("textures://earth.jpg")}
+        , m_earth_tex_ptr{g_resources.load<Texture>("textures://earth.jpg")}
         , m_earth_dset{renderer.dset_allocator().allocate(
             renderer.dset_layout_cache().layout({
                 vk::sampler_binding(0)

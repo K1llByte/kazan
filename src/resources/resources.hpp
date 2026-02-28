@@ -58,7 +58,7 @@ public:
     //! or if path contains a path alias that wasn't registered, throws
     // LoadingError.
     template<LoadableResource T>
-    std::shared_ptr<T> find_or_load(const std::string_view path) {
+    std::shared_ptr<T> load(const std::string_view path) {
         const auto resolved_path_opt = path_aliases.resolve(path);
         // If path contains a path alias that wasn't registered.
         if (resolved_path_opt == std::nullopt) {

@@ -32,8 +32,8 @@ public:
     PipelineBuilder& set_front_face(VkFrontFace font_face);
     PipelineBuilder& set_line_width(float line_width);
 
-    [[nodiscard]]
-    Pipeline build();
+    // [[nodiscard]]
+    // Pipeline build();
 
 private:
     std::shared_ptr<ShaderCode> m_vertex_stage = nullptr;
