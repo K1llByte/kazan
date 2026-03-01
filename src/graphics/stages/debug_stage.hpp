@@ -20,24 +20,13 @@ public:
     DebugStage(Renderer& renderer, vk::RenderPass& render_pass, vk::DescriptorSet& camera_dset)
         : m_renderer_ptr{&renderer}
         , m_debug_pipeline{
-            renderer.device(),
-            vk::PipelineStages{
-                .vertex = load_shader("shaders://debug.vert.spv"),
-                .fragment = load_shader("shaders://debug.frag.spv"),
-            },
-            vk::PipelineConfig(render_pass)
+            vk::PipelineBuilder(render_pass)
+                .set_vertex_stage(load_shader("shaders://debug.vert.spv"))
+                .set_fragment_stage(load_shader("shaders://debug.frag.spv"))
                 .set_vertex_input<Vec2, Vec3>()
                 .set_topology(VK_PRIMITIVE_TOPOLOGY_LINE_LIST)
-                .set_layout(vk::PipelineLayout{
-                    .push_constants = {
-                        vk::push_constant_range<PvmPushData>()
-                    },
-                    .descriptor_sets = {
-                        renderer.dset_layout_cache()
-                            .layout({vk::uniform_binding(0)})
-                    }
-                })
-          }
+                .build(renderer.device())
+        }
         , m_camera_dset_ptr{&camera_dset}
         , m_debug_render(renderer) {}
 

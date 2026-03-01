@@ -1,6 +1,6 @@
 #include "dset_layout.hpp"
-
-#include "vk/utils.hpp"
+#include "core/log.hpp"
+#include "vk/error.hpp"
 
 #include <algorithm>
 
@@ -71,13 +71,17 @@ size_t DescriptorSetLayoutCache::DescriptorLayoutInfo::hash() const {
     return result;
 }
 
-DescriptorSetLayoutCache::DescriptorSetLayoutCache(Device& device)
-    : m_device{device} {
+DescriptorSetLayoutCache::DescriptorSetLayoutCache(VkDevice device)
+    : m_vk_device{device} {
 }
 
 DescriptorSetLayoutCache::~DescriptorSetLayoutCache() {
-    for (auto& [_, layout] : m_layout_cache) {
-        vkDestroyDescriptorSetLayout(m_device, layout, nullptr);
+    if(m_vk_device != VK_NULL_HANDLE) {
+        for (auto& [_, layout] : m_layout_cache) {
+            vkDestroyDescriptorSetLayout(m_vk_device, layout, nullptr);
+        }
+        m_vk_device = VK_NULL_HANDLE;
+        Log::trace("Destroyed DSet Layout Cache!");
     }
 }
 
@@ -96,9 +100,10 @@ DescriptorSetLayout DescriptorSetLayoutCache::layout(
 
     auto it = m_layout_cache.find(layout_info);
     if (it != m_layout_cache.end()) {
-        return DescriptorSetLayout(
-            DescriptorSetBindings(it->first.bindings), it->second
-        );
+        return DescriptorSetLayout{
+            .bindings = it->first.bindings,
+            .vk_layout = it->second,
+        };
     }
     else {
         // Create vulkan layout
@@ -109,25 +114,18 @@ DescriptorSetLayout DescriptorSetLayoutCache::layout(
             .pBindings = bindings.data(),
         };
         auto result = vkCreateDescriptorSetLayout(
-            m_device, &layout_create_info, nullptr, &layout
+            m_vk_device, &layout_create_info, nullptr, &layout
         );
         VK_CHECK_MSG(result, "Failed to create descriptor set layout");
 
         // Add layout to cache
         const auto [it, _] = m_layout_cache.insert({layout_info, layout});
 
-        return DescriptorSetLayout(
-            DescriptorSetBindings(it->first.bindings), layout
-        );
+        return DescriptorSetLayout{
+            .bindings = it->first.bindings,
+            .vk_layout = layout,
+        };
     }
-}
-
-DescriptorSetLayout::DescriptorSetLayout(
-    DescriptorSetBindings&& layout_bindings,
-    VkDescriptorSetLayout layout
-)
-    : m_layout_bindings{std::move(layout_bindings)}
-    , m_layout{layout} {
 }
 
 } // namespace kzn::vk

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "core/assert.hpp"
+#include "vk/dset.hpp"
 #include "vk/instance.hpp"
 
 #include "vk_mem_alloc.h"
@@ -109,6 +110,9 @@ struct DeviceParams {
 
 class Device {
 public:
+    using SelectedDevice =
+        std::tuple<VkPhysicalDevice, QueueFamilies, SwapchainSupport>;
+public:
     // Ctor
     Device(Instance& instance, DeviceParams&& params = {});
     // Copy
@@ -133,12 +137,12 @@ public:
 
     [[nodiscard]]
     const SwapchainSupport& swapchain_support() const {
-        return m_swapchain_support;
+        return std::get<2>(m_selected_device);
     }
 
     [[nodiscard]]
     const QueueFamilies& queue_families() const {
-        return m_queue_families;
+        return std::get<1>(m_selected_device);
     }
 
     [[nodiscard]]
@@ -151,8 +155,18 @@ public:
         return m_main_deletion_queue;
     }
 
+    [[nodiscard]]
+    DescriptorSetAllocator& dset_allocator() {
+        return *m_dset_allocator;
+    }
+
+    [[nodiscard]]
+    DescriptorSetLayoutCache& dset_layout_cache() {
+        return *m_dset_layout_cache;
+    }
+
     operator VkDevice() const { return m_vk_device; }
-    operator VkPhysicalDevice() const { return m_vk_physical_device; }
+    operator VkPhysicalDevice() const { return std::get<0>(m_selected_device); }
 
     [[nodiscard]]
     const SwapchainSupport& find_swapchain_support(VkSurfaceKHR surface);
@@ -164,14 +178,16 @@ public:
 
 private:
     vk::Instance& m_instance;
+    SelectedDevice m_selected_device;
     VkDevice m_vk_device = VK_NULL_HANDLE;
-    VkPhysicalDevice m_vk_physical_device = VK_NULL_HANDLE;
     VkQueue m_vk_graphics_queue;
     VkQueue m_vk_present_queue;
-    SwapchainSupport m_swapchain_support;
-    QueueFamilies m_queue_families;
     VmaAllocator m_vma_allocator;
     DeletionQueue m_main_deletion_queue;
+    // FIXME: This std::optional is not ideal, change later the way Device
+    // handles cleanup of these components
+    std::optional<DescriptorSetAllocator> m_dset_allocator;
+    std::optional<DescriptorSetLayoutCache> m_dset_layout_cache;
 };
 
 } // namespace kzn::vk

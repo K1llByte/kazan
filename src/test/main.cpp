@@ -21,21 +21,21 @@ inline void create_test_level(Scene& scene) {
 }
 
 inline void init_render_stages(RenderSystem& render_sys) {
-    render_sys.emplace_stage<SpriteStage>(
-        render_sys.context<Renderer>(),
-        render_sys.screen_render_pass(),
-        render_sys.camera_dset()
-    );
+    // render_sys.emplace_stage<SpriteStage>(
+    //     render_sys.context<Renderer>(),
+    //     render_sys.screen_render_pass(),
+    //     render_sys.camera_dset()
+    // );
     render_sys.emplace_stage<GpuPlanetStage>(
         render_sys.context<Renderer>(),
         render_sys.screen_render_pass(),
         render_sys.camera_dset()
     );
-    render_sys.emplace_stage<DebugStage>(
-        render_sys.context<Renderer>(),
-        render_sys.screen_render_pass(),
-        render_sys.camera_dset()
-    );
+    // render_sys.emplace_stage<DebugStage>(
+    //     render_sys.context<Renderer>(),
+    //     render_sys.screen_render_pass(),
+    //     render_sys.camera_dset()
+    // );
     // NOTE: EditorSystem will inject ImguiStage by event
 }
 

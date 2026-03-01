@@ -1,8 +1,10 @@
 #pragma once
 
-#include "cmd_buffer.hpp"
 #include "dset_layout.hpp"
+
 #include <vulkan/vulkan_core.h>
+
+#include <vector>
 
 namespace kzn::vk {
 
@@ -15,7 +17,7 @@ public:
     using PoolSizes = std::vector<std::pair<VkDescriptorType, float>>;
 
     // Ctor
-    DescriptorSetAllocator(Device& device);
+    DescriptorSetAllocator(VkDevice device);
     // Copy
     DescriptorSetAllocator(const DescriptorSetAllocator&) = delete;
     DescriptorSetAllocator& operator=(const DescriptorSetAllocator&) = delete;
@@ -26,10 +28,10 @@ public:
     ~DescriptorSetAllocator();
 
     void reset_pools();
-    DescriptorSet allocate(DescriptorSetLayout&& layout);
+    DescriptorSet allocate(DescriptorSetLayout layout);
 
 private:
-    Device& m_device;
+    VkDevice m_vk_device;
     VkDescriptorPool m_current_pool = VK_NULL_HANDLE;
     PoolSizes m_descriptor_sizes;
     std::vector<VkDescriptorPool> m_used_pools;
@@ -67,14 +69,14 @@ public:
     void update(std::initializer_list<DescriptorInfo> descriptor_infos);
 
 private:
-    Device& m_device;
+    VkDevice m_vk_device;
     VkDescriptorSet m_vk_descriptor_set;
     DescriptorSetLayout m_layout;
 
 private:
     // Ctor
     DescriptorSet(
-        Device& device,
+        VkDevice device,
         VkDescriptorSet descriptor_set,
         DescriptorSetLayout&& layout
     );

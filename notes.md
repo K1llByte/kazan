@@ -1,12 +1,7 @@
 # Todo
 
 
-- [ ] Move DsetLayoutCache and Allocator to Device instead of Renderer
-    - Allows PipelineBuilder to reuse these constructs
-    - device.allocate_dset()
-    - device.create_dset_layout()
-- [ ] Make pipeline allow query its descriptor set layouts by index
-    - pipeline.dset_layout(0)
+
 - [ ] Add volk meta loader as dependency
 - [ ] Add https://github.com/martinus/unordered_dense as dependency and benchmark performance differences
 - [ ] Remove Singleton base class
@@ -19,6 +14,10 @@
 - [ ] Modern cmake presets
 - [ ] Make vulkan features configurable for any vulkan version
 
+- [x] Move DsetLayoutCache and Allocator to Device instead of Renderer
+    - Allows PipelineBuilder to reuse these constructs
+- [x] Make pipeline allow query its descriptor set layouts by index
+    - pipeline.dset_layout(0)
 - [x] PipelineBuilder that uses spirv reflection data to deduce pipeline layout
 - [x] Fix vkQueueSubmit warning
 - [x] Slang shader support

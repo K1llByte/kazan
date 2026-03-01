@@ -203,18 +203,22 @@ ShaderReflection reflect_shader(
                         && block_ptr->size == pc_range.size;
                 }
             );            
+            
             // If found, then merge shader stage flags.
             // Otherwise add to vector.
-            if(it != reflection.push_constants.end()) {
-                it->stageFlags |= module.shader_stage;
-            }
-            else {
+            if(it == reflection.push_constants.end()) {
                 reflection.push_constants.push_back(VkPushConstantRange{
-                    .stageFlags = module.shader_stage,
+                    .stageFlags = VK_SHADER_STAGE_ALL_GRAPHICS,
+                    // FIXME: This will not work if there are shared push
+                    // constants across multiple pipelines.
+                    // .stageFlags = module.shader_stage,
                     .offset = block_ptr->offset,
                     .size = block_ptr->size,
                 });
             }
+            // else {
+            //     it->stageFlags |= module.shader_stage;
+            // }
         }
 
         // Merge descriptor sets
@@ -231,7 +235,10 @@ ShaderReflection reflect_shader(
                         binding_ptr->descriptor_type
                     ),
                     .descriptorCount = binding_ptr->count,
-                    .stageFlags = module.shader_stage,
+                    .stageFlags = VK_SHADER_STAGE_ALL_GRAPHICS,
+                    // FIXME: This will not work if there are shared push
+                    // constants across multiple pipelines.
+                    // .stageFlags = module.shader_stage,
                     .pImmutableSamplers = nullptr,
                 };
 
@@ -250,7 +257,10 @@ ShaderReflection reflect_shader(
                         }
                     );
 
-                    if(binding_it != it->second.end()) {
+                    if(binding_it == it->second.end()) {
+                        it->second.push_back(vk_binding);
+                    }
+                    else {
                         // FIXME: Instead of assert, these checks should be
                         // runtime error.
                         KZN_ASSERT(
@@ -261,10 +271,7 @@ ShaderReflection reflect_shader(
                             binding_ptr->count == binding_it->descriptorCount
                         );
 
-                        binding_it->stageFlags |= module.shader_stage;
-                    }
-                    else {
-                        it->second.push_back(vk_binding);
+                        // binding_it->stageFlags |= module.shader_stage;
                     }
                 }
             }
@@ -354,19 +361,24 @@ Pipeline PipelineBuilder::build(Device& device) {
     };
     layout.descriptor_sets.reserve(reflection.descriptor_sets.size());
     
-    for(auto& [set, bindings] : reflection.descriptor_sets) {
-        VkDescriptorSetLayout dset_layout;
-        VkDescriptorSetLayoutCreateInfo dset_layout_create_info{
-            .sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO,
-            .bindingCount = static_cast<uint32_t>(bindings.size()),
-            .pBindings = bindings.data(),
-        };
-        auto result = vkCreateDescriptorSetLayout(
-            device, &dset_layout_create_info, nullptr, &dset_layout
+    // Since the vector of dset layouts layout.descriptor_sets could have
+    // sparse dsets (could contain [set 0, set 1, set 3]), this map will be
+    // used by the pipeline for querying dset layouts.
+    std::vector<DescriptorSetLayout> sparse_dset_layouts;
+    // Get max dset number
+    uint32_t max_dset = 0;
+    if(!reflection.descriptor_sets.empty()) {
+        max_dset = std::ranges::max(
+            reflection.descriptor_sets | std::views::keys
         );
-        VK_CHECK_MSG(result, "Failed to create descriptor set layout");
-
-        layout.descriptor_sets.push_back(dset_layout);
+        max_dset += 1;
+        sparse_dset_layouts.resize(max_dset, {{}, VK_NULL_HANDLE});
+    }
+    
+    for(auto& [set, bindings] : reflection.descriptor_sets) {
+        auto dset_layout = device.dset_layout_cache().layout(bindings);
+        layout.descriptor_sets.push_back(dset_layout.vk_layout);
+        sparse_dset_layouts[set] = std::move(dset_layout);
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -429,7 +441,7 @@ Pipeline PipelineBuilder::build(Device& device) {
     pipeline_create_info.basePipelineIndex = -1;
     pipeline_create_info.basePipelineHandle = VK_NULL_HANDLE;
     
-    auto pipeline = Pipeline(device, pipeline_create_info);
+    Pipeline pipeline{device, pipeline_create_info, sparse_dset_layouts};
 
     ///////////////////////////////////////////////////////////////////////////
     // Destroy shader modules and dset layouts
@@ -437,9 +449,6 @@ Pipeline PipelineBuilder::build(Device& device) {
 
     for (std::size_t i = 0; i < valid_stages_count; ++i) {
         vkDestroyShaderModule(device, vk_shader_modules[i], nullptr);
-    }
-    for(auto dset_layout : layout.descriptor_sets) {
-        vkDestroyDescriptorSetLayout(device, dset_layout, nullptr);
     }
 
     return pipeline;

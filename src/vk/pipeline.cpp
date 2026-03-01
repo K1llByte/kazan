@@ -148,8 +148,7 @@ Pipeline::Pipeline(
     const PipelineStages& stages,
     const PipelineConfig& config
 )
-    : m_device{device}
-    , m_shader_modules{VK_NULL_HANDLE} {
+    : m_device{device} {
     // Create pipeline layout
     VkPipelineLayoutCreateInfo pipeline_layout_info{
         .sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO,
@@ -169,7 +168,8 @@ Pipeline::Pipeline(
     VK_CHECK_MSG(result, "Failed to create pipeline layout!");
 
     // Create shader stages
-    VkPipelineShaderStageCreateInfo shader_stages[5];
+    std::array<VkShaderModule, 5> shader_modules{VK_NULL_HANDLE};
+    std::array<VkPipelineShaderStageCreateInfo, 5> shader_stages;
     size_t next_stage_idx = 0;
     
     // Vertex Shader
@@ -183,7 +183,7 @@ Pipeline::Pipeline(
     shader_stages[next_stage_idx].flags = 0;
     shader_stages[next_stage_idx].pNext = nullptr;
     shader_stages[next_stage_idx].pSpecializationInfo = nullptr;
-    m_shader_modules[next_stage_idx] = vertex_shader_mod;
+    shader_modules[next_stage_idx] = vertex_shader_mod;
     next_stage_idx += 1;
 
     // Tesselation Control Shader
@@ -197,7 +197,7 @@ Pipeline::Pipeline(
         shader_stages[next_stage_idx].flags = 0;
         shader_stages[next_stage_idx].pNext = nullptr;
         shader_stages[next_stage_idx].pSpecializationInfo = nullptr;
-        m_shader_modules[next_stage_idx] = tess_control_shader_mod;
+        shader_modules[next_stage_idx] = tess_control_shader_mod;
         next_stage_idx += 1;
     }
     // Tesselation Evaluation Shader
@@ -211,7 +211,7 @@ Pipeline::Pipeline(
         shader_stages[next_stage_idx].flags = 0;
         shader_stages[next_stage_idx].pNext = nullptr;
         shader_stages[next_stage_idx].pSpecializationInfo = nullptr;
-        m_shader_modules[next_stage_idx] = tess_evaluation_shader_mod;
+        shader_modules[next_stage_idx] = tess_evaluation_shader_mod;
         next_stage_idx += 1;
     }
     // Geometry Shader
@@ -225,7 +225,7 @@ Pipeline::Pipeline(
         shader_stages[next_stage_idx].flags = 0;
         shader_stages[next_stage_idx].pNext = nullptr;
         shader_stages[next_stage_idx].pSpecializationInfo = nullptr;
-        m_shader_modules[next_stage_idx] = geometry_shader_mod;
+        shader_modules[next_stage_idx] = geometry_shader_mod;
         next_stage_idx += 1;
     }
     // Fragment Shader
@@ -239,7 +239,7 @@ Pipeline::Pipeline(
         shader_stages[next_stage_idx].flags = 0;
         shader_stages[next_stage_idx].pNext = nullptr;
         shader_stages[next_stage_idx].pSpecializationInfo = nullptr;
-        m_shader_modules[next_stage_idx] = fragment_shader_mod;
+        shader_modules[next_stage_idx] = fragment_shader_mod;
         next_stage_idx += 1;
     }
 
@@ -259,7 +259,7 @@ Pipeline::Pipeline(
     VkGraphicsPipelineCreateInfo pipeline_info{};
     pipeline_info.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
     pipeline_info.stageCount = next_stage_idx;
-    pipeline_info.pStages = shader_stages;
+    pipeline_info.pStages = shader_stages.data();
     pipeline_info.pVertexInputState = &vertex_input_info;
     pipeline_info.pInputAssemblyState = &config.m_input_assembly_info;
     pipeline_info.pViewportState = &config.m_viewport_info;
@@ -280,7 +280,7 @@ Pipeline::Pipeline(
         m_device, VK_NULL_HANDLE, 1, &pipeline_info, nullptr, &m_vk_pipeline
     );
 
-    for (auto shader_module : m_shader_modules) {
+    for (auto shader_module : shader_modules) {
         if(shader_module != VK_NULL_HANDLE) {
             vkDestroyShaderModule(m_device, shader_module, nullptr);
         }
@@ -292,14 +292,13 @@ Pipeline::Pipeline(
 
 Pipeline::Pipeline(
     Device& device,
-    const VkGraphicsPipelineCreateInfo& create_info
+    const VkGraphicsPipelineCreateInfo& create_info,
+    std::vector<DescriptorSetLayout> sparse_dset_layouts
 )
     : m_device{device}
-    , m_shader_modules{VK_NULL_HANDLE}
+    , m_pipeline_layout{create_info.layout}
+    , m_sparse_dset_layouts{std::move(sparse_dset_layouts)}
 {
-    
-    m_pipeline_layout = create_info.layout;
-
     auto result = vkCreateGraphicsPipelines(
         m_device, VK_NULL_HANDLE, 1, &create_info, nullptr, &m_vk_pipeline
     );
