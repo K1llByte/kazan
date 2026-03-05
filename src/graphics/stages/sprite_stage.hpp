@@ -9,6 +9,7 @@
 #include "vk/dset.hpp"
 #include "vk/functions.hpp"
 #include "vk/pipeline.hpp"
+#include "vk/pipeline_builder.hpp"
 #include "vk/render_pass.hpp"
 
 namespace kzn {
@@ -23,26 +24,13 @@ public:
     SpriteStage(Renderer& renderer, vk::RenderPass& render_pass, vk::DescriptorSet& camera_dset)
         : m_renderer_ptr{&renderer}
         , m_sprite_geom_cache{renderer}
-        , m_pipeline{
-            renderer.device(),
-            vk::PipelineStages{
-                .vertex = load_shader("shaders://sprites/sprite_render.vert.spv"),
-                .fragment = load_shader("shaders://sprites/sprite_render.frag.spv"),
-            },
-            vk::PipelineConfig(render_pass)
-                .set_vertex_input<Vec3, Vec2>()
-                .set_topology(VK_PRIMITIVE_TOPOLOGY_TRIANGLE_STRIP)
-                .set_layout(vk::PipelineLayout{
-                    .push_constants = {vk::push_constant_range<PvmPushData>()},
-                    .descriptor_sets = {
-                        renderer.dset_layout_cache()
-                            .layout({vk::uniform_binding(0)}),
-                        renderer.dset_layout_cache().layout(
-                            {vk::sampler_binding(0), vk::uniform_binding(1)}
-                        )
-                    }
-                })
-          }
+        , m_pipeline{vk::PipelineBuilder(render_pass)
+            .set_vertex_stage(load_shader("shaders://sprites/sprite_render.vert.spv"))
+            .set_fragment_stage(load_shader("shaders://sprites/sprite_render.frag.spv"))
+            .set_vertex_input<Vec3, Vec2>()
+            .set_topology(VK_PRIMITIVE_TOPOLOGY_TRIANGLE_STRIP)
+            .build(renderer.device())
+        }
         , m_camera_dset_ptr{&camera_dset}
         {}
     // Copy

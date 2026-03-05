@@ -1,13 +1,12 @@
 #include "dset.hpp"
 
 #include "core/log.hpp"
-#include "vk/utils.hpp"
-#include <vulkan/vulkan_core.h>
+#include "vk/error.hpp"
 
 namespace kzn::vk {
 
-DescriptorSetAllocator::DescriptorSetAllocator(Device& device)
-    : m_device(device)
+DescriptorSetAllocator::DescriptorSetAllocator(VkDevice device)
+    : m_vk_device(device)
     , m_descriptor_sizes{
           {VK_DESCRIPTOR_TYPE_SAMPLER, 0.5f},
           {VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER, 4.f},
@@ -20,26 +19,30 @@ DescriptorSetAllocator::DescriptorSetAllocator(Device& device)
           {VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER_DYNAMIC, 1.f},
           {VK_DESCRIPTOR_TYPE_STORAGE_BUFFER_DYNAMIC, 1.f},
           {VK_DESCRIPTOR_TYPE_INPUT_ATTACHMENT, 0.5f}
-      } {
+      }
+{
     Log::trace("Created DSet Allocator!");
     m_used_pools.reserve(5);
     m_free_pools.reserve(5);
 }
 
 DescriptorSetAllocator::~DescriptorSetAllocator() {
-    // Delete every pool held
-    for (auto pool : m_free_pools) {
-        vkDestroyDescriptorPool(m_device, pool, nullptr);
+    if(m_vk_device != VK_NULL_HANDLE) {
+        // Delete every pool held
+        for (auto pool : m_free_pools) {
+            vkDestroyDescriptorPool(m_vk_device, pool, nullptr);
+        }
+        for (auto pool : m_used_pools) {
+            vkDestroyDescriptorPool(m_vk_device, pool, nullptr);
+        }
+        m_vk_device = VK_NULL_HANDLE;
+        Log::trace("Destroyed DSet Allocator!");
     }
-    for (auto pool : m_used_pools) {
-        vkDestroyDescriptorPool(m_device, pool, nullptr);
-    }
-    Log::trace("Destroyed DSet Allocator!");
 }
 
 void DescriptorSetAllocator::reset_pools() {
     for (auto& pool : m_used_pools) {
-        vkResetDescriptorPool(m_device, pool, 0);
+        vkResetDescriptorPool(m_vk_device, pool, 0);
     }
 
     m_free_pools = std::move(m_used_pools);
@@ -47,13 +50,13 @@ void DescriptorSetAllocator::reset_pools() {
     m_current_pool = VK_NULL_HANDLE;
 }
 
-DescriptorSet DescriptorSetAllocator::allocate(DescriptorSetLayout&& layout) {
+DescriptorSet DescriptorSetAllocator::allocate(DescriptorSetLayout layout) {
     if (m_current_pool == VK_NULL_HANDLE) {
         m_current_pool = grab_pool();
         m_used_pools.push_back(m_current_pool);
     }
 
-    const VkDescriptorSetLayout set_layouts[] = {layout};
+    const VkDescriptorSetLayout set_layouts[] = {layout.vk_layout};
     VkDescriptorSetAllocateInfo alloc_info{
         .sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO,
         .descriptorPool = m_current_pool,
@@ -62,10 +65,10 @@ DescriptorSet DescriptorSetAllocator::allocate(DescriptorSetLayout&& layout) {
     };
 
     VkDescriptorSet dset;
-    auto result = vkAllocateDescriptorSets(m_device, &alloc_info, &dset);
+    auto result = vkAllocateDescriptorSets(m_vk_device, &alloc_info, &dset);
 
     if (result == VK_SUCCESS) [[likely]] {
-        return DescriptorSet(m_device, dset, std::move(layout));
+        return DescriptorSet(m_vk_device, dset, std::move(layout));
     }
     else [[unlikely]] {
         if (result == VK_ERROR_FRAGMENTED_POOL ||
@@ -75,9 +78,9 @@ DescriptorSet DescriptorSetAllocator::allocate(DescriptorSetLayout&& layout) {
             m_current_pool = grab_pool();
             m_used_pools.push_back(m_current_pool);
 
-            result = vkAllocateDescriptorSets(m_device, &alloc_info, &dset);
+            result = vkAllocateDescriptorSets(m_vk_device, &alloc_info, &dset);
             VK_CHECK_MSG(result, "DescriptorSet allocation failed on new pool");
-            return DescriptorSet(m_device, dset, std::move(layout));
+            return DescriptorSet(m_vk_device, dset, std::move(layout));
         }
     }
 
@@ -85,7 +88,7 @@ DescriptorSet DescriptorSetAllocator::allocate(DescriptorSetLayout&& layout) {
 }
 
 VkDescriptorPool create_pool(
-    Device& device,
+    VkDevice device,
     const DescriptorSetAllocator::PoolSizes& pool_sizes,
     uint32_t count,
     VkDescriptorPoolCreateFlags flags
@@ -117,16 +120,16 @@ VkDescriptorPool DescriptorSetAllocator::grab_pool() {
         return pool;
     }
     else {
-        return create_pool(m_device, m_descriptor_sizes, 1000, 0);
+        return create_pool(m_vk_device, m_descriptor_sizes, 1000, 0);
     }
 }
 
 DescriptorSet::DescriptorSet(
-    Device& device,
+    VkDevice device,
     VkDescriptorSet descriptor_set,
     DescriptorSetLayout&& layout
 )
-    : m_device{device}
+    : m_vk_device{device}
     , m_vk_descriptor_set{descriptor_set}
     , m_layout{std::move(layout)} {
 }
@@ -134,7 +137,7 @@ DescriptorSet::DescriptorSet(
 void DescriptorSet::update(
     std::initializer_list<DescriptorInfo> descriptor_infos
 ) {
-    auto bindings = m_layout.bindings();
+    auto bindings = m_layout.bindings;
     // Create allocated array of VkWriteDescriptorSet
     auto writes = std::vector<VkWriteDescriptorSet>(bindings.size());
 
@@ -170,7 +173,7 @@ void DescriptorSet::update(
     }
 
     vkUpdateDescriptorSets(
-        m_device,
+        m_vk_device,
         static_cast<uint32_t>(bindings.size()),
         writes.data(),
         0,

@@ -62,14 +62,6 @@ public:
     vk::Swapchain& swapchain() {
         return m_swapchain;
     }
-    [[nodiscard]]
-    vk::DescriptorSetAllocator& dset_allocator() {
-        return m_dset_allocator;
-    }
-    [[nodiscard]]
-    vk::DescriptorSetLayoutCache& dset_layout_cache() {
-        return m_dset_layout_cache;
-    }
 
 private:
     // Members
@@ -78,8 +70,6 @@ private:
     vk::Surface m_surface;
     vk::Device m_device;
     vk::Swapchain m_swapchain;
-    vk::DescriptorSetAllocator m_dset_allocator;
-    vk::DescriptorSetLayoutCache m_dset_layout_cache;
     vk::CommandPool m_cmd_pool;
 
     // Synchronization data

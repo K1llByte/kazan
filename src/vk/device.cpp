@@ -2,7 +2,9 @@
 
 #include "core/assert.hpp"
 #include "error.hpp"
+#include "vk/dset_layout.hpp"
 #include <core/log.hpp>
+#include <optional>
 #include <vulkan/vulkan_core.h>
 
 #define VMA_IMPLEMENTATION
@@ -160,10 +162,7 @@ SwapchainSupport get_swapchain_support(
     return support;
 }
 
-using SelectedDevice =
-    std::tuple<VkPhysicalDevice, QueueFamilies, SwapchainSupport>;
-
-SelectedDevice select_device(
+static Device::SelectedDevice select_device(
     vk::Instance& instance,
     std::vector<VkPhysicalDevice> const& available_devices,
     const std::vector<const char*>& required_extensions,
@@ -292,33 +291,33 @@ VkDevice create_device(
 }
 
 Device::Device(Instance& instance, DeviceParams&& params)
-    : m_instance(instance) {
-
-    // 1. Select physical device //
-    auto available_devices = m_instance.available_devices();
-    auto [vk_physical_device, indices, swapchain_support] = select_device(
-        m_instance, available_devices, params.extensions, params.surface
-    );
-
-    // 2. Create device //
-    m_vk_physical_device = vk_physical_device;
-    m_swapchain_support = swapchain_support;
-    m_queue_families = indices;
-    m_vk_device = create_device(
-        vk_physical_device, indices, params.features, params.extensions
-    );
-
-    // 2.1. Get device queues //
+    : m_instance(instance)
+    // Select physical device
+    , m_selected_device{select_device(
+        m_instance, m_instance.available_devices(), params.extensions, params.surface
+    )}
+    // Create device
+    , m_vk_device{create_device(
+        std::get<0>(m_selected_device),
+        std::get<1>(m_selected_device),
+        params.features,
+        params.extensions
+    )}
+    , m_dset_allocator{m_vk_device}
+    , m_dset_layout_cache{m_vk_device}
+{
+    // Get device queues
+    auto& queue_families = std::get<1>(m_selected_device);
     vkGetDeviceQueue(
-        m_vk_device, indices.graphics_family.value(), 0, &m_vk_graphics_queue
+        m_vk_device, queue_families.graphics_family.value(), 0, &m_vk_graphics_queue
     );
     vkGetDeviceQueue(
-        m_vk_device, indices.present_family.value(), 0, &m_vk_present_queue
+        m_vk_device, queue_families.present_family.value(), 0, &m_vk_present_queue
     );
 
-    // 3. Create Vma Allocator //
+    // Create Vma Allocator
     VmaAllocatorCreateInfo allocator_info{};
-    allocator_info.physicalDevice = m_vk_physical_device;
+    allocator_info.physicalDevice = std::get<0>(m_selected_device);
     allocator_info.device = m_vk_device;
     allocator_info.instance = m_instance;
     auto result = vmaCreateAllocator(&allocator_info, &m_vma_allocator);
@@ -326,8 +325,12 @@ Device::Device(Instance& instance, DeviceParams&& params)
 }
 
 Device::~Device() {
+    m_dset_layout_cache = std::nullopt;
+    m_dset_allocator = std::nullopt;
+
     // Make sure every pending resource is destroye
     m_main_deletion_queue.flush();
+    
     // Destroy Vma Allocator
     vmaDestroyAllocator(m_vma_allocator);
     // Destroy logical device instance
@@ -336,8 +339,9 @@ Device::~Device() {
 }
 
 const SwapchainSupport& Device::find_swapchain_support(VkSurfaceKHR surface) {
-    m_swapchain_support = get_swapchain_support(m_vk_physical_device, surface);
-    return m_swapchain_support;
+    auto& swapchain_support = std::get<2>(m_selected_device);
+    swapchain_support = get_swapchain_support(std::get<0>(m_selected_device), surface);
+    return swapchain_support;
 }
 
 // void Device::immediate_submit(std::function<void(vk::CommandBuffer&)>&& func)

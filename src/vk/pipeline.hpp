@@ -1,5 +1,6 @@
 #pragma once
 
+#include "core/type.hpp"
 #include "render_pass.hpp"
 #include "utils.hpp"
 #include "vk/shader_code.hpp"
@@ -98,14 +99,6 @@ private:
     uint32_t m_subpass = 0;
 };
 
-// struct PipelineStages {
-//     std::string_view vertex;
-//     std::string_view tess_control;
-//     std::string_view tess_evaluation;
-//     std::string_view geometry;
-//     std::string_view fragment;
-// };
-
 struct PipelineStages {
     std::shared_ptr<ShaderCode> vertex = nullptr;
     std::shared_ptr<ShaderCode> tess_control = nullptr;
@@ -122,6 +115,11 @@ public:
         const PipelineStages& stages,
         const PipelineConfig& config
     );
+    Pipeline(
+        Device& device,
+        const VkGraphicsPipelineCreateInfo& create_info,
+        std::vector<DescriptorSetLayout> sparse_dset_layouts
+    );
     // Copy
     Pipeline(const Pipeline&) = delete;
     Pipeline& operator=(const Pipeline&) = delete;
@@ -136,18 +134,25 @@ public:
     }
 
     [[nodiscard]]
+    const DescriptorSetLayout* dset_layout(std::size_t set) {
+        return (set < m_sparse_dset_layouts.size())
+            ? &m_sparse_dset_layouts[set]
+            : nullptr;
+    }
+
+    [[nodiscard]]
     VkPipeline vk_pipeline() const { return m_vk_pipeline; }
 
 private:
     Device& m_device;
     VkPipeline m_vk_pipeline;
     VkPipelineLayout m_pipeline_layout = VK_NULL_HANDLE;
-    std::array<VkShaderModule, 5> m_shader_modules;
+    std::vector<DescriptorSetLayout> m_sparse_dset_layouts;
 };
 
-//////////////////////////////////////////////////////////////
-//                      Implementation                      //
-//////////////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////////////////////
+// Implementation
+///////////////////////////////////////////////////////////////////////////////
 
 template<typename... Ts>
 PipelineConfig& PipelineConfig::set_vertex_input() {

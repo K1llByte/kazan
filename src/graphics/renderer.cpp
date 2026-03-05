@@ -48,8 +48,6 @@ Renderer::Renderer(Window& window)
           }
       )
     , m_swapchain(m_device, m_surface, window.extent())
-    , m_dset_allocator(m_device)
-    , m_dset_layout_cache(m_device)
     , m_cmd_pool(m_device) {
     // Initialize Per frame data
     m_frame_data.reserve(MAX_FRAMES_IN_FLIGHT);

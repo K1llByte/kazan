@@ -1,9 +1,11 @@
 #pragma once
 
+#include "core/log.hpp"
 #include <span>
+#include <vector>
 #include <unordered_map>
 
-#include "device.hpp"
+#include <vulkan/vulkan_core.h>
 
 namespace kzn::vk {
 
@@ -18,37 +20,10 @@ VkDescriptorSetLayoutBinding sampler_binding(
     VkShaderStageFlags stage_flags = VK_SHADER_STAGE_ALL_GRAPHICS
 );
 
-class DescriptorSetLayoutCache;
 
-class DescriptorSetLayout {
-public:
-    friend class DescriptorSetLayoutCache;
-
-    // Copy
-    DescriptorSetLayout(const DescriptorSetLayout&) = delete;
-    DescriptorSetLayout& operator=(const DescriptorSetLayout&) = delete;
-    // Move
-    DescriptorSetLayout(DescriptorSetLayout&&) = default;
-    DescriptorSetLayout& operator=(DescriptorSetLayout&&) = default;
-    // Dtor
-    ~DescriptorSetLayout() = default;
-
-    std::span<const VkDescriptorSetLayoutBinding> bindings() const {
-        return m_layout_bindings;
-    };
-
-    operator VkDescriptorSetLayout() const { return m_layout; }
-
-private:
-    DescriptorSetBindings m_layout_bindings;
-    VkDescriptorSetLayout m_layout;
-
-private:
-    // Ctor
-    DescriptorSetLayout(
-        DescriptorSetBindings&& layout_bindings,
-        VkDescriptorSetLayout layout
-    );
+struct DescriptorSetLayout {
+    DescriptorSetBindings bindings;
+    VkDescriptorSetLayout vk_layout;
 };
 
 class DescriptorSetLayoutCache {
@@ -62,7 +37,7 @@ public:
     };
 
     // Ctor
-    DescriptorSetLayoutCache(Device& device);
+    DescriptorSetLayoutCache(VkDevice device);
     // Copy
     DescriptorSetLayoutCache(const DescriptorSetLayoutCache&) = delete;
     DescriptorSetLayoutCache& operator=(const DescriptorSetLayoutCache&) =
@@ -87,7 +62,7 @@ private:
     using Value = VkDescriptorSetLayout;
     using DescriptorSetLayoutMap =
         std::unordered_map<Key, Value, DescriptorLayoutHash>;
-    Device& m_device;
+    VkDevice m_vk_device;
     DescriptorSetLayoutMap m_layout_cache;
 };
 

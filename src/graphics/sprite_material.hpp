@@ -28,8 +28,8 @@ struct SpriteMaterialRenderData {
         Vec2 slice_size,
         Vec4 overlap_color
     )
-        : material_dset{renderer.dset_allocator().allocate(
-              renderer.dset_layout_cache().layout({
+        : material_dset{renderer.device().dset_allocator().allocate(
+              renderer.device().dset_layout_cache().layout({
                   vk::sampler_binding(0),
                   vk::uniform_binding(1),
               })

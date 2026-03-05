@@ -2,12 +2,14 @@
 
 #include "graphics/renderer.hpp"
 #include "graphics/stages/render_stage.hpp"
+#include "graphics/stages/sprite_stage.hpp"
 #include "graphics/texture.hpp"
 #include "resources/resources.hpp"
 #include "vk/dset_layout.hpp"
 #include "vk/functions.hpp"
 #include "vk/image.hpp"
 #include "vk/pipeline.hpp"
+#include "vk/pipeline_builder.hpp"
 #include "vk/render_pass.hpp"
 
 namespace kzn {
@@ -15,32 +17,43 @@ namespace kzn {
 class GpuPlanetStage : public RenderStage {
 public:
     // Ctor
-    GpuPlanetStage(Renderer& renderer, vk::RenderPass& render_pass, vk::DescriptorSet& camera_dset)
+    GpuPlanetStage(
+        Renderer& renderer,
+        vk::RenderPass& render_pass,
+        vk::DescriptorSet& camera_dset
+    )
         : m_renderer_ptr{&renderer}
         , m_test_pipeline{
-            renderer.device(),
-            vk::PipelineStages{
-                .vertex = load_shader("shaders://planet/planet.vert.spv"),
-                .fragment = load_shader("shaders://planet/planet.frag.spv"),
-            },
-            vk::PipelineConfig(render_pass)
+            vk::PipelineBuilder(render_pass)
+                .set_vertex_stage(load_shader("shaders://planet/planet.vert.spv"))
+                .set_fragment_stage(load_shader("shaders://planet/planet.frag.spv"))
                 .set_topology(VK_PRIMITIVE_TOPOLOGY_TRIANGLE_STRIP)
-                .set_layout(vk::PipelineLayout{
-                    .descriptor_sets = {
-                        renderer.dset_layout_cache()
-                            .layout({vk::uniform_binding(0)}),
-                        renderer.dset_layout_cache()
-                            .layout({vk::sampler_binding(0)})
-                    }
-                })
+                .build(renderer.device())
         }
+        // , m_test_pipeline{
+        //     renderer.device(),
+        //     vk::PipelineStages{
+        //         .vertex = load_shader("shaders://planet/planet.vert.spv"),
+        //         .fragment = load_shader("shaders://planet/planet.frag.spv"),
+        //     },
+        //     vk::PipelineConfig(render_pass)
+        //         .set_topology(VK_PRIMITIVE_TOPOLOGY_TRIANGLE_STRIP)
+        //         .set_layout(
+        //             vk::PipelineLayout{
+        //                 .descriptor_sets = {
+        //                     renderer.device().dset_layout_cache().layout({vk::uniform_binding(0)}).vk_layout,
+        //                     renderer.device().dset_layout_cache().layout({vk::sampler_binding(0)}).vk_layout
+        //                 },
+        //             }
+        //         )
+        // }
         , m_camera_dset_ptr{&camera_dset}
-        , m_earth_tex_ptr{g_resources.find_or_load<Texture>("textures://earth.jpg")}
-        // , m_earth_tex_ptr{g_resources.find_or_load<Texture>("textures://earth.jpg")}
-        , m_earth_dset{renderer.dset_allocator().allocate(
-            renderer.dset_layout_cache().layout({
-                vk::sampler_binding(0)
-            })
+        , m_earth_tex_ptr{g_resources.load<Texture>("textures://earth.jpg")}
+        , m_earth_dset{renderer.device().dset_allocator().allocate(
+            *m_test_pipeline.dset_layout(1)
+            // renderer.device().dset_layout_cache().layout({
+            //     vk::sampler_binding(0)
+            // })
         )}
         , m_earth_image(renderer.device(), m_earth_tex_ptr->extent())
     {
