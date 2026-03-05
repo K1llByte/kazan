@@ -12,3 +12,6 @@ build/
 
 # Ignore config files
 imgui.ini
+
+# Ignore notes
+notes.md
