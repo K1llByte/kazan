@@ -1,89 +1,56 @@
- # Todo
 
-## In Progress
+# Todo
 
-- [Plan simple editor architecture](api_design.md)
+- [ ] 3D Graphics rendering
+- [ ] Add volk meta loader as dependency
+- [ ] Remove Singleton base class
+- [ ] Reuse simple imgui overlay to display text information such as rendering info
+- [ ] Make vulkan features configurable for any vulkan version
+- [ ] Shader compilation
+- [ ] Add https://github.com/martinus/unordered_dense as dependency and benchmark performance differences
 
-## Todo
+_______________________________________________________________________________
+# Planned
 
-- Improve EventManager for better event type deduction (EventManager::listen(on_foo)) and make EventListener class that registers event handlers at runtime 
-
-- [Create Texture and vk::Image abstractions](api_design.md)
-
-- CMake setup shader compiler
-- CMake setup vulkan fetch and install SDK
-- Github Actions setup CI/CD
-- Documentation generation with hdoc/Doxygen+MkDocs/DoxygenAwesomeCss
-- Disable some clang-tidy warnings
-    - Magic numbers
-    - Virtual dtors
-    - backslash-newline
-
-- Make Registry same singleton as Renderer (using the Singleton base class abstraction)
-- Remake ECS Registry abstraction
-- Info component with information about an entities
-- Fix alignment of single float  
-- Create Entities panel (list of selectable entities)
-- Move vk folder to graphics folder
-- Test uniforms without struct
-- Move create_sampler/create_image_view utils from render_image.cpp to the vk abstraction layer
-- Crude opeartions for SystemManager
-- Crude opeartions for RenderGraph
-- StringHash constexpr type for instant string comparison and string matching with switch case
-- Pseudo RenderGraph
-- Improve pipeline layout
-
-## Planned
-
-- Vulkan shader reflection to generate pipeline layout
-- Loader classes for loading data from files (PngTextureLoader, ObjMeshLoader)
-- Make staged submition for Vertex Buffers
-    - For now vertex buffers are in a host visible region on the GPU
-    I need to refactor the code to store a staging buffer and the real buffer
-    followed by a scheduled copy of the Host visible buffer to the real VertexBuffer
+- Write kzn cli to create applications, compile shaders and compile project
+- Modern cmake presets
+- Profile rendering with amd/nvidia profiler
 - RenderImage abstraction, probably with a RenderTarget interface
 - vk::Queue wrapper (Moveable but not Copyable) with submit method which receives vk::CommandBuffer as argument
 - Primitive Generator
-- Generate Mipmaps
+- Mipmaps
+- Anisotropic filtering
 - Multisampling (MXAA)
-- Resource Management. Distinguish engine assets and project assets.
-- Uniform structured alignment (have special glsl types)
-- Mesh classes with layout description (use glft2 as inspiration)
-- Plan 3D and 2D rendering
+- Hierarchy component
+- Make SpriteGeometryCache work like a ref counted allocator, when theres no more references left, destroy the geometry
+- Figure out how to submit mat3 uniform data (alignment not correct)
+- Fix alpha test not working for alpha textures between players texture (if players are in same depth)
+- Bug: Physics segfaults if theres a system that runs before it, that initializes a physics component
+    - This is a current design flaw of components
+- Make EventHandlerId a mix of the event type id + counter
 
-## Done
+_______________________________________________________________________________
+# Done
 
-## Roadmap #1
-
-- Editor architecture
-    - Editor
-        - Responsible for intilializing imgui context
-        - Owns panels
-
-- ECS Framework using entt
-    - Entity/Component/System classes
-    - Transform2DComponent
-        - Vec2 position
-        - float rotation
-        - Vec2 scale
-    - SpriteComponent
-    - Singleton Registry class with an entt registry
-
-- Event System
-    - First use case is vulkan events (SwapchainResize)
-
-- RenderSystem
-    - PipelineManager, RenderPassManager
-    - With a SpriteSubSystem that just renders 2d textures
-    - Render images for offscreen rendering (editor viewport )
-
-- Engine Modules
-    - Attached and initialized to an application
-    - Live throughtout the lifetime of the application
-    - Can specify hard dependencies on other modules
-    - This will provide an internal reference to those hard dependencies
-
-<!-- 
-References:
-- GPU Driven Rendering (https://vkguide.dev/docs/gpudriven)
--->
+- [x] Move DsetLayoutCache and Allocator to Device instead of Renderer
+    - Allows PipelineBuilder to reuse these constructs
+- [x] Make pipeline allow query its descriptor set layouts by index
+    - pipeline.dset_layout(0)
+- [x] PipelineBuilder that uses spirv reflection data to deduce pipeline layout
+- [x] Fix vkQueueSubmit warning
+- [x] Slang shader support
+- [x] Add versioned cmake dependencies
+- [x] Refactor CMakeLists.txt to allow adding kazan/paperlib as a submodule and write a simple application using engine
+- [x] Make BitMayhem compile again
+- [-] Disable warnings for external libs
+- [x] Unify paper and kazan into same lib
+- [x] BasicApp base class
+- [x] Test example that just displays a texture
+- [x] Change console colors
+- [x] Simple system scheduler (DAG + topologycal sort)
+    - [x] Express dependencies using associated type `using Before = TypeList<RenderSystem>`
+- [x] Refactor Renderer into a non singleton
+- [x] Refactor Registry into a non singleton
+- [x] Make EditorSystem only initialize after RenderSystem, since it depends on it and the renderer
+- [x] Brainstorm how to deal with relative engine/app path
+- [x] Brainstorm a way to costumize render stages in the RenderSystem

@@ -11,7 +11,7 @@ Modern C++ 20 vulkan rendering engine.
 git clone git@github.com:K1llByte/kazan.git
 cd kazan
 
-# Build project
+# Generate and compile project
 cmake -Bbuild && cmake --build build
 
 # Compile shaders before running executable
@@ -22,12 +22,12 @@ cmake -Bbuild && cmake --build build
 ```
 
 <!--
-___
+_______________________________________________________________________________
 ## References
-
-https://www.khronos.org/registry/vulkan/specs/1.0-wsi_extensions/pdf/vkspec.pdf  
-https://www.khronos.org/files/vulkan11-reference-guide.pdf  
-https://vulkan-tutorial.com/Development_environment#page_Linux  
-https://vkguide.dev/  
-https://learnopengl.com/
+- GPU Driven Rendering https://vkguide.dev/docs/gpudriven
+- https://www.khronos.org/registry/vulkan/specs/1.0-wsi_extensions/pdf/vkspec.pdf  
+- https://www.khronos.org/files/vulkan11-reference-guide.pdf  
+- https://vulkan-tutorial.com/Development_environment#page_Linux  
+- https://vkguide.dev/  
+- https://learnopengl.com/
 -->
