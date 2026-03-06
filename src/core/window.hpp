@@ -42,6 +42,8 @@ public:
     // TODO: Remove when event system is implemented
     void set_resized(bool resized);
 
+    void set_mouse_mode(int value);
+
     vk::Surface create_surface(vk::Instance& instance);
 
     VkExtent2D extent();

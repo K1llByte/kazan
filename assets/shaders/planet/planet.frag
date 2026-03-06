@@ -28,7 +28,7 @@ vec3 ray_direction(
 ) {
     float px = ndc.x * aspect_ratio;
     float py = ndc.y;
-    float pz = -1.0 / tan(fov_v * 0.5);
+    float pz = 1.0 / tan(fov_v * 0.5);
 
     return normalize(px * cam_right + py * cam_up + pz * camera.forward);
 }

@@ -30,6 +30,8 @@ public:
 
     void destroy_all();
 
+    // TODO: [entity, c1, c2] = find_with<C1, C2>()
+
 private:
     entt::basic_registry<EntityId> m_registry;
 };

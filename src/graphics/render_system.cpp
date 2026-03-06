@@ -155,7 +155,6 @@ void RenderSystem::select_camera(Scene& scene) {
     // Camera 2D
     ///////////////////////////////////////////////////////////////////////////
 
-    
     // Select rendering camera otherwise choose default camera params.
     EntityId camera2d_entity = entt::null;
     Camera2DComponent* camera2d_ptr = nullptr;
@@ -214,7 +213,7 @@ void RenderSystem::select_camera(Scene& scene) {
         // Default camera shader data
         m_camera3d_ubo.upload(Camera3DUniformData{
             .aspect_ratio = 1,
-            .fov_v = 100.f,
+            .fov_v = glm::radians(100.f),
             .position = Vec3{0},
             .forward = Vec3{0,0,-1},
             .up = Vec3{0,-1,0},
@@ -229,7 +228,7 @@ void RenderSystem::select_camera(Scene& scene) {
 
         auto camera_data = Camera3DUniformData{
             .aspect_ratio = camera3d_ptr->aspect_ratio,
-            .fov_v = camera3d_ptr->fov_v,
+            .fov_v = glm::radians(camera3d_ptr->fov_v),
             .position = camera3d_ptr->position,
             .forward = camera3d_ptr->forward,
             .up = camera3d_ptr->up,

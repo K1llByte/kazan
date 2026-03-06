@@ -30,8 +30,6 @@ Window::Window(std::string_view name, int width, int height)
     glfwSetWindowUserPointer(m_glfw_window, this);
     // On framebuffer resize callback
     glfwSetFramebufferSizeCallback(m_glfw_window, framebuffer_resized);
-    // Hide mouse cursor
-    // glfwSetInputMode(m_glfw_window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
 
     Log::trace("Window created");
 }
@@ -59,6 +57,10 @@ void Window::set_title(std::string_view name) {
 
 void Window::set_resized(bool resized) {
     m_has_resized = resized;
+}
+
+void Window::set_mouse_mode(int value) {
+    glfwSetInputMode(m_glfw_window, GLFW_CURSOR, value);
 }
 
 vk::Surface Window::create_surface(vk::Instance& instance) {

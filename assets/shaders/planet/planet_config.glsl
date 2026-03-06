@@ -14,13 +14,10 @@
 
 // Camera settings //
 
-#define CAMERA_POSITION vec3(0, 0, -6)
-#define CAMERA_FORWARD vec3(0, 0, -1)
 #define CAMERA_FOV 100.0
-#define CAMERA_ASPECT_RATIO (16.0 / 2) / 9.0
 #define LIGHT_COLOR vec3(1,1,1)
 #define LIGHT_DIRECTION vec3(1,0,0)
-#define AMBIENT_STRENGTH 0.01
+#define AMBIENT_STRENGTH 0.001
 
 // A more artistic preset //
 #define EARTH_RADIUS 1.0

@@ -13,7 +13,7 @@ namespace kzn {
 class BasicApp : public App {
 public:
     BasicApp()
-        : BasicApp("test app", 800, 600) {}
+        : BasicApp("test app", 1200, 800) {}
 
     BasicApp(std::string_view name, int width, int height)
         : m_window(name, width, height)

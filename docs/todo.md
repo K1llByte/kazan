@@ -1,8 +1,8 @@
 
 # Todo
 
-- [ ] Fix Camera3D not being converted to radians
-- [ ] Camera3D controller
+- [ ] Skybox shader
+- [ ] Registry `find_with<C1, C2, ...>()` method
 - [ ] Fix problem with glsl data alignment in Camera3DUniformData, cant have a Vec3 before a Float
 - [ ] Mesh loader
 - [ ] 3D Graphics rendering pipeline
@@ -37,6 +37,7 @@ _______________________________________________________________________________
 _______________________________________________________________________________
 # Done
 
+- [x] Basic CameraSystem controller 
 - [x] Camera3D component
 - [x] Move DsetLayoutCache and Allocator to Device instead of Renderer
     - Allows PipelineBuilder to reuse these constructs

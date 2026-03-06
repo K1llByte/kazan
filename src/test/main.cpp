@@ -9,6 +9,7 @@
 #include "graphics/stages/render_stage.hpp"
 #include "graphics/camera.hpp"
 #include "math/types.hpp"
+#include "test/camera_system.hpp"
 
 using namespace kzn;
 
@@ -18,7 +19,7 @@ inline void create_test_level(Scene& scene) {
 
     auto camera = scene.registry.create();
     auto& camera3d = camera.add(Camera3DComponent{
-        .position = Vec3{0,0,-6},
+        .position = Vec3{0,0,-3},
         .fov_v = 100.f,
         .use_viewport_aspect_ratio = true,
     });
@@ -48,11 +49,23 @@ inline void init_render_stages(RenderSystem& render_sys) {
 
 struct TestApp : public BasicApp {
     TestApp() {
-        // Initialize systems
+        ///////////////////////////////////////////////////////////////////////
+        // Initialize Systems
+        ///////////////////////////////////////////////////////////////////////
+
+        // Camera system
+        m_systems.emplace<CameraSystem>();
+        
+        // Render system
         auto& render_sys = m_systems.emplace<RenderSystem>();
         init_render_stages(render_sys);
+        
         // EditorSystem auto registers as dependency before RenderSystem
         m_systems.emplace<EditorSystem>(m_window, m_input, m_console);
+
+        ///////////////////////////////////////////////////////////////////////
+        // Load level
+        ///////////////////////////////////////////////////////////////////////
 
         // Load level entities
         create_test_level(m_scene);
