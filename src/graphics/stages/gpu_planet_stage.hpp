@@ -30,30 +30,10 @@ public:
                 .set_topology(VK_PRIMITIVE_TOPOLOGY_TRIANGLE_STRIP)
                 .build(renderer.device())
         }
-        // , m_test_pipeline{
-        //     renderer.device(),
-        //     vk::PipelineStages{
-        //         .vertex = load_shader("shaders://planet/planet.vert.spv"),
-        //         .fragment = load_shader("shaders://planet/planet.frag.spv"),
-        //     },
-        //     vk::PipelineConfig(render_pass)
-        //         .set_topology(VK_PRIMITIVE_TOPOLOGY_TRIANGLE_STRIP)
-        //         .set_layout(
-        //             vk::PipelineLayout{
-        //                 .descriptor_sets = {
-        //                     renderer.device().dset_layout_cache().layout({vk::uniform_binding(0)}).vk_layout,
-        //                     renderer.device().dset_layout_cache().layout({vk::sampler_binding(0)}).vk_layout
-        //                 },
-        //             }
-        //         )
-        // }
         , m_camera_dset_ptr{&camera_dset}
         , m_earth_tex_ptr{g_resources.load<Texture>("textures://earth.jpg")}
         , m_earth_dset{renderer.device().dset_allocator().allocate(
             *m_test_pipeline.dset_layout(1)
-            // renderer.device().dset_layout_cache().layout({
-            //     vk::sampler_binding(0)
-            // })
         )}
         , m_earth_image(renderer.device(), m_earth_tex_ptr->extent())
     {

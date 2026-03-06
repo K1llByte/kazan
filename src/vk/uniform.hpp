@@ -3,14 +3,15 @@
 #include "boost/pfr/core.hpp"
 #include "core/traits.hpp"
 #include "math/types.hpp"
+
 #include <type_traits>
 
 //! Helper namespace for GLSL std140 layout compliant algebra types.
 namespace kzn::glsl {
 
-template<typename T, size_t Align>
-    requires(Align >= sizeof(T))
-class AlignedUniformType : public T {
+template<typename T, size_t Alignment>
+    requires(Alignment >= sizeof(T))
+class alignas(Alignment) AlignedUniformType : public T {
 public:
     using T::T;
     AlignedUniformType() = default;
@@ -18,9 +19,6 @@ public:
         : T(value) {}
     AlignedUniformType(T&& value)
         : T(std::move(value)) {}
-
-private:
-    char m_padding[Align - sizeof(T)];
 };
 
 // Fundamental types

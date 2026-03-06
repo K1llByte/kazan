@@ -1,7 +1,11 @@
 
 # Todo
 
-- [ ] 3D Graphics rendering
+- [ ] Fix Camera3D not being converted to radians
+- [ ] Camera3D controller
+- [ ] Fix problem with glsl data alignment in Camera3DUniformData, cant have a Vec3 before a Float
+- [ ] Mesh loader
+- [ ] 3D Graphics rendering pipeline
 - [ ] Add volk meta loader as dependency
 - [ ] Remove Singleton base class
 - [ ] Reuse simple imgui overlay to display text information such as rendering info
@@ -12,7 +16,7 @@
 _______________________________________________________________________________
 # Planned
 
-- Write kzn cli to create applications, compile shaders and compile project
+- Separate git LFS repo with assets
 - Modern cmake presets
 - Profile rendering with amd/nvidia profiler
 - RenderImage abstraction, probably with a RenderTarget interface
@@ -28,10 +32,12 @@ _______________________________________________________________________________
 - Bug: Physics segfaults if theres a system that runs before it, that initializes a physics component
     - This is a current design flaw of components
 - Make EventHandlerId a mix of the event type id + counter
+- Write kzn cli to create applications, compile shaders and compile project
 
 _______________________________________________________________________________
 # Done
 
+- [x] Camera3D component
 - [x] Move DsetLayoutCache and Allocator to Device instead of Renderer
     - Allows PipelineBuilder to reuse these constructs
 - [x] Make pipeline allow query its descriptor set layouts by index

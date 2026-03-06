@@ -5,7 +5,6 @@
 #include "events/event_manager.hpp"
 #include "events/events.hpp"
 #include "graphics/stages/render_stage.hpp"
-#include "math/types.hpp"
 #include "vk/buffer.hpp"
 #include "vk/dset.hpp"
 #include "vk/image.hpp"
@@ -21,21 +20,6 @@
 #define KZN_ENABLE_EDITOR
 
 namespace kzn {
-
-struct Camera2DComponent {
-    float zoom = 1.f;
-    float aspect_ratio = 1.f;
-    bool use_viewport_aspect_ratio = true;
-
-    [[nodiscard]]
-    constexpr Mat4 matrix() const {
-        // Initialize with identity
-        auto proj_mat = Mat4{};
-        // Aspect ratio multiplier
-        proj_mat[0].x = 1.f / aspect_ratio;
-        return proj_mat;
-    }
-};
 
 //! ECS System for rendering
 class RenderSystem
@@ -59,8 +43,13 @@ public:
     }
 
     [[nodiscard]]
-    vk::DescriptorSet& camera_dset() {
-        return m_camera_dset;
+    vk::DescriptorSet& camera2d_dset() {
+        return m_camera2d_dset;
+    }
+
+    [[nodiscard]]
+    vk::DescriptorSet& camera3d_dset() {
+        return m_camera3d_dset;
     }
 
     template<typename T, typename ...Args>
@@ -73,12 +62,23 @@ public:
     void update(Scene& scene, float delta_time) override;
 
 private:
-    struct CameraUniformData {
+    struct Camera2DUniformData {
         glsl::Vec2 position;
         glsl::Float zoom;
         glsl::Float aspect_ratio;
         glsl::Float rotation;
     };
+
+    struct Camera3DUniformData {
+        glsl::Float aspect_ratio;
+        glsl::Float fov_v;
+        glsl::Vec3 position;
+        glsl::Vec3 forward;
+        glsl::Vec3 up;
+    };
+
+private:
+    void select_camera(Scene& scene);
 
 private:
     // Render system specific data
@@ -88,8 +88,10 @@ private:
     std::vector<vk::Framebuffer> m_framebuffers;
 
     // Camera data shared between stages
-    vk::UniformBuffer m_camera_ubo;
-    vk::DescriptorSet m_camera_dset;
+    vk::UniformBuffer m_camera2d_ubo;
+    vk::DescriptorSet m_camera2d_dset;
+    vk::UniformBuffer m_camera3d_ubo;
+    vk::DescriptorSet m_camera3d_dset;
 
     // Stages
     std::vector<std::unique_ptr<RenderStage>> m_render_stages;
