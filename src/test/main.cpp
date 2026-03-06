@@ -5,9 +5,10 @@
 #include "graphics/renderer.hpp"
 #include "graphics/sprite_component.hpp"
 #include "graphics/stages/debug_stage.hpp"
-#include "graphics/stages/gpu_planet_stage.hpp"
+#include "graphics/stages/planet_stage.hpp"
 #include "graphics/stages/render_stage.hpp"
 #include "graphics/camera.hpp"
+#include "graphics/stages/skybox_stage.hpp"
 #include "math/types.hpp"
 #include "test/camera_system.hpp"
 
@@ -34,7 +35,12 @@ inline void init_render_stages(RenderSystem& render_sys) {
     //     render_sys.screen_render_pass(),
     //     render_sys.camera2d_dset()
     // );
-    render_sys.emplace_stage<GpuPlanetStage>(
+    render_sys.emplace_stage<SkyboxStage>(
+        render_sys.context<Renderer>(),
+        render_sys.screen_render_pass(),
+        render_sys.camera3d_dset()
+    );
+    render_sys.emplace_stage<PlanetStage>(
         render_sys.context<Renderer>(),
         render_sys.screen_render_pass(),
         render_sys.camera3d_dset()
@@ -49,10 +55,6 @@ inline void init_render_stages(RenderSystem& render_sys) {
 
 struct TestApp : public BasicApp {
     TestApp() {
-        ///////////////////////////////////////////////////////////////////////
-        // Initialize Systems
-        ///////////////////////////////////////////////////////////////////////
-
         // Camera system
         m_systems.emplace<CameraSystem>();
         
@@ -62,10 +64,6 @@ struct TestApp : public BasicApp {
         
         // EditorSystem auto registers as dependency before RenderSystem
         m_systems.emplace<EditorSystem>(m_window, m_input, m_console);
-
-        ///////////////////////////////////////////////////////////////////////
-        // Load level
-        ///////////////////////////////////////////////////////////////////////
 
         // Load level entities
         create_test_level(m_scene);

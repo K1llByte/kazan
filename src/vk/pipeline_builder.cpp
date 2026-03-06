@@ -72,16 +72,12 @@ PipelineBuilder::PipelineBuilder(
         VK_COLOR_COMPONENT_R_BIT | VK_COLOR_COMPONENT_G_BIT |
         VK_COLOR_COMPONENT_B_BIT | VK_COLOR_COMPONENT_A_BIT;
     m_color_blend_attachment.blendEnable = VK_TRUE;
-    m_color_blend_attachment.srcColorBlendFactor =
-        VK_BLEND_FACTOR_SRC_ALPHA; // Optional
-    m_color_blend_attachment.dstColorBlendFactor =
-        VK_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA;                 // Optional
-    m_color_blend_attachment.colorBlendOp = VK_BLEND_OP_ADD; // Optional
-    m_color_blend_attachment.srcAlphaBlendFactor =
-        VK_BLEND_FACTOR_ONE; // Optional
-    m_color_blend_attachment.dstAlphaBlendFactor =
-        VK_BLEND_FACTOR_ZERO;                                // Optional
-    m_color_blend_attachment.alphaBlendOp = VK_BLEND_OP_ADD; // Optional
+    m_color_blend_attachment.srcColorBlendFactor = VK_BLEND_FACTOR_SRC_ALPHA;
+    m_color_blend_attachment.dstColorBlendFactor = VK_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA;                 // Optional
+    m_color_blend_attachment.colorBlendOp = VK_BLEND_OP_ADD;
+    m_color_blend_attachment.srcAlphaBlendFactor = VK_BLEND_FACTOR_ONE;
+    m_color_blend_attachment.dstAlphaBlendFactor = VK_BLEND_FACTOR_ZERO;
+    m_color_blend_attachment.alphaBlendOp = VK_BLEND_OP_ADD;
 
     m_color_blend_info = {};
     m_color_blend_info.sType =
@@ -100,7 +96,7 @@ PipelineBuilder::PipelineBuilder(
         VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO;
     m_depth_stencil_info.depthTestEnable = VK_TRUE;
     m_depth_stencil_info.depthWriteEnable = VK_TRUE;
-    m_depth_stencil_info.depthCompareOp = VK_COMPARE_OP_LESS;
+    m_depth_stencil_info.depthCompareOp = VK_COMPARE_OP_LESS_OR_EQUAL;
     m_depth_stencil_info.depthBoundsTestEnable = VK_FALSE;
     m_depth_stencil_info.minDepthBounds = 0.0f; // Optional
     m_depth_stencil_info.maxDepthBounds = 1.0f; // Optional
@@ -168,6 +164,42 @@ PipelineBuilder& PipelineBuilder::set_line_width(float line_width) {
     m_rasterization_info.lineWidth = line_width;
     return *this;
 }
+
+PipelineBuilder& PipelineBuilder::set_depth_test(VkBool32 enable) {
+    m_depth_stencil_info.depthTestEnable = enable;
+    return *this;
+}
+
+PipelineBuilder& PipelineBuilder::set_depth_write(VkBool32 enable) {
+    m_depth_stencil_info.depthWriteEnable = enable;
+    return *this;
+}
+
+PipelineBuilder& PipelineBuilder::set_depth_cmp(VkCompareOp cmp) {
+    m_depth_stencil_info.depthCompareOp = cmp;
+    return *this;
+}
+
+PipelineBuilder& PipelineBuilder::set_depth_bounds_test(VkBool32 enable) {
+    m_depth_stencil_info.depthBoundsTestEnable = enable;
+    return *this;
+}
+
+PipelineBuilder& PipelineBuilder::set_min_depth(float min) {
+    m_depth_stencil_info.minDepthBounds = min;
+    return *this;
+}
+
+PipelineBuilder& PipelineBuilder::set_max_depth(float max) {
+    m_depth_stencil_info.maxDepthBounds = max;
+    return *this;
+}
+
+PipelineBuilder& PipelineBuilder::set_stencil_test(VkBool32 enable) {
+    m_depth_stencil_info.stencilTestEnable = enable;
+    return *this;
+}
+
 
 struct ShaderReflection {
     FlatMap<uint32_t, std::vector<VkDescriptorSetLayoutBinding>> descriptor_sets;

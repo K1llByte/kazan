@@ -193,7 +193,7 @@ AtmosphereResult atmosphere(
 }
 
 void main() {
-    out_color = vec4(0, 0, 0, 1);
+    out_color = vec4(0);
 
     const vec3 right = normalize(cross(camera.forward, vec3(0, -1, 0)));
 
@@ -214,6 +214,8 @@ void main() {
 
         earth_color = vec4(diffuse + ambient, 1.0);
     }
+    // NOTE: Force draw in z near
+    gl_FragDepth = float(earth_hit.x > 0.0);
 
 #ifdef ENABLE_ATMOSPHERE
     vec2 atmosphere_hit = ray_intersect_sphere(
@@ -237,6 +239,9 @@ void main() {
             max(composited_alpha, earth_color.a)
         );
     }
+    // NOTE: Force draw in z near
+    gl_FragDepth = float(atmosphere_hit.x > 0.0);
+
 #else
     out_color = earth_color;
 #endif

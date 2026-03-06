@@ -3,6 +3,7 @@
 #include "vk/pipeline.hpp"
 
 #include <memory>
+#include <vulkan/vulkan_core.h>
 
 namespace kzn::vk {
 
@@ -31,6 +32,16 @@ public:
     PipelineBuilder& set_polygon_mode(VkPolygonMode polygon_mode);
     PipelineBuilder& set_front_face(VkFrontFace font_face);
     PipelineBuilder& set_line_width(float line_width);
+
+    // Depth Stencil
+    PipelineBuilder& set_depth_test(VkBool32 enable);
+    PipelineBuilder& set_depth_write(VkBool32 enable);
+    PipelineBuilder& set_depth_cmp(VkCompareOp cmp);
+    PipelineBuilder& set_depth_bounds_test(VkBool32 enable);
+    PipelineBuilder& set_min_depth(float min);
+    PipelineBuilder& set_max_depth(float max);
+    PipelineBuilder& set_stencil_test(VkBool32 enable);
+
 
     [[nodiscard]]
     Pipeline build(Device& device);
