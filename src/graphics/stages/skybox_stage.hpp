@@ -4,13 +4,13 @@
 #include "graphics/stages/render_stage.hpp"
 #include "graphics/texture.hpp"
 #include "resources/resources.hpp"
+#include "vk/cube_image.hpp"
 #include "vk/dset_layout.hpp"
 #include "vk/functions.hpp"
 #include "vk/image.hpp"
 #include "vk/pipeline.hpp"
 #include "vk/pipeline_builder.hpp"
 #include "vk/render_pass.hpp"
-#include <vulkan/vulkan_core.h>
 
 namespace kzn {
 
@@ -34,16 +34,32 @@ public:
                 .build(renderer.device())
         }
         , m_camera_dset_ptr{&camera_dset}
-        // , m_earth_tex_ptr{g_resources.load<Texture>("textures://earth.jpg")}
-        // , m_earth_dset{renderer.device().dset_allocator().allocate(
-        //     *m_pipeline.dset_layout(1)
-        // )}
-        // , m_earth_image(renderer.device(), m_earth_tex_ptr->extent())
+        , m_skybox_tex{
+            load_texture("textures://skybox/space0.png"),
+            load_texture("textures://skybox/space1.png"),
+            load_texture("textures://skybox/space2.png"),
+            load_texture("textures://skybox/space3.png"),
+            load_texture("textures://skybox/space4.png"),
+            load_texture("textures://skybox/space5.png"),
+        }
+        , m_skybox_dset{renderer.device().dset_allocator().allocate(
+            *m_pipeline.dset_layout(1)
+        )}
+        , m_skybox_image(renderer.device(), m_skybox_tex[0]->extent())
     {
-        // // Upload texture data to gpu image memory
-        // m_earth_image.upload(m_earth_tex_ptr->data());
-        // // Update dset and upload data
-        // m_earth_dset.update({m_earth_image.info()});
+        // Upload texture data to gpu image memory
+        m_skybox_image.upload(
+            (const void*[6]) {
+                m_skybox_tex[0]->data(),
+                m_skybox_tex[1]->data(),
+                m_skybox_tex[2]->data(),
+                m_skybox_tex[3]->data(),
+                m_skybox_tex[4]->data(),
+                m_skybox_tex[5]->data()
+            }
+        );
+        // Update dset and upload data
+        m_skybox_dset.update({m_skybox_image.info()});
     }
 
     void render(Scene& scene, vk::CommandBuffer& cmd_buffer) override {
@@ -55,7 +71,7 @@ public:
         vk::cmd_bind_dsets(
             cmd_buffer,
             // std::array{m_camera_dset_ptr, &m_earth_dset},
-            std::array{m_camera_dset_ptr},
+            std::array{m_camera_dset_ptr, &m_skybox_dset},
             m_pipeline.layout()
         );
 
@@ -66,9 +82,9 @@ private:
     Renderer* m_renderer_ptr;
     vk::Pipeline m_pipeline;
     vk::DescriptorSet* m_camera_dset_ptr;
-    // std::shared_ptr<Texture> m_earth_tex_ptr;
-    // vk::DescriptorSet m_earth_dset;
-    // vk::Image m_earth_image;
+    std::array<std::shared_ptr<Texture>, 6> m_skybox_tex;
+    vk::DescriptorSet m_skybox_dset;
+    vk::CubeImage m_skybox_image;
 };
 
 } // namespace kzn

@@ -9,6 +9,7 @@
 #include "graphics/stages/render_stage.hpp"
 #include "graphics/camera.hpp"
 #include "graphics/stages/skybox_stage.hpp"
+#include "math/transform.hpp"
 #include "math/types.hpp"
 #include "test/camera_system.hpp"
 
@@ -26,7 +27,16 @@ inline void create_test_level(Scene& scene) {
     });
 
     auto sprite = scene.registry.create();
-    camera.add(SpriteComponent{});
+    sprite.add(Transform2DComponent{
+        .position = Vec2{-0.5,0},
+    });
+    sprite.add(SpriteComponent{});
+
+    auto sprite2 = scene.registry.create();
+    sprite2.add(Transform2DComponent{
+        .position = Vec2{0.5,0},
+    });
+    sprite2.add(SpriteComponent{});
 }
 
 inline void init_render_stages(RenderSystem& render_sys) {

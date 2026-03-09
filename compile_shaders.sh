@@ -1,22 +1,37 @@
 #!/bin/bash
 
 BOLD_GREEN="\033[1;32m"
+BOLD_RED="\033[1;31m"
 RESET="\033[0m"
 
 compile_glsl_shaders_by_ext() {
+    if ! command -v glslangValidator >/dev/null 2>&1; then
+        echo -e "${BOLD_RED}Error:${RESET} Command glslangValidator does not exist"
+        return 1
+    fi
+
     for ext in "$@"; do
         for filename in assets/shaders/**/*.${ext}; do
-            echo -e "${BOLD_GREEN}Compiling GLSL ${filename}${RESET}"
-            glslangValidator -Os -V "${filename}" -o "${filename}.spv"
+            # NOTE: When compiling with -Os unused dsets will be stripped out
+            # of the shader, and therefore wont be visible by shader reflection
+            if glslangValidator -V "$filename" -o "$filename.spv" ; then
+                echo -e "${BOLD_GREEN}Compiled${RESET} ${filename}"
+            fi
         done
     done
 }
 
 compile_slang_shaders_by_ext() {
+    if ! command -v slangc >/dev/null 2>&1; then
+        echo -e "${BOLD_RED}Error:${RESET} Command slangc does not exist"
+        return 1
+    fi
+
     for ext in "$@"; do
         for filename in assets/shaders/**/*.${ext}; do
-            echo -e "${BOLD_GREEN}Compiling Slang ${filename}${RESET}"
-            slangc "${filename}" -target spirv -profile sm_6_5 -o "${filename}.spv"
+            if slangc "${filename}" -target spirv -profile sm_6_5 -o "${filename}.spv" > /dev/null; then
+                echo -e "${BOLD_GREEN}Compiled${RESET} ${filename}"
+            fi
         done
     done
 }
@@ -39,6 +54,5 @@ compile_glsl_shaders_by_ext "rmiss"
 compile_glsl_shaders_by_ext "rcall"
 compile_glsl_shaders_by_ext "task"
 compile_glsl_shaders_by_ext "mesh"
-
 # Compile slang shaders
 compile_slang_shaders_by_ext "slang"

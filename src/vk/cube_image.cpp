@@ -1,4 +1,4 @@
-#include "image.hpp"
+#include "cube_image.hpp"
 
 #include "vk/error.hpp"
 #include "vk/utils.hpp"
@@ -11,7 +11,7 @@ namespace kzn::vk {
 // Pixel size for format: 4 bytes
 constexpr uint32_t pixel_size = 4;
 
-Image::Image(
+CubeImage::CubeImage(
     Device& device,
     VkExtent3D extent,
     VkFormat format,
@@ -51,7 +51,7 @@ Image::Image(
     image_info.imageType = VK_IMAGE_TYPE_2D;
     image_info.extent = m_extent;
     image_info.mipLevels = 1;
-    image_info.arrayLayers = 1;
+    image_info.arrayLayers = 6;
     // Image format
     image_info.format = format;
     image_info.tiling = VK_IMAGE_TILING_OPTIMAL;
@@ -59,7 +59,7 @@ Image::Image(
     image_info.usage = usage_flags;
     image_info.samples = VK_SAMPLE_COUNT_1_BIT;
     image_info.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
-    image_info.flags = 0; // Optional
+    image_info.flags = VK_IMAGE_CREATE_CUBE_COMPATIBLE_BIT; // Optional
 
     VmaAllocationCreateInfo image_alloc_info = {};
     image_alloc_info.usage = VMA_MEMORY_USAGE_GPU_ONLY;
@@ -78,13 +78,13 @@ Image::Image(
     VkImageViewCreateInfo view_info{};
     view_info.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
     view_info.image = m_texture_image;
-    view_info.viewType = VK_IMAGE_VIEW_TYPE_2D;
+    view_info.viewType = VK_IMAGE_VIEW_TYPE_CUBE;
     view_info.format = format;
     view_info.subresourceRange.aspectMask = aspect_mask;
     view_info.subresourceRange.baseMipLevel = 0;
     view_info.subresourceRange.levelCount = 1;
     view_info.subresourceRange.baseArrayLayer = 0;
-    view_info.subresourceRange.layerCount = 1;
+    view_info.subresourceRange.layerCount = 6;
 
     result = vkCreateImageView(
         *m_device_ptr, &view_info, nullptr, &m_texture_image_view
@@ -119,7 +119,7 @@ Image::Image(
     VK_CHECK_MSG(result, "Failed to create texture sampler");
 }
 
-// Image::Image(Image&& other)
+// CubeImage::CubeImage(Image&& other)
 //     : m_device_ptr{other.m_device_ptr}
 //     , m_extent{other.m_extent}
 //     , m_staging_buffer{other.m_staging_buffer}
@@ -132,7 +132,7 @@ Image::Image(
 //     other.m_device_ptr = nullptr;
 // }
 
-Image& Image::operator=(Image&& other) {
+CubeImage& CubeImage::operator=(CubeImage&& other) {
     delete_image_data();
     m_device_ptr = other.m_device_ptr;
     m_extent = other.m_extent;
@@ -147,17 +147,17 @@ Image& Image::operator=(Image&& other) {
     return *this;
 }
 
-Image::~Image() {
+CubeImage::~CubeImage() {
     if (m_device_ptr != nullptr) {
         delete_image_data();
     }
 }
 
-uint64_t Image::size() const noexcept {
-    return m_extent.width * m_extent.height * m_extent.depth * pixel_size;
+uint64_t CubeImage::size() const noexcept {
+    return m_extent.width * m_extent.height * m_extent.depth * pixel_size * 6;
 }
 
-DescriptorInfo Image::info() const noexcept {
+DescriptorInfo CubeImage::info() const noexcept {
     return DescriptorInfo{
         .image_info =
             VkDescriptorImageInfo{
@@ -168,13 +168,18 @@ DescriptorInfo Image::info() const noexcept {
     };
 }
 
-void Image::upload(const void* data) {
+void CubeImage::upload(const void* data[6]) {
+    const uint64_t face_size = size() / 6;
+
     // 1. Upload data to staging buffer
     void* mapped_memory;
     vmaMapMemory(
         m_device_ptr->allocator(), m_staging_buffer_allocation, &mapped_memory
     );
-    std::memcpy(mapped_memory, data, static_cast<size_t>(size()));
+    char* dst = static_cast<char*>(mapped_memory);
+    for (uint32_t i = 0; i < 6; i++) {
+        std::memcpy(dst + face_size * i, data[i], face_size);
+    }
     vmaUnmapMemory(m_device_ptr->allocator(), m_staging_buffer_allocation);
 
     // 2. Copy data to image
@@ -187,7 +192,7 @@ void Image::upload(const void* data) {
             range.baseMipLevel = 0;
             range.levelCount = 1;
             range.baseArrayLayer = 0;
-            range.layerCount = 1;
+            range.layerCount = 6;
 
             VkImageMemoryBarrier image_barrier_transfer_dst = {};
             image_barrier_transfer_dst.sType =
@@ -215,16 +220,23 @@ void Image::upload(const void* data) {
                 &image_barrier_transfer_dst
             );
 
-            // 2.2. Copy buffer to image
-            VkBufferImageCopy copy_region = {};
-            copy_region.bufferOffset = 0;
-            copy_region.bufferRowLength = 0;
-            copy_region.bufferImageHeight = 0;
-            copy_region.imageSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
-            copy_region.imageSubresource.mipLevel = 0;
-            copy_region.imageSubresource.baseArrayLayer = 0;
-            copy_region.imageSubresource.layerCount = 1;
-            copy_region.imageExtent = m_extent;
+            // 2.2 Copy buffer to cubemap faces
+            VkBufferImageCopy copy_regions[6];
+
+            for (uint32_t i = 0; i < 6; i++) {
+                copy_regions[i] = {};
+                copy_regions[i].bufferOffset = face_size * i;
+                copy_regions[i].bufferRowLength = 0;
+                copy_regions[i].bufferImageHeight = 0;
+
+                copy_regions[i].imageSubresource.aspectMask =
+                    VK_IMAGE_ASPECT_COLOR_BIT;
+                copy_regions[i].imageSubresource.mipLevel = 0;
+                copy_regions[i].imageSubresource.baseArrayLayer = i;
+                copy_regions[i].imageSubresource.layerCount = 1;
+
+                copy_regions[i].imageExtent = m_extent;
+            }
 
             // Copy the staging buffer into the image
             vkCmdCopyBufferToImage(
@@ -232,8 +244,8 @@ void Image::upload(const void* data) {
                 m_staging_buffer,
                 m_texture_image,
                 VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL,
-                1,
-                &copy_region
+                6,
+                copy_regions
             );
 
             // 2.3. Transition image to shader read optimal layout
@@ -264,7 +276,7 @@ void Image::upload(const void* data) {
     );
 }
 
-void Image::delete_image_data() {
+void CubeImage::delete_image_data() {
     m_device_ptr->main_deletion_queue().enqueue(
         [
             device_ptr = m_device_ptr, 

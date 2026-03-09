@@ -9,10 +9,10 @@
 namespace kzn {
 
 inline std::shared_ptr<SpriteMaterial> default_material() {
-    static auto s_default_material = std::make_shared<SpriteMaterial>(
+    // TODO: Create a MaterialManager to avoid this
+    return std::make_shared<SpriteMaterial>(
         g_resources.load<Texture>("textures://debug.png")
     );
-    return s_default_material;
 }
 
 class SpriteComponent {
@@ -33,6 +33,7 @@ public:
         , m_centered{centered}
         , m_material_ptr{material_ptr}
     {
+
     }
 
     ~SpriteComponent() = default;

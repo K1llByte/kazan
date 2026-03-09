@@ -1,7 +1,10 @@
 
 # Todo
 
+- [ ] Create vk::CubeImage
 - [ ] Skybox shader
+- [ ] Runtime shader compilation (with glslc's libshaderc)
+- [ ] FIXME: default material being always allocated
 - [ ] Registry `find_with<C1, C2, ...>()` method
 - [ ] Fix problem with glsl data alignment in Camera3DUniformData, cant have a Vec3 before a Float
 - [ ] Mesh loader
@@ -10,12 +13,12 @@
 - [ ] Remove Singleton base class
 - [ ] Reuse simple imgui overlay to display text information such as rendering info
 - [ ] Make vulkan features configurable for any vulkan version
-- [ ] Shader compilation
 - [ ] Add https://github.com/martinus/unordered_dense as dependency and benchmark performance differences
 
 _______________________________________________________________________________
 # Planned
 
+- Consider using https://github.com/abseil/abseil-cpp
 - Separate git LFS repo with assets
 - Modern cmake presets
 - Profile rendering with amd/nvidia profiler

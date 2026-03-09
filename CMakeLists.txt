@@ -67,7 +67,7 @@ FetchContent_Declare(stb
 )
 FetchContent_MakeAvailable(stb)
 # - Entt
-FetchContent_Declare(entt 
+FetchContent_Declare(entt
     GIT_REPOSITORY https://github.com/skypjack/entt
     GIT_TAG v3.16.0
 )
@@ -98,11 +98,16 @@ FetchContent_MakeAvailable(box2d)
 
 # Kazan Library
 file(GLOB KAZAN_SOURCES
-    "src/editor/**.cpp"
+    "src/animation/**.cpp"
     "src/core/**.cpp"
     "src/ecs/**.cpp"
+    "src/editor/**.cpp"
+    "src/events/**.cpp"
     "src/graphics/**.cpp"
+    "src/input/**.cpp"
+    "src/physics/**.cpp"
     "src/vk/**.cpp"
+    "src/resources/**.cpp"
 )
 # Add ImGui backends
 add_library(KazanLib STATIC ${KAZAN_SOURCES})

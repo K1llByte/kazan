@@ -7,10 +7,10 @@
 
 namespace kzn::vk {
 
-class Image {
+class CubeImage {
 public:
     // Ctor
-    Image(
+    CubeImage(
         Device& device,
         VkExtent3D extent,
         VkFormat format = VK_FORMAT_R8G8B8A8_SRGB,
@@ -19,13 +19,13 @@ public:
         VkImageAspectFlags aspect_mask = VK_IMAGE_ASPECT_COLOR_BIT
     );
     // Copy
-    Image(const Image&) = delete;
-    Image& operator=(const Image&) = delete;
+    CubeImage(const CubeImage&) = delete;
+    CubeImage& operator=(const CubeImage&) = delete;
     // Move
-    Image(Image&&);
-    Image& operator=(Image&&);
+    CubeImage(CubeImage&&);
+    CubeImage& operator=(CubeImage&&);
     // Dtor
-    ~Image();
+    ~CubeImage();
 
     [[nodiscard]]
     uint64_t size() const noexcept;
@@ -43,7 +43,7 @@ public:
     [[nodiscard]]
     DescriptorInfo info() const noexcept;
 
-    void upload(const void* data);
+    void upload(const void* data[6]);
 
 private:
     Device* m_device_ptr;
