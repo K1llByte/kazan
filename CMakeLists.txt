@@ -91,6 +91,14 @@ FetchContent_Declare(box2d
     GIT_TAG v3.1.0
 )
 FetchContent_MakeAvailable(box2d)
+# - FastGltf
+# set(FASTGLTF_USE_CUSTOM_SMALLVECTOR ON CACHE BOOL "" FORCE)
+set(FASTGLTF_COMPILE_AS_CPP20 ON CACHE BOOL "" FORCE)
+FetchContent_Declare(fastgltf
+    GIT_REPOSITORY https://github.com/spnda/fastgltf/
+    GIT_TAG v0.9.0
+)
+FetchContent_MakeAvailable(fastgltf)
 
 ###############################################################################
 ## Kazan Target
@@ -132,6 +140,7 @@ target_link_libraries(KazanLib PUBLIC
     box2d
     ${Vulkan_LIBRARIES}
     spirv-reflect-static
+    fastgltf
 )
 set(KAZAN_INCLUDE_PATH
     ${CMAKE_CURRENT_SOURCE_DIR}/src

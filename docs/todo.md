@@ -1,14 +1,20 @@
 
 # Todo
 
-- [ ] Create vk::CubeImage
-- [ ] Skybox shader
+- [ ] Basic Mesh class
+    - [ ] Load vertices first
+    - [ ] Any data and describe layout in MeshData
+- [ ] Mesh loader (obj, gltf)
+- [ ] Basic 3D Graphics rendering pipeline
+- [ ] Material3D based on gltf spec
+- [ ] Frustum culling
+- [ ] SubMesh's
+
+- [ ] Improve resource cache architecture, loader + resource cache
 - [ ] Runtime shader compilation (with glslc's libshaderc)
 - [ ] FIXME: default material being always allocated
 - [ ] Registry `find_with<C1, C2, ...>()` method
 - [ ] Fix problem with glsl data alignment in Camera3DUniformData, cant have a Vec3 before a Float
-- [ ] Mesh loader
-- [ ] 3D Graphics rendering pipeline
 - [ ] Add volk meta loader as dependency
 - [ ] Remove Singleton base class
 - [ ] Reuse simple imgui overlay to display text information such as rendering info
@@ -40,6 +46,8 @@ _______________________________________________________________________________
 _______________________________________________________________________________
 # Done
 
+- [x] Create vk::CubeImage
+- [x] Skybox shader
 - [x] Basic CameraSystem controller 
 - [x] Camera3D component
 - [x] Move DsetLayoutCache and Allocator to Device instead of Renderer
