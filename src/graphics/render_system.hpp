@@ -75,6 +75,7 @@ private:
         glsl::Vec3 position;
         glsl::Vec3 forward;
         glsl::Vec3 up;
+        glsl::Mat4 proj_view;
     };
 
 private:

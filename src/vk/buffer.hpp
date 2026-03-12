@@ -28,10 +28,8 @@ public:
 
     void upload(const void* vertices);
 
-    void bind(CommandBuffer& cmd_buffer);
-
     [[nodiscard]]
-    VkBuffer vk_buffer() {
+    VkBuffer vk_buffer() const {
         return m_buffer;
     }
 
@@ -58,7 +56,7 @@ public:
     void upload(const uint32_t* indices);
 
     [[nodiscard]]
-    VkBuffer vk_buffer() {
+    VkBuffer vk_buffer() const {
         return m_buffer;
     }
 

@@ -36,13 +36,14 @@ std::shared_ptr<MeshData> MeshData::load(const std::filesystem::path& path) {
 
         auto& gltf = asset_res.get();
         
-        std::vector<Vec3> vertices;
+        std::vector<Vertex3D> vertices;
         for (fastgltf::Mesh& mesh : gltf.meshes) {
             for(auto& primitive : mesh.primitives) {
                 // TODO: Load all meshes instead of just the first
                 // TODO: Load indices
                 // TODO: Load normals
                 // TODO: Load tex_coords
+                // TODO: Store primitive.type
 
                 // Load vertex positions
                 const auto& pos_accessor = gltf.accessors[primitive.findAttribute("POSITION")->accessorIndex];
@@ -51,7 +52,7 @@ std::shared_ptr<MeshData> MeshData::load(const std::filesystem::path& path) {
                     gltf,
                     pos_accessor,
                     [&vertices](glm::vec3 pos, size_t idx) {
-                        vertices[idx] = pos;
+                        vertices[idx].position = pos;
                     }
                 );
 
@@ -64,6 +65,13 @@ std::shared_ptr<MeshData> MeshData::load(const std::filesystem::path& path) {
     }
 
     return nullptr;
+}
+
+Mesh::Mesh(vk::Device& device, const std::vector<Vertex3D>& vertices)
+    : m_vtx_count{vertices.size()}
+    , m_vtx_buffer(device, sizeof(Vertex3D) * m_vtx_count)
+{
+    m_vtx_buffer.upload(static_cast<const void*>(vertices.data()));
 }
 
 } // namespace kzn

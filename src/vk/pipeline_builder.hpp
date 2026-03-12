@@ -30,7 +30,8 @@ public:
 
     // Rasterization Stage
     PipelineBuilder& set_polygon_mode(VkPolygonMode polygon_mode);
-    PipelineBuilder& set_front_face(VkFrontFace font_face);
+    PipelineBuilder& set_cull_mode(VkCullModeFlags cull_mode);
+    PipelineBuilder& set_front_face(VkFrontFace front_face);
     PipelineBuilder& set_line_width(float line_width);
 
     // Depth Stencil

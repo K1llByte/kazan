@@ -1,15 +1,18 @@
 
 # Todo
 
+- [ ] Clamp camera controller max angle
 - [ ] Basic Mesh class
-    - [ ] Load vertices first
-    - [ ] Any data and describe layout in MeshData
-- [ ] Mesh loader (obj, gltf)
+    - [x] Load vertices first
+- [ ] Mesh loader gltf
 - [ ] Basic 3D Graphics rendering pipeline
 - [ ] Material3D based on gltf spec
 - [ ] Frustum culling
+- [ ] Make camera api consistent `component.view()` `component.projection()`
 - [ ] SubMesh's
+- [ ] Assert when look_at has gimbal singularity
 
+- [ ] Setup cppcheck, clang-tidy and sanitizers
 - [ ] Improve resource cache architecture, loader + resource cache
 - [ ] Runtime shader compilation (with glslc's libshaderc)
 - [ ] FIXME: default material being always allocated

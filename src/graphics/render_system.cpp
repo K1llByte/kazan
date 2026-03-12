@@ -217,6 +217,7 @@ void RenderSystem::select_camera(Scene& scene) {
             .position = Vec3{0},
             .forward = Vec3{0,0,-1},
             .up = Vec3{0,-1,0},
+            .proj_view = Mat4{},
         });
     }
     else {
@@ -226,12 +227,16 @@ void RenderSystem::select_camera(Scene& scene) {
                 float(extent.width) / float(extent.height);
         }
 
+        const float fov_v = glm::radians(camera3d_ptr->fov_v);
+        const Mat4 proj_mat = camera3d_ptr->projection_matrix();
+        const Mat4 view_mat = camera3d_ptr->view_matrix();
         auto camera_data = Camera3DUniformData{
             .aspect_ratio = camera3d_ptr->aspect_ratio,
-            .fov_v = glm::radians(camera3d_ptr->fov_v),
+            .fov_v = fov_v,
             .position = camera3d_ptr->position,
             .forward = camera3d_ptr->forward,
             .up = camera3d_ptr->up,
+            .proj_view = proj_mat * view_mat,
         };
         m_camera3d_ubo.upload(camera_data);
     }

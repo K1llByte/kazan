@@ -21,7 +21,7 @@
 
 // A more artistic preset //
 #define EARTH_RADIUS 1.0
-#define EARTH_POSITION vec3(0, 0, 0)
+#define EARTH_POSITION vec3(0, 0, 1)
 #define ATMOSPHERE_RADIUS 1.2
 #define ATMOSPHERE_DENSITY 4.3
 #define IN_SCATTERING_SAMPLES 16

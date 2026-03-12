@@ -49,7 +49,7 @@ PipelineBuilder::PipelineBuilder(
     m_rasterization_info.rasterizerDiscardEnable = VK_FALSE;
     m_rasterization_info.polygonMode = VK_POLYGON_MODE_FILL;
     m_rasterization_info.lineWidth = 1.0f;
-    m_rasterization_info.cullMode = VK_CULL_MODE_BACK_BIT; // VK_CULL_MODE_NONE;
+    m_rasterization_info.cullMode = VK_CULL_MODE_NONE;
     m_rasterization_info.frontFace =
         VK_FRONT_FACE_CLOCKWISE; // VK_FRONT_FACE_COUNTER_CLOCKWISE;
     m_rasterization_info.depthBiasEnable = VK_FALSE;
@@ -155,8 +155,13 @@ PipelineBuilder& PipelineBuilder::set_polygon_mode(VkPolygonMode polygon_mode) {
     return *this;
 }
 
-PipelineBuilder& PipelineBuilder::set_front_face(VkFrontFace font_face) {
-    m_rasterization_info.frontFace = font_face;
+PipelineBuilder& PipelineBuilder::set_cull_mode(VkCullModeFlags cull_mode) {
+    m_rasterization_info.cullMode = cull_mode;
+    return *this;
+}
+
+PipelineBuilder& PipelineBuilder::set_front_face(VkFrontFace front_face) {
+    m_rasterization_info.frontFace = front_face;
     return *this;
 }
 

@@ -6,6 +6,7 @@
 #include "graphics/renderer.hpp"
 #include "graphics/sprite_component.hpp"
 #include "graphics/stages/debug_stage.hpp"
+#include "graphics/stages/geometry_stage.hpp"
 #include "graphics/stages/planet_stage.hpp"
 #include "graphics/stages/render_stage.hpp"
 #include "graphics/camera.hpp"
@@ -22,11 +23,9 @@ inline void create_test_level(Scene& scene) {
     entity.emplace<Transform2DComponent>();
 
     auto camera = scene.registry.create();
-    auto& camera3d = camera.add(Camera3DComponent{
-        .position = Vec3{0,0,-3},
-        .fov_v = 100.f,
-        .use_viewport_aspect_ratio = true,
-    });
+    auto& camera3d = camera.add(Camera3DComponent{});
+    camera3d.fov_v = 100.f;
+    camera3d.look_at(Vec3{0,0,3}, Vec3{0}, Vec3{0,-1,0});
 
     auto sprite = scene.registry.create();
     sprite.add(Transform2DComponent{
@@ -52,6 +51,11 @@ inline void init_render_stages(RenderSystem& render_sys) {
         render_sys.screen_render_pass(),
         render_sys.camera3d_dset()
     );
+    render_sys.emplace_stage<GeometryStage>(
+        render_sys.context<Renderer>(),
+        render_sys.screen_render_pass(),
+        render_sys.camera3d_dset()
+    );
     // render_sys.emplace_stage<PlanetStage>(
     //     render_sys.context<Renderer>(),
     //     render_sys.screen_render_pass(),
@@ -60,23 +64,20 @@ inline void init_render_stages(RenderSystem& render_sys) {
     // render_sys.emplace_stage<DebugStage>(
     //     render_sys.context<Renderer>(),
     //     render_sys.screen_render_pass(),
-    //     render_sys.camera_dset()
+    //     render_sys.camera3d_dset()
     // );
     // NOTE: EditorSystem will inject ImguiStage by event
 }
 
 struct TestApp : public BasicApp {
     TestApp() {
-        // Testing mesh loading
-        auto mesh_ptr = g_resources.load<MeshData>("models://damaged_helmet.glb");
-        
         // Camera system
         m_systems.emplace<CameraSystem>();
         
         // Render system
         auto& render_sys = m_systems.emplace<RenderSystem>();
         init_render_stages(render_sys);
-        
+
         // EditorSystem auto registers as dependency before RenderSystem
         m_systems.emplace<EditorSystem>(m_window, m_input, m_console);
 

@@ -15,6 +15,7 @@ layout(set = 0, binding = 0) uniform Camera3D {
     vec3 position;
     vec3 forward;
     vec3 up;
+    mat4 proj_view;
 } camera;
 layout(set = 1, binding = 0) uniform sampler2D earth_sampler;
 
@@ -195,10 +196,10 @@ AtmosphereResult atmosphere(
 void main() {
     out_color = vec4(0);
 
-    const vec3 right = normalize(cross(camera.forward, vec3(0, -1, 0)));
+    const vec3 right = normalize(cross(camera.forward, camera.up));
 
     vec3 ray_dir = ray_direction(
-        in_ndc, camera.fov_v, camera.aspect_ratio, camera.forward, right, camera.up
+        in_ndc, camera.fov_v, camera.aspect_ratio, camera.forward, -right, camera.up
     );
 
     vec4 earth_color = out_color;

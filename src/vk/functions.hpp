@@ -80,7 +80,7 @@ inline void cmd_bind_pipeline(
 //! \param buffer Vertex buffer to bind.
 inline void cmd_bind_vtx_buffer(
     CommandBuffer& cmd_buffer,
-    VertexBuffer& buffer
+    const VertexBuffer& buffer
 ) {
     // Bind Vertex Buffer
     VkDeviceSize offset = 0;
@@ -96,7 +96,7 @@ inline void cmd_bind_vtx_buffer(
 template<std::size_t N>
 inline void cmd_bind_vtx_buffers(
     CommandBuffer& cmd_buffer,
-    std::array<VertexBuffer*, N> buffers
+    std::array<const VertexBuffer*, N> buffers
 ) {
     std::array<VkDescriptorSet, N> vk_buffers;
     for (std::size_t i = 0; i < N; ++i) {
@@ -118,7 +118,7 @@ inline void cmd_bind_vtx_buffers(
 //! \param buffer Index buffer to bind.
 inline void cmd_bind_idx_buffer(
     CommandBuffer& cmd_buffer,
-    IndexBuffer& buffer
+    const IndexBuffer& buffer
 ) {
     VkDeviceSize offset = 0;
     auto vk_buffer = buffer.vk_buffer();

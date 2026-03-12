@@ -53,10 +53,10 @@ struct CameraSystem: public System {
             camera3d.position -= camera3d.right * delta_time * fast_factor;
         }
         if(keyboard.is_pressed(KeyboardKey::E)) {
-            camera3d.position += Vec3{0,1,0} * delta_time * fast_factor;
+            camera3d.position += g_world_up * delta_time * fast_factor;
         }
         if(keyboard.is_pressed(KeyboardKey::Q)) {
-            camera3d.position -= Vec3{0,1,0} * delta_time * fast_factor;
+            camera3d.position -= g_world_up * delta_time * fast_factor;
         }
 
         if(mouse.is_pressed(MouseButton::Right)) {
@@ -79,10 +79,13 @@ struct CameraSystem: public System {
             camera3d.forward = glm::normalize(
                 camera3d.forward * cos_pitch + camera3d.up * sin_pitch
             );
-    
+            
             // Rebuild orthonormal basis
-            camera3d.right = glm::normalize(glm::cross(camera3d.forward, Vec3{0,-1,0}));
-            camera3d.up = glm::normalize(glm::cross(camera3d.right, camera3d.forward));
+            camera3d.set_view_direction(
+                camera3d.position,
+                camera3d.forward,
+                g_world_up
+            );
         }
         else {
             context<Window>().set_mouse_mode(GLFW_CURSOR_NORMAL);
