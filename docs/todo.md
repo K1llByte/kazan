@@ -1,7 +1,7 @@
 
 # Todo
 
-- [ ] Basic Mesh class
+- [ ] Transform matrix
 - [ ] Mesh loader gltf
 - [ ] Basic 3D Graphics rendering pipeline
 - [ ] Material3D based on gltf spec
@@ -52,6 +52,7 @@ _______________________________________________________________________________
 _______________________________________________________________________________
 # Done
 
+- [x] Basic Mesh class
 - [x] Create MeshComponent and GeometryStage renders them
 - [x] Create vk::CubeImage
 - [x] Skybox shader

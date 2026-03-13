@@ -21,7 +21,7 @@ struct Transform2DComponent {
             0, 1, 0, 0,
             0, 0, 1, 0,
             // Invert Y since vulkan renders inverted
-            // FIXME: This should be done in shader
+            // FIXME: This should be done in view matrix
             position.x, -position.y, depth, 1
         };
         const Mat4 rotation_mat{
@@ -40,6 +40,17 @@ struct Transform2DComponent {
 
         return translation_mat * rotation_mat * scale_mat;
     }
+};
+
+struct Transform3DComponent {
+    Vec3 position = {0.f, 0.f, 0.f};
+    Vec3 scale = {1.f, 1.f, 1.f};
+    Quat rotation;
+
+    // [[nodiscard]]
+    // constexpr Mat4 matrix() const {
+    //     return translation_mat * rotation_mat * scale_mat;
+    // }
 };
 
 } // namespace kzn
