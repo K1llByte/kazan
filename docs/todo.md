@@ -1,20 +1,18 @@
 
 # Todo
 
-- [ ] Clamp camera controller max angle
+- [ ] Avoid gimbal singularity
 - [ ] Basic Mesh class
-    - [x] Load vertices first
 - [ ] Mesh loader gltf
 - [ ] Basic 3D Graphics rendering pipeline
 - [ ] Material3D based on gltf spec
-- [ ] Frustum culling
-- [ ] Make camera api consistent `component.view()` `component.projection()`
+- [ ] Make camera api consistent `component.view_matrix()` `component.projection_matrix()`
 - [ ] SubMesh's
+- [ ] Clamp camera controller max angle
 - [ ] Assert when look_at has gimbal singularity
 
 - [ ] Setup cppcheck, clang-tidy and sanitizers
 - [ ] Improve resource cache architecture, loader + resource cache
-- [ ] Runtime shader compilation (with glslc's libshaderc)
 - [ ] FIXME: default material being always allocated
 - [ ] Registry `find_with<C1, C2, ...>()` method
 - [ ] Fix problem with glsl data alignment in Camera3DUniformData, cant have a Vec3 before a Float
@@ -27,6 +25,8 @@
 _______________________________________________________________________________
 # Planned
 
+- Runtime shader compilation (with glslc's libshaderc)
+- Frustum culling
 - Consider using https://github.com/abseil/abseil-cpp
 - Separate git LFS repo with assets
 - Modern cmake presets

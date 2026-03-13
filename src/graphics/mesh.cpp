@@ -37,17 +37,33 @@ std::shared_ptr<MeshData> MeshData::load(const std::filesystem::path& path) {
         auto& gltf = asset_res.get();
         
         std::vector<Vertex3D> vertices;
+        std::vector<std::uint32_t> indices;
+        Log::debug("meshes.size: {}", gltf.meshes.size());
         for (fastgltf::Mesh& mesh : gltf.meshes) {
+            Log::debug("mesh.primitives.size: {}", mesh.primitives.size());
             for(auto& primitive : mesh.primitives) {
                 // TODO: Load all meshes instead of just the first
                 // TODO: Load indices
-                // TODO: Load normals
                 // TODO: Load tex_coords
                 // TODO: Store primitive.type
+                
+                // Load indices
+                if (primitive.indicesAccessor.has_value()) {
+                    auto& accessor = gltf.accessors[primitive.indicesAccessor.value()];
+                    indices.resize(accessor.count);
+                    fastgltf::iterateAccessorWithIndex<uint32_t>(
+                        gltf,
+                        accessor,
+                        [&indices](uint32_t i, size_t idx) {
+                            indices[idx] = i;
+                        }
+                    );
+                }
 
                 // Load vertex positions
                 const auto& pos_accessor = gltf.accessors[primitive.findAttribute("POSITION")->accessorIndex];
-                vertices.resize(vertices.size() + pos_accessor.count);
+                vertices.resize(pos_accessor.count);
+                Log::debug("vertices count: {}", vertices.size());
                 fastgltf::iterateAccessorWithIndex<glm::vec3>(
                     gltf,
                     pos_accessor,
@@ -56,7 +72,19 @@ std::shared_ptr<MeshData> MeshData::load(const std::filesystem::path& path) {
                     }
                 );
 
-                return std::make_shared<MeshData>(std::move(vertices));
+                // Load vertex normals
+                auto normals = primitive.findAttribute("NORMAL");
+                if (normals != primitive.attributes.end()) {
+                    fastgltf::iterateAccessorWithIndex<glm::vec3>(
+                        gltf,
+                        gltf.accessors[normals->accessorIndex],
+                        [&vertices](glm::vec3 normal, size_t idx) {
+                            vertices[idx].normal = normal;
+                        }
+                    );
+                }
+
+                return std::make_shared<MeshData>(std::move(vertices), std::move(indices));
             }
         }
     }
@@ -67,11 +95,17 @@ std::shared_ptr<MeshData> MeshData::load(const std::filesystem::path& path) {
     return nullptr;
 }
 
-Mesh::Mesh(vk::Device& device, const std::vector<Vertex3D>& vertices)
-    : m_vtx_count{vertices.size()}
+Mesh::Mesh(
+    vk::Device& device,
+    const MeshData& mesh_data
+)
+    : m_vtx_count{mesh_data.vertices.size()}
+    , m_idx_count{mesh_data.indices.size()}
     , m_vtx_buffer(device, sizeof(Vertex3D) * m_vtx_count)
+    , m_idx_buffer(device, sizeof(std::uint32_t) * m_idx_count)
 {
-    m_vtx_buffer.upload(static_cast<const void*>(vertices.data()));
+    m_vtx_buffer.upload(static_cast<const void*>(mesh_data.vertices.data()));
+    m_idx_buffer.upload(mesh_data.indices.data());
 }
 
 } // namespace kzn
