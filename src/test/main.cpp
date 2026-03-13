@@ -72,7 +72,7 @@ inline void init_render_stages(RenderSystem& render_sys) {
 struct TestApp : public BasicApp {
     TestApp() {
         // Camera system
-        m_systems.emplace<CameraSystem>();
+        // m_systems.emplace<CameraSystem>();
         
         // Render system
         auto& render_sys = m_systems.emplace<RenderSystem>();
@@ -80,6 +80,15 @@ struct TestApp : public BasicApp {
 
         // EditorSystem auto registers as dependency before RenderSystem
         m_systems.emplace<EditorSystem>(m_window, m_input, m_console);
+
+        
+        auto& device = render_sys.context<Renderer>().device();
+        auto mesh = m_scene.registry.create();
+        mesh.emplace<MeshComponent>(device, "models://damaged_helmet.glb");
+
+        Log::debug("RenderSystem exists? {}", m_systems.try_get<RenderSystem>() != nullptr);
+        Log::debug("EditorSystem exists? {}", m_systems.try_get<EditorSystem>() != nullptr);
+        m_systems.contains<CameraSystem>();
 
         // Load level entities
         create_test_level(m_scene);

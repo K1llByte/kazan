@@ -32,17 +32,17 @@ public:
                 .set_fragment_stage(load_shader("shaders://geom.frag.spv"))
                 .set_vertex_input<Vec3,Vec3,Vec3>()
                 .set_topology(VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST)
-                // .set_cull_mode(VK_CULL_MODE_BACK_BIT)
-                // .set_front_face(VK_FRONT_FACE_CLOCKWISE)
+                .set_cull_mode(VK_CULL_MODE_BACK_BIT)
+                .set_front_face(VK_FRONT_FACE_COUNTER_CLOCKWISE)
                 .set_depth_test(true)
                 .set_depth_write(true)
                 .build(renderer.device())
         }
         , m_camera_dset_ptr{&camera_dset}
-        , m_mesh{
-            renderer.device(), 
-            // Custom Model
-            *g_resources.load<MeshData>("models://damaged_helmet.glb")
+        // , m_mesh{
+        //     renderer.device(), 
+        //     // Custom Model
+        //     *g_resources.load<MeshData>("models://damaged_helmet.glb")
 
             // Triangle
             // std::vector{
@@ -96,7 +96,7 @@ public:
             //     {Vec3{ 0.5f,  0.5f, -0.5f}, Vec3{0,0,-1}, cyan},
             //     {Vec3{ 0.5f, -0.5f, -0.5f}, Vec3{0,0,-1}, cyan},
             // }
-        }
+        // }
     {
     }
 
@@ -105,24 +105,24 @@ public:
         const auto swapchain_extent = m_renderer_ptr->swapchain().extent();
         vk::cmd_set_viewport(cmd_buffer, vk::create_viewport(swapchain_extent));
         vk::cmd_set_scissor(cmd_buffer, vk::create_scissor(swapchain_extent));
-
-        vk::cmd_bind_vtx_buffer(cmd_buffer, m_mesh.vtx_buffer());
-        vk::cmd_bind_idx_buffer(cmd_buffer, m_mesh.idx_buffer());
         vk::cmd_bind_dsets(
             cmd_buffer,
             std::array{m_camera_dset_ptr},
             m_pipeline.layout()
         );
 
-        vk::cmd_draw_indexed(cmd_buffer, m_mesh.idx_count());
-        // vk::cmd_draw(cmd_buffer, m_mesh.vtx_count());
+        auto meshes_view = scene.registry.registry().view<MeshComponent>();
+        for (auto [_, mesh] : meshes_view->each()) {
+            vk::cmd_bind_vtx_buffer(cmd_buffer, mesh.mesh().vtx_buffer());
+            vk::cmd_bind_idx_buffer(cmd_buffer, mesh.mesh().idx_buffer());
+            vk::cmd_draw_indexed(cmd_buffer, mesh.mesh().idx_count());
+        }
     }
 
 private:
     Renderer* m_renderer_ptr;
     vk::Pipeline m_pipeline;
     vk::DescriptorSet* m_camera_dset_ptr;
-    Mesh m_mesh;
 };
 
 } // namespace kzn

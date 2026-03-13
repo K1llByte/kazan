@@ -160,6 +160,33 @@ public:
         return ref;
     }
 
+    template<typename S>
+    requires std::is_base_of_v<System, S>
+    [[nodiscard]]
+    constexpr bool contains() const {
+        return m_systems.contains(typeid(S));
+    }
+
+    // TODO: Docs
+    template<typename S>
+        requires std::is_base_of_v<System, S>
+    constexpr S& get() const {
+        const std::type_index type_id = typeid(S);
+        KZN_ASSERT_MSG(m_systems.contains(type_id), "System does not exist");
+
+        return static_cast<S*>(m_systems.find(type_id)->second.get());
+    }
+
+    // TODO: Docs
+    template<typename S>
+        requires std::is_base_of_v<System, S>
+    constexpr S* try_get() const {
+        auto it = m_systems.find(typeid(S));
+        return (it != m_systems.end())
+            ? static_cast<S*>(it->second.get())
+            : nullptr;
+    }
+
     //! Declare an execution dependency between two systems.
     //! Ensures that the system of type `Before` is executed *before*
     //! the system of type `After` when the scheduler is built.

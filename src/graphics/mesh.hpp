@@ -1,6 +1,7 @@
 #pragma once
 
 #include "math/types.hpp"
+#include "resources/resources.hpp"
 #include "vk/buffer.hpp"
 #include "vk/device.hpp"
 #include <filesystem>
@@ -32,8 +33,8 @@ public:
     Mesh(const Mesh&) = delete;
     Mesh& operator=(const Mesh&) = delete;
     // Move
-    Mesh(Mesh&&) = delete;
-    Mesh& operator=(Mesh&&) = delete;
+    Mesh(Mesh&&) = default;
+    Mesh& operator=(Mesh&&) = default;
     // Dtor
     ~Mesh() = default;
 
@@ -60,6 +61,29 @@ private:
     std::size_t m_idx_count;
     vk::VertexBuffer m_vtx_buffer;
     vk::IndexBuffer m_idx_buffer;
+};
+
+class MeshComponent {
+public:
+    // Ctor
+    MeshComponent(vk::Device &device, const std::string_view mesh_path)
+        : m_mesh(device, *g_resources.load<MeshData>(mesh_path)) {}
+    // Copy
+    MeshComponent(const MeshComponent&) = delete;
+    MeshComponent& operator=(const MeshComponent&) = delete;
+    // Move
+    MeshComponent(MeshComponent&&) = default;
+    MeshComponent& operator=(MeshComponent&&) = default;
+    // Dtor
+    ~MeshComponent() = default;
+
+    [[nodiscard]]
+    const Mesh& mesh() const {
+        return m_mesh;
+    }
+
+private:
+    Mesh m_mesh;
 };
 
 } // namespace kzn

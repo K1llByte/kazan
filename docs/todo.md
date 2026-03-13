@@ -1,15 +1,18 @@
 
 # Todo
 
-- [ ] Avoid gimbal singularity
 - [ ] Basic Mesh class
 - [ ] Mesh loader gltf
 - [ ] Basic 3D Graphics rendering pipeline
 - [ ] Material3D based on gltf spec
 - [ ] Make camera api consistent `component.view_matrix()` `component.projection_matrix()`
 - [ ] SubMesh's
+- [ ] Avoid gimbal singularity
 - [ ] Clamp camera controller max angle
 - [ ] Assert when look_at has gimbal singularity
+
+- [ ] Brainstorm an InstanceCache a way to get data loaded from ResourceCache and have named ref counted of instances of data such as textures, meshes, materials.
+    - Instanced data is different from loaded data, and we might want to have different instances of same loaded data (ie: one modifiable instance and other static instance)
 
 - [ ] Setup cppcheck, clang-tidy and sanitizers
 - [ ] Improve resource cache architecture, loader + resource cache
@@ -49,6 +52,7 @@ _______________________________________________________________________________
 _______________________________________________________________________________
 # Done
 
+- [x] Create MeshComponent and GeometryStage renders them
 - [x] Create vk::CubeImage
 - [x] Skybox shader
 - [x] Basic CameraSystem controller 
