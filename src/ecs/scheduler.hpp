@@ -174,7 +174,7 @@ public:
         const std::type_index type_id = typeid(S);
         KZN_ASSERT_MSG(m_systems.contains(type_id), "System does not exist");
 
-        return static_cast<S*>(m_systems.find(type_id)->second.get());
+        return static_cast<S&>(*m_systems.find(type_id)->second);
     }
 
     // TODO: Docs
