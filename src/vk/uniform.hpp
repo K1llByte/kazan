@@ -103,19 +103,46 @@ struct is_uniform
 template<class T>
 constexpr bool is_uniform_v = is_uniform<T>::value;
 
+
+template<typename T>
+[[nodiscard]]
+constexpr bool is_uniform_field();
+
 //! Auxiliary function for UniformBlock concept requirements
 template<typename T>
     requires std::is_default_constructible_v<T>
 [[nodiscard]]
 constexpr bool is_uniform_block() {
-    bool has_non_uniform = false;
-    boost::pfr::for_each_field(T{}, [&has_non_uniform](const auto& field) {
-        if (!glsl::is_uniform_v<std::decay_t<decltype(field)>>) {
-            has_non_uniform = true;
-            return;
+    if constexpr (!std::is_class_v<T>) {
+        return false;
+    }
+
+    bool all_fields_uniform = true;
+    boost::pfr::for_each_field(T{}, [&](const auto& field) {
+        using FieldType = std::decay_t<decltype(field)>;
+        if (!glsl::is_uniform_field<FieldType>) {
+            all_fields_uniform = false;
+            // return;
         }
     });
-    return !has_non_uniform;
+    return all_fields_uniform;
+}
+
+template<typename T>
+[[nodiscard]]
+constexpr bool is_uniform_field() {
+    if constexpr (glsl::is_uniform_v<T>) {
+        return true;
+    }
+    else if constexpr (std::is_class_v<T>) {
+        return is_uniform_block<T>();
+    }
+    else if constexpr (std::is_array_v<T>) {
+        return is_uniform_field<std::remove_extent_t<T>>();
+    }
+    else {
+        return false;
+    }
 }
 
 //! The concept UniformBlock<T> is satisfied if T is a struct that only contains

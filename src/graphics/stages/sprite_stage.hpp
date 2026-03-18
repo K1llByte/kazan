@@ -14,10 +14,6 @@
 
 namespace kzn {
 
-struct PvmPushData {
-    glsl::Mat4 matrix = {};
-};
-
 class SpriteStage : public RenderStage {
 public:
     // Ctor
@@ -96,8 +92,13 @@ public:
                 m_pipeline.layout()
             );
 
+            struct PvmPushData {
+                Mat4 matrix;
+            } pvm = {
+                transform_mat 
+            };
             vk::cmd_push_constants(
-                cmd_buffer, m_pipeline.layout(), PvmPushData{transform_mat}
+                cmd_buffer, m_pipeline.layout(), pvm
             );
 
             // Bind vertex buffer

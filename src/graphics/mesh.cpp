@@ -38,9 +38,7 @@ std::shared_ptr<MeshData> MeshData::load(const std::filesystem::path& path) {
         
         std::vector<Vertex3D> vertices;
         std::vector<std::uint32_t> indices;
-        Log::debug("meshes.size: {}", gltf.meshes.size());
         for (fastgltf::Mesh& mesh : gltf.meshes) {
-            Log::debug("mesh.primitives.size: {}", mesh.primitives.size());
             for(auto& primitive : mesh.primitives) {
                 // TODO: Load all meshes instead of just the first
                 // TODO: Load indices
@@ -63,7 +61,6 @@ std::shared_ptr<MeshData> MeshData::load(const std::filesystem::path& path) {
                 // Load vertex positions
                 const auto& pos_accessor = gltf.accessors[primitive.findAttribute("POSITION")->accessorIndex];
                 vertices.resize(pos_accessor.count);
-                Log::debug("vertices count: {}", vertices.size());
                 fastgltf::iterateAccessorWithIndex<glm::vec3>(
                     gltf,
                     pos_accessor,

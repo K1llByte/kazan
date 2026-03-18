@@ -1,6 +1,7 @@
 #include "core/app.hpp"
 #include "core/basic_app.hpp"
 #include "editor/editor_system.hpp"
+#include "graphics/light.hpp"
 #include "graphics/mesh.hpp"
 #include "graphics/render_system.hpp"
 #include "graphics/renderer.hpp"
@@ -15,6 +16,7 @@
 #include "math/types.hpp"
 #include "resources/resources.hpp"
 #include "test/camera_system.hpp"
+#include "vk/uniform.hpp"
 
 using namespace kzn;
 
@@ -46,6 +48,12 @@ inline void init_render_stages(RenderSystem& render_sys) {
     // );
     // NOTE: EditorSystem will inject ImguiStage by event
 }
+
+// struct Lights2 {
+//     // glsl::Int count;
+//     // Light data[KZN_MAX_LIGHTS];
+//     Vec3 data;
+// };
 
 struct TestApp : public BasicApp {
     TestApp() {
@@ -87,8 +95,29 @@ struct TestApp : public BasicApp {
             .get<RenderSystem>()
             .context<Renderer>()
             .device();
-        auto mesh = m_scene.registry.create();
-        mesh.emplace<MeshComponent>(device, "models://damaged_helmet.glb");
+        auto mesh1 = m_scene.registry.create();
+        mesh1.emplace<MeshComponent>(device, "models://damaged_helmet.glb");
+        auto& mesh1_t = mesh1.emplace<Transform3DComponent>();
+        mesh1_t.position.x = 1.5f;
+        mesh1_t.position.z = 0.f;
+
+        auto mesh2 = m_scene.registry.create();
+        mesh2.emplace<MeshComponent>(device, "models://damaged_helmet.glb");
+        auto& mesh2_t = mesh2.emplace<Transform3DComponent>();
+        mesh2_t.position.x = -1.5f;
+        mesh2_t.position.z = 0.f;
+
+        auto mesh3 = m_scene.registry.create();
+        mesh3.emplace<MeshComponent>(device, "models://damaged_helmet.glb");
+        auto& mesh3_t = mesh3.emplace<Transform3DComponent>();
+        mesh3_t.position.x = 0.f;
+        mesh3_t.position.z = 1.5f;
+
+        auto mesh4 = m_scene.registry.create();
+        mesh4.emplace<MeshComponent>(device, "models://damaged_helmet.glb");
+        auto& mesh4_t = mesh4.emplace<Transform3DComponent>();
+        mesh4_t.position.x = 0.f;
+        mesh4_t.position.z = -1.5f;
     }
 
     void init_render_stages() {

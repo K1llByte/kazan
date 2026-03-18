@@ -3,9 +3,13 @@
 #include "graphics/mesh.hpp"
 #include "graphics/renderer.hpp"
 #include "graphics/stages/render_stage.hpp"
+#include "math/transform.hpp"
 #include "render_stage.hpp"
 #include "vk/functions.hpp"
 #include "vk/pipeline_builder.hpp"
+#include "graphics/light.hpp"
+
+#include <glm/trigonometric.hpp>
 #include <vulkan/vulkan_core.h>
 
 namespace kzn {
@@ -38,66 +42,70 @@ public:
                 .set_depth_write(true)
                 .build(renderer.device())
         }
+        , m_light_ubo(renderer.device(), sizeof(Lights))
         , m_camera_dset_ptr{&camera_dset}
-        // , m_mesh{
-        //     renderer.device(), 
-        //     // Custom Model
-        //     *g_resources.load<MeshData>("models://damaged_helmet.glb")
-
-            // Triangle
-            // std::vector{
-            //     {Vec3{ 0.0, -0.5, 0}},
-            //     {Vec3{ 0.5,  0.5, 0}},
-            //     {Vec3{-0.5,  0.5, 0}},
-            // }
-            
-            // Cube
-            // std::vector<Vertex3D>{
-            //     // Right (+X)
-            //     {Vec3{ 0.5f, -0.5f,  0.5f}, Vec3{1,0,0}, red},
-            //     {Vec3{ 0.5f, -0.5f, -0.5f}, Vec3{1,0,0}, red},
-            //     {Vec3{ 0.5f,  0.5f, -0.5f}, Vec3{1,0,0}, red},
-            //     {Vec3{ 0.5f,  0.5f, -0.5f}, Vec3{1,0,0}, red},
-            //     {Vec3{ 0.5f,  0.5f,  0.5f}, Vec3{1,0,0}, red},
-            //     {Vec3{ 0.5f, -0.5f,  0.5f}, Vec3{1,0,0}, red},
-            //     // Top (+Y)
-            //     {Vec3{-0.5f,  0.5f,  0.5f}, Vec3{0,1,0}, green},
-            //     {Vec3{ 0.5f,  0.5f,  0.5f}, Vec3{0,1,0}, green},
-            //     {Vec3{ 0.5f,  0.5f, -0.5f}, Vec3{0,1,0}, green},
-            //     {Vec3{ 0.5f,  0.5f, -0.5f}, Vec3{0,1,0}, green},
-            //     {Vec3{-0.5f,  0.5f, -0.5f}, Vec3{0,1,0}, green},
-            //     {Vec3{-0.5f,  0.5f,  0.5f}, Vec3{0,1,0}, green},
-            //     // Front (+Z)
-            //     {Vec3{-0.5f, -0.5f,  0.5f}, Vec3{0,0,1}, blue},
-            //     {Vec3{ 0.5f, -0.5f,  0.5f}, Vec3{0,0,1}, blue},
-            //     {Vec3{ 0.5f,  0.5f,  0.5f}, Vec3{0,0,1}, blue},
-            //     {Vec3{ 0.5f,  0.5f,  0.5f}, Vec3{0,0,1}, blue},
-            //     {Vec3{-0.5f,  0.5f,  0.5f}, Vec3{0,0,1}, blue},
-            //     {Vec3{-0.5f, -0.5f,  0.5f}, Vec3{0,0,1}, blue},
-            //     // Left (-X)
-            //     {Vec3{-0.5f, -0.5f, -0.5f}, Vec3{-1,0,0}, yellow},
-            //     {Vec3{-0.5f, -0.5f,  0.5f}, Vec3{-1,0,0}, yellow},
-            //     {Vec3{-0.5f,  0.5f,  0.5f}, Vec3{-1,0,0}, yellow},
-            //     {Vec3{-0.5f,  0.5f,  0.5f}, Vec3{-1,0,0}, yellow},
-            //     {Vec3{-0.5f,  0.5f, -0.5f}, Vec3{-1,0,0}, yellow},
-            //     {Vec3{-0.5f, -0.5f, -0.5f}, Vec3{-1,0,0}, yellow},
-            //     // Bottom (-Y)
-            //     {Vec3{-0.5f, -0.5f, -0.5f}, Vec3{0,-1,0}, pink},
-            //     {Vec3{ 0.5f, -0.5f, -0.5f}, Vec3{0,-1,0}, pink},
-            //     {Vec3{ 0.5f, -0.5f,  0.5f}, Vec3{0,-1,0}, pink},
-            //     {Vec3{ 0.5f, -0.5f,  0.5f}, Vec3{0,-1,0}, pink},
-            //     {Vec3{-0.5f, -0.5f,  0.5f}, Vec3{0,-1,0}, pink},
-            //     {Vec3{-0.5f, -0.5f, -0.5f}, Vec3{0,-1,0}, pink},
-            //     // Back (-Z)
-            //     {Vec3{ 0.5f, -0.5f, -0.5f}, Vec3{0,0,-1}, cyan},
-            //     {Vec3{-0.5f, -0.5f, -0.5f}, Vec3{0,0,-1}, cyan},
-            //     {Vec3{-0.5f,  0.5f, -0.5f}, Vec3{0,0,-1}, cyan},
-            //     {Vec3{-0.5f,  0.5f, -0.5f}, Vec3{0,0,-1}, cyan},
-            //     {Vec3{ 0.5f,  0.5f, -0.5f}, Vec3{0,0,-1}, cyan},
-            //     {Vec3{ 0.5f, -0.5f, -0.5f}, Vec3{0,0,-1}, cyan},
-            // }
-        // }
+        , m_light_dset{renderer.device().dset_allocator().allocate(
+            *m_pipeline.dset_layout(1)
+        )}
     {
+        constexpr Vec3 light_color = Vec3{0.8,0.2,0.2};
+        // m_light_ubo.upload(directional_light(1.f, Vec3{1,1,1}, light_color));
+        // m_light_ubo.upload(point_light(1.f, Vec3{0,0,0}, 10.f, light_color));
+        // auto lights = Lights{
+        //     .count = 1,
+        //     .data = {
+        //         spot_light(
+        //             1.f,
+        //             Vec3{0,0,0},
+        //             Vec3{1,0,0}, 
+        //             10.f,
+        //             glm::radians(45.f),
+        //             glm::radians(90.f),
+        //             light_color
+        //         )
+        //     },
+        // };
+        auto light0 = spot_light(
+            1.f,
+            Vec3{0,0,0},
+            Vec3{1,0,0}, 
+            10.f,
+            glm::radians(35.f),
+            glm::radians(40.f),
+            Vec3{0.8,0.2,0.2}
+        );
+        auto light1 = spot_light(
+            1.f,
+            Vec3{0,0,0},
+            Vec3{-1,0,0}, 
+            10.f,
+            glm::radians(35.f),
+            glm::radians(45.f),
+            Vec3{0.2,0.2,0.8}
+        );
+        auto light2 = spot_light(
+            1.f,
+            Vec3{0,0,0},
+            Vec3{0,0,1}, 
+            10.f,
+            glm::radians(35.f),
+            glm::radians(45.f),
+            Vec3{0.2,0.8,0.2}
+        );
+        auto light3 = spot_light(
+            1.f,
+            Vec3{0,0,0},
+            Vec3{0,0,-1}, 
+            10.f,
+            glm::radians(35.f),
+            glm::radians(45.f),
+            Vec3{0.2,0.8,0.8}
+        );
+        m_light_ubo.upload(Lights{
+            .count = 4,
+            .data = {light0, light1, light2, light3},
+        });
+        m_light_dset.update({m_light_ubo.info()});
     }
 
     void render(Scene& scene, vk::CommandBuffer& cmd_buffer) override {
@@ -107,14 +115,25 @@ public:
         vk::cmd_set_scissor(cmd_buffer, vk::create_scissor(swapchain_extent));
         vk::cmd_bind_dsets(
             cmd_buffer,
-            std::array{m_camera_dset_ptr},
+            std::array{m_camera_dset_ptr, &m_light_dset},
             m_pipeline.layout()
         );
 
         auto meshes_view = scene.registry.registry().view<MeshComponent>();
-        for (auto [_, mesh] : meshes_view->each()) {
+        for (auto [entity, mesh] : meshes_view->each()) {
+            // Bind buffers
             vk::cmd_bind_vtx_buffer(cmd_buffer, mesh.mesh().vtx_buffer());
             vk::cmd_bind_idx_buffer(cmd_buffer, mesh.mesh().idx_buffer());
+            
+            struct TransformPushData {
+                glsl::Mat4 matrix = {1.f};
+            } transform;
+
+            auto transform_ptr = scene.registry.registry().try_get<Transform3DComponent>(entity);
+            if (transform_ptr != nullptr) {
+                transform.matrix = transform_ptr->matrix();
+            }
+            vk::cmd_push_constants(cmd_buffer, m_pipeline.layout(), transform);
             vk::cmd_draw_indexed(cmd_buffer, mesh.mesh().idx_count());
         }
     }
@@ -122,7 +141,9 @@ public:
 private:
     Renderer* m_renderer_ptr;
     vk::Pipeline m_pipeline;
+    vk::UniformBuffer m_light_ubo;
     vk::DescriptorSet* m_camera_dset_ptr;
+    vk::DescriptorSet m_light_dset;
 };
 
 } // namespace kzn

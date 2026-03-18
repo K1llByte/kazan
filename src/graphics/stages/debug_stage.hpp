@@ -56,13 +56,18 @@ public:
             vk::cmd_bind_dset(
                 cmd_buffer, *m_camera_dset_ptr, m_debug_pipeline.layout()
             );
+            struct PvmPushData {
+                Mat4 matrix = {
+                    1,  0, 0, 0,
+                    0, -1, 0, 0,
+                    0,  0, 1, 0,
+                    0,  0, 0, 1,
+                };
+            } pvm;
             vk::cmd_push_constants(
                 cmd_buffer,
                 m_debug_pipeline.layout(),
-                PvmPushData{
-                    // Transform matrix to correct y position to be inverted
-                    Mat4{1, 0, 0, 0, 0, -1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1}
-                }
+                pvm
             );
             vk::cmd_bind_vtx_buffer(cmd_buffer, debug_vbo);
             vk::cmd_draw(cmd_buffer, debug_render.lines().size());
