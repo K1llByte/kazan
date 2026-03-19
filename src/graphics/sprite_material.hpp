@@ -23,7 +23,7 @@ struct SpriteUniformData {
 struct SpriteMaterialRenderData {
     SpriteMaterialRenderData(
         Renderer& renderer,
-        std::shared_ptr<Texture>& texture_ptr,
+        std::shared_ptr<TextureData>& texture_ptr,
         Vec2 slice_offset,
         Vec2 slice_size,
         Vec4 overlap_color
@@ -34,10 +34,10 @@ struct SpriteMaterialRenderData {
                   vk::uniform_binding(1),
               })
           )}
-        , albedo_image(renderer.device(), texture_ptr->extent())
+        , albedo_image(renderer.device(), texture_ptr->vk_extent())
         , material_ubo{renderer.device(), sizeof(SpriteUniformData)} {
         // Upload texture data to gpu image memory
-        albedo_image.upload(texture_ptr->data());
+        albedo_image.upload(texture_ptr->bytes);
         // Update material dset and upload data
         material_dset.update({albedo_image.info(), material_ubo.info()});
         material_ubo.upload(SpriteUniformData{
@@ -59,7 +59,7 @@ struct SpriteMaterialRenderData {
 class SpriteMaterial {
 public:
     // Ctor
-    SpriteMaterial(std::shared_ptr<Texture> albedo_ptr)
+    SpriteMaterial(std::shared_ptr<TextureData> albedo_ptr)
         : m_texture_ptr(std::move(albedo_ptr)) {}
     // Dtor
     ~SpriteMaterial() = default;
@@ -109,7 +109,7 @@ public:
     }
 
 private:
-    std::shared_ptr<Texture> m_texture_ptr;
+    std::shared_ptr<TextureData> m_texture_ptr;
     Vec2 m_slice_offset = {0, 0};
     Vec2 m_slice_size = {1, 1};
     Vec4 m_overlap_color = {0, 0, 0, 0};

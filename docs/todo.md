@@ -1,21 +1,21 @@
 
 # Todo
 
-- [ ] PointLightComponent / DirectionalLightComponent / SpotLightComponent
-    - Brainstorm how to check modifications and upload to gpu
+- [ ] Brainstorm a way to instantiate a Scene3DData into a Scene (create corresponding components and hierarchy)
 - [ ] Phong lightning model
 - [ ] Blin-Phong lightning model
 - [ ] Fix is_uniform_block
+- [ ] Gltf loader
+    - Load mesh 
+    - Load primitives/submeshes
+    - Load materials
+    - Load textures
 - [ ] PBR Cook-Torrence BRDF model
-- [ ] Brainstorm SceneData gltf loader and how to 
-- [ ] Mesh
-- [ ] Mesh loader
-- [ ] SubMesh's
-- [ ] Convert all errors into enums
-- [ ] Basic 3D Graphics rendering pipeline
-- [ ] Material3D based on gltf spec
+- [ ] Move all renderer resources to the Renderer ownership.
+    - Components should have only references/ids to those resources and render system/renderer is responsible for actual managing lifetime
 - [ ] Make camera api consistent `component.view_matrix()` `component.projection_matrix()`
 - [ ] Avoid gimbal singularity/Clamp camera controller max angle/Assert when look_at has gimbal singularity
+- [ ] LightPacked type for gpu
 
 - [ ] Brainstorm an InstanceCache a way to get data loaded from ResourceCache and have named ref counted of instances of data such as textures, meshes, materials.
     - Instanced data is different from loaded data, and we might want to have different instances of same loaded data (ie: one modifiable instance and other static instance)
@@ -58,6 +58,7 @@ _______________________________________________________________________________
 _______________________________________________________________________________
 # Done
 
+- [x] LightComponent with LightsChangedEvent signaling for gpu submition
 - [x] PointLight, DirectionalLight, SpotLight
 - [x] Transform3DComponent
 - [x] Basic Mesh class

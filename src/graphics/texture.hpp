@@ -8,48 +8,40 @@
 
 namespace kzn {
 
+//! Represents decoded and uncompressed texture data. Can be used to upload
+// data directly to the GPU.
 struct TextureData {
     unsigned char* bytes;
     Vec3u extent;
 
+    //! Frees allocated image data.
     ~TextureData();
-};
 
-class Texture {
-public:
-    // Ctor
-    Texture(unsigned char* data, VkExtent3D extent) noexcept
-        : m_data{data}
-        , m_extent{extent} {}
-    // Copy
-    Texture(const Texture&) = delete;
-    Texture& operator=(const Texture&) = delete;
-    // Move
-    Texture(Texture&&) = delete;
-    Texture& operator=(Texture&&) = delete;
-    // Dtor
-    ~Texture();
+    //! Convert extent member into a VkExtent3D.
+    [[nodiscard]]
+    constexpr VkExtent3D vk_extent() const;
 
-    //! \brief Creates a new texture object with the data from the specified
-    //! path.
+    //! \brief Creates a new texture data from the specified path.
     //! \param path Relative path to the texture file.
-    //! \throws LoadingError if
+    //! \throws LoadingError
     [[nodiscard]]
-    static std::shared_ptr<Texture> load(const std::filesystem::path& path);
-
-    [[nodiscard]]
-    unsigned char const* const data() const noexcept {
-        return m_data;
-    }
-
-    [[nodiscard]]
-    VkExtent3D extent() const noexcept {
-        return m_extent;
-    }
-
-private:
-    unsigned char* m_data;
-    VkExtent3D m_extent;
+    static std::shared_ptr<TextureData> load(const std::filesystem::path& path);
 };
+
+} // namespace kzn
+
+///////////////////////////////////////////////////////////////////////////////
+// Implementation
+///////////////////////////////////////////////////////////////////////////////
+
+namespace kzn {
+
+constexpr VkExtent3D TextureData::vk_extent() const {
+    return VkExtent3D{
+        .width = extent.x,
+        .height = extent.y,
+        .depth = extent.z,
+    };
+}
 
 } // namespace kzn

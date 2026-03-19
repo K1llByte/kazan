@@ -34,14 +34,14 @@ public:
                 .build(renderer.device())
         }
         , m_camera_dset_ptr{&camera_dset}
-        , m_earth_tex_ptr{g_resources.load<Texture>("textures://earth.jpg")}
+        , m_earth_tex_ptr{g_resources.load<TextureData>("textures://earth.jpg")}
         , m_earth_dset{renderer.device().dset_allocator().allocate(
             *m_pipeline.dset_layout(1)
         )}
-        , m_earth_image(renderer.device(), m_earth_tex_ptr->extent())
+        , m_earth_image(renderer.device(), m_earth_tex_ptr->vk_extent())
     {
         // Upload texture data to gpu image memory
-        m_earth_image.upload(m_earth_tex_ptr->data());
+        m_earth_image.upload(m_earth_tex_ptr->bytes);
         // Update dset and upload data
         m_earth_dset.update({m_earth_image.info()});
     }
@@ -65,7 +65,7 @@ private:
     Renderer* m_renderer_ptr;
     vk::Pipeline m_pipeline;
     vk::DescriptorSet* m_camera_dset_ptr;
-    std::shared_ptr<Texture> m_earth_tex_ptr;
+    std::shared_ptr<TextureData> m_earth_tex_ptr;
     vk::DescriptorSet m_earth_dset;
     vk::Image m_earth_image;
 };

@@ -45,17 +45,17 @@ public:
         , m_skybox_dset{renderer.device().dset_allocator().allocate(
             *m_pipeline.dset_layout(1)
         )}
-        , m_skybox_image(renderer.device(), m_skybox_tex[0]->extent())
+        , m_skybox_image(renderer.device(), m_skybox_tex[0]->vk_extent())
     {
         // Upload texture data to gpu image memory
         m_skybox_image.upload(
             (const void*[6]) {
-                m_skybox_tex[0]->data(),
-                m_skybox_tex[1]->data(),
-                m_skybox_tex[2]->data(),
-                m_skybox_tex[3]->data(),
-                m_skybox_tex[4]->data(),
-                m_skybox_tex[5]->data()
+                m_skybox_tex[0]->bytes,
+                m_skybox_tex[1]->bytes,
+                m_skybox_tex[2]->bytes,
+                m_skybox_tex[3]->bytes,
+                m_skybox_tex[4]->bytes,
+                m_skybox_tex[5]->bytes
             }
         );
         // Update dset and upload data
@@ -82,7 +82,7 @@ private:
     Renderer* m_renderer_ptr;
     vk::Pipeline m_pipeline;
     vk::DescriptorSet* m_camera_dset_ptr;
-    std::array<std::shared_ptr<Texture>, 6> m_skybox_tex;
+    std::array<std::shared_ptr<TextureData>, 6> m_skybox_tex;
     vk::DescriptorSet m_skybox_dset;
     vk::CubeImage m_skybox_image;
 };

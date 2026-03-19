@@ -36,7 +36,7 @@ struct TestApp : public BasicApp {
         init_render_stages();
         // Load level entities
         create_test_level();
-        
+
         // auto scene3d_ptr = g_resources.load<Scene3DData>("models://damaged_helmet.glb");
         // Log::debug("Num meshes: {}", scene3d_ptr->meshes.size());
         // for(auto& mesh : scene3d_ptr->meshes) {
@@ -46,53 +46,49 @@ struct TestApp : public BasicApp {
     }
 
     void create_test_level() {
-        auto entity = m_scene.registry.create();
-        entity.emplace<Transform2DComponent>();
-    
+        auto create_mesh = [this](auto mesh_path, auto position) {
+            auto& device = m_systems
+                .get<RenderSystem>()
+                .context<Renderer>()
+                .device();
+            auto entity = m_scene.registry.create();
+            entity.emplace<MeshComponent>(device, mesh_path);
+            auto& transform = entity.emplace<Transform3DComponent>();
+            transform.position = position;
+        };
+
+        auto create_spot_light = [this](Vec3 direction, Vec3 color) {
+            constexpr Vec3 light_color = Vec3{0.8,0.2,0.2};
+            constexpr float intensity = 0.5f;
+            
+            auto entity = m_scene.registry.create();
+            entity.emplace<LightComponent>(
+                spot_light(
+                    intensity,
+                    Vec3{0},
+                    direction, 
+                    10.f,
+                    glm::radians(35.f),
+                    glm::radians(40.f),
+                    color
+                )
+            );
+        };
+
         auto camera = m_scene.registry.create();
         auto& camera3d = camera.add(Camera3DComponent{});
         camera3d.fov_v = 100.f;
         camera3d.look_at(Vec3{0,0,3}, Vec3{0}, Vec3{0,-1,0});
-    
-        auto sprite = m_scene.registry.create();
-        sprite.add(Transform2DComponent{
-            .position = Vec2{-0.5,0},
-        });
-        sprite.add(SpriteComponent{});
-    
-        auto sprite2 = m_scene.registry.create();
-        sprite2.add(Transform2DComponent{
-            .position = Vec2{0.5,0},
-        });
-        sprite2.add(SpriteComponent{});
 
-        auto& device = m_systems
-            .get<RenderSystem>()
-            .context<Renderer>()
-            .device();
-        auto mesh1 = m_scene.registry.create();
-        mesh1.emplace<MeshComponent>(device, "models://damaged_helmet.glb");
-        auto& mesh1_t = mesh1.emplace<Transform3DComponent>();
-        mesh1_t.position.x = 1.5f;
-        mesh1_t.position.z = 0.f;
+        create_mesh("models://damaged_helmet.glb", Vec3{1.5f, 0.f, 0.f});
+        create_mesh("models://damaged_helmet.glb", Vec3{-1.5f, 0.f, 0.f});
+        create_mesh("models://damaged_helmet.glb", Vec3{0.f, 0.f, 1.5f});
+        create_mesh("models://damaged_helmet.glb", Vec3{0.f, 0.f, -1.5f});
 
-        auto mesh2 = m_scene.registry.create();
-        mesh2.emplace<MeshComponent>(device, "models://damaged_helmet.glb");
-        auto& mesh2_t = mesh2.emplace<Transform3DComponent>();
-        mesh2_t.position.x = -1.5f;
-        mesh2_t.position.z = 0.f;
-
-        auto mesh3 = m_scene.registry.create();
-        mesh3.emplace<MeshComponent>(device, "models://damaged_helmet.glb");
-        auto& mesh3_t = mesh3.emplace<Transform3DComponent>();
-        mesh3_t.position.x = 0.f;
-        mesh3_t.position.z = 1.5f;
-
-        auto mesh4 = m_scene.registry.create();
-        mesh4.emplace<MeshComponent>(device, "models://damaged_helmet.glb");
-        auto& mesh4_t = mesh4.emplace<Transform3DComponent>();
-        mesh4_t.position.x = 0.f;
-        mesh4_t.position.z = -1.5f;
+        create_spot_light(Vec3{1,0,0}, Vec3{1});
+        create_spot_light(Vec3{-1,0,0}, Vec3{1});
+        create_spot_light(Vec3{0,0,1}, Vec3{1});
+        create_spot_light(Vec3{0,0,-1}, Vec3{1});
     }
 
     void init_render_stages() {

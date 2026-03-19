@@ -14,8 +14,8 @@ namespace kzn {
 inline std::shared_ptr<vk::ShaderCode> load_shader(const std::string_view path) {
     return g_resources.load<vk::ShaderCode>(path);
 }
-inline std::shared_ptr<Texture> load_texture(const std::string_view path) {
-    return g_resources.load<Texture>(path);
+inline std::shared_ptr<TextureData> load_texture(const std::string_view path) {
+    return g_resources.load<TextureData>(path);
 }
 
 struct RenderStage {

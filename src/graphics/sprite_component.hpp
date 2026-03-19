@@ -11,7 +11,7 @@ namespace kzn {
 inline std::shared_ptr<SpriteMaterial> default_material() {
     // TODO: Create a MaterialManager to avoid this
     return std::make_shared<SpriteMaterial>(
-        g_resources.load<Texture>("textures://debug.png")
+        g_resources.load<TextureData>("textures://debug.png")
     );
 }
 

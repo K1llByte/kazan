@@ -1,9 +1,11 @@
 #pragma once
 
 #include "core/assert.hpp"
-#include "glm/geometric.hpp"
 #include "math/types.hpp"
 #include "vk/uniform.hpp"
+#include "events/event_manager.hpp"
+
+#include <glm/geometric.hpp>
 
 #define KZN_LIGHT_TYPE_DIRECTIONAL 0
 #define KZN_LIGHT_TYPE_POINT 1
@@ -28,6 +30,58 @@ struct Lights {
     // NOTE: C style array does not work here due to problem with boost::pfr.
     std::array<Light, KZN_MAX_LIGHTS> data;
 };
+
+constexpr Light directional_light(
+    float intensity,
+    Vec3 direction,
+    Vec3 color
+);
+
+constexpr Light point_light(
+    float intensity,
+    Vec3 position,
+    float range,
+    Vec3 color
+);
+
+constexpr Light spot_light(
+    float intensity,
+    Vec3 position,
+    Vec3 direction,
+    float range,
+    float spot_inner,
+    float spot_outer,
+    Vec3 color
+);
+
+struct ChangedLightsEvent : Event {};
+
+class LightComponent {
+    public:
+    // Ctor
+    LightComponent(Light light)
+        : m_light{std::move(light)}
+    {
+        EventManager::send(ChangedLightsEvent{});
+    }
+    // Dtor
+    ~LightComponent() = default;
+
+    const Light& light() const {
+        return m_light;
+    }
+
+private:
+    Light m_light;
+};
+
+} // namespace kzn
+
+///////////////////////////////////////////////////////////////////////////////
+// Implementation
+///////////////////////////////////////////////////////////////////////////////
+
+namespace kzn {
 
 constexpr Light directional_light(
     float intensity,

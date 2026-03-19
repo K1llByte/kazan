@@ -11,8 +11,9 @@
 #include "graphics/light.hpp"
 
 #include <glm/trigonometric.hpp>
-#include <optional>
 #include <vulkan/vulkan_core.h>
+
+#include <optional>
 
 namespace kzn {
 
@@ -23,7 +24,9 @@ const Vec3 cyan =   Vec3{0.22, 0.88, 0.88};
 const Vec3 pink =   Vec3{0.88, 0.22, 0.88};
 const Vec3 yellow = Vec3{0.88, 0.88, 0.22};
 
-class GeometryStage : public RenderStage {
+class GeometryStage
+    : public RenderStage
+    , public EventListener {
 public:
     // Ctor
     GeometryStage(
@@ -50,55 +53,34 @@ public:
             *m_pipeline.dset_layout(1)
         )}
     {
-        constexpr Vec3 light_color = Vec3{0.8,0.2,0.2};
-        constexpr float intensity = 0.5f;
-        auto light0 = spot_light(
-            intensity,
-            Vec3{0,0,0},
-            Vec3{1,0,0}, 
-            10.f,
-            glm::radians(35.f),
-            glm::radians(40.f),
-            // Vec3{0.8,0.2,0.2}
-            Vec3{1}
-        );
-        auto light1 = spot_light(
-            intensity,
-            Vec3{0,0,0},
-            Vec3{-1,0,0}, 
-            10.f,
-            glm::radians(35.f),
-            glm::radians(45.f),
-            // Vec3{0.2,0.2,0.8}
-            Vec3{1}
-        );
-        auto light2 = spot_light(
-            intensity,
-            Vec3{0,0,0},
-            Vec3{0,0,1}, 
-            10.f,
-            glm::radians(35.f),
-            glm::radians(45.f),
-            // Vec3{0.2,0.8,0.2}
-            Vec3{1}
-        );
-        auto light3 = spot_light(
-            intensity,
-            Vec3{0,0,0},
-            Vec3{0,0,-1}, 
-            10.f,
-            glm::radians(35.f),
-            glm::radians(45.f),
-            // Vec3{0.2,0.8,0.8}
-            Vec3{1}
-        );
-        m_light_ubo.upload(Lights{
-            .count = 4,
-            .data = {light0, light1, light2, light3},
-        });
+        listen(&GeometryStage::on_lights_changed);
         m_light_dset.update({m_light_ubo.info()});
     }
 
+    void on_lights_changed(const ChangedLightsEvent&) {
+        m_lights_changed = true;
+    }
+
+    void pre_render(Scene& scene) override {
+        if(m_lights_changed) {
+            // Gather lights data
+            auto lights_view = scene.registry.registry().view<LightComponent>();
+            std::size_t counter = 0;
+            for (auto [entity, light] : lights_view->each()) {
+                m_lights.data[counter] = light.light();
+                counter += 1;
+                if(counter >= KZN_MAX_LIGHTS) {
+                    break;
+                }
+            }
+            m_lights.count = counter;
+
+            // Upload light data to GPU
+            m_light_ubo.upload(m_lights);
+            m_lights_changed = false;
+        }
+    }
+    
     void render(Scene& scene, vk::CommandBuffer& cmd_buffer) override {
         vk::cmd_bind_pipeline(cmd_buffer, m_pipeline);
         const auto swapchain_extent = m_renderer_ptr->swapchain().extent();
@@ -140,6 +122,8 @@ private:
     vk::UniformBuffer m_light_ubo;
     vk::DescriptorSet* m_camera_dset_ptr;
     vk::DescriptorSet m_light_dset;
+    Lights m_lights;
+    bool m_lights_changed = false;
 };
 
 } // namespace kzn

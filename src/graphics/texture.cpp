@@ -11,33 +11,24 @@ TextureData::~TextureData() {
     stbi_image_free(bytes);
 }
 
-Texture::~Texture() {
-    stbi_image_free(m_data);
-}
-
-std::shared_ptr<Texture> Texture::load(const std::filesystem::path& path) {
-    int tex_width;
-    int tex_height;
-    int tex_channels;
+std::shared_ptr<TextureData> TextureData::load(const std::filesystem::path& path) {
+    int width;
+    int height;
+    int channels;
     unsigned char* result_ptr = stbi_load(
         path.c_str(),
-        &tex_width,
-        &tex_height,
-        &tex_channels,
+        &width,
+        &height,
+        &channels,
         STBI_rgb_alpha
     );
-
     if (result_ptr == nullptr) {
         throw LoadingError{stbi_failure_reason()};
     }
 
-    return std::make_shared<Texture>(
+    return std::make_shared<TextureData>(
         result_ptr,
-        VkExtent3D{
-            .width = static_cast<uint32_t>(tex_width),
-            .height = static_cast<uint32_t>(tex_height),
-            .depth = 1,
-        }
+        Vec3u{static_cast<uint>(width), static_cast<uint>(height), 1}
     );
 }
 
