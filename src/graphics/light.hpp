@@ -1,5 +1,7 @@
 #pragma once
 
+#include "core/assert.hpp"
+#include "glm/geometric.hpp"
 #include "math/types.hpp"
 #include "vk/uniform.hpp"
 
@@ -32,6 +34,10 @@ constexpr Light directional_light(
     Vec3 direction,
     Vec3 color
 ) {
+    KZN_ASSERT_MSG(
+        glm::epsilonEqual(glm::length(direction), 1.0f, 1e-6f),
+        "Light direction is not normalized"
+    );
     return Light {
         .type = KZN_LIGHT_TYPE_DIRECTIONAL,
         .intensity = intensity,
@@ -64,6 +70,11 @@ constexpr Light spot_light(
     float spot_outer,
     Vec3 color
 ) {
+    KZN_ASSERT_MSG(
+        glm::epsilonEqual(glm::length(direction), 1.0f, 1e-6f),
+        "Light direction is not normalized"
+    );
+    
     return Light {
         .type = KZN_LIGHT_TYPE_SPOT,
         .intensity = intensity,

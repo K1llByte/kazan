@@ -34,7 +34,7 @@ public:
             vk::PipelineBuilder(render_pass)
                 .set_vertex_stage(load_shader("shaders://geom.vert.spv"))
                 .set_fragment_stage(load_shader("shaders://geom.frag.spv"))
-                .set_vertex_input<Vec3,Vec3,Vec3>()
+                .set_vertex_input<Vec3,Vec3,Vec2,Vec3>()
                 .set_topology(VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST)
                 .set_cull_mode(VK_CULL_MODE_BACK_BIT)
                 .set_front_face(VK_FRONT_FACE_COUNTER_CLOCKWISE)
@@ -49,57 +49,46 @@ public:
         )}
     {
         constexpr Vec3 light_color = Vec3{0.8,0.2,0.2};
-        // m_light_ubo.upload(directional_light(1.f, Vec3{1,1,1}, light_color));
-        // m_light_ubo.upload(point_light(1.f, Vec3{0,0,0}, 10.f, light_color));
-        // auto lights = Lights{
-        //     .count = 1,
-        //     .data = {
-        //         spot_light(
-        //             1.f,
-        //             Vec3{0,0,0},
-        //             Vec3{1,0,0}, 
-        //             10.f,
-        //             glm::radians(45.f),
-        //             glm::radians(90.f),
-        //             light_color
-        //         )
-        //     },
-        // };
+        constexpr float intensity = 0.5f;
         auto light0 = spot_light(
-            1.f,
+            intensity,
             Vec3{0,0,0},
             Vec3{1,0,0}, 
             10.f,
             glm::radians(35.f),
             glm::radians(40.f),
-            Vec3{0.8,0.2,0.2}
+            // Vec3{0.8,0.2,0.2}
+            Vec3{1}
         );
         auto light1 = spot_light(
-            1.f,
+            intensity,
             Vec3{0,0,0},
             Vec3{-1,0,0}, 
             10.f,
             glm::radians(35.f),
             glm::radians(45.f),
-            Vec3{0.2,0.2,0.8}
+            // Vec3{0.2,0.2,0.8}
+            Vec3{1}
         );
         auto light2 = spot_light(
-            1.f,
+            intensity,
             Vec3{0,0,0},
             Vec3{0,0,1}, 
             10.f,
             glm::radians(35.f),
             glm::radians(45.f),
-            Vec3{0.2,0.8,0.2}
+            // Vec3{0.2,0.8,0.2}
+            Vec3{1}
         );
         auto light3 = spot_light(
-            1.f,
+            intensity,
             Vec3{0,0,0},
             Vec3{0,0,-1}, 
             10.f,
             glm::radians(35.f),
             glm::radians(45.f),
-            Vec3{0.2,0.8,0.8}
+            // Vec3{0.2,0.8,0.8}
+            Vec3{1}
         );
         m_light_ubo.upload(Lights{
             .count = 4,

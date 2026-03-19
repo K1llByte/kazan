@@ -16,14 +16,20 @@
 
 namespace kzn {
 
+struct ResourceKeyHash {
+    std::size_t operator()(const std::pair<StringHash, std::type_index>& k) const {
+        std::size_t h1 = std::hash<StringHash>{}(k.first);
+        std::size_t h2 = std::hash<std::type_index>{}(k.second);
+        return h1 ^ (h2 << 1);
+    }
+};
+
 class ResourceCache {
 public:
     PathAliases path_aliases;
 
 public:
-    // Ctor
     ResourceCache() = default;
-    // Dtor
     ~ResourceCache() = default;
 
     //! Find resource of specified type T, if not found, returns nullptr.
@@ -39,15 +45,13 @@ public:
         }
 
         const auto& resolved_path = resolved_path_opt.value();
-        auto it = m_resources.find(std::string_view{resolved_path.native()});
+        const auto key = std::make_pair(
+            StringHash(std::string_view{resolved_path.native()}),
+            std::type_index(typeid(T))
+        );
+        auto it = m_resources.find(key);
         if (it != m_resources.end()) {
-            if (it->second.first != typeid(T)) {
-                throw LoadingError{fmt::format(
-                    "Incompatible specified resource type of '{}'",
-                    resolved_path.native()
-                )};
-            }
-            return std::static_pointer_cast<T>(it->second.second);
+            return std::static_pointer_cast<T>(it->second);
         }
 
         return nullptr;
@@ -66,35 +70,31 @@ public:
         }
 
         const auto& resolved_path = resolved_path_opt.value();
-        auto it = m_resources.find(std::string_view{resolved_path.native()});
+        const auto key = std::make_pair(
+            StringHash(std::string_view{resolved_path.native()}),
+            std::type_index(typeid(T))
+        );
+        auto it = m_resources.find(key);
         if (it != m_resources.end()) {
-            if (it->second.first != typeid(T)) {
-                throw LoadingError{fmt::format(
-                    "Incompatible specified resource type of '{}'",
-                    resolved_path.native()
-                )};
-            }
-            return std::static_pointer_cast<T>(it->second.second);
+            return std::static_pointer_cast<T>(it->second);
         }
 
-        auto [inserted_it, _] = m_resources.insert(
-            {StringHash(resolved_path.native()),
-             std::make_pair(
-                 std::type_index(typeid(T)),
-                 std::static_pointer_cast<void>(T::load(resolved_path.native()))
-             )}
-        );
+        auto [inserted_it, _] = m_resources.insert({
+            key,
+            std::static_pointer_cast<void>(T::load(resolved_path.native()))
+        });
 
         Log::info("Loaded '{}'", path);
 
-        return std::static_pointer_cast<T>(inserted_it->second.second);
+        return std::static_pointer_cast<T>(inserted_it->second);
     }
 
 private:
     std::unordered_map<
-        StringHash,
-        std::pair<std::type_index, std::shared_ptr<void>>>
-        m_resources;
+        std::pair<StringHash, std::type_index>,
+        std::shared_ptr<void>,
+        ResourceKeyHash
+    > m_resources;
 };
 
 // NOTE: This will be a global for now, but in the future, application should

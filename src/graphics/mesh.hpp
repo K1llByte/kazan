@@ -14,13 +14,14 @@ namespace kzn {
 struct Vertex3D {
     Vec3 position;
     Vec3 normal;
+    Vec2 uv;
     Vec3 color = Vec3{1,1,1};
 };
 
 struct MeshData {
     std::vector<Vertex3D> vertices;
     std::vector<std::uint32_t> indices;
-    // VertexLayout layout;
+    // TODO: VertexLayout layout;
 
     [[nodiscard]]
     static std::shared_ptr<MeshData> load(const std::filesystem::path& path);

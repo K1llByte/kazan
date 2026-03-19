@@ -18,42 +18,9 @@
 #include "test/camera_system.hpp"
 #include "vk/uniform.hpp"
 
+#include "graphics/scene3d.hpp"
+
 using namespace kzn;
-
-inline void init_render_stages(RenderSystem& render_sys) {
-    // render_sys.emplace_stage<SpriteStage>(
-    //     render_sys.context<Renderer>(),
-    //     render_sys.screen_render_pass(),
-    //     render_sys.camera2d_dset()
-    // );
-    render_sys.emplace_stage<SkyboxStage>(
-        render_sys.context<Renderer>(),
-        render_sys.screen_render_pass(),
-        render_sys.camera3d_dset()
-    );
-    render_sys.emplace_stage<GeometryStage>(
-        render_sys.context<Renderer>(),
-        render_sys.screen_render_pass(),
-        render_sys.camera3d_dset()
-    );
-    // render_sys.emplace_stage<PlanetStage>(
-    //     render_sys.context<Renderer>(),
-    //     render_sys.screen_render_pass(),
-    //     render_sys.camera3d_dset()
-    // );
-    // render_sys.emplace_stage<DebugStage>(
-    //     render_sys.context<Renderer>(),
-    //     render_sys.screen_render_pass(),
-    //     render_sys.camera3d_dset()
-    // );
-    // NOTE: EditorSystem will inject ImguiStage by event
-}
-
-// struct Lights2 {
-//     // glsl::Int count;
-//     // Light data[KZN_MAX_LIGHTS];
-//     Vec3 data;
-// };
 
 struct TestApp : public BasicApp {
     TestApp() {
@@ -68,6 +35,8 @@ struct TestApp : public BasicApp {
         init_render_stages();
         // Load level entities
         create_test_level();
+        
+        auto scene3d = g_resources.load<Scene3DData>("models://damaged_helmet.glb");
     }
 
     void create_test_level() {

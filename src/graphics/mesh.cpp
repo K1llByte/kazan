@@ -3,8 +3,8 @@
 #include "core/log.hpp"
 #include "resources/resource.hpp"
 
-#include "fastgltf/core.hpp"
-#include "fastgltf/types.hpp"
+#include <fastgltf/core.hpp>
+#include <fastgltf/types.hpp>
 #include <fastgltf/glm_element_traits.hpp>
 
 #include <memory>
@@ -77,6 +77,18 @@ std::shared_ptr<MeshData> MeshData::load(const std::filesystem::path& path) {
                         gltf.accessors[normals->accessorIndex],
                         [&vertices](glm::vec3 normal, size_t idx) {
                             vertices[idx].normal = normal;
+                        }
+                    );
+                }
+
+                // Load vertex texture coordinates
+                auto tex_coords = primitive.findAttribute("TEXCOORD_0");
+                if (tex_coords != primitive.attributes.end()) {
+                    fastgltf::iterateAccessorWithIndex<glm::vec2>(
+                        gltf,
+                        gltf.accessors[tex_coords->accessorIndex],
+                        [&vertices](glm::vec2 uv, size_t idx) {
+                            vertices[idx].uv = uv;
                         }
                     );
                 }

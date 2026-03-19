@@ -2,6 +2,8 @@
 
 #include "vk/error.hpp"
 
+#include <cstdlib>
+
 namespace kzn {
 
 //! Pure interface for implementing an app

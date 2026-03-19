@@ -1,15 +1,17 @@
 
 # Todo
 
-- [ ] Fix is_uniform_block
-- [ ] Light
+- [ ] PointLightComponent / DirectionalLightComponent / SpotLightComponent
+    - Brainstorm how to check modifications and upload to gpu
 - [ ] Phong lightning model
 - [ ] Blin-Phong lightning model
+- [ ] Fix is_uniform_block
 - [ ] PBR Cook-Torrence BRDF model
 - [ ] Brainstorm SceneData gltf loader and how to 
 - [ ] Mesh
 - [ ] Mesh loader
 - [ ] SubMesh's
+- [ ] Convert all errors into enums
 - [ ] Basic 3D Graphics rendering pipeline
 - [ ] Material3D based on gltf spec
 - [ ] Make camera api consistent `component.view_matrix()` `component.projection_matrix()`
