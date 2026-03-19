@@ -1,5 +1,6 @@
 #include "core/app.hpp"
 #include "core/basic_app.hpp"
+#include "core/log.hpp"
 #include "editor/editor_system.hpp"
 #include "graphics/light.hpp"
 #include "graphics/mesh.hpp"
@@ -36,7 +37,12 @@ struct TestApp : public BasicApp {
         // Load level entities
         create_test_level();
         
-        auto scene3d = g_resources.load<Scene3DData>("models://damaged_helmet.glb");
+        // auto scene3d_ptr = g_resources.load<Scene3DData>("models://damaged_helmet.glb");
+        // Log::debug("Num meshes: {}", scene3d_ptr->meshes.size());
+        // for(auto& mesh : scene3d_ptr->meshes) {
+        //     Log::debug("Num vertices: {}", mesh.vertices.size());
+        //     Log::debug("Num indices: {}", mesh.indices.size());
+        // }
     }
 
     void create_test_level() {

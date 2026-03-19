@@ -67,6 +67,7 @@ DescriptorSet DescriptorSetAllocator::allocate(DescriptorSetLayout layout) {
     VkDescriptorSet dset;
     auto result = vkAllocateDescriptorSets(m_vk_device, &alloc_info, &dset);
 
+
     if (result == VK_SUCCESS) [[likely]] {
         return DescriptorSet(m_vk_device, dset, std::move(layout));
     }

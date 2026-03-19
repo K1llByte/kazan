@@ -1,7 +1,8 @@
 #include "mesh.hpp"
 
+#include "graphics/scene3d.hpp"
 #include "core/log.hpp"
-#include "resources/resource.hpp"
+#include "resources/resources.hpp"
 
 #include <fastgltf/core.hpp>
 #include <fastgltf/types.hpp>
@@ -11,6 +12,48 @@
 #include <vector>
 
 namespace kzn {
+
+MeshComponent::MeshComponent(vk::Device &device, const MeshData& mesh_data)
+    : m_mesh(device, mesh_data)
+    , m_material_opt{
+        [&mesh_data, &device]() -> std::optional<Material3D> {
+            if(mesh_data.albedo_opt.has_value()) {
+                return Material3D{
+                    .albedo_image = vk::Image(
+                        device,
+                        VkExtent3D{
+                            mesh_data.albedo_opt->extent.x,
+                            mesh_data.albedo_opt->extent.y,
+                            mesh_data.albedo_opt->extent.z,
+                        }
+                    ),
+                    .dset = vk::DescriptorSet(
+                        device.dset_allocator().allocate(
+                            device.dset_layout_cache().layout({
+                                vk::sampler_binding(0),
+                            })
+                        )
+                    ),
+                };
+            }
+            else {
+                return std::nullopt;
+            }
+        }()
+    }
+{
+    if(m_material_opt.has_value()) {
+        m_material_opt->albedo_image.upload(mesh_data.albedo_opt->bytes);
+        m_material_opt->dset.update({m_material_opt->albedo_image.info()});
+    }
+}
+
+MeshComponent::MeshComponent(vk::Device &device, const std::string_view mesh_path)
+    // : MeshComponent(device, *g_resources.load<MeshData>(mesh_path))
+    : MeshComponent(device, g_resources.load<Scene3DData>(mesh_path)->meshes[0])
+{
+
+}
 
 std::shared_ptr<MeshData> MeshData::load(const std::filesystem::path& path) {
     auto& path_str = path.native();

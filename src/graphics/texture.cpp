@@ -7,12 +7,24 @@
 
 namespace kzn {
 
+TextureData::~TextureData() {
+    stbi_image_free(bytes);
+}
+
+Texture::~Texture() {
+    stbi_image_free(m_data);
+}
+
 std::shared_ptr<Texture> Texture::load(const std::filesystem::path& path) {
     int tex_width;
     int tex_height;
     int tex_channels;
     unsigned char* result_ptr = stbi_load(
-        path.c_str(), &tex_width, &tex_height, &tex_channels, STBI_rgb_alpha
+        path.c_str(),
+        &tex_width,
+        &tex_height,
+        &tex_channels,
+        STBI_rgb_alpha
     );
 
     if (result_ptr == nullptr) {

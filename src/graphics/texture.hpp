@@ -8,6 +8,13 @@
 
 namespace kzn {
 
+struct TextureData {
+    unsigned char* bytes;
+    Vec3u extent;
+
+    ~TextureData();
+};
+
 class Texture {
 public:
     // Ctor
@@ -21,7 +28,7 @@ public:
     Texture(Texture&&) = delete;
     Texture& operator=(Texture&&) = delete;
     // Dtor
-    ~Texture() = default;
+    ~Texture();
 
     //! \brief Creates a new texture object with the data from the specified
     //! path.

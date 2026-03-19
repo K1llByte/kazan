@@ -32,6 +32,8 @@ layout(set = 1, binding = 0) uniform Lights {
     Light data[MAX_LIGHTS];
 } lights;
 
+layout(set = 2, binding = 0) uniform sampler2D albedo;
+
 #ifdef USE_BRANCHLESS_COMPUTE_LIGHT
 
 vec3 compute_light(Light light, vec3 position, vec3 normal) {
@@ -116,7 +118,7 @@ void main() {
         light_color += compute_light(lights.data[i], in_world_position, in_normal);
     }
 #endif
-    out_color = vec4(light_color * in_color, 1.0);
+    out_color = vec4(light_color * texture(albedo, in_uv).xyz, 1.0);
 }
 
 // float ndf_trowbridge_reitz_ggx(vec3 n, vec3 h, float a) {

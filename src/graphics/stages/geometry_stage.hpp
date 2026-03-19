@@ -1,5 +1,6 @@
 #pragma once
 
+#include "core/assert.hpp"
 #include "graphics/mesh.hpp"
 #include "graphics/renderer.hpp"
 #include "graphics/stages/render_stage.hpp"
@@ -10,6 +11,7 @@
 #include "graphics/light.hpp"
 
 #include <glm/trigonometric.hpp>
+#include <optional>
 #include <vulkan/vulkan_core.h>
 
 namespace kzn {
@@ -102,11 +104,6 @@ public:
         const auto swapchain_extent = m_renderer_ptr->swapchain().extent();
         vk::cmd_set_viewport(cmd_buffer, vk::create_viewport(swapchain_extent));
         vk::cmd_set_scissor(cmd_buffer, vk::create_scissor(swapchain_extent));
-        vk::cmd_bind_dsets(
-            cmd_buffer,
-            std::array{m_camera_dset_ptr, &m_light_dset},
-            m_pipeline.layout()
-        );
 
         auto meshes_view = scene.registry.registry().view<MeshComponent>();
         for (auto [entity, mesh] : meshes_view->each()) {
@@ -122,6 +119,16 @@ public:
             if (transform_ptr != nullptr) {
                 transform.matrix = transform_ptr->matrix();
             }
+            KZN_ASSERT_MSG(mesh.material() != std::nullopt, "Mesh must have material");
+            vk::cmd_bind_dsets(
+                cmd_buffer,
+                std::array{
+                    m_camera_dset_ptr,
+                    &m_light_dset,
+                    &mesh.material()->dset
+                },
+                m_pipeline.layout()
+            );
             vk::cmd_push_constants(cmd_buffer, m_pipeline.layout(), transform);
             vk::cmd_draw_indexed(cmd_buffer, mesh.mesh().idx_count());
         }

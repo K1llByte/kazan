@@ -15,6 +15,7 @@
 #define VK_CHECK_MSG(res, msg, ...)                                            \
     {                                                                          \
         if (res != VK_SUCCESS) {                                               \
+            Log::error(msg);                                                   \
             throw vk::ResultError(res);                                        \
         }                                                                      \
     }

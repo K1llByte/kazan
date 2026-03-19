@@ -1,13 +1,20 @@
 #pragma once
 
+#include "graphics/material3d.hpp"
+#include "graphics/texture.hpp"
 #include "math/types.hpp"
 #include "resources/resources.hpp"
 #include "vk/buffer.hpp"
 #include "vk/device.hpp"
+#include "vk/dset.hpp"
+#include "vk/dset_layout.hpp"
+#include "vk/image.hpp"
 
 #include <filesystem>
 #include <memory>
+#include <optional>
 #include <vector>
+#include <vulkan/vulkan_core.h>
 
 namespace kzn {
 
@@ -21,6 +28,7 @@ struct Vertex3D {
 struct MeshData {
     std::vector<Vertex3D> vertices;
     std::vector<std::uint32_t> indices;
+    std::optional<TextureData> albedo_opt;
     // TODO: VertexLayout layout;
 
     [[nodiscard]]
@@ -68,8 +76,8 @@ private:
 class MeshComponent {
 public:
     // Ctor
-    MeshComponent(vk::Device &device, const std::string_view mesh_path)
-        : m_mesh(device, *g_resources.load<MeshData>(mesh_path)) {}
+    MeshComponent(vk::Device &device, const MeshData& mesh_data);
+    MeshComponent(vk::Device &device, const std::string_view mesh_path);
     // Copy
     MeshComponent(const MeshComponent&) = delete;
     MeshComponent& operator=(const MeshComponent&) = delete;
@@ -83,9 +91,14 @@ public:
     const Mesh& mesh() const {
         return m_mesh;
     }
+    [[nodiscard]]
+    std::optional<Material3D>& material() {
+        return m_material_opt;
+    }
 
 private:
     Mesh m_mesh;
+    std::optional<Material3D> m_material_opt;
 };
 
 } // namespace kzn

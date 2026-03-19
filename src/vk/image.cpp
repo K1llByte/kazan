@@ -1,5 +1,6 @@
 #include "image.hpp"
 
+#include "core/assert.hpp"
 #include "vk/error.hpp"
 #include "vk/utils.hpp"
 
@@ -21,6 +22,7 @@ Image::Image(
     : m_device_ptr{&device}
     , m_extent{extent} {
     const uint64_t image_size = size();
+    KZN_ASSERT_MSG(image_size != 0, "Cannot have a zero sized image");
 
     // 1. Create staging buffer
     VkBufferCreateInfo buffer_info = {};
@@ -119,18 +121,18 @@ Image::Image(
     VK_CHECK_MSG(result, "Failed to create texture sampler");
 }
 
-// Image::Image(Image&& other)
-//     : m_device_ptr{other.m_device_ptr}
-//     , m_extent{other.m_extent}
-//     , m_staging_buffer{other.m_staging_buffer}
-//     , m_staging_buffer_allocation{other.m_staging_buffer_allocation}
-//     , m_texture_image{other.m_texture_image}
-//     , m_texture_image_allocation{other.m_texture_image_allocation}
-//     , m_texture_image_view{other.m_texture_image_view}
-//     , m_texture_sampler{other.m_texture_sampler} {
-//     // Invalidate other instance to avoid deallocation of moved resource.
-//     other.m_device_ptr = nullptr;
-// }
+Image::Image(Image&& other)
+    : m_device_ptr{other.m_device_ptr}
+    , m_extent{other.m_extent}
+    , m_staging_buffer{other.m_staging_buffer}
+    , m_staging_buffer_allocation{other.m_staging_buffer_allocation}
+    , m_texture_image{other.m_texture_image}
+    , m_texture_image_allocation{other.m_texture_image_allocation}
+    , m_texture_image_view{other.m_texture_image_view}
+    , m_texture_sampler{other.m_texture_sampler} {
+    // Invalidate other instance to avoid deallocation of moved resource.
+    other.m_device_ptr = nullptr;
+}
 
 Image& Image::operator=(Image&& other) {
     delete_image_data();
