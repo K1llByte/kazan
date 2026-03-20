@@ -1,4 +1,5 @@
 #include "scene3d.hpp"
+#include "graphics/material3d.hpp"
 #include "graphics/texture.hpp"
 
 #include <fastgltf/core.hpp>
@@ -11,6 +12,58 @@
 #include <variant>
 
 namespace kzn {
+
+[[nodiscard]]
+static inline TextureData load_image(fastgltf::Asset& gltf_asset, std::size_t image_idx) {
+    std::vector<std::byte> bytes;
+
+    fastgltf::Image* image_ptr = &gltf_asset.images[image_idx];
+
+    if (std::holds_alternative<fastgltf::sources::URI>(image_ptr->data)) {
+        const auto& uri = std::get<fastgltf::sources::URI>(image_ptr->data);
+
+        std::ifstream file{uri.uri.c_str(), std::ios::binary};
+        if(file) {
+            file.seekg(0, std::ios::end);
+            const auto size = static_cast<std::size_t>(file.tellg());
+            file.seekg(0, std::ios::beg);
+
+            bytes.resize(size);
+            file.read(reinterpret_cast<char*>(bytes.data()), size);
+        }
+    }
+    else if(std::holds_alternative<fastgltf::sources::Vector>(image_ptr->data)) {
+        bytes = std::get<fastgltf::sources::Vector>(image_ptr->data).bytes;
+    }
+    else if (std::holds_alternative<fastgltf::sources::BufferView>(image_ptr->data)) {
+        const auto& view = std::get<fastgltf::sources::BufferView>(image_ptr->data);
+        const auto& buffer_view = gltf_asset.bufferViews[view.bufferViewIndex];
+        const auto& buffer = gltf_asset.buffers[buffer_view.bufferIndex];
+
+        const auto& data = std::get<fastgltf::sources::Array>(buffer.data);
+        bytes = std::vector<std::byte>(
+            data.bytes.begin() + buffer_view.byteOffset,
+            data.bytes.begin() + buffer_view.byteOffset + buffer_view.byteLength
+        );
+    }
+
+    // Decode image format
+    int width;
+    int height;
+    int channels;
+    unsigned char* result_ptr = stbi_load_from_memory(
+        reinterpret_cast<const stbi_uc*>(bytes.data()),
+        static_cast<int>(bytes.size()),
+        &width, &height, &channels,
+        STBI_rgb_alpha
+    );
+
+    if (result_ptr == nullptr) {
+        throw LoadingError{stbi_failure_reason()};
+    }
+
+    return TextureData(result_ptr, Vec3u{width, height, 1});
+}
 
 std::shared_ptr<Scene3DData> Scene3DData::load(const std::filesystem::path& path) {
     auto& path_str = path.native();
@@ -46,7 +99,6 @@ std::shared_ptr<Scene3DData> Scene3DData::load(const std::filesystem::path& path
         fastgltf::Mesh& gltf_mesh = gltf_asset.meshes[i];
         auto& vertices = scene3d_ptr->meshes[i].vertices;
         auto& indices = scene3d_ptr->meshes[i].indices;
-        auto& albedo = scene3d_ptr->meshes[i].albedo_opt;
 
         for(auto& primitive : gltf_mesh.primitives) {
             
@@ -110,67 +162,49 @@ std::shared_ptr<Scene3DData> Scene3DData::load(const std::filesystem::path& path
             // Load primitive material data
             ///////////////////////////////////////////////////////////////////
             
-            
             if (primitive.materialIndex.has_value()) {
                 const auto& material = gltf_asset.materials[*primitive.materialIndex];
+
+                scene3d_ptr->meshes[i].material_opt = MaterialData{};
+                auto& material_data = *scene3d_ptr->meshes[i].material_opt;
+                
+                // Load albedo image
                 if(material.pbrData.baseColorTexture.has_value()) {
-                    const auto& tex = gltf_asset.textures[
+                    const auto& texture = gltf_asset.textures[
                         material.pbrData.baseColorTexture->textureIndex
                     ];
-                    if (tex.imageIndex.has_value()) {
-                        std::vector<std::byte> bytes;
+                    if (texture.imageIndex.has_value()) {
+                        material_data.albedo_opt = load_image(gltf_asset, texture.imageIndex.value());
+                    }
+                }
 
-                        fastgltf::Image* albedo_image_ptr = &gltf_asset.images[*tex.imageIndex];
+                // Load normal map image
+                if(material.normalTexture.has_value()) {
+                    const auto& texture = gltf_asset.textures[
+                        material.normalTexture->textureIndex
+                    ];
+                    if (texture.imageIndex.has_value()) {
+                        material_data.normal_opt = load_image(gltf_asset, texture.imageIndex.value());
+                    }
+                }
 
-                        if (std::holds_alternative<fastgltf::sources::URI>(albedo_image_ptr->data)) {
-                            const auto& uri = std::get<fastgltf::sources::URI>(albedo_image_ptr->data);
+                // Load metallic roughness image
+                if(material.pbrData.metallicRoughnessTexture.has_value()) {
+                    const auto& texture = gltf_asset.textures[
+                        material.pbrData.metallicRoughnessTexture->textureIndex
+                    ];
+                    if (texture.imageIndex.has_value()) {
+                        material_data.metallic_roughness_opt = load_image(gltf_asset, texture.imageIndex.value());
+                    }
+                }
 
-                            // TODO: Better error handling 
-                            std::ifstream file{uri.uri.c_str(), std::ios::binary};
-                            // bytes = std::vector<std::byte>(
-                            //     std::istreambuf_iterator<char>(file),
-                            //     {}
-                            // );
-                        }
-                        else if(std::holds_alternative<fastgltf::sources::Vector>(albedo_image_ptr->data)) {
-                            bytes = std::get<fastgltf::sources::Vector>(albedo_image_ptr->data).bytes;
-                        }
-                        else if (std::holds_alternative<fastgltf::sources::BufferView>(albedo_image_ptr->data)) {
-                            const auto& view = std::get<fastgltf::sources::BufferView>(albedo_image_ptr->data);
-                            const auto& buffer_view = gltf_asset.bufferViews[view.bufferViewIndex];
-                            const auto& buffer = gltf_asset.buffers[buffer_view.bufferIndex];
-
-                            const auto& data = std::get<fastgltf::sources::Array>(buffer.data);
-                            bytes = std::vector<std::byte>(
-                                data.bytes.begin() + buffer_view.byteOffset,
-                                data.bytes.begin() + buffer_view.byteOffset + buffer_view.byteLength
-                            );
-                        }
-
-                        // Decode image format
-                        int width;
-                        int height;
-                        int channels;
-                        unsigned char* result_ptr = stbi_load_from_memory(
-                            reinterpret_cast<const stbi_uc*>(bytes.data()),
-                            static_cast<int>(bytes.size()),
-                            &width, &height, &channels,
-                            STBI_rgb_alpha
-                        );
-
-                        if (result_ptr == nullptr) {
-                            throw LoadingError{stbi_failure_reason()};
-                        }
-
-                        albedo = TextureData{};
-                        albedo->bytes = result_ptr;
-                        albedo->extent = Vec3u{width, height, 1};
-                        // Log::debug(
-                        //     "Loaded albedo texture ({}, {}, {})",
-                        //     albedo->extent.x,
-                        //     albedo->extent.y,
-                        //     albedo->extent.z
-                        // );
+                // Load occlusion map image
+                if(material.occlusionTexture.has_value()) {
+                    const auto& texture = gltf_asset.textures[
+                        material.occlusionTexture->textureIndex
+                    ];
+                    if (texture.imageIndex.has_value()) {
+                        material_data.occlusion_opt = load_image(gltf_asset, texture.imageIndex.value());
                     }
                 }
             }

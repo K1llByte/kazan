@@ -1,15 +1,18 @@
 
 # Todo
 
+- [ ] Insert all primitives data into same vertices and index buffers
 - [ ] Brainstorm a way to instantiate a Scene3DData into a Scene (create corresponding components and hierarchy)
+- [ ] from TextureData to ImageData
 - [ ] Phong lightning model
 - [ ] Blin-Phong lightning model
 - [ ] Fix is_uniform_block
 - [ ] Gltf loader
-    - Load mesh 
-    - Load primitives/submeshes
-    - Load materials
+    - Load images
     - Load textures
+    - Load materials (properties and textures)
+    - Load primitives/submeshes
+    - Load all meshes 
 - [ ] PBR Cook-Torrence BRDF model
 - [ ] Move all renderer resources to the Renderer ownership.
     - Components should have only references/ids to those resources and render system/renderer is responsible for actual managing lifetime

@@ -37,8 +37,8 @@ public:
         : m_renderer_ptr{&renderer}
         , m_pipeline{
             vk::PipelineBuilder(render_pass)
-                .set_vertex_stage(load_shader("shaders://geom.vert.spv"))
-                .set_fragment_stage(load_shader("shaders://geom.frag.spv"))
+                .set_vertex_stage(load_shader("shaders://pbr/pbr.vert.spv"))
+                .set_fragment_stage(load_shader("shaders://pbr/pbr.frag.spv"))
                 .set_vertex_input<Vec3,Vec3,Vec2,Vec3>()
                 .set_topology(VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST)
                 .set_cull_mode(VK_CULL_MODE_BACK_BIT)

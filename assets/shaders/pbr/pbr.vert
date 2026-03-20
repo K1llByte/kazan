@@ -27,7 +27,7 @@ void main() {
     const vec4 world_position = transform.matrix * vec4(in_position, 1.0);
     gl_Position = camera.proj_view * world_position;
     out_world_position = world_position.xyz;
-    out_color = in_color;
-    out_uv = in_uv;
     out_normal = in_normal;
+    out_uv = in_uv;
+    out_color = in_color;
 }

@@ -8,7 +8,9 @@
 namespace kzn {
 
 TextureData::~TextureData() {
-    stbi_image_free(bytes);
+    if(bytes != nullptr) {
+        stbi_image_free(bytes);
+    }
 }
 
 std::shared_ptr<TextureData> TextureData::load(const std::filesystem::path& path) {

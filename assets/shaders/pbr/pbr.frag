@@ -33,6 +33,9 @@ layout(set = 1, binding = 0) uniform Lights {
 } lights;
 
 layout(set = 2, binding = 0) uniform sampler2D albedo;
+layout(set = 2, binding = 1) uniform sampler2D normal;
+layout(set = 2, binding = 2) uniform sampler2D metallic_roughness;
+layout(set = 2, binding = 3) uniform sampler2D occlusion;
 
 #ifdef USE_BRANCHLESS_COMPUTE_LIGHT
 
@@ -118,7 +121,11 @@ void main() {
         light_color += compute_light(lights.data[i], in_world_position, in_normal);
     }
 #endif
-    out_color = vec4(light_color * texture(albedo, in_uv).xyz, 1.0);
+    vec3 albedo_color = texture(albedo, in_uv).xyz;
+    vec3 metallic_roughness_color = texture(metallic_roughness, in_uv).xyz;
+    vec3 occlusion_color = texture(occlusion, in_uv).xyz;
+    // out_color = vec4(light_color * (occlusion_color + albedo_color) , 1.0);
+    out_color = vec4(vec3(metallic_roughness_color.b), 1.0);
 }
 
 // float ndf_trowbridge_reitz_ggx(vec3 n, vec3 h, float a) {
@@ -137,6 +144,6 @@ void main() {
 //     return g_schlick_ggx(n, v, k) * g_schlick_ggx(n, l, k);
 // }
 
-// vec3 g_fresnel_schlick(vec3 h, vec3 v, vec3 f0) {
+// vec3 f_fresnel_schlick(vec3 h, vec3 v, vec3 f0) {
 //     return f0 + (1.0 - f0) * pow(1.0 - max(dot(h, v), 0.0), 5.0);
 // }

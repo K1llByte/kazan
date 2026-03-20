@@ -10,11 +10,12 @@
 #include "vk/dset_layout.hpp"
 #include "vk/image.hpp"
 
+#include <vulkan/vulkan_core.h>
+
 #include <filesystem>
 #include <memory>
 #include <optional>
 #include <vector>
-#include <vulkan/vulkan_core.h>
 
 namespace kzn {
 
@@ -28,7 +29,7 @@ struct Vertex3D {
 struct MeshData {
     std::vector<Vertex3D> vertices;
     std::vector<std::uint32_t> indices;
-    std::optional<TextureData> albedo_opt;
+    std::optional<MaterialData> material_opt;
     // TODO: VertexLayout layout;
 
     [[nodiscard]]

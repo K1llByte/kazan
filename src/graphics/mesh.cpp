@@ -17,20 +17,34 @@ MeshComponent::MeshComponent(vk::Device &device, const MeshData& mesh_data)
     : m_mesh(device, mesh_data)
     , m_material_opt{
         [&mesh_data, &device]() -> std::optional<Material3D> {
-            if(mesh_data.albedo_opt.has_value()) {
+            if(mesh_data.material_opt.has_value()) {
                 return Material3D{
                     .albedo_image = vk::Image(
                         device,
-                        VkExtent3D{
-                            mesh_data.albedo_opt->extent.x,
-                            mesh_data.albedo_opt->extent.y,
-                            mesh_data.albedo_opt->extent.z,
-                        }
+                        mesh_data.material_opt->albedo_opt->vk_extent()
+                    ),
+                    .normal_image = vk::Image(
+                        device,
+                        mesh_data.material_opt->normal_opt->vk_extent(),
+                        VK_FORMAT_R8G8B8A8_UNORM
+                    ),
+                    .metallic_roughness_image = vk::Image(
+                        device,
+                        mesh_data.material_opt->metallic_roughness_opt->vk_extent(),
+                        VK_FORMAT_R8G8B8A8_UNORM
+                    ),
+                    .occlusion_image = vk::Image(
+                        device,
+                        mesh_data.material_opt->occlusion_opt->vk_extent(),
+                        VK_FORMAT_R8G8B8A8_UNORM
                     ),
                     .dset = vk::DescriptorSet(
                         device.dset_allocator().allocate(
                             device.dset_layout_cache().layout({
                                 vk::sampler_binding(0),
+                                vk::sampler_binding(1),
+                                vk::sampler_binding(2),
+                                vk::sampler_binding(3),
                             })
                         )
                     ),
@@ -43,8 +57,16 @@ MeshComponent::MeshComponent(vk::Device &device, const MeshData& mesh_data)
     }
 {
     if(m_material_opt.has_value()) {
-        m_material_opt->albedo_image.upload(mesh_data.albedo_opt->bytes);
-        m_material_opt->dset.update({m_material_opt->albedo_image.info()});
+        m_material_opt->albedo_image.upload(mesh_data.material_opt->albedo_opt->bytes);
+        m_material_opt->normal_image.upload(mesh_data.material_opt->normal_opt->bytes);
+        m_material_opt->metallic_roughness_image.upload(mesh_data.material_opt->metallic_roughness_opt->bytes);
+        m_material_opt->occlusion_image.upload(mesh_data.material_opt->occlusion_opt->bytes);
+        m_material_opt->dset.update({
+            m_material_opt->albedo_image.info(),
+            m_material_opt->normal_image.info(),
+            m_material_opt->metallic_roughness_image.info(),
+            m_material_opt->occlusion_image.info(),
+        });
     }
 }
 

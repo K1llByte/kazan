@@ -60,7 +60,7 @@ struct TestApp : public BasicApp {
         auto create_spot_light = [this](Vec3 direction, Vec3 color) {
             constexpr Vec3 light_color = Vec3{0.8,0.2,0.2};
             constexpr float intensity = 0.5f;
-            
+
             auto entity = m_scene.registry.create();
             entity.emplace<LightComponent>(
                 spot_light(
@@ -82,12 +82,10 @@ struct TestApp : public BasicApp {
 
         create_mesh("models://damaged_helmet.glb", Vec3{1.5f, 0.f, 0.f});
         create_mesh("models://damaged_helmet.glb", Vec3{-1.5f, 0.f, 0.f});
-        create_mesh("models://damaged_helmet.glb", Vec3{0.f, 0.f, 1.5f});
         create_mesh("models://damaged_helmet.glb", Vec3{0.f, 0.f, -1.5f});
 
         create_spot_light(Vec3{1,0,0}, Vec3{1});
         create_spot_light(Vec3{-1,0,0}, Vec3{1});
-        create_spot_light(Vec3{0,0,1}, Vec3{1});
         create_spot_light(Vec3{0,0,-1}, Vec3{1});
     }
 
